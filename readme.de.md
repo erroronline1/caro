@@ -9,7 +9,6 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Was es nicht ist](#was-es-nicht-ist)
     * [Extras](#extras)
     * [Datenintegrität](#datenintegrität)
-    * [Tips](#tips)
 * [Module](#module)
     * [Anwendung](#anwendung)
         * [Nutzer](#nutzer)
@@ -50,6 +49,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Markdown](#markdown)
     * [CSV Prozessor](#csv-prozessor)
     * [ERP Anbindung](#erp-anbindung)
+* [Tips](#tips)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
 * [Voraussetzungen](#voraussetzungen)
     * [Installation](#installation)
@@ -131,15 +131,6 @@ Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nu
 Dokumente können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nur um eine einfache elektronische Signatur (EES) gemäß eIDAS handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
 
 Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftliche oder gestempelte Datumsangaben auf Papierdokumenten kann jedoch aktuell nicht erkannt werden.
-
-[Übersicht](#übersicht)
-
-## Tips
-* Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
-* Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden. Sofern im Import-Filter abgefragt, wird basierend auf der letzten Bestellung im ERP-System eine Produkteinführung initiiert.
-* Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Prozessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
-
-![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -341,7 +332,7 @@ Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, k
 [Übersicht](#übersicht)
 
 ### Whiteboard
-Kurzzeitige Informationen, Kurznotizen und alles, was sonst auf Haftnotizen oder Schmierzettel geschrieben wird kann in eigenen Whiteboards festgehalten werden. Die Übersicht zeigt alle Whiteboards des erstellenden Nutzers and und diejenigen, deren gewählten Bereiche übereinstimmen. Die Bearbeitung ist allen Nutzern erlaubt, Namensänderungen und die Löschung jedoch nur dem erstellenden Nutzer und Administratoren. Der nutzername und das Änderungsdatum werden automatisch angehängt.  
+Kurzzeitige Informationen, Kurznotizen und alles, was sonst auf Haftnotizen oder Schmierzettel geschrieben wird kann in eigenen Whiteboards festgehalten werden. Die Übersicht zeigt alle Whiteboards des erstellenden Nutzers and und diejenigen, deren gewählten Bereiche übereinstimmen. Die Bearbeitung ist allen Nutzern erlaubt, Namensänderungen, Anpassung der Sichtbarkeit für Bereiche und die Löschung jedoch nur dem erstellenden Nutzer und Administratoren. Der Nutzername und das Änderungsdatum werden automatisch angehängt.  
 Whiteboards werden bei der Löschung eines Nutzers nicht entfernt, da sie für andere kurzfristig relevante Daten enthalten können. Eine Löschung ist dann nur durch Administratoren möglich.
 
 [Übersicht](#übersicht)
@@ -1098,7 +1089,7 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden. Verfügbare Optionen sind alphabetisch sortiert.
 * Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systemen bekannt ist.
-* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder "Klettband", "blau" oder "20mm" als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".  
+* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder *Klettband*, *blau* oder *20mm* als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".  
 Die Suche kann weiterhin nach Datenbankenspalten eingegrenzt werden indem einem Suchbegriff der Spaltenname mit : vorangestellt wird. -, ?, * und "" sind auch hier für den Suchbegriff nutzbar. Ergebnisse ohne den Spaltennamen werden herausgefiltert. Mögliche Spaltennamen sind:
     * für die Artikelsuche z.B.: vendor_name, article_name, article_no, article_alias
     * für die Risikosuche z.B.: cause, effect, measure, risk_benefit, measure_remainder
@@ -1574,6 +1565,17 @@ Das Standardmodul beinhaltet verfügbare Optionen zur Dateneinsicht in die ERP-S
 
 [Übersicht](#übersicht)
 
+# Tips
+* Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
+* Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden. Sofern im Import-Filter abgefragt, wird basierend auf der letzten Bestellung im ERP-System eine Produkteinführung initiiert. Es kann auch die [programmiertechnische Option](#installation-1) gewählt werden.
+* Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Prozessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
+* Kennzeichen-Aufkleber können für Arbeitslisten genutzt werden. Die Bestrebung Bäume zu retten kann für manche Aufgaben nur eingeschränkt umsetzbar sein. Ein Blatt Papier mit Kennzeichen für die Navigation zu Aufzeichnungen mit Kurznotizen kann die Barriere zur Nutzung der Anwendung reduzieren.
+* Barcodes oder QR-Codes an Lagerplätzen kann eine Nachbestellung beschleunigen.
+
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
+
+[Übersicht](#übersicht)
+
 # Vorgesehene regulatorische Zielsetzungen
 Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Dokumente erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Moduls](#regulatorische-auswertungen-und-zusammenfassungen) sichergestellt.
 
@@ -1585,7 +1587,7 @@ Anwendungsunterstützung Legende:
 | Regulatorische Anforderung | Anwendungs-unterstützung | Methode | Verweis |
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 Allgemeine Anforderungen an das Qualitäts-managementsystem | teilweise, strukturell | &bull; Die Erfüllung regulatorischer Anforderungen kann gegengeprüft werden, sofern Dokumenten die regulatorischen Zusammenhänge zugeordnet wurden.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Dokumente](#dokumente), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
-| ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
+| ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse für Medizinprodukte gemäß ISO 14971 um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben. Die entsprechende Eingabemaske dürfte auch geeignet sein um Risiken im Allgemeinen zu erfassen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
 | ISO 13485 4.1.3 Prozessüberwachung | teilweise, strukturell | &bull; Nutzerrollen und Schulungen<br/>&bull; Verantwortlichkeiten<br/>&bull; Verbesserungsvorschläge<br/>&bull; Aufzeichnungen<br/>&bull; Dokumentenlenkung<br/>&bull; Interne Audits<br/>&bull; Managementbewertung<br/>&bull; Beschaffung<br/>&bull; Lieferantenbewertung<br/>&bull; Checkliste über regulatorische Erfüllung<br/>&bull; Bestellstatistiken&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | [Nutzer](#nutzer), [Verantwortlichkeiten](#verantwortlichkeiten), [Verbesserungsvorschläge](#verbesserungsvorschläge), [Aufzeichnungen](#aufzeichnungen-1), [Dokumente](#dokumente), [Audit](#audit), [Managementbericht](#managementbericht), [Bestellung](#bestellung), [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) | 
 | ISO 13485 4.1.4 Prozesslenkung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.1.5 Ausgegliederte Prozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
@@ -1655,10 +1657,10 @@ Anwendungsunterstützung Legende:
 | ISO 13485 8.5.1 Verbesserung | teilweise, strukturell | &bull; Jeder registrierte Nutzer kann jederzeit Verbesserungsvorschläge unterbreiten.<br/>&bull; Die Mitarbeiterqualifikation wird laufend auf abgelaufene Zertifikate hin überwacht und sowohl an die Evaluierung, als auch an die Planung von Anschlussschulungen erinnert.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Verbesserungsvorschläge](#verbesserungsvorschläge), [Schulungen](#schulungen) |
 | ISO 13485 8.5.2 Korrekturmaßnahmen | teilweise, strukturell | &bull; Aufzeichnungen müssen von berechtigten Nutzern abgeschlossen werden. Jeder Vorgang kann zu diesem Zeitpunkt oder zuvor zu einer Reklamation umgewandelt werden. Reklamationen an eigenen Produkten bedürfen in der Standardkonfiguration der Anwendung eines Abschlusses durch eine verantwortliche Person und einen Qualitätsmanagementbeauftragten, so dass spätestens hier strukturelle Fehler aufgedeckt und adressiert werden können.<br/>&bull; Eine Übersicht über laufende Reklamationen kann von berechtigten Nutzern eingesehen werden.<br/>&bull; Festgelegte kritische Rücksendegründe für eingekaufte Waren leiten einen neuen Einführungsprozess ein, der in der Standardkonfiguration von qualitäts- und sicherheitsrelvanten Rollen abgeschlossen werden muss.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Vorkommnis"-Kontext* | [Aufzeichnungen](#aufzeichnungen-1), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen), [Bestellung](#bestellung) |
 | ISO 13485 8.5.3 Vorbeugungsmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Vorkommnis"-Kontext* | |
-| ISO 14971 4.5 Risikomanagementakte | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten, Maßnahmen und Restrisiken zu beschreiben .<br/>&bull; Beispiele von Ereignissen und Umständen gemäß Anhang C und den Empfehlungen der [DGIHV](https://www.dgihv.org) ist für die Nutzung standardmäßig verbereitet. <br/>&bull; Risiken können nicht gelöscht aber die Anwendbarkeit entzogen werden.<br/>&bull; Änderungen können nur von autorisierten Nutzern vorgenommen, aber von allen Nutzern eingesehen werden.<br/>&bull; Eigenschaften von Medizinprodukten und Risiken können in jeder verfügbaren Fassung exportiert werden. | [Risikomanagement](#risikomanagement), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
-| ISO 14971 5 Risikoanalyse | ja | &bull; Beispiele von Ereignissen und Umständen gemäß Anhang C und den Empfehlungen der [DGIHV](https://www.dgihv.org) ist für die Nutzung standardmäßig verbereitet. | [Risikomanagement](#risikomanagement), [Sprachdateien](#anpassung), [Beispieldateien](#anwendungseinrichtung) |
-| ISO 14971 6 Risikobewertung | ja | &bull; Die Anforderungen werden durch die Beispieldateien erfüllt. | [Risikomanagement](#risikomanagement), [Beispieldateien](#anwendungseinrichtung) |
-| ISO 14971 7 Riskobeherrschung | ja | &bull; Die Anforderungen werden durch die Beispieldateien erfüllt. | [Risikomanagement](#risikomanagement), [Beispieldateien](#anwendungseinrichtung) |
+| ISO 14971 4.5 Risikomanagementakte | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten, Maßnahmen und Restrisiken zu beschreiben .<br/>&bull; Beispiele von Ereignissen und Umständen gemäß Anhang C und den Empfehlungen der [DGIHV](https://www.dgihv.org) ist für die Nutzung standardmäßig vorbereitet. <br/>&bull; Risiken können nicht gelöscht aber die Anwendbarkeit entzogen werden.<br/>&bull; Änderungen können nur von autorisierten Nutzern vorgenommen, aber von allen Nutzern eingesehen werden.<br/>&bull; Eigenschaften von Medizinprodukten und Risiken können in jeder verfügbaren Fassung exportiert werden. | [Risikomanagement](#risikomanagement), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
+| ISO 14971 5 Risikoanalyse | ja | &bull; Beispiele von Ereignissen und Umständen gemäß Anhang C und den Empfehlungen der [DGIHV](https://www.dgihv.org) ist für die Nutzung standardmäßig vorbereitet. | [Risikomanagement](#risikomanagement), [Sprachdateien](#anpassung), [Beispieldateien](#anwendungseinrichtung) |
+| ISO 14971 6 Risikobewertung | ja | &bull; Die Anforderungen werden strukturell und durch die Beispieldateien erfüllt. | [Risikomanagement](#risikomanagement), [Beispieldateien](#anwendungseinrichtung) |
+| ISO 14971 7 Riskobeherrschung | ja | &bull; Die Anforderungen werden strukturell und durch die Beispieldateien erfüllt. | [Risikomanagement](#risikomanagement), [Beispieldateien](#anwendungseinrichtung) |
 | ISO 14971 7.6 Vollständigkeit der Risikobeherrschung | ja | &bull; Es können Probleme in Bezug auf Risiken ohne definierte Eigenschaften und anders herum angezeigt werden. | [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 19011 5.2 Festlegen der Auditprogrammziele | teilweise | &bull; Es kann ein Programm für interne Audits vorbereitet werden, welches auch die Auditziele und Zusammenfassungen vorausgegangener Audits beinhaltet. | [Audit](#audit) |
 | ISO 19011 5.4 Festlegen des Auditprogramms | teilweise | &bull; Es kann ein Programm für interne Audits vorbereitet werden, welches auch die Auditziele und Zusammenfassungen vorausgegangener Audits beinhaltet. | [Audit](#audit) |
@@ -1782,10 +1784,10 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 * Eine [Installation als Progressive Web App (PWA)](https://developer.mozilla.org/de/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_aus_dem_web) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 Nach der Installation können
-* [Risiken](#risikomanagement) durch das [Wartungs](#wartung)-Modul importiert werden; Volagen finden sich bei den Template-Dateien
+* [Risiken](#risikomanagement) durch das [Wartungs](#wartung)-Modul importiert werden; Vorlagen finden sich bei den Template-Dateien
 * Artikellisten der möglicherweise zuvor installierten Lieferanten importiert werden
-* die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung im Sonderfall erwogen werden 
-* die möglicherweise zuvor installierten Dokumente freigegeben werden
+* die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung oder Dokumentenfreigabe im Sonderfall erwogen werden, oder
+* die möglicherweise zuvor installierten Dokumente manuell freigegeben werden
 
 [Übersicht](#übersicht)
 
@@ -1923,7 +1925,6 @@ products_per_slide = 6
 announcements = "ceo, qmo, prrc" ; Anlegen, Ändern und Löschen von Ankündigungen
 appmanual = "qmo" ; Ergänzugen und Änderungen der Anleitung
 audit = "ceo, qmo" ; Vorbereiten und Durchführen von internen Audits
-auditsoperation = "ceo, qmo, prrc" ; Erlaubnis zum Export, dem Widerruf von Stichprobenprüfungen, dem Löschen von Bestellstatistiken, etc.
 calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach telefonischer Meldung
 calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
@@ -1935,7 +1936,7 @@ erpimport = "purchase, office" ; Bereitstellung von ERP Datenquellen, mehr dazu 
 erpcasedata = "user" ; Suche und Anzeige von ERP Vorgangsdaten sofern anwendbar
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
 files = "office, ceo, qmo" ; Dateien bereitstellen und Verwalten
-formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Dokumenten und ihrer Komponenten
+documentapproval = "ceo, qmo, prrc, supervisor" ; obige Warnung beachten - Freigabe von Dokumenten und ihrer Komponenten
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
 incorporation = "ceo, qmo, prrc, hazardous_materials" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
@@ -1949,8 +1950,8 @@ orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
 orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
-recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen, Kennzeichen ändern (z.B. bei versehentlicher doppelter Anlage)
 recordscasestate = "ceo, supervisor, office" ; Fall-Stände bearbeiten
+recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen, Kennzeichen ändern (z.B. bei versehentlicher doppelter Anlage)
 recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewollte Datenverbreitung einzuschränken
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 regulatory = "ceo, qmo, prrc, supervisor" ; Zugriff auf regulatorische Auswertungen und Zusammenfassungen
@@ -2041,7 +2042,16 @@ und sind für die Person welche die Anwendung einrichtet prinzipiell selbsterkl�
 ### Allgemein
 Diese Software wurde in bester Absicht entwickelt. Sie soll die Bearbeitung regulatorischer Anforderungen etwas weniger anstrengend machen. Das Nutzungsszenario ist jedoch auf die persönlichen Erfahrungen des [Teams](#das-team) in einem Medizinprodukte herstellenden Betrieb zugeschnitten, hoffentlich aber auch an jemandes anderen Grundbedürfnisse anpassbar.
 
-Das Leben, das medizinische Feld und regulatorische Anforderungen sind kompliziert, agil und unvorhersehbar. Hinter jeder Ecke verbirgt sich möglicherweise eine neue Anordnung. Daher versucht die CARO App ebenso agil zu sein um auch den nächsten Einfall der Auditorin schnell abbilden zu können. Dies kann kaum vollständig in eine einfach verständliche Nutzeroberfläche eingebunden werden. Die persönliche Erfahrung zeigt, dass weniger als ein Prozent der Beschäftigten reguläre Ausdrücke und die bloße Menge and Einstellungen, die eine solche Software zur Bewältigung der vorgesehenen Aufgaben benötigt, verstehen können. Daher wurde nach etlichen fruchtlosen Versuchen letztlich die Entscheidung getroffen diese Stellrädchen so zu belassen. Insbesondere die Datenverarbeitung unterschiedlichster Tabellen mit dem [CSV Prozessor](#csv-prozessor) und die Definition der [Laufzeitvariablen](#laufzeitvariablen) benötigen wahrscheinlich eine einigermaßen fortgeschrittene computerbegeisterte Person.
+Das Leben, das medizinische Feld und regulatorische Anforderungen sind kompliziert, agil und unvorhersehbar. Hinter jeder Ecke verbirgt sich möglicherweise eine neue Anordnung. Daher versucht die CARO App ebenso agil zu sein um auch den nächsten Einfall der Auditorin schnell abbilden zu können. Dies kann kaum vollständig in eine einfach verständliche Nutzeroberfläche eingebunden werden. Die persönliche Erfahrung zeigt, dass weniger als ein Prozent der Beschäftigten reguläre Ausdrücke und die bloße Menge and Einstellungen, die eine solche Software zur Bewältigung der vorgesehenen Aufgaben benötigt, verstehen können. Dennoch wurde nach etlichen fruchtlosen Versuchen letztlich die Entscheidung getroffen diese Stellrädchen so zu belassen.
+
+Es benötigt vermutlich eine einigermaßen fortgeschrittene computerbegeisterte Person für:
+* die Definition der [Laufzeitvariablen](#laufzeitvariablen) und andere [Anpassungen](#anpassung)
+* die Vorbereitung der Templates für eine beschleunigte Installation
+* die Einrichtung der Datenverarbeitung unterschiedlichster Tabellen mit dem [CSV Prozessor](#csv-prozessor) für den Import von Artikellisten oder anderen CSV-Filtern
+* die Einrichtung der [ERP-Anbindung](#erp-anbindung)
+* die Konfiguration von einmalig automatisierten Freigaben innerhalb des _stresstest-Werkzeugs (siehe englischsprachige Anleitung)
+
+Man kann sich auch die Hände beim Eintauchen in den Quelltext schmutzig machen, aber alle anderen Funktionen sollten direkt funktionieren.
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
@@ -2090,7 +2100,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 [Übersicht](#übersicht)
 
 ## Bekannte Schwachstellen
-* Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Safari in iOS kann bei langen Berühren zwar verschieben, dafür jedoch nicht das Kontextmenu öffnen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
+* Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Safari in iOS kann bei langen Berühren zwar verschieben, dafür jedoch nicht das Kontextmenu öffnen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen. iOS mit einem Magic-Keyboard funktioniert allerdings.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es gibt einige Einschränkungen und Unterschiede zu [regulärem](https://www.rfc-editor.org/rfc/rfc7763.html) bzw. [GitHub-flavoured](https://github.github.com/gfm/) Markdown sofern man damit vertraut ist:
@@ -2383,7 +2393,7 @@ Trotz meiner Bemühungen, die CARO App barrierefrei zu gestalten, bin ich mir ve
 Bekannte Einschränkungen auf der CARO App:
 * Farbkontrast-Verhältnisse erreichen standardmäßig nicht die gewünschte Grenze. Sie können ein hoffentlich adäquates Farbschema im Nutzerprofil wählen.
 * Manche horizontal scrollbare Bereiche haben keine direkte Tastaturerreichbarkeit. Der Desktopmodus stellt Bedienelemente für die Navigation zur Verfügung. Für Bildschirmleser sind diese verborgen. Horizontal scrollbare Bereiche reduzieren die visuelle Informationsfülle für zweitranginge aber zugehörige Informationen und werden daher als insgesamt vorteilhaft betrachtet, auch trotz möglicher Konflikte mit dem Informationsfluss-Kriterium.
-* Der Ablauf von Verbindungen kann durch administrative Nutzer auf das bis zu Dreifache des Standardlimits erhöht werden. Es kann jedoch auch durch die Serverkonfiguration limitiert sein. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber falls notwendig.
+* Der Ablauf von Verbindungen kann durch administrative Nutzer erhöht werden. Es kann jedoch auch durch die Serverkonfiguration limitiert sein. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber falls notwendig.
 * Langzeitplanungen werden durch die Einfärbung kleiner Bildschirmbereiche umgesetzt. Die Barrierefreiheit für diese spezielle Funktion kann aufgrund der Dimensionen und Kontraste beeinträchtigt sein. Für die Einfärbung kann neben der Legende keine zusätzliche Beschreibung zur Verfügung gestellt werden.
 
 [Übersicht](#übersicht)

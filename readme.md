@@ -27,15 +27,16 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
+* signature increase validity, preferably to advanced electronic signature
+    * storing payload/document-content hash and image data hash with image and embedded to it? ensuring data linked to signature or embed data directly into image somehow, metadata?
+    * recalculate hash from metadata to revalidate signature, auditable as open source
+    * identity is ensured because the signature takes place in person at the working site?
+    * the image is like handwritten and can be verified by comparison - it is not just a digital key or string?
 
 ## to do
 * unittests
 * templates
 * erp_interface, additional usecases?
-    * product import, look for medical device flag regarding trading good
-* consider search _shared.php
-    * describe advanced options *somewhere* within the application?
-* assemble swipe to toggle autocomplete for safari
 
 ## Content
 * [Aims](#aims)
@@ -44,7 +45,6 @@ Things are still in motion. Images may be outdated.
     * [What it is not](#what-it-is-not)
     * [Extras](#extras)
     * [Data integrity](#data-integrity)
-    * [Tips](#tips)
 * [Modules](#modules)
     * [Application](#application)
         * [Users](#users)
@@ -85,6 +85,7 @@ Things are still in motion. Images may be outdated.
     * [Markdown](#markdown)
     * [CSV processor](#csv-processor)
     * [ERP Interface](#erp-interface)
+* [Tips](#tips)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -224,15 +225,6 @@ An encoded user identifier is added to the payload of submitted form data, the s
 Documents can contain a digital signature pad. Please note due to lacking certification this is only a simple electronic signature (SES) according to eIDAS. You can define where this might be suitable enough for your processes.
 
 Timestamps are not qualified. A reduced validity than manual or stamped dates on paper documents is currently not discernible.
-
-[Content](#content)
-
-## Tips
-* Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
-* Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though. If contained within the import filters, a default incorporation based of most recent erp-order is initiated.
-* Include the flowcharts from this description in your process instructions to depict your processes where defined by the application.
-
-![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20en.png)
 
 [Content](#content)
 
@@ -430,8 +422,8 @@ To reduce pointless data and possible malignant spam, suggestions can be deleted
 [Content](#content)
 
 ### Whiteboard
-Volatile information, brief notes or anything that otherwise would go onto a sticky note or a piece of rough paper can be noted on a custom whiteboard. The overview shows all whiteboards that are created by the current user or matching selected organizational units. Contributing is allowed for all users, editing the name and deleting for the owning user and admin only. The user name and editing date is appended by default.  
-On deleting users whiteboards are not removed for possibly containing relevant information to others. Removal ist possible by users with administrator priviledges.
+Volatile information, brief notes or anything that otherwise would go onto a sticky note or a piece of rough paper can be noted on a custom whiteboard. The overview shows all whiteboards that are created by the current user or matching selected organizational units. Contributing is allowed for all users, editing the name, unit visibility and deleting for the owning user and admin only. The user name and editing date is appended by default.  
+On deleting users, whiteboards are not removed for possibly containing relevant information to others. Removal is then possible by users with administrator priviledges.
 
 [Content](#content)
 
@@ -1193,7 +1185,7 @@ Search functionality across the application may differ slightly depending of con
 
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext. Available options are sorted alphabetically.
 * File search allows wildcards as `*` for any amount of any characters or `?` as any character on the given position, as you know from any file search in other places.
-* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms. Please note, that results may contain any amount of optional matches. Looking for "Velcro blue 20mm" lists all products that contain either "velcro", "blue" or "20mm" as single or combined match. The same search with quotes does not match "blue 20mm velcro" though.  
+* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms. Please note, that results may contain any amount of optional matches. Looking for "Velcro blue 20mm" lists all products that contain either *velcro*, *blue* or *20mm* as single or combined match. The same search with quotes does not match "blue 20mm velcro" though.  
 The search can further be refined by database column names followed by : prior to the search term. -, ?, * and "" can be used for the term as well. results without the column name will be filtered out. Possible column names are:
     * for product search e.g.: vendor_name, article_name, article_no, article_alias
     * for risk search e.g.: cause, effect, measure, risk_benefit, measure_remainder
@@ -1647,7 +1639,7 @@ The CARO App stores orders for a relatively short time by default unless orders 
 If available and tidy the product database of the CARO App can be populated directly from the ERP data. This has the advantage of improved matching of products between the CARO App products and order data updates as well as most likely reducing the database size and speeding up any request.
 
 ### Custom database dumps
-Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
+Your custom ERP-interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
 ### Data source provision
 In case you have to rely on data dumps instead of direct database access, the interface parent class provides an example to define files, usecases and the intended name for processing within your custom methods. If this is provided a menu item will show up within the [Tools](#tools). Files are overwritten.
@@ -1670,6 +1662,17 @@ The default module contains available options for data retrieval from the [teams
 
 [Content](#content)
 
+# Tips
+* Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
+* Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though. If contained within the import filters, a default incorporation based of most recent erp-order is initiated. You can as well consider the [programming option](#installation-procedure).
+* Include the flowcharts from this description in your process instructions to depict your processes where defined by the application.
+* Use identifier labels for worklists. The attempt on saving trees may be limited for some tasks. A sheet of paper with labels to access records and maybe some volatile notes can enhance the accessability and use of the application.
+* Use barcodes or qr-codes in your storages to speed up reorders.
+
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20en.png)
+
+[Content](#content)
+
 # Intended regulatory goals
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
@@ -1681,7 +1684,7 @@ Application support legend:
 | Regulatory requirement | Application support | Method | Reference |
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified, given documents are assigned proper regulatory contexts.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)|
-| ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Risk management](#risk-management) |
+| ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks for medical devices according to ISO 14971. The respective forms are likely suitable to handle risks in general.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Risk management](#risk-management) |
 | ISO 13485 4.1.3 Process monitoring | partial, structural | &bull; User roles and trainings<br/>&bull; Responsibilities<br/>&bull; Improvement Suggestions<br/>&bull; Records<br/>&bull; Document distribution<br/>&bull; Internal audits<br/>&bull; Management reviews<br/>&bull; Procurement<br/>&bull; Vendor evaluation<br/>&bull; Regulatory fulfilment checklist<br/>&bull; Order statistics<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | [Users](#users), [Responsibilities](#responsibilities), [Improvement suggestions](#improvement-suggestions), [Records](#records-1), [Documents](#documents), [Audit](#audit), [Management review](#management-review), [Order](#order), [Vendor and product management](#vendor-and-product-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 4.1.4 Process control | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 4.1.5 Process outsourcing | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
@@ -1880,8 +1883,8 @@ If you are going to prepare the deployment you are free to create multiple files
 After installation you can
 * import [risks](#risk-management) through the [maintenance](#maintenance)-module; presets are found within the template files
 * import product lists for the possibly previously installed vendors
-* consider incorporation handling through the [_stresstest](#stress-test-and-performance)-tool
-* approve possibly previously installed documents
+* consider incorporation and document approval handling through the [_stresstest](#stress-test-and-performance)-tool or
+* approve possibly previously installed documents manually
 
 [Content](#content)
 
@@ -2030,7 +2033,7 @@ erpimport = "purchase, office" ; provide erp data sources, more details within _
 erpcasedata = "user" ; search and display erp case data if applicable
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 files = "office, ceo, qmo" ; upload and delete files
-documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
+documentapproval = "ceo, qmo, prrc, supervisor" ; SEE WARNING ABOVE - approve documents and components
 documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc, hazardous_materials" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
@@ -2136,7 +2139,16 @@ but pretty much self explanatory for the person setting up the application.
 ### General
 This software has been developed with good intent. It is supposed to make managing regulatory requirements a little less exhausting. However the usecase is tailored to the [teams](#the-team) personal experiences working in a medical aid providing facility, hopefully scalable to your basic demands.
 
-Life, the medical field and regulatory requirements are complicated, agile and unpredictable. A new directive may be lurking around every corner. So the CARO App tries to be agile as well to quickly match the auditors next idea. This can (possibly due to the teams incapacity) hardly be implemented completely within an easy comprehensible user interface. By personal experience less than 1 percent of staff can comprehend regular expressions and the sheer amount of settings this kind of software requires to handle the intended tasks. Therefore after some fruitless attempts finally the decision has been made to leave these dials as they are. Especially dataprocessing of inhomogenuous tables with the [CSV Processor](#csv-processor) and defining [runtime variables](#runtime-variables) may need a somewhat advanced computer enthusiast to set up.
+Life, the medical field and regulatory requirements are complicated, agile and unpredictable. A new directive may be lurking around every corner. So the CARO App tries to be agile as well to quickly match the auditors next idea. This can (possibly due to the teams incapacity) hardly be implemented completely within an easy comprehensible user interface. By personal experience less than 1 percent of staff can comprehend regular expressions and the sheer amount of settings this kind of software requires to handle the intended tasks. Nevertheless the decision finally has been made to leave these dials as they are after some fruitless attempts.
+
+There may be the need for a somewhat advanced computer enthusiast for:
+* defining [runtime variables](#runtime-variables) and other [customizations](#customisation)
+* preparing templates for a sped up installation procedure
+* settings up dataprocessing of inhomogenuous tables with the [CSV Processor](#csv-processor) for product list imports and other csv-filters
+* setting up the [ERP interface](#erp-interface)
+* setting up one-time automated approvals within the [_stresstest](#stress-test-and-performance)
+
+You can try to get your hands dirty on diving into the sourcecode as well, most of the other functions should work out of the box though.
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
@@ -2184,7 +2196,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 [Content](#content)
 
 ## Known deficiencies
-* Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer.
+* Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer. iOS with a Magic-Keyboard works though.
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
@@ -2632,7 +2644,7 @@ Stakeholder identification:
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
 
-A solution could be established due to an erp database connection thus implementing an erp interface into the application.
+A solution could be established due to an erp database connection thus implementing an ERP interface into the application.
 
 #### Usability tests
 | Goals | Stakeholder | Time | Outcome |
@@ -2737,7 +2749,7 @@ Despite my best efforts to ensure the accessibility of the CARO App, I am aware 
 Known limitations for the CARO App:
 * Color contrast ratios are not meeting desired thresholds by default. You are able to select a hopefully adequate theme within your user profile.
 * Some horizontal scrollable regions lack direct keyboard access. Desktop mode does provide buttons to navigate these regions. Navigation buttons are hidden for screen readers. Horizontal scrollable regions reduce visual information load for secondary, yet related information, and are therefore considered beneficial in general, even while possibly conflicting reflow criterion.
-* Connection timeout can be prolonged to three times the default setting by administrative users. However this may be still limited by the server settings. Please discuss this [general adjustable setting](#server-setup) with your operator if necessary.
+* Connection timeout can be prolonged by administrative users. However this may be still limited by the server settings. Please discuss this [general adjustable setting](#server-setup) with your operator if necessary.
 * Longterm planning happens with colourizing small areas on the screen. Accessibility my be reduced for this particular function due to dimensions and contrast. Beside the legend no additional description can be provided for colourisation.
 
 [Content](#content)
@@ -2777,6 +2789,12 @@ Using these methods is mandatory. (./api/_utility.php) Deviations are allowed on
 * *groups* not having access to recording
 * *patients* having access to permitted documents and their profile settings only
 
+There are MARKDOWN and SEARCH classes for
+* parsing Markdown to HTML
+* handling search expressions and filters
+
+Using these methods (./api/_utility.php) is strongly advised for consistency.
+
 There is an SQLQUERY class handling
 * database connections
 * query preparation
@@ -2789,6 +2807,7 @@ Helper modules start with _, only endpoints do not. Helper modules are supposed 
 
 _shared.php is an exception with a
 * SEARCHHANDLER class handling inter-module used search and filter operations
+* ORDERSTATISTICS class handling inter-module used database entries for order statistics
 * DOCUMENTHANDLER class handling inter-module used document and record handling
 
 for having application-specific patterns embedded.
@@ -2800,6 +2819,8 @@ All requests have to be executed through the api ensuring
 Application endpoint differs for availability of language settings being able to be returned as default. (./api/api.php and registered files)
 
 Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (possible sensitive data).
+
+Noteable: [ERP interface](#erp-interface)
 
 [Content](#content)
 
@@ -2831,7 +2852,8 @@ Not all functions can be unittested, as this application is mostly a skeleton fo
 
 Same applies to vendors. Vendor-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
 
-One special usecase may be the auto-approval incorporations on migration from another quality management system. If you agree within the administration on the terms, you can set up the approvals that will override all currently pending incorporations. This step should be well thought out, documented and only being used once after initial migration and imports of product lists through the [erp interface](#erp-interface), assuming previous known products have been incorporated already. 
+One special usecase may be the auto-approval incorporations on migration from another quality management system. If you agree within the administration on terms, you can set up the approvals that will override all currently pending incorporations. This step should be well thought out, documented and only being used once after initial migration and imports of product lists through the [ERP interface](#erp-interface), assuming previous known products have been incorporated already.
+This is possible for document approval too and could also be used wisely on subsequently added roles for approval, to reduce the workload. Again, this should be well documented.
 
 Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode. To run any method you have to be signed into CARO with administrator priviledges.
 
@@ -3960,7 +3982,7 @@ Sample response
 
 > POST ./api/api.php/erpquery/csvdump/{id}
 
-Returns a CSV file for successful erp interface requests.
+Returns a CSV file for successful ERP interface requests.
 
 Parameters
 | Name | Data Type | Required | Description |
