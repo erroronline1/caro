@@ -657,6 +657,7 @@ class TOOL extends API {
 				}
 				break;
 			default: // quick reference and editor
+				$preview = new MARKDOWN();
 				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
 				$response = ['render' => [
 					'content' => [
@@ -666,7 +667,7 @@ class TOOL extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
 								],
-								'content' => $this->_lang->GET('tool.markdown.quick_reference')
+								'htmlcontent' => $preview->md2html($this->_lang->GET('tool.markdown.quick_reference'))
 							], [
 								'type' => 'textarea',
 								'attributes' => [
@@ -686,7 +687,6 @@ class TOOL extends API {
 					]
 				]];
 				if ($markdown) {
-					$preview = new MARKDOWN();
 					$response['render']['content'][] = [
 						[
 							'type' => 'textsection',
