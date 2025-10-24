@@ -9,17 +9,16 @@
  */
 
 :root {
-	--background: #2e3440;
-	--foreground: #e5e9f0;
-	--inputborder: #d8dee9;
-	--disabled: #acb1ba;
-	--article: rgba(67, 76, 94, 1);
-	--article_transparent: rgba(67, 76, 94, 0);
+	--background: rgb(46, 52, 64); /*#2e3440*/
+	--foreground: rgb(229, 233, 240); /*#e5e9f0*/
+	--inputborder: rgb(216, 222, 233); /*#d8dee9*/
+	--disabled: rgb(172, 177, 186); /*#acb1ba*/
+	--article: rgb(67, 76, 94);
 	--3d-border: rgba(67, 76, 94, 0);
-	--lightshadow: rgba(255, 255, 255, 0.1);
-	--lightershadow: rgba(255, 255, 255, 0.5);
+	--lightshadow: rgba(229, 233, 240, 0.1);
+	--lightershadow: rgba(229, 233, 240, 0.5);
 	--darkshadow: rgba(0, 0, 0, 0.4);
-	--notsodarkshadow: rgba(255, 255, 255, 0.1);
+	--notsodarkshadow: rgba(229, 233, 240, 0.1);
 	--frostgreen: rgb(143, 188, 187);
 	--red: rgb(191, 97, 106);
 	--reddish: rgba(191, 97, 106, 0.3);
@@ -32,7 +31,7 @@
 	--cta_darker: rgb(80, 155, 176);
 	--cta_active: rgb(161, 227, 246);
 	--shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
-	--notif: #e5e9f0;
+	--notif: rgb(229, 233, 240);
 	--menu: rgba(46, 52, 64, 0.9);
 }
 

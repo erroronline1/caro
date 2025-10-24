@@ -9,17 +9,16 @@
  */
 
 :root {
-	--background: #d8dee9;
+	--background: rgb(216, 222, 233);
 	--foreground: rgb(46, 52, 64);
 	--inputborder: #434c5e;
 	--disabled: rgb(92, 97, 109);
 	--article: rgba(236, 239, 244, 1);
-	--article_transparent: rgba(236, 239, 244, 0);
-	--3d-border: rgba(255, 255, 255, 0.3);
-	--lightshadow: rgba(255, 255, 255, 0.9);
-	--lightershadow: rgba(255, 255, 255, 0.5);
-	--darkshadow: rgba(76, 86, 106, 0.3);
-	--notsodarkshadow: rgba(76, 86, 106, 0.15);
+	--3d-border: rgba(229, 233, 240, 0.3);
+	--lightshadow: rgba(229, 233, 240, 0.9);
+	--lightershadow: rgba(229, 233, 240, 0.5);
+	--darkshadow: rgba(46, 52, 64, 0.3);
+	--notsodarkshadow: rgba(46, 52, 64, 0.15);
 	--frostgreen: rgb(143, 188, 187);
 	--red: rgb(191, 97, 106);
 	--reddish: rgba(191, 97, 106, 0.3);
@@ -31,8 +30,8 @@
 	--evenDiscreetButton: rgba(136, 192, 208, 0.2);
 	--cta_darker: rgb(80, 155, 176);
 	--cta_active: rgb(161, 227, 246);
-	--shadow: 2px 2px 6px rgba(76, 86, 106, 0.3);
-	--notif: #e5e9f0;
+	--shadow: 2px 2px 6px rgba(46, 52, 64, 0.3);
+	--notif: rgb(229, 233, 240);
 	--menu: rgba(255, 255, 255, 0.9);
 }
 
