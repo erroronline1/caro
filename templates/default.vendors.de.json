@@ -1983,6 +1983,29 @@
 		}
 	},
 	{
+		"name": "Evomotion GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Wallstraße 3, 21335 Lüneburg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Feet Control GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -2607,6 +2630,29 @@
 		}
 	},
 	{
+		"name": "Heinrich Kipp Werk KG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Heubergstraße 2, 72172 Sulz-Holzhausen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Ihle Strumpf GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -2754,13 +2800,13 @@
 		}
 	},
 	{
-		"name": "Heinrich Kipp Werk KG",
+		"name": "KDK GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
-			"address": "Heubergstraße 2, 72172 Sulz-Holzhausen",
+			"address": "In den Ziegelwiesen 25, 69168 Wiesloch",
 			"sales_representative": "",
 			"customer_id": ""
 		},
@@ -2821,7 +2867,7 @@
 		}
 	},
 	{
-		"name": "Lohmann& Rauscher GmbH & Co. KG",
+		"name": "Lohmann & Rauscher GmbH & Co. KG",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
