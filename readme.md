@@ -199,7 +199,7 @@ For technical details see [prerequisites](#prerequisites).
 ## What it is not
 Beside some architectural decisions to fit regulatory requirements the app is not a fully preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if your're lucky you can import tidy data trough the [ERP Interface](#erp-interface).
+The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if you're lucky you can import tidy data through the [ERP Interface](#erp-interface).
 
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
@@ -465,10 +465,10 @@ Available elements for components or rather documents are:
 * document link, just for display or to continue transferring identifier
 * horizontal line for document structure
 
-Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation. In theory this allows for the creation of documents with more detailed properties but these will not be able to be fully edited the standard way.
+Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*administration*-privileges](#users) can directly import and export components as JSON-notation. In theory this allows for the creation of documents with more detailed properties but these will not be able to be fully edited the standard way.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
-Recomendations of former inputs are stored with a reference to the assigned unit of the used document to ensure a topical relevance. The recommendation database can be updated through the [maintenance](#maintenance) module.
+Recommendations of former inputs are stored with a reference to the assigned unit of the used document to ensure a topical relevance. The recommendation database can be updated through the [maintenance](#maintenance) module.
 
 > [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but may limit the analytical possibilities for the data dump.
 
@@ -576,7 +576,7 @@ Exported document
 [Content](#content)
 
 ### Records
-Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime. PDF-exports include embedded images and file attachmends if provided.
+Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime. PDF-exports include embedded images and file attachments if provided.
 
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
@@ -584,7 +584,7 @@ The identifier is always a QR-code with additional readable content that will ap
 
 ![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code%20en.png)
 
-On display of any record appear recommendations to complete records according to bundles that match the last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
+On display of any record recommendations appear to complete records according to bundles that match the last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.  
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
@@ -806,7 +806,7 @@ While scheduled tasks address single cases or specified duties, work lists are s
 [Content](#content)
 
 ### Long term planning
-The calendar supports long term planning like used for assigning appretices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
+The calendar supports long term planning like used for assigning apprentices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
 
 Planning is easy to use:
 * assign a name, define a timespan
@@ -1577,7 +1577,7 @@ The CARO App is prepared for retrieving and integrating updates from the ERP-sys
 Basic supported integrations include
 
 ### Case state updates for records
-Case state updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_casestate] value. If available the ERP-data is matched with provided provided ERP case numbers and dates for the database columns
+Case state updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_casestate] value. If available the ERP-data is matched with provided ERP case numbers and dates for the database columns
 * reimbursement
 * inquiry
 * partiallygranted
@@ -1585,7 +1585,7 @@ Case state updates occur during the [cron-job](#cron). The interval can be set w
 * production
 * settled
 
-are set if a given value ist provided and not already present within the CARO-App records.
+are set if a given value is provided and not already present within the CARO-App records.
 
 ### Updates on order data
 Order data updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_orderdata] value. If data is generally available the application presents an identification-code within orders, that has to be appended to the order text for a future matching of order processing dates. The update inserts respective dates to the database columns
@@ -1598,16 +1598,16 @@ if provided and not already present within the CARO-App database.
 Updates affect approved orders that match the identifier, vendor name, the article number or, if not provided, the article name.
 
 ### Customer data import for records
-Customer data is fetched by request if any data is to be expected. The function for records which is able to import data based on an identifier, is also able to import results of ERP-matches based on name and/or date of birth. The application will present matches too chose from and transfer the selected dataset to the respective document inputs.
+Customer data is fetched by request if any data is to be expected. The function for records which is able to import data based on an identifier, is also able to import results of ERP-matches based on inputs defined by the method, e.g. name and/or date of birth. The application will present matches too chose from and transfer the selected dataset to the respective document inputs.
 
 To prepare significant responses for customer data to import, the ERP-interface must consider the relevant document inputs by name.
 
 ### Data matching on product list imports
-ERP-Data is fetched during product list imports if available and selected. For articles with matching article numbers for the selected vendor data for
+ERP-Data is fetched during product list imports if available and selected. For articles with matching article numbers for the selected vendor, data for
 * article_unit
 * article_ean
 * trading_good
-* incorporated (likelyness by being already ordered in the past)
+* incorporated (likeliness by being already ordered in the past)
 * has_expiry_date
 * special_attention
 * stock_item
@@ -1633,10 +1633,10 @@ Case media are fetched by request. If available, links with data-urls will be di
 Data will be presented as constructed within the custom interface-class-method.
 
 ### Past orders
-The CARO App stores orders for a relatively short time by default unless orders are archived. The ERP-interface is prepared to access orders per request, per patient. If available you can decide to narrow things down by date and make use of filter functions. Displayed orders are presented as links, that refer to a new order and prepared search for the selected product.
+The CARO App stores orders for a relatively short time by default unless orders are archived. The ERP-interface is prepared to access orders per request, per customer as comission. If available you can decide to narrow things down by date and make use of filter functions. Displayed orders are presented as links, that refer to a new order and prepared search for the selected product.
 
 ### ERP stock list imports
-If available and tidy the product database of the CARO App can be populated directly from the ERP data. This has the advantage of improved matching of products between the CARO App products and order data updates as well as most likely reducing the database size and speeding up any request.
+If available and tidy, the product database of the CARO App can be populated directly from the ERP data. This has the advantage of improved matching of products between the CARO App products and order data updates as well as most likely reducing the database size and speeding up any request.
 
 ### Custom database dumps
 Your custom ERP-interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
