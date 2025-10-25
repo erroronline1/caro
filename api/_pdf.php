@@ -80,6 +80,7 @@ class PDF{
 		// export pdf to temp and return link
 		// move pointer to last page
 		$this->_pdf->lastPage();
+		$this->_pdf->setProtection(['modify'], '', null, 1);
 
 		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
