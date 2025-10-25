@@ -1515,4 +1515,118 @@ class SEARCH{
 		return $results;
 	}
 }
+
+class IPTC {
+	// kudos https://www.php.net/manual/en/function.iptcembed.php#85887
+	private $meta = [];
+	private $hasmeta = false;
+	private $file = false;
+
+	// as opposed to the original scriptlet, options are not set as constants
+	// non indented tags are shown within nemo file manager by default
+	// other tags are still readeable
+	// files can be embedded
+	private $iptcTag = [
+			'IPTC_OBJECT_NAME' => '005',
+			'IPTC_EDIT_STATUS' => '007',
+			'IPTC_PRIORITY' => '010',
+			'IPTC_CATEGORY' => '015',
+			'IPTC_SUPPLEMENTAL_CATEGORY' => '020',
+			'IPTC_FIXTURE_IDENTIFIER' => '022',
+		'IPTC_KEYWORDS' => '025',
+			'IPTC_RELEASE_DATE' => '030',
+			'IPTC_RELEASE_TIME' => '035',
+			'IPTC_SPECIAL_INSTRUCTIONS' => '040',
+			'IPTC_REFERENCE_SERVICE' => '045',
+			'IPTC_REFERENCE_DATE' => '047',
+			'IPTC_REFERENCE_NUMBER' => '050',
+			'IPTC_CREATED_DATE' => '055',
+			'IPTC_CREATED_TIME' => '060',
+			'IPTC_ORIGINATING_PROGRAM' => '065',
+			'IPTC_PROGRAM_VERSION' => '070',
+			'IPTC_OBJECT_CYCLE' => '075',
+		'IPTC_BYLINE' => '080',
+			'IPTC_BYLINE_TITLE' => '085',
+			'IPTC_CITY' => '090',
+			'IPTC_PROVINCE_STATE' => '095',
+			'IPTC_COUNTRY_CODE' => '100',
+			'IPTC_COUNTRY' => '101',
+			'IPTC_ORIGINAL_TRANSMISSION_REFERENCE' => '103',
+			'IPTC_HEADLINE' => '105',
+			'IPTC_CREDIT' => '110',
+			'IPTC_SOURCE' => '115',
+		'IPTC_COPYRIGHT_STRING' => '116',
+		'IPTC_CAPTION' => '120',
+			'IPTC_LOCAL_CAPTION' => '121',
+	];
+	
+	public function __construct($filename) {
+		$size = getimagesize($filename,$info);
+		$this->hasmeta = isset($info['APP13']);
+		if($this->hasmeta)
+			$this->meta = iptcparse ($info['APP13']);
+		$this->file = $filename;
+	}
+
+	public function set($tag, $data) {
+		$this->meta ['2#' . $this->iptcTag[$tag]] = Array( $data );
+		$this->hasmeta = true;
+	}
+
+	public function get($tag) {
+		return isset($this->meta['2#' . $this->iptcTag[$tag]]) ? $this->meta['2#' . $this->iptcTag[$tag]][0] : false;
+	}
+	
+	public function dump() {
+		print_r($this->meta);
+	}
+
+	private function binary() {
+		$iptc_new = '';
+		foreach (array_keys($this->meta) as $s) {
+			$tag = str_replace('2#', '', $s);
+			$iptc_new .= $this->iptc_maketag(2, $tag, $this->meta[$s][0]);
+		}        
+		return $iptc_new;    
+	}
+
+	private function iptc_maketag($rec, $dat, $val) {
+		$len = strlen($val);
+		if ($len < 0x8000) {
+				return chr(0x1c).chr($rec).chr($dat).
+				chr($len >> 8).
+				chr($len & 0xff).
+				$val;
+		} else {
+				return chr(0x1c).chr($rec).chr($dat).
+				chr(0x80).chr(0x04).
+				chr(($len >> 24) & 0xff).
+				chr(($len >> 16) & 0xff).
+				chr(($len >> 8 ) & 0xff).
+				chr(($len ) & 0xff).
+				$val;
+		}
+	}
+	
+	public function write($mode = 0) {
+		if(!function_exists('iptcembed')) return false;
+		$content = iptcembed($this->binary(), $this->file, $mode);    
+		$filename = $this->file;
+			
+		@unlink($filename); #delete if exists
+		
+		$fp = fopen($filename, 'wb');
+		fwrite($fp, $content);
+		fclose($fp);
+	}    
+	
+	#requires GD library installed
+	public  function removeAllTags() {
+		$this->hasmeta = false;
+		$this->meta = [];
+		$img = imagecreatefromstring(implode(file($this->file)));
+		@unlink($this->file); #delete if exists
+		imagejpeg($img, $this->file, 100);
+	}
+}
 ?>
