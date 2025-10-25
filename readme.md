@@ -28,10 +28,26 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * signature increase validity, preferably to advanced electronic signature
-    * storing payload/document-content hash and image data hash with image and embedded to it? ensuring data linked to signature or embed data directly into image somehow, metadata?
-    * recalculate hash from metadata to revalidate signature, auditable as open source
-    * identity is ensured because the signature takes place in person at the working site?
-    * the image is like handwritten and can be verified by comparison - it is not just a digital key or string?
+    * eidas art 26  
+        An advanced electronic signature shall meet the following requirements:  
+        (a) it is uniquely linked to the signatory;  
+        -> handwritten signature, not indistinguishable data-strings, compareable to official id or passport, identity is ensured because the signature takes place in person at the working site  
+
+        (b) it is capable of identifying the signatory;  
+        -> see (a)  
+
+        (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
+        -> handwritten is solely under the signatorys control. visual integration to be clearly approveable before submission  
+
+        (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.  
+        -> write record, create modification-protected pdf export to temp, import pdf and append to signature  
+        -> data is linked to signature  
+        -> data can be extracted from signature  
+        -> signature can be compared visually to own image in embedded export
+    * validation:  
+        extract mandatory embedded file  
+        -> creation and modification date of record-export in accordance to filename +- 1 sec  
+        -> list metadata as strong hint regarding creator tool and creator
 
 ## to do
 * unittests
