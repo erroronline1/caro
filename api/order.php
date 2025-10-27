@@ -492,7 +492,7 @@ class ORDER extends API {
 					}
 					
 					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
-					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
+					if (str_contains($row['approval'], 'data:image/jpeg') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
 
 					$decoded_order_data = json_decode($row['order_data'], true);
 
@@ -1356,7 +1356,7 @@ class ORDER extends API {
 				}
 				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/jpeg;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'jpg'));
 				}
 				if (!$approval) $this->response([], 401);
 
@@ -1610,7 +1610,7 @@ class ORDER extends API {
 
 		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+			$approval = 'data:image/jpeg;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'jpg'));
 		}
 
 		// initiate data
