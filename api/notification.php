@@ -321,7 +321,7 @@ class NOTIFICATION extends API {
 											$this->_lang->GET('record.reminder_message', [
 												':days' => $last->diff($this->_date['servertime'])->days,
 												':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
-												':document' => $row['last_document'] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)],			
+												':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
 												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 											], true)
 										);
