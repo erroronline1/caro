@@ -1560,16 +1560,20 @@ class IPTC {
 			'IPTC_LOCAL_CAPTION' => '121',
 	];
 	
+	/**
+	 * embed metadata to jpeg files
+	 * WARNING: embedding binary data does not seem to work under IIS because of reasons
+	 */
 	public function __construct($filename) {
-		$size = getimagesize($filename,$info);
+		$size = getimagesize($filename, $info);
 		$this->hasmeta = isset($info['APP13']);
 		if($this->hasmeta)
-			$this->meta = iptcparse ($info['APP13']);
+			$this->meta = iptcparse($info['APP13']);
 		$this->file = $filename;
 	}
 
 	public function set($tag, $data) {
-		$this->meta ['2#' . $this->iptcTag[$tag]] = Array( $data );
+		$this->meta['2#' . $this->iptcTag[$tag]] = Array( $data );
 		$this->hasmeta = true;
 	}
 
@@ -1586,8 +1590,8 @@ class IPTC {
 		foreach (array_keys($this->meta) as $s) {
 			$tag = str_replace('2#', '', $s);
 			$iptc_new .= $this->iptc_maketag(2, $tag, $this->meta[$s][0]);
-		}        
-		return $iptc_new;    
+		}
+		return $iptc_new;
 	}
 
 	private function iptc_maketag($rec, $dat, $val) {
@@ -1610,9 +1614,9 @@ class IPTC {
 	
 	public function write($mode = 0) {
 		if(!function_exists('iptcembed')) return false;
-		$content = iptcembed($this->binary(), $this->file, $mode);    
+		$content = iptcembed($this->binary(), $this->file, $mode);
 		$filename = $this->file;
-			
+		
 		@unlink($filename); #delete if exists
 		
 		$fp = fopen($filename, 'wb');

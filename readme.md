@@ -40,7 +40,7 @@ Things are still in motion. Images may be outdated.
         -> handwritten is solely under the signatorys control. visual integration to be clearly approveable before submission  
 
         (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.  
-        -> write record, create modification-protected pdf export to temp, import pdf and append to signature  
+        -> write record, create modification-protected pdf export to temp, append hash to signature  
         -> data is linked to signature  
         -> data can be extracted from signature  
         -> signature can be compared visually to own image in embedded export
@@ -48,6 +48,8 @@ Things are still in motion. Images may be outdated.
         extract mandatory embedded file  
         -> creation and modification date of record-export in accordance to filename +- 1 sec  
         -> list metadata as strong hint regarding creator tool and creator
+    * iptcembed does not write binary unter iis
+        * back to hashes
 
 ## to do
 * unittests
