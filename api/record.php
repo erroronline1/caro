@@ -916,26 +916,30 @@ class RECORD extends API {
 				// handle attachments and images
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
+				$signature = null;
 				foreach ($_FILES as $fileinput => $files){
 					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
 								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 
-								if (isset($attachments[$fileinput])) $attachments[$fileinput][]= substr($uploaded[$i], 1);
+								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
+
+								if (stristr($files['name'][$i], 'CAROsignature')) $signature = $uploaded[$i];
 							}
 						}
 						else {
 							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[0], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 							$attachments[$fileinput] = [substr($uploaded[0], 1)];
+
+							if (stristr($files['name'], 'CAROsignature')) $signature = $uploaded[0];
 						}
 					}
 				}
 				foreach ($attachments as $input => $files){
 					$this->_payload->$input = implode(', ', $files);
 				}
-
 				if (boolval((array) $this->_payload)){
 					// update record datalists if passed document contains issues permitting autocompletion
 					if ($useddocument){
@@ -1040,7 +1044,24 @@ class RECORD extends API {
 
 					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 							'values' => $case
-						])){		
+						])){
+						// plausibility handling for signatures
+						// add simplified record export to signature metadata
+						// THERE ARE ISSUES WITH METADATA WRITING UNDER IIS, THIS IS NOT WORKING!
+						if (false && $signature){
+							// assign necessary properties for method
+							$this->_requestedID = $identifier;
+							$this->_documentExport = $document_name;
+							// create pdf with signed contents
+							$content = $this->summarizeRecord('simplified', true);
+							$PDF = new PDF(CONFIG['pdf']['record']);
+							$file = $PDF->recordsPDF($content);
+							$embed = file_get_contents('.' . $file);
+							$valid_signature = new IPTC($signature);
+							echo $valid_signature->set('IPTC_SOURCE', $embed); 
+							$valid_signature->write();
+						}
+
 						// append next document recommendation for common and matching user units
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
