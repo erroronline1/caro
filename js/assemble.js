@@ -1399,7 +1399,7 @@ export class Assemble {
 				}
 				document.getElementById("SIGNATURE").value = null;
 			} else {
-				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "signature.jpg", {
+				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "CAROsignature.jpg", {
 					type: "image/jpeg",
 					lastModified: new Date().getTime(),
 				});
@@ -2001,8 +2001,24 @@ export class Assemble {
 
 		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);
+
+		function forbiddenName(files){
+			for(const file of Object.values(files)){
+				console.log(file);
+				if (file.name.match("CAROsignature")){
+					new Toast(api._lang.GET("assemble.render.reserved_name", {':name': "CAROsignature"}));
+					return true;
+				}
+			}
+			return false;
+		}
+
 		if (this.currentElement.attributes.multiple !== undefined)
 			input.onchange = function () {
+				if (forbiddenName(this.files)){
+					delete this.files;
+					return;
+				}
 				this.nextSibling.innerHTML = this.files.length
 					? Array.from(this.files)
 							.map((x) => x.name)
@@ -2013,6 +2029,10 @@ export class Assemble {
 			};
 		else
 			input.onchange = function () {
+				if (forbiddenName(this.files)){
+					delete this.files;
+					return;
+				}
 				this.nextSibling.innerHTML = this.files.length
 					? Array.from(this.files)
 							.map((x) => x.name)
@@ -2721,7 +2741,23 @@ export class Assemble {
 		}
 		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
 		else hint = [...this.hint()];
+
+		function forbiddenName(files){
+			for(const file of Object.values(files)){
+				console.log(file);
+				if (file.name.match("CAROsignature")){
+					new Toast(api._lang.GET("assemble.render.reserved_name", {':name': "CAROsignature"}));
+					return true;
+				}
+			}
+			return false;
+		}
+
 		function changeEvent() {
+			if (forbiddenName(this.files)){
+				delete this.files;
+				return;
+			}
 			this.nextSibling.nextSibling.innerHTML = this.files.length
 				? Array.from(this.files)
 						.map((x) => x.name)

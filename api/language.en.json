@@ -518,6 +518,7 @@
 			"photo_choose": "take a photo...",
 			"photo_rechoose": "or retake photo...",
 			"required_asterisk": "Fields with * are required",
+			"reserved_name": "The name :name is a reserved word, please choose another.",
 			"reset": "Reset",
 			"search_hint": "-key to submit",
 			"scan_button": "Scan a Code for :field",

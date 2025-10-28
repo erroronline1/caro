@@ -518,6 +518,7 @@
 			"photo_choose": "Foto wählen...",
 			"photo_rechoose": "oder noch einmal ein neues Foto wählen...",
 			"required_asterisk": "Felder mit * sind erforderlich",
+			"reserved_name": "Der Name :name ist ein reservierter Begriff, bitte wähle einen anderen.",
 			"reset": "Zurücksetzen",
 			"search_hint": "-Taste um abzusenden",
 			"scan_button": "Einen Code für :field scannen",
