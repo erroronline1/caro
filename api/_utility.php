@@ -1669,6 +1669,12 @@ class BLOCKCHAIN {
 			$previous_hash = $chain[$i - 1]['hash'];
             $block = $chain[$i];
 			$current_hash = $block['hash'];
+			if (isset($block['attachments'])){
+				$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
+				foreach ($attachments as $file => $hash){
+					if (!is_file($file) || hash_file('sha256', $file) !== $hash) return false;
+				}
+			}
 			unset($block['hash']);
 			$block_hash = hash('sha256', json_encode($block));
 			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) return false;
