@@ -138,7 +138,6 @@ class RECORD extends API {
 					$case[':content'] = UTILITY::json_encode($records) ? : null;
 					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]);
 
-				var_dump($case, $successMsg);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 						'values' => $case
 					])) $this->response([
