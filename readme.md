@@ -37,19 +37,16 @@ Things are still in motion. Images may be outdated.
         -> see (a)  
 
         (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
-        -> handwritten is solely under the signatorys control. visual integration to be clearly approveable before submission  
+        -> handwritten is solely under the signatorys control. visual integration to be clearly approveable before submission
+        -> signed data is visible prior to signing  
 
         (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.  
-        -> write record, create modification-protected pdf export to temp, append hash to signature  
-        -> data is linked to signature  
-        -> data can be extracted from signature  
-        -> signature can be compared visually to own image in embedded export
-    * validation:  
-        extract mandatory embedded file  
-        -> creation and modification date of record-export in accordance to filename +- 1 sec  
-        -> list metadata as strong hint regarding creator tool and creator
+        -> write record, add blockchain hash to signature via image functions  
+        -> data is linked to signature given a valid blockchain  
     * iptcembed does not write binary unter iis
-        * back to hashes
+        * record blockchain, add hash to image matadata
+        * a valid signature must contain a valid hash, consider it part of the upcoming record validation tool
+        * consider merges -> verify chain then trail?, rewrite signature hashes
 
 ## to do
 * unittests

@@ -1633,4 +1633,49 @@ class IPTC {
 		imagejpeg($img, $this->file, 100);
 	}
 }
+
+/**
+ * this class does create and continue small blockchains from the passed array of named arrays and recent block
+ * it appends the hash from the previous hash and the hash from the recent addition
+ * 
+ * the chain can be verified too
+ */
+class BLOCKCHAIN {
+	/**
+	 * @param null|array $chain
+	 * @param array $block
+	 * @return array
+	 */
+	public static function add($chain = [], $block = []){
+		if (!$chain){
+			// create genesis data
+			$previous_hash = hash('sha256', bin2hex(random_bytes(18)));
+		}
+		else $previous_hash = $chain(count($chain) - 1)['hash'];
+
+		$block_hash = hash('sha256', json_encode($block));
+		$block['hash'] = hash('sha256', $previous_hash + $block_hash);
+
+		$chain[] = $block;
+		return $chain;
+	}
+
+	/**
+	 * @param array $chain
+	 * @return bool
+	 */
+	public static function verified($chain = []){
+		if (!$chain || count($chain) < 2) return true;
+		// skip genesis block
+		for($i = 1 ; $i < count($chain); $i++){
+			$previous_hash = $chain[$i - 1]['hash'];
+			$current_hash = $chain[$i]['hash'];
+			unset($chain[$i]['hash']);
+			$block_hash = hash('sha256', json_encode($chain[$i]));
+			if ($current_hash !== hash('sha256', $previous_hash + $block_hash)) return false;
+		}
+		return true;
+	}
+}
+
 ?>
