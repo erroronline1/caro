@@ -47,7 +47,9 @@ Things are still in motion. Images may be outdated.
         * add file hashes to record (https://www.php.net/manual/en/function.hash-file.php) -> no use of metadata for changing the hash!
         * integrate into the blockchain hash
         * verify file hashes on upcoming chain verification
-        * consider merges -> verify chain then trail?
+        * consider merges
+            * verify chain then trail?
+            * record.php ln 1901 usort, sort on summarize instead
 
 ## to do
 * unittests
