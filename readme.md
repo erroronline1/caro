@@ -41,12 +41,13 @@ Things are still in motion. Images may be outdated.
         -> signed data is visible prior to signing  
 
         (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.  
-        -> write record, add blockchain hash to signature via image functions  
+        -> file hash as part of the record, secured via blockchain  
         -> data is linked to signature given a valid blockchain  
     * iptcembed does not write binary unter iis
-        * record blockchain, add hash to image matadata
-        * a valid signature must contain a valid hash, consider it part of the upcoming record validation tool
-        * consider merges -> verify chain then trail?, rewrite signature hashes
+        * add file hashes to record (https://www.php.net/manual/en/function.hash-file.php) -> no use of metadata for changing the hash!
+        * integrate into the blockchain hash
+        * verify file hashes on upcoming chain verification
+        * consider merges -> verify chain then trail?
 
 ## to do
 * unittests
