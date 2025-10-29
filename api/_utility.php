@@ -1651,6 +1651,9 @@ class BLOCKCHAIN {
 		if (!$chain) $previous_hash = hash('sha256', bin2hex(random_bytes(18))); // create genesis data
 		else $previous_hash = $chain[count($chain) - 1]['hash'];
 
+		// for merging records
+		unset($block['hash']);
+
 		$block_hash = hash('sha256', json_encode($block));
 		$block['hash'] = hash('sha256', $previous_hash . $block_hash);
 
