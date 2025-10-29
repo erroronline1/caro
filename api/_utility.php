@@ -1563,6 +1563,7 @@ class IPTC {
 	/**
 	 * embed metadata to jpeg files
 	 * WARNING: embedding binary data does not seem to work under IIS because of reasons
+	 * also length is restricted to something at least under windows
 	 */
 	public function __construct($filename) {
 		$size = getimagesize($filename, $info);
@@ -1647,14 +1648,11 @@ class BLOCKCHAIN {
 	 * @return array
 	 */
 	public static function add($chain = [], $block = []){
-		if (!$chain){
-			// create genesis data
-			$previous_hash = hash('sha256', bin2hex(random_bytes(18)));
-		}
-		else $previous_hash = $chain(count($chain) - 1)['hash'];
+		if (!$chain) $previous_hash = hash('sha256', bin2hex(random_bytes(18))); // create genesis data
+		else $previous_hash = $chain[count($chain) - 1]['hash'];
 
 		$block_hash = hash('sha256', json_encode($block));
-		$block['hash'] = hash('sha256', $previous_hash + $block_hash);
+		$block['hash'] = hash('sha256', $previous_hash . $block_hash);
 
 		$chain[] = $block;
 		return $chain;
@@ -1669,10 +1667,11 @@ class BLOCKCHAIN {
 		// skip genesis block
 		for($i = 1 ; $i < count($chain); $i++){
 			$previous_hash = $chain[$i - 1]['hash'];
-			$current_hash = $chain[$i]['hash'];
-			unset($chain[$i]['hash']);
-			$block_hash = hash('sha256', json_encode($chain[$i]));
-			if ($current_hash !== hash('sha256', $previous_hash + $block_hash)) return false;
+            $block = $chain[$i];
+			$current_hash = $block['hash'];
+			unset($block['hash']);
+			$block_hash = hash('sha256', json_encode($block));
+			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) return false;
 		}
 		return true;
 	}
