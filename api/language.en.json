@@ -393,7 +393,7 @@
 				"select": "Add a dropdown",
 				"select_hint": "If you want an entry (e.g. the first) not to submit a value enter ... as a value.",
 				"signature": "Add a signature pad",
-				"signature_hint": "Remember this signature not being document proof for lacking certification",
+				"signature_hint": "Consult your data protection supervisor if this is sufficient for an electronic signature.",
 				"simple_element": "Enter name for element",
 				"filereference": "Add a file reference",
 				"filereference_hint": "Provided files are available. Consider that files may not be permanent and this field only suffices for short term information transfer.",
@@ -1563,7 +1563,12 @@
 			"complaint": "Complaint"
 		},
 		"type_description": "Record type",
-		"unassigned": "Not assignable"
+		"unassigned": "Not assignable",
+		"verify": {
+			"corrupt": "The record :identifier did not pass the validation. It appears there have been unauthorized changes!",
+			"passed": "No irregularities within the record detected. Attached files and data are fine!",
+			"verify": "Verify record"
+		}
 	},
 	"responsibility": {
 		"accept": "I confirm my responsibility for the task :task",

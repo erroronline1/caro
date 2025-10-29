@@ -393,7 +393,7 @@
 				"select": "Füge eine Auswahlliste hinzu",
 				"select_hint": "Falls du nicht willst dass ein Eintrag (z.B. der erste) einen Wert übermittelt gibt ein ... als Wert ein.",
 				"signature": "Füge ein Unterschriftenfeld hinzu",
-				"signature_hint": "Zur Erinnerung: die Unterschrift ist mangels Zertifizierung nicht dokumentensicher",
+				"signature_hint": "Frage den Datenschutzbeauftragten ob das als elektronische Unterschrift anerkannt wird.",
 				"simple_element": "Gib einen Namen für das Element an",
 				"filereference": "Füge einen Dateiverweis hinzu",
 				"filereference_hint": "Es stehen die bereitgestellten Dateien zur Verfügung. Bitte beachte, dass die Dateien möglicherweise nicht dauerhaft zur Verfügung stehen und dieses Feld daher nur für eine kurzfristige Kommunikation geeignet ist.",
@@ -1563,7 +1563,12 @@
 			"complaint": "Reklamation"
 		},
 		"type_description": "Dokumentationstyp",
-		"unassigned": "Nicht zugeordnet"
+		"unassigned": "Nicht zugeordnet",
+		"verify": {
+			"corrupt": "Die Aufzeichnung :identify konnte nicht erfolgreich verifiziert werden. Es sieht so aus, als habe es unauthorisierte Änderungen geben!",
+			"passed": "Es konnten keine strukturellen Fehler in der Aufzeichnung festgestellt werden. Angehängte Dateien und Daten sind in Ordnung!",
+			"verify": "Aufzeichnung verifizieren"
+		}
 	},
 	"responsibility": {
 		"accept": "Ich bestätige meine Verantwortung für die Aufgabe :task",

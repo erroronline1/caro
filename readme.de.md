@@ -21,9 +21,9 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
         * [Verantwortlichkeiten](#verantwortlichkeiten)
         * [Verbesserungsvorschläge](#verbesserungsvorschläge)
         * [Whiteboard](#whiteboard)
-    * [Aufzeichnungen](#aufzeichnungen)
+    * [Aufzeichnungen](#aufzeichnungen-1)
         * [Dokumente](#dokumente)
-        * [Aufzeichnungen](#aufzeichnungen-1)
+        * [Aufzeichnungen](#aufzeichnungen-2)
         * [Risikomanagement](#risikomanagement)
         * [Audit](#audit)
         * [Managementbericht](#managementbericht)
@@ -89,6 +89,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Auditunterstützung: interne Audits vorbereiten, planen und durchführen, Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
 * Verbesserungsvorschläge: jeder kann Verbesserungsvorschläge äußern und bewerten, sowie die Maßnahmen einsehen
 * Automatische Planungen, Erinnerungen und Benachrichtigungen
+* Blockchain gesicherte Aufzeichnungsdaten
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
 * keine künstliche Intelligenz: volle Datenhoheit behalten
 
@@ -118,17 +119,35 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 * Zeitzonen und Bundesländer
     * Die Anwendung kann unterschiedliche Zeitzonen und Bundesländer in Bezug auf Feiertage verarbeiten, je nach Standortverteilung.
 
-
 [Übersicht](#übersicht)
 
 ## Datenintegrität
+
+### Identifikation
 Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
-Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
-
+### Aufzeichnungen
 Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
 
-Dokumente können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nur um eine einfache elektronische Signatur (EES) gemäß eIDAS handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
+Aufzeichnungen werden in einem [Blockchain Datenformat](#blockchain-gesicherte-inhalte) gespeichert. Jeder Versuch die Daten zu manipulieren invalidiert die gesamte Aufzeichnung aufgrund widersprüchlicher Hashes und Prüfsummen.
+
+Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
+> Artikel 26  
+> Anforderungen an fortgeschrittene elektronische Signaturen  
+> Eine fortgeschrittene elektronische Signatur erfüllt alle folgenden Anforderungen:  
+> (a) Sie ist eindeutig dem Unterzeichner zugeordnet.  
+> (b) Sie ermöglicht die Identifizierung des Unterzeichners.  
+> (c) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
+> (d) Sie ist so mit den auf diese Weise unterzeichneten Daten verbunden, dass eine nachträgliche Veränderung der Daten erkannt werden kann.
+
+bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.
+bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.
+bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung macht die gesamte Aufzeichnung ungültig.
+
+Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
+
+### Verschiedenes
+Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
 
 Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftliche oder gestempelte Datumsangaben auf Papierdokumenten kann jedoch aktuell nicht erkannt werden.
 
@@ -569,6 +588,38 @@ Exportierte vollständige Aufzeichnung
 Exportierte reduzierte Aufzeichnung
 
 ![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary%20de.png)
+
+#### Blockchain gesicherte Inhalte
+Aufzeichnungen werden in einer Blockchain gespeichert. Das bedeutet, dass jeder Eintrag gehashed wird und auch den vorherigen Hash beinhaltet. Dies schließt Prüfsummen von Anhängen mit ein. Auf diesem Weg kann ein hohes Maß an Vertrauen in die Integrität der Daten erreicht werden. Jeder Versuch die Daten zu manipulieren invalidiert die gesamte Aufzeichnung aufgrund widersprüchlicher Hashes und Prüfsummen.
+
+Ein vereinfachtes Diagramm einer Blockchain mit kurzen CRC Hashes. Die CARO App nutzt jedoch SHA256.
+
+```mermaid
+graph LR;
+    A["date: 2025-10-29
+    author: error on line 1
+    content:hello
+    "]-->B(contained content hash: dcce6e55)
+    B-.->C["date: 2025-10-29
+    author: error on line 1
+    content:world
+    attachments:signature:a5fb0d49
+    "]
+    C-->D("contained content hash: 4cff5f20
+    + previous hash dcce6e55
+    = 6897f6dc")
+    D-.->E["date: 2025-10-29
+    author: error on line 1
+    content: bye
+    "]
+    E-->F("contained content hash: 028fd280
+    + previous hash: 6897f6dc
+    = 4287cac3")
+    B-->D
+    D-->F
+```
+
+Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen.
 
 [Übersicht](#übersicht)
 

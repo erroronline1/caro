@@ -128,7 +128,7 @@ class RECORD extends API {
 					}
 
 					$records = $case[':content'];
-					if ($current_record) $records[] = $current_record;
+					if ($current_record) $records = BLOCKCHAIN::add($records, $current_record);
 					$case_state = $case[':case_state'];
 					if (!in_array($this->_caseState, ['lifespan', 'erp_case_number', 'note'])){
 						if ($this->_caseStateValue === 'true') $case_state[$this->_caseState] = true;
@@ -915,7 +915,6 @@ class RECORD extends API {
 				// handle attachments and images
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
-				$signature = null;
 				foreach ($_FILES as $fileinput => $files){
 					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
@@ -924,21 +923,25 @@ class RECORD extends API {
 
 								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
-
-								if (stristr($files['name'][$i], 'CAROsignature')) $signature = $uploaded[$i];
 							}
 						}
 						else {
 							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[0], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 							$attachments[$fileinput] = [substr($uploaded[0], 1)];
-
-							if (stristr($files['name'], 'CAROsignature')) $signature = $uploaded[0];
 						}
 					}
 				}
+				$secureattachments = [];
 				foreach ($attachments as $input => $files){
+					// store file paths to input as value 
 					$this->_payload->$input = implode(', ', $files);
+					
+					// create array of files with hash to hamper tampering, appended to record for verification
+					foreach($files as $file){
+						$secureattachments['.' . $file] = hash_file('sha256', '.' . $file);
+					}
 				}
+				
 				if (boolval((array) $this->_payload)){
 					// update record datalists if passed document contains issues permitting autocompletion
 					if ($useddocument){
@@ -1001,6 +1004,7 @@ class RECORD extends API {
 						'document' => $document_id,
 						'content' => UTILITY::json_encode($this->_payload)
 					];
+					if ($secureattachments) $current_record['attachments'] = UTILITY::json_encode($secureattachments);
 					
 					$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 						'values' => [
@@ -1038,29 +1042,12 @@ class RECORD extends API {
 							':note' => null
 						];
 					}
-					$case[':content'][] = $current_record; // append current record
+					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
 					$case[':content'] = UTILITY::json_encode($case[':content']);
 
 					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 							'values' => $case
 						])){
-						// plausibility handling for signatures
-						// add simplified record export to signature metadata
-						// THERE ARE ISSUES WITH METADATA WRITING UNDER IIS, THIS IS NOT WORKING!
-						if (false && $signature){
-							// assign necessary properties for method
-							$this->_requestedID = $identifier;
-							$this->_documentExport = $document_name;
-							// create pdf with signed contents
-							$content = $this->summarizeRecord('simplified', true);
-							$PDF = new PDF(CONFIG['pdf']['record']);
-							$file = $PDF->recordsPDF($content);
-							$embed = file_get_contents('.' . $file);
-							$valid_signature = new IPTC($signature);
-							echo $valid_signature->set('IPTC_SOURCE', $embed); 
-							$valid_signature->write();
-						}
-
 						// append next document recommendation for common and matching user units
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
@@ -1619,6 +1606,16 @@ class RECORD extends API {
 							]
 						]]);
 					}
+					// verify record button
+					$response['render']['content'][$last_element][] = 
+						[
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('record.verify.verify'),
+								'onclick' => "api.record('get', 'verify', '" . $this->_requestedID . "')"
+							]
+						];
+
 				}
 				$this->response($response);
 				break;
@@ -1862,14 +1859,14 @@ class RECORD extends API {
 		]);
 		$merge = $merge ? $merge[0] : null;
 		$merge['content'] = json_decode($merge['content'], true);
-		$merge['content'][] = [
+		$merge['content'] = BLOCKCHAIN::add($merge['content'], [
 			'author' => $_SESSION['user']['name'],
 			'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 			'document' => 0,
 			'content' => [
 				$this->_lang->GET('record.reidentify_pseudodocument_name', [], true) => ($original ? $this->_lang->GET('record.reidentify_merge_content', [':identifier' => $entry_id], true) : $this->_lang->GET('record.reidentify_identify_content', [':identifier' => $entry_id], true))
 			]
-		];
+		]);
 
 		if (!$original) {
 			// overwrite identifier, append record altering
@@ -1895,10 +1892,16 @@ class RECORD extends API {
 		else {
 			// append merged content to new identifier
 			$original['content'] = json_decode($original['content'], true);
+
+			if (!BLOCKCHAIN::verified($original['content'])) $this->response([
+				'response' => [
+					'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $original['identifier']]),
+					'type' => 'error'
+				]]);		
+
 			foreach ($merge['content'] as $record){
-				$original['content'][] = $record;
+				$original['content'] = BLOCKCHAIN::add($original['content'], $record);
 			}
-			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
 	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
@@ -1952,7 +1955,7 @@ class RECORD extends API {
 		if ($original && $record_type){
 			// set up record-altering record if record is found and new type is provided
 			$original['content'] = json_decode($original['content'], true);
-			$original['content'][] = [
+			$original['content'] = BLOCKCHAIN::add($original['content'], [
 				'author' => $_SESSION['user']['name'],
 				'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 				'document' => 0,
@@ -1961,7 +1964,7 @@ class RECORD extends API {
 					':previoustype' => $this->_lang->GET('record.type.' . $original['record_type'], [], true),
 					':newtype' => $this->_lang->GET('record.type.' . $record_type, [], true)
 					], true)]
-			];
+			]);
 			// update record
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
@@ -2054,6 +2057,8 @@ class RECORD extends API {
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 		$records = json_decode($data['content'], true);
+		usort($records, Fn($a, $b) => $a['date'] <=> $b['date']);
+
 		foreach ($records as $record){
 			// check whether the record is within a valid and accessible document
 			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
@@ -2203,6 +2208,25 @@ class RECORD extends API {
 			}
 		}
 		return $summary;
+	}
+
+	public function verify(){
+		$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+			'values' => [
+				':identifier' => $this->_requestedID
+			]
+		]);
+		$case = $case ? $case[0] : null;
+		if (!$case || ! BLOCKCHAIN::verified(json_decode($case['content'], true))) $this->response([
+			'response' => [
+				'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $this->_requestedID]),
+				'type' => 'error'
+			]]);
+		$this->response([
+			'response' => [
+				'msg' => $this->_lang->GET('record.verify.passed'),
+				'type' => 'success'
+			]]);
 	}
 }
 ?>

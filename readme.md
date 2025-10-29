@@ -27,29 +27,6 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
-* signature increase validity, preferably to advanced electronic signature
-    * eidas art 26  
-        An advanced electronic signature shall meet the following requirements:  
-        (a) it is uniquely linked to the signatory;  
-        -> handwritten signature, not indistinguishable data-strings, compareable to official id or passport, identity is ensured because the signature takes place in person at the working site  
-
-        (b) it is capable of identifying the signatory;  
-        -> see (a)  
-
-        (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
-        -> handwritten is solely under the signatorys control. visual integration to be clearly approveable before submission
-        -> signed data is visible prior to signing  
-
-        (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.  
-        -> file hash as part of the record, secured via blockchain  
-        -> data is linked to signature given a valid blockchain  
-    * iptcembed does not write binary unter iis
-        * add file hashes to record (https://www.php.net/manual/en/function.hash-file.php) -> no use of metadata for changing the hash!
-        * integrate into the blockchain hash
-        * verify file hashes on upcoming chain verification
-        * consider merges
-            * verify chain then trail?
-            * record.php ln 1901 usort, sort on summarize instead
 
 ## to do
 * unittests
@@ -75,9 +52,9 @@ Things are still in motion. Images may be outdated.
         * [Responsibilities](#responsibilities)
         * [Improvement suggestions](#improvement-suggestions)
         * [Whiteboard](#whiteboard)
-    * [Records](#records)
+    * [Records](#records-1)
         * [Documents](#documents)
-        * [Records](#records-1)
+        * [Records](#records-2)
         * [Risk management](#risk-management)
         * [Audit](#audit)
         * [Management review](#management-review)
@@ -202,6 +179,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Audit support: prepare, schedule and execute internal audits, summarizing application data to tidy overviews
 * Improvement suggestions: everyone can suggest improvements, express their opinion and look at resulting measures
 * Automated schedules, reminders and notifications
+* Blockchain secured record data
 * Device agnostic: web-application accessible by any suitable device
 * No artificial intelligence: you have absolute data authority
 
@@ -234,13 +212,32 @@ Orders can be deleted by administrative users and requesting unit members at any
 [Content](#content)
 
 ## Data integrity
+
+### Identification
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
-Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
-
+### Records
 An encoded user identifier is added to the payload of submitted form data, the server verifies the identity and data integrity with a checksum.
 
-Documents can contain a digital signature pad. Please note due to lacking certification this is only a simple electronic signature (SES) according to eIDAS. You can define where this might be suitable enough for your processes.
+Records are stored in a [blockchain data format](#blockchain-secured-content). Any attempts on tampering with the data corrupts the whole record due to inconsistent hashes and checksums.
+
+Documents can contain a digital signature pad. According to eIDAS
+> Article 26  
+> Requirements for advanced electronic signatures  
+> An advanced electronic signature shall meet the following requirements:  
+> (a) it is uniquely linked to the signatory;  
+> (b) it is capable of identifying the signatory;  
+> (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
+> (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.
+
+regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatory identity is ensured because the signature takes place in person at the working site.  
+regarding (c): handwritten signatures are solely under the signatorys control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
+regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes invalidate the whole record.
+
+Consult your data protection supervisor if this is sufficient for an electronic signature.
+
+### Miscellaneous
+Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
 Timestamps are not qualified. A reduced validity than manual or stamped dates on paper documents is currently not discernible.
 
@@ -691,6 +688,38 @@ Exported full record summary
 Exported reduced record summary
 
 ![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary%20en.png)
+
+#### Blockchain secured content
+Records are stored in a blockchain. This means every entry is hashed and does contain the previous entries hash as well. This includes checksums of attachments. This way a high level of trust regarding the data integrity can be achieved. Any attempts on tampering with the data corrupts the whole record due to inconsistent hashes and checksums.
+
+Simplified diagram of a blockchain using short CRC hashes. The CARO App actually uses SHA256.
+
+```mermaid
+graph LR;
+    A["date: 2025-10-29
+    author: error on line 1
+    content:hello
+    "]-->B(contained content hash: dcce6e55)
+    B-.->C["date: 2025-10-29
+    author: error on line 1
+    content:world
+    attachments:signature:a5fb0d49
+    "]
+    C-->D("contained content hash: 4cff5f20
+    + previous hash dcce6e55
+    = 6897f6dc")
+    D-.->E["date: 2025-10-29
+    author: error on line 1
+    content: bye
+    "]
+    E-->F("contained content hash: 028fd280
+    + previous hash: 6897f6dc
+    = 4287cac3")
+    B-->D
+    D-->F
+```
+
+The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. 
 
 [Content](#content)
 
@@ -4903,6 +4932,20 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
+```
+
+> GET ./api/api.php/record/verify/{identifier}
+
+Informs about whether a record has intact integrity or is corrupted.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"response":{"msg":"No irregularities within the record detected. Attached files and data are fine!","type":"success"}}
 ```
 
 [Content](#content)

@@ -192,7 +192,9 @@ class NOTIFICATION extends API {
 
 									if ($current_records) {
 										$records = json_decode($case['content'], true);
-										array_push($records, ...$current_records);
+										foreach($current_records as $current){
+											$records = BLOCKCHAIN::add($records, $current);
+										}
 										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_post'),
 											[
 												':context' => $case['context'],
