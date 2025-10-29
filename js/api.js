@@ -513,6 +513,12 @@ export const api = {
 							api._settings.config = data.config || {};
 							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
 							api.history.reset();
+
+							// close all modals to avoid access to files once logged out
+							for (const opendialog of Object.values(document.querySelectorAll("dialog[open]"))) {
+								opendialog.remove();
+							}
+				
 							api.application("get", "start");
 						};
 						break;
