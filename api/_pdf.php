@@ -104,7 +104,7 @@ class PDF{
 			// values column
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
 			if (gettype($value) === 'array') {
-				$value = implode("\n", array_keys($value));
+				$value = implode("  \n", array_keys($value));
 			}
 
 			$markdown = new MARKDOWN();
