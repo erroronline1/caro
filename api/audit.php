@@ -2377,6 +2377,11 @@ class AUDIT extends API {
 			$line = [];
 			$skip = false;
 			$row['content'] = json_decode($row['content'], true);
+			// drop blockchain genesis block
+			array_shift($row['content']);
+			//sort by date
+			usort($row['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
+
 			foreach ($row['content'] as $entry){
 				$currentdate = substr($entry['date'], 0, 10);
 				// check if entry is out of requested timestamp bound

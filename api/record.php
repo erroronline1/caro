@@ -693,6 +693,7 @@ class RECORD extends API {
 
 				$records = json_decode($data['content'], true);
 				foreach ($records as $record){
+					if (!isset($record['document']) || !isset($record['content'])) continue;
 					$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 					if (!PERMISSION::permissionIn($document['restricted_access'])) continue; // check if user has access to form
 					if ($record['document'] == 0) continue; // skip pseudoforms
@@ -805,6 +806,7 @@ class RECORD extends API {
 		// retrieve considered documents
 		$considered = [];
 		foreach (json_decode($data['content'], true) as $record){
+			if (!isset($record['document']) || !isset($record['content'])) continue;
 			if (($documentIndex = array_search($record['document'], array_column($alldocuments, 'id'))) !== false)
 				$considered[] = $alldocuments[$documentIndex]['name'];
 		}
@@ -1897,8 +1899,10 @@ class RECORD extends API {
 				'response' => [
 					'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $original['identifier']]),
 					'type' => 'error'
-				]]);		
+				]]);
 
+			// drop blockchain genesis block
+			array_shift($merge['content']);
 			foreach ($merge['content'] as $record){
 				$original['content'] = BLOCKCHAIN::add($original['content'], $record);
 			}
@@ -2057,6 +2061,9 @@ class RECORD extends API {
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 		$records = json_decode($data['content'], true);
+		// drop blockchain genesis block
+		array_shift($records);
+		//sort by date
 		usort($records, Fn($a, $b) => $a['date'] <=> $b['date']);
 
 		foreach ($records as $record){
