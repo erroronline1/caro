@@ -735,6 +735,7 @@
 		"risk_issues_none": "risk management issues",
 		"risk_issues_report": "Issue report for state on :date",
 		"risks_update_button": "Update risks valid at the given date/time",
+		"signature_uneccessary": "This document has been created automated and is valid without a signature",
 		"skillfulfilment_warning": "This skill has no assigned users!",
 		"userskills": {
 			"bulk_training": "Apply training to multiple employees",

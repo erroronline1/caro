@@ -735,6 +735,7 @@
 		"risk_issues_none": "Probleme im Risikomanagement",
 		"risk_issues_report": "Problembericht für den Status am :date",
 		"risks_update_button": "Aktualisiere gültige Risken zum angebenen Zeitpunkt",
+		"signature_uneccessary": "Dieses Dokument wurde maschinell erstellt und ist ohne Unterschrift gültig",
 		"skillfulfilment_warning": "Dieser Fähigkeit ist kein Mitarbeiter zugeordnet!",
 		"userskills": {
 			"bulk_training": "Schulung für mehrere Mitarbeiter eintragen",
