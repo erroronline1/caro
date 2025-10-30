@@ -670,12 +670,12 @@ class USER extends API {
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
-						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
+						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . ' ' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
 							if ($level != 0) $user[':skills'][] = $duty . '.' . $skill . '.' . $level;
 						}
 					}
 				}
-				$user[':skills'] = UTILITY::json_encode($user[':skills']);
+				$user[':skills'] = implode(',', $user[':skills']);
 
 				// generate order auth
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
@@ -827,7 +827,7 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
 				// gather ans construct skill matrix
-				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				$user['skills'] = explode(',', $user['skills'] ? : '');
 				// also see audit.php
 				$skillmatrix = [
 					[
