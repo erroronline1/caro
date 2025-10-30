@@ -1648,8 +1648,12 @@ class BLOCKCHAIN {
 	 * @return array
 	 */
 	public static function add($chain = [], $block = []){
-		if (!$chain) $previous_hash = hash('sha256', bin2hex(random_bytes(18))); // create genesis data
-		else $previous_hash = $chain[count($chain) - 1]['hash'];
+		if (!$chain) {
+			$chain[] = [
+				'hash' => hash('sha256', bin2hex(random_bytes(18))) // create genesis data
+			];
+		}
+		$previous_hash = $chain[count($chain) - 1]['hash'];
 
 		// for merging records
 		unset($block['hash']);
