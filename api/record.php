@@ -426,9 +426,21 @@ class RECORD extends API {
 			$defaults = [$record_date, $record_time];
 			// add record types if applicable
 			if (in_array($document['context'], ['casedocumentation'])) {
+				$preset = null;
+				if ($this->_passedIdentify){
+					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+						'values' => [
+							':identifier' => $this->_passedIdentify
+						]
+					]);
+					$data = $data ? $data[0] : null;
+					if ($data) $preset = $data['record_type'];
+				}
+
 				$options = [];
 				foreach ($this->_lang->_USER['record']['type'] as $key => $value){
 					$options[$value] = CONFIG['application']['require_record_type_selection'] ? ['value' => $key, 'required' => true] : ['value' => $key];
+					if ($preset && $key === $preset) $options[$value]['checked'] = true;
 				}
 				$defaults[] = [
 					'type' => 'radio',
