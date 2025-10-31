@@ -1658,7 +1658,7 @@ class BLOCKCHAIN {
 		// for merging records
 		unset($block['hash']);
 
-		$block_hash = hash('sha256', json_encode($block));
+		$block_hash = hash('sha256', UTILITY::json_encode($block));
 		$block['hash'] = hash('sha256', $previous_hash . $block_hash);
 
 		$chain[] = $block;
@@ -1667,26 +1667,44 @@ class BLOCKCHAIN {
 
 	/**
 	 * @param array $chain
-	 * @return bool
+	 * @param bool $details to return details on checks
+	 * @return bool|array
 	 */
-	public static function verified($chain = []){
-		if (!$chain || count($chain) < 2) return true;
+	public static function verified($chain = [], $details = false){
+		$report = [];
+		if (!$chain) return false;
+		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* Randomized hash"];
 		// skip genesis block
 		for($i = 1 ; $i < count($chain); $i++){
 			$previous_hash = $chain[$i - 1]['hash'];
             $block = $chain[$i];
+			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
+
 			$current_hash = $block['hash'];
+			unset($block['hash']);
+			$block_hash = hash('sha256', UTILITY::json_encode($block));
+			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) {
+				if (!$details) return false;
+				$blockreport['verification'] .= "" . '**previous hash ' . $previous_hash . ' and content hash ' . $block_hash . 'did not resolve to required current hash ' . $current_hash . "!**";
+			}
+			else 
+				$blockreport['verification'] .= "\n* previous hash " . $previous_hash . ' and content hash ' . $block_hash . 'do resolve to required current hash ' . $current_hash . ".";
+
 			if (isset($block['attachments'])){
 				$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
 				foreach ($attachments as $file => $hash){
-					if (!is_file($file) || hash_file('sha256', $file) !== $hash) return false;
+					$filehash = hash_file('sha256', $file); 
+					if (!is_file($file) || $filehash !== $hash){
+						if (!$details) return false;
+					}
+					$blockreport['verification'] .= "\n* " . $file . ' **has** hash ' . $filehash;
 				}
 			}
-			unset($block['hash']);
-			$block_hash = hash('sha256', json_encode($block));
-			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) return false;
+
+			$report[] = $blockreport;
 		}
-		return true;
+		if (!$details) return true;
+		return $report;
 	}
 }
 

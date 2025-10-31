@@ -1009,6 +1009,7 @@ class AUDIT extends API {
 					'orderstatistics', // order statistics
 					'complaints', // complaints within records
 					'records',
+					'recordverification',
 					'regulatory', // regulatory issues
 					'risks', // risks
 					'trainingevaluation', // training evaluation
@@ -2508,6 +2509,66 @@ class AUDIT extends API {
 		$this->response([
 			'render' => $body,
 		]);
+	}
+
+	private function recordverification(){
+		$content = [];
+		$identifier = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.identifier'));
+		$content[] = [
+			[
+				'type' => 'scanner',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.records.identifier'),
+					'value' => $identifier ? : '',
+					'id' => '_identifier'
+				]
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'data-type' => 'submitbutton',
+					'value' => $this->_lang->GET('record.verify.verify'),
+					'onclick' => "const identifier = document.getElementById('_identifier').value; if (identifier) {const fd = new FormData(); fd.append('" . $this->_lang->GET('audit.records.identifier') ."', identifier); api.audit('post', 'checks', 'recordverification', fd)}"
+				]
+			]
+		];
+		if($_SERVER['REQUEST_METHOD'] === 'POST' && $identifier){
+			$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+				'values' => [
+					':identifier' => $identifier
+				]
+			]);
+			$case = $case ? $case[0] : null;
+			if (!$case) $content[] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('application.error_response.404')
+					]
+				]
+			];
+			else {
+				$report = '';
+				$recordcontent = json_decode($case['content'], true);
+				foreach(BLOCKCHAIN::verified($recordcontent, true) as $block){
+					foreach($block as $key => $value){
+						if ($key === 'verification') continue;
+						$report .= $key . ': ' . $value . "  \n";
+					}
+					$report .= $block['verification'] . "\n \n \n";
+				}
+
+				$content[] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => BLOCKCHAIN::verified($recordcontent) ? $this->_lang->GET('record.verify.passed') : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
+						],
+						'htmlcontent' => $this->_markdown->md2html($report)
+					]
+				];
+			}
+		}
+		return $content;
 	}
 
 	/**

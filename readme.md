@@ -719,7 +719,7 @@ graph LR;
     D-->F
 ```
 
-The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. 
+The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. Details on the record verification can also be viewed within the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries).
 
 [Content](#content)
 
@@ -1150,6 +1150,7 @@ Furthermore hopefully beneficial information on
 * appropriateness of current documents including a use count gathered from records
 * order statistics as a structured Excel-export to support vendor evaluation based on delivery data
 * treatment statistics, as all treatment-records within a given timespan can be exported for analysis of distinct record topics, given the [documents](#documents) provide distinct issues. The export file is a CSV that can be processed with a suitable filter using the [CSV-processor](#csv-processor) too.
+* record verification, with more details on the [records blockchain](#blockchain-secured-content)
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20en.png)
 

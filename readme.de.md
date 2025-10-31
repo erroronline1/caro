@@ -619,7 +619,7 @@ graph LR;
     D-->F
 ```
 
-Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen.
+Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen. Die [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) bieten eine detailliertere Darstellung der Integritätsprüfung.
 
 [Übersicht](#übersicht)
 
@@ -1058,6 +1058,7 @@ Ferner hoffentlich hilfreiche Informationen zu
 * der Angemessenheit aktueller Dokumente incl. einem Nutzungszähler gemäß Aufzeichnungen
 * Bestellstatistiken in Form eines strukturierten Excel-Export um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen
 * Versorgungsstatistiken, bei Export aller verfügbaren Versorgungsaufzeichnungen innerhalb eines wählbaren Zeitraumes, deren Inhalte beliebig ausgewertet werden können, vorausgesetzt die [Dokumente](#dokumente) haben einzigartige Fragestellungen. Die Ausgabedatei ist eine CSV-Datei die unter anderem mit einem entsprechenden Filter auch durch den [CSV-Prozessor](#csv-prozessor) verarbeitet werden kann.
+* Integritität der Aufzeichnungen mit Details zur [Blockchain](#blockchain-gesicherte-inhalte)
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de.png)
 
