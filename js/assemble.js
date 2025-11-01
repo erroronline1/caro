@@ -1399,8 +1399,8 @@ export class Assemble {
 				}
 				document.getElementById("SIGNATURE").value = null;
 			} else {
-				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "CAROsignature.jpg", {
-					type: "image/jpeg",
+				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "CAROsignature.png", {
+					type: "image/png",
 					lastModified: new Date().getTime(),
 				});
 				let section = new DataTransfer();
@@ -1455,7 +1455,7 @@ export class Assemble {
 		window.signaturePad = new SignaturePad(api._settings.session.signatureCanvas, {
 			// It's Necessary to use an opaque color when saving image as JPEG;
 			// this option can be omitted if only saving as PNG or SVG
-			backgroundColor: 'rgb(236, 239, 244)',
+			//backgroundColor: 'rgb(236, 239, 244)',
 			penColor: "rgb(46, 52, 64)",
 		});
 		// On mobile devices it might make more sense to listen to orientation change,
@@ -3542,6 +3542,7 @@ export class Assemble {
 		if (this.currentElement.editor) {
 			let div = document.createElement("div");
 			div.classList.add("editor");
+			if (this.currentElement.attributes.style) div.style = this.currentElement.attributes.style;
 			div.append(textarea);
 			this.codeEditor.push(textarea.id);
 			div.append(document.createElement("br"));
