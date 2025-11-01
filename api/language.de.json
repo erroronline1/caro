@@ -1568,7 +1568,7 @@
 		"unassigned": "Nicht zugeordnet",
 		"verify": {
 			"corrupt": "Die Aufzeichnung :identify konnte nicht erfolgreich verifiziert werden. Es sieht so aus, als habe es unauthorisierte Änderungen geben!",
-			"passed": "Es konnten keine strukturellen Fehler in der Aufzeichnung festgestellt werden. Angehängte Dateien und Daten sind in Ordnung!",
+			"passed": "Es konnten keine strukturellen Fehler in der Aufzeichnung :identify festgestellt werden. Angehängte Dateien und Daten sind in Ordnung!",
 			"verify": "Aufzeichnung verifizieren"
 		}
 	},

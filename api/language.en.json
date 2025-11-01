@@ -1568,7 +1568,7 @@
 		"unassigned": "Not assignable",
 		"verify": {
 			"corrupt": "The record :identifier did not pass the validation. It appears there have been unauthorized changes!",
-			"passed": "No irregularities within the record detected. Attached files and data are fine!",
+			"passed": "No irregularities within the record :identifier detected. Attached files and data are fine!",
 			"verify": "Verify record"
 		}
 	},

@@ -2240,7 +2240,7 @@ class RECORD extends API {
 			]]);
 		$this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('record.verify.passed'),
+				'msg' => $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]),
 				'type' => 'success'
 			]]);
 	}
