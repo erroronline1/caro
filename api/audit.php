@@ -1118,6 +1118,7 @@ class AUDIT extends API {
 			'orderstatistics',
 			'complaints',
 			'records',
+			'recordverification',
 			'regulatory',
 			'risks'
 		];
@@ -2556,19 +2557,111 @@ class AUDIT extends API {
 					}
 					$report .= $block['verification'] . "\n \n \n";
 				}
+				// gather attachments if applicable
+				$files = [];
+				foreach($recordcontent as $block){
+					if (isset($block['attachments'])) {
+						$block['attachments'] = json_decode($block['attachments'], true);
+						$files = array_merge($files, array_combine(array_map(Fn($f) => substr($f ,1), array_keys($block['attachments'])), array_map(Fn($f) => ['href' => './api/api.php/file/stream/' . substr($f ,1)], array_keys($block['attachments']))));
+					}
+				}
 
-				$content[] = [
+				// include code for verification into output
+				$reflector = new \ReflectionMethod('CARO\API\BLOCKCHAIN::verified');
+				$reflector_start = $reflector->getStartLine() - 1;
+				$reflector_end = $reflector->getEndLine() - 1;
+				$code = $reflector->__toString() . "\n";
+
+				foreach(file('_utility.php') as $line => $codeline){
+					if ($line < $reflector_start) continue;
+					if ($line > $reflector_end) break;
+					$code .= substr($codeline, 1); // strip initial tab
+				}
+				$code = preg_replace('/\t/', '   ', $code);
+				$summary = [
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => BLOCKCHAIN::verified($recordcontent) ? $this->_lang->GET('record.verify.passed') : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
+							'name' => BLOCKCHAIN::verified($recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
 						],
 						'htmlcontent' => $this->_markdown->md2html($report)
+					]
+				];
+				if ($files) $summary[] = [
+					'type' => 'links',
+					'description' => 'Attachments',
+					'content' => $files
+				];
+				$summary[] = [
+					'type' => 'code',
+					'attributes' => [
+						'name' => 'verified by',
+						'value' => $code,
+						'style' => 'height: 35em;'
+					]
+				];
+
+				$content[] = $summary;
+
+				$content[] = [
+					[
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('audit.records.export'),
+							'onclick' => "const identifier = document.getElementById('_identifier').value; if (identifier) {const fd = new FormData(); fd.append('" . $this->_lang->GET('audit.records.identifier') ."', identifier); api.audit('post', 'export', 'recordverification', fd)}",
+						]
 					]
 				];
 			}
 		}
 		return $content;
+	}
+	private function exportrecordverification(){
+		$summary = [
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.recordverification') . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => $this->_lang->GET('audit.checks_type.recordverification'),
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
+		];
+
+		$issues = $this->recordverification();
+
+		foreach ($issues[1] as $item){
+			if (!isset($item['type'])) continue;
+			switch ($item['type']){
+				case 'textsection':
+					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];	
+					break;
+				case 'links':
+					$summary['files'] = array_keys($item['content']);
+					break;
+				case 'code':
+					$summary['content'][$item['attributes']['name']] = $item['attributes']['value'];	
+					break;
+			}
+		}
+		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
 	/**
