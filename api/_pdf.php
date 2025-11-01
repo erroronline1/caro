@@ -373,6 +373,8 @@ class PDF{
 			}
 		}
 
+		$this->_pdf->SetFont('helvetica', '', 8); 
+		if (isset($content['recenthash'])) $this->_pdf->MultiCell(140, 4, $content['recenthash'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 		return $this->return($content);
 	}
 

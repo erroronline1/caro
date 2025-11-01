@@ -142,7 +142,7 @@ Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
 
 bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.
 bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.
-bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung macht die gesamte Aufzeichnung ungültig.
+bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung der Unterschrift oder der Daten macht die gesamte Aufzeichnung ungültig.
 
 Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
 
@@ -619,7 +619,9 @@ graph LR;
     D-->F
 ```
 
-Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen. Die [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) bieten eine detailliertere Darstellung der Integritätsprüfung.
+Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen. Die [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) bieten eine detailliertere Darstellung der Integritätsprüfung.  
+Die Blockchain ist zwar privat und kein verteiltes Hauptbuch, exportierte PDF-Aufzeichnungen enthalten aber den jweils neuesten verfügbaren Hash. Bei der Ausgabe von Informationen an Dritte, wie beispielsweise Patienten oder Kostenträger, werden auch kleine Teile der Ketteninformation verteilt, die sich dann in der detaillierten Integritätsprüfung unveränderter valider Aufzeichnungen wiederfinden lassen.  
+Zusammengeführte Aufzeichnungen beinhalten die zuvor verifizierten Blockchain-Informationen. Diese können aktuell noch nicht automatisiert verifiziert werden, verbleiben aber als gesicherte Information bestehen.
 
 [Übersicht](#übersicht)
 

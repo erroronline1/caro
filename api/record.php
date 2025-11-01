@@ -1907,17 +1907,11 @@ class RECORD extends API {
 			// append merged content to new identifier
 			$original['content'] = json_decode($original['content'], true);
 
-			if (!BLOCKCHAIN::verified($original['content'])) $this->response([
+			if (($original['content'] = BLOCKCHAIN::merge($original['content'], $merge['content'])) === false) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $original['identifier']]),
 					'type' => 'error'
 				]]);
-
-			// drop blockchain genesis block
-			array_shift($merge['content']);
-			foreach ($merge['content'] as $record){
-				$original['content'] = BLOCKCHAIN::add($original['content'], $record);
-			}
 	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
@@ -2066,7 +2060,8 @@ class RECORD extends API {
 			'case_state' => $data['case_state'],
 			'lifespan' => $data['lifespan'],
 			'erp_case_number' => $data['erp_case_number'],
-			'note' => $data['note']
+			'note' => $data['note'],
+			'recenthash' => ''
 		];
 		$accumulatedcontent = [];
 
@@ -2079,6 +2074,8 @@ class RECORD extends API {
 		usort($records, Fn($a, $b) => $a['date'] <=> $b['date']);
 
 		foreach ($records as $record){
+			// append most recent hash for optional validity checking of the blockchain by comparing the hash with the detailed verification output
+			$summary['recenthash'] = $record['hash'];
 			// check whether the record is within a valid and accessible document
 			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($document['restricted_access'])) continue;

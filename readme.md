@@ -230,9 +230,9 @@ Documents can contain a digital signature pad. According to eIDAS
 > (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
 > (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.
 
-regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatory identity is ensured because the signature takes place in person at the working site.  
-regarding (c): handwritten signatures are solely under the signatorys control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
-regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes invalidate the whole record.
+regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatories identity is ensured because the signature takes place in person at the working site.  
+regarding (c): handwritten signatures are solely under the signatories control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
+regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes of the signature or the data invalidate the whole record.
 
 Consult your data protection supervisor if this is sufficient for an electronic signature.
 
@@ -719,7 +719,9 @@ graph LR;
     D-->F
 ```
 
-The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. Details on the record verification can also be viewed within the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries).
+The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. Details on the record verification can also be viewed within the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries).  
+The blockchain is not a distributed ledger but a private one, but PDF-exports of records do contain the most recent available hash. On handing out any piece of information to third parties, like patients, cost bearers, etc., a piece of information on the chain will be spread and can be found within the detailed verification output of valid untampered records.  
+Merged records do contain the previous verified blockchain information, that currently can not be verified automated, but remains a secured content for reference.
 
 [Content](#content)
 
@@ -2752,6 +2754,7 @@ A solution could be established due to an erp database connection thus implement
 | Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
 | Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
+| Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain |
 
 [Content](#content)
 
