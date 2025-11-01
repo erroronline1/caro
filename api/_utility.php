@@ -1643,6 +1643,7 @@ class IPTC {
  */
 class BLOCKCHAIN {
 	/**
+	 * add a block to the chain, initiate the chain if necessary
 	 * @param null|array $chain
 	 * @param array $block
 	 * @return array
@@ -1655,9 +1656,6 @@ class BLOCKCHAIN {
 		}
 		$previous_hash = $chain[count($chain) - 1]['hash'];
 
-		// for merging records
-		unset($block['hash']);
-
 		$block_hash = hash('sha256', UTILITY::json_encode($block));
 		$block['hash'] = hash('sha256', $previous_hash . $block_hash);
 
@@ -1666,6 +1664,7 @@ class BLOCKCHAIN {
 	}
 
 	/**
+	 * verify chain by validating hashes. id $details is set to true the chain is returned with raw data and additional verification information
 	 * @param array $chain
 	 * @param bool $details to return details on checks
 	 * @return bool|array
@@ -1675,7 +1674,7 @@ class BLOCKCHAIN {
 		if (!$chain) return false;
 		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* Randomized hash"];
 		// skip genesis block
-		for($i = 1 ; $i < count($chain); $i++){
+		for($i = 1; $i < count($chain); $i++){
 			$previous_hash = $chain[$i - 1]['hash'];
             $block = $chain[$i];
 			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
@@ -1705,6 +1704,28 @@ class BLOCKCHAIN {
 		}
 		if (!$details) return true;
 		return $report;
+	}
+
+	/**
+	 * merges two chains, including previous hash information for backwards checks
+	 * this may have to be done manually or with future methods if necessary in case of serious concerns, but at least there is no data loss
+	 * @param array $chain
+	 * @param array $append chain to append
+	 * @return bool|array false if validation fails, else $chain 
+	 */
+	public static function merge($chain = [], $append = []){
+		if (!self::verified($append)) return false;
+		for($i = 1; $i < count($append); $i++){
+			$block = $append[$i];
+			$block['merged'] = ['former_hash' => $block['hash']];
+			// append genesis block to first merged block
+			if ($i < 2) {
+				$block['merged']['genesis'] = $append[0];
+			}
+			unset($block['hash']);
+			$chain = self::add($chain, $block);
+		}
+		return $chain;
 	}
 }
 
