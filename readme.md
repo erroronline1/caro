@@ -32,6 +32,7 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+* libraries test enable source mapping on ios, maybe the new os is finally able to comply
 
 ## Content
 * [Aims](#aims)
@@ -3250,7 +3251,7 @@ Sample response
 {"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"documents"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by documents and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
-> GET ./api/api.php/audit/export/{type}/{date}/{date/time}
+> GET/POST ./api/api.php/audit/export/{type}/{date}/{date/time}
 
 Returns a download link to a temporary file based on type.
 
@@ -6267,7 +6268,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * [MIT license](https://github.com/mk-j/PHP_XLSXWriter?tab=MIT-1-ov-file)
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
-    * Justification: this library enables the use of simple electronic signature (SES) according to eIDAS.
+    * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).
     * v5.1.1
     * \> 11k stars
     * \> 2k forks

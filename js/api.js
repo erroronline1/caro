@@ -876,6 +876,7 @@ export const api = {
 					// passed formdata
 					payload = request[3];
 					delete request[3];
+					if (["export"].includes(request[1])) break; // export checks that are called via post to call default successFn displaying a download link
 					successFn = function (data) {
 						if (data.render) {
 							api.update_header(title[request[1]] + (request[2] ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
