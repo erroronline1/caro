@@ -1664,7 +1664,7 @@ class BLOCKCHAIN {
 	}
 
 	/**
-	 * verify chain by validating hashes. id $details is set to true the chain is returned with raw data and additional verification information
+	 * verify chain by validating hashes. if $details is set to true the chain is returned with raw data and additional verification information
 	 * @param array $chain
 	 * @param bool $details to return details on checks
 	 * @return bool|array
@@ -1673,10 +1673,9 @@ class BLOCKCHAIN {
 		$report = [];
 		if (!$chain) return false;
 		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* Randomized hash"];
-		// skip genesis block
 		for($i = 1; $i < count($chain); $i++){
 			$previous_hash = $chain[$i - 1]['hash'];
-            $block = $chain[$i];
+			$block = $chain[$i];
 			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
 
 			$current_hash = $block['hash'];
@@ -1684,19 +1683,22 @@ class BLOCKCHAIN {
 			$block_hash = hash('sha256', UTILITY::json_encode($block));
 			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) {
 				if (!$details) return false;
-				$blockreport['verification'] .= "" . '**previous hash ' . $previous_hash . ' and content hash ' . $block_hash . 'did not resolve to required current hash ' . $current_hash . "!**";
+				$blockreport['verification'] .= "\n* **previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' did not resolve to required current hash ' . $current_hash . "!**";
 			}
-			else 
-				$blockreport['verification'] .= "\n* previous hash " . $previous_hash . ' and content hash ' . $block_hash . 'do resolve to required current hash ' . $current_hash . ".";
+			else $blockreport['verification'] .= "\n* previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' do resolve to required current hash ' . $current_hash . ".";
 
 			if (isset($block['attachments'])){
 				$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
 				foreach ($attachments as $file => $hash){
 					$filehash = hash_file('sha256', $file); 
-					if (!is_file($file) || $filehash !== $hash){
-						if (!$details) return false;
+					if (is_file($file)){
+						if ($filehash !== $hash){
+							if (!$details) return false;
+							$blockreport['verification'] .= "\n* " . $file . ' hash ' . $filehash . ' **did not match** ' . $hash;
+						}
+						else $blockreport['verification'] .= "\n* " . $file . ' **has** hash ' . $filehash;
 					}
-					$blockreport['verification'] .= "\n* " . $file . ' **has** hash ' . $filehash;
+					else $blockreport['verification'] .= "\n* " . $file . ' **has not been found**';
 				}
 			}
 
