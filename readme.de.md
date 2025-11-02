@@ -140,8 +140,8 @@ Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
 > (c) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
 > (d) Sie ist so mit den auf diese Weise unterzeichneten Daten verbunden, dass eine nachträgliche Veränderung der Daten erkannt werden kann.
 
-bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.
-bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.
+bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.  
+bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.  
 bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung der Unterschrift oder der Daten macht die gesamte Aufzeichnung ungültig.
 
 Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
