@@ -93,7 +93,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
 * keine künstliche Intelligenz: volle Datenhoheit behalten
 
-![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de-fullpage.png)
 
 ## Erforderliche Infrastruktur 
 Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Dokumenten, Textvorschlägen und Auditvorlagen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
@@ -200,7 +200,7 @@ Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betri
 
 > In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.
 
-![user screenshot](http://toh.erroronline.one/caro/user%20de.png)
+![user screenshot](http://toh.erroronline.one/caro/user%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -238,7 +238,7 @@ graph TD;
 
 Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
 
-![user screenshot](http://toh.erroronline.one/caro/profile%20de.png)
+![user screenshot](http://toh.erroronline.one/caro/profile%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -296,7 +296,7 @@ Bei der Erstellung von Textvorschlägen können die Textbausteine individuell so
 
 Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
-![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20de.png)
+![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -426,7 +426,7 @@ Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fäl
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
-![document composer screenshot](http://toh.erroronline.one/caro/document%20manager%20de.png)
+![document composer screenshot](http://toh.erroronline.one/caro/document%20manager%20de-fullpage.png)
 
 #### Dokumentenlenkung
 Komponenten und Dokumente müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Eine Freigabe-Anfrage für Komponenten und Dokumente wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der berechtigten Rolle während der Anmeldung in der Anwendung. Alle Nutzer erhalten eine Mitteilung über aktualisierte Dokumente.
@@ -485,7 +485,7 @@ graph TD;
 
 Bildschirmformular
 
-![screen document](http://toh.erroronline.one/caro/document%20screen%20de.png)
+![screen document](http://toh.erroronline.one/caro/document%20screen%20de-fullpage.png)
 
 Exportiertes Dokument
 
@@ -522,7 +522,7 @@ Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallsta
 
 Aufzeichnungen die außerhalb manuell angelegter Dokumente durch die Anwendung unterstützt werden (z.B. Fallstatus, s.o.) werden in der [Systemsprache](#laufzeitvariablen) gespeichert.
 
-![screen record summary](http://toh.erroronline.one/caro/record%20screen%20de.png)
+![screen record summary](http://toh.erroronline.one/caro/record%20screen%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -637,7 +637,7 @@ Eine Aktualisierung ist, neben der manuellen Pflege, auch über einen Import dur
 
 Für Risiken mit der selben Ursache, Auswirkung, Maßnahme und verbleibender Maßnahme werden Risikobezüge, Wahrscheinlichkeiten und Schadenshöhe aktualisiert, andernfalls ein neuer Eintrag erstellt. Auf diese Weise können versehentliche Fehleinschätzungen korrigiert werden.
 
-![risk screenshot](http://toh.erroronline.one/caro/risks%20de.png)
+![risk screenshot](http://toh.erroronline.one/caro/risks%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -645,11 +645,11 @@ Für Risiken mit der selben Ursache, Auswirkung, Maßnahme und verbleibender Ma�
 Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele, der Auditmethode und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt, [umsortiert](#verschiedenes) und reimportiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.  
 Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren.
 
-![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de.png)
+![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de-fullpage.png)
 
 Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem letzten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
-![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
+![audit screenshot](http://toh.erroronline.one/caro/audit%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -681,7 +681,7 @@ Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar,
 
 Die Planung von Aufgaben ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht. Ereignisse werden nach einer [einstellbaren Zeit](#laufzeitvariablen) nach Erledigung gelöscht sofern nicht anders angegeben.
 
-![calendar screenshot](http://toh.erroronline.one/caro/calendar%20de.png)
+![tasks screenshot](http://toh.erroronline.one/caro/tasks%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -766,7 +766,7 @@ Die Planung ist einfach zu nutzen:
 
 Gewählte Zeiträume werden auf den ersten Tag des Startmonats und den letzten Tag des Endmonats korrigiert. Die Einfärbung erfolgt für halbe Monate.
 
-![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20de.png)
+![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -841,7 +841,7 @@ Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserkl�
 
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
-![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de.png)
+![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -932,7 +932,7 @@ Die Darstellung von Bestellungen kann innerhalb des [Nutzer-Profils](#nutzer) au
 
 Bearbeitete Bestellungen werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) exportiert und für die Lieferantenbewertung genutzt werden.
 
-![orders screenshot](http://toh.erroronline.one/caro/orders%20de.png)
+![orders screenshot](http://toh.erroronline.one/caro/orders%20de-fullpage.png)
 
 ```mermaid
 graph TD;
@@ -1062,7 +1062,7 @@ Ferner hoffentlich hilfreiche Informationen zu
 * Versorgungsstatistiken, bei Export aller verfügbaren Versorgungsaufzeichnungen innerhalb eines wählbaren Zeitraumes, deren Inhalte beliebig ausgewertet werden können, vorausgesetzt die [Dokumente](#dokumente) haben einzigartige Fragestellungen. Die Ausgabedatei ist eine CSV-Datei die unter anderem mit einem entsprechenden Filter auch durch den [CSV-Prozessor](#csv-prozessor) verarbeitet werden kann.
 * Integritität der Aufzeichnungen mit Details zur [Blockchain](#blockchain-gesicherte-inhalte)
 
-![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de.png)
+![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -1259,7 +1259,7 @@ eine@email.addresse und maskierte\@email.addresse
 
 und werden in etwa folgendermaßen angezeigt:
 
-![markdown screenshot](http://toh.erroronline.one/caro/markdown%20de.png)
+![markdown screenshot](http://toh.erroronline.one/caro/markdown%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
@@ -1626,7 +1626,7 @@ Das Standardmodul beinhaltet verfügbare Optionen zur Dateneinsicht in die ERP-S
 * Kennzeichen-Aufkleber können für Arbeitslisten genutzt werden. Die Bestrebung Bäume zu retten kann für manche Aufgaben nur eingeschränkt umsetzbar sein. Ein Blatt Papier mit Kennzeichen für die Navigation zu Aufzeichnungen mit Kurznotizen kann die Barriere zur Nutzung der Anwendung reduzieren.
 * Barcodes oder QR-Codes an Lagerplätzen kann eine Nachbestellung beschleunigen.
 
-![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 

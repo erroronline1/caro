@@ -1877,7 +1877,7 @@ export async function screenshot(lang = null, distinct = null) {
 			/* 15 */ { en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
 			/* 16 */ { en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
 			/* 17 */ { en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
-			/* 18 */ { en: "api.calendar('get', 'schedule')", de: "", screenshot: `:screenshot --fullpage --filename "calendar ${lang}.png"` },
+			/* 18 */ { en: "api.calendar('get', 'tasks')", de: "", screenshot: `:screenshot --fullpage --filename "tasks ${lang}.png"` },
 			/* 19 */ { en: "api.document('get', 'document_editor', 3168)", de: "api.document('get', 'document_editor', 127)", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
 			/* 20 */ { en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
 			/* 21 */ { en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
@@ -1887,8 +1887,8 @@ export async function screenshot(lang = null, distinct = null) {
 			/* 25 */ { en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
 			/* 26 */ { en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
 			/* 27 */ {
-				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO 2025-08-09 15:52')",
-				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02')",
+				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO #t548po')",
+				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese #t548y0')",
 				screenshot: `:screenshot --fullpage --filename "record screen ${lang}.png"`,
 			}, // customize identifier
 		];
@@ -2199,24 +2199,24 @@ eine@email.addresse und maskierte\@email.addresse
 			},
 			/* 32 */ {
 				en: async function () {
-					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
+					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO #t548po"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02"); // customize identifier
+					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #t548y0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 			},
 			/* 33 */ {
 				en: async function () {
-					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
+					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO #t548po"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02"); // customize identifier
+					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #t548y0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
