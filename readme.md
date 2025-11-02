@@ -2755,7 +2755,7 @@ A solution could be established due to an erp database connection thus implement
 | Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
 | Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
-| Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain |
+| Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain | This is the safest to get to work without keys and should likely meet the criteria for a advanced electronic signature. Validity can be checked and a report exported in case of judicial disputes |
 
 [Content](#content)
 
