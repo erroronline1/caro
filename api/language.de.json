@@ -1567,8 +1567,8 @@
 		"type_description": "Dokumentationstyp",
 		"unassigned": "Nicht zugeordnet",
 		"verify": {
-			"corrupt": "Die Aufzeichnung :identify konnte nicht erfolgreich verifiziert werden. Es sieht so aus, als habe es unauthorisierte Änderungen geben!",
-			"passed": "Es konnten keine strukturellen Fehler in der Aufzeichnung :identify festgestellt werden. Angehängte Dateien und Daten sind in Ordnung!",
+			"corrupt": "Die Aufzeichnung :identifier konnte nicht erfolgreich verifiziert werden. Es sieht so aus, als habe es unauthorisierte Änderungen geben!",
+			"passed": "Es konnten keine strukturellen Fehler in der Aufzeichnung :identifier festgestellt werden. Angehängte Dateien und Daten sind in Ordnung!",
 			"verify": "Aufzeichnung verifizieren"
 		}
 	},
