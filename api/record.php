@@ -2075,7 +2075,7 @@ class RECORD extends API {
 
 		foreach ($records as $record){
 			// append most recent hash for optional validity checking of the blockchain by comparing the hash with the detailed verification output
-			$summary['recenthash'] = $record['hash'];
+			if (isset($record['hash'])) $summary['recenthash'] = $record['hash'];
 			// check whether the record is within a valid and accessible document
 			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($document['restricted_access'])) continue;

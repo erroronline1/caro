@@ -1649,7 +1649,7 @@ class BLOCKCHAIN {
 	 * @return array
 	 */
 	public static function add($chain = [], $block = []){
-		if (!$chain) {
+		if (!$chain || !isset($chain[count($chain) - 1]['hash'])) {
 			$chain[] = [
 				'hash' => hash('sha256', bin2hex(random_bytes(18))) // create genesis data
 			];
@@ -1672,36 +1672,42 @@ class BLOCKCHAIN {
 	public static function verified($chain = [], $details = false){
 		$report = [];
 		if (!$chain) return false;
-		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* Randomized hash"];
+		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* " . (isset($chain[0]['hash']) ? "Randomized hash" : "**This block is not secured!**")];
 		for($i = 1; $i < count($chain); $i++){
-			$previous_hash = $chain[$i - 1]['hash'];
 			$block = $chain[$i];
 			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
 
-			$current_hash = $block['hash'];
-			unset($block['hash']);
-			$block_hash = hash('sha256', UTILITY::json_encode($block));
-			if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) {
+			if (!isset($chain[$i - 1]['hash'])){
 				if (!$details) return false;
-				$blockreport['verification'] .= "\n* **previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' did not resolve to required current hash ' . $current_hash . "!**";
+				$blockreport['verification'] .= "\n* **This block is not secured!**";
 			}
-			else $blockreport['verification'] .= "\n* previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' do resolve to required current hash ' . $current_hash . ".";
+			else {
+				$previous_hash = $chain[$i - 1]['hash'];
 
-			if (isset($block['attachments'])){
-				$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
-				foreach ($attachments as $file => $hash){
-					$filehash = hash_file('sha256', $file); 
-					if (is_file($file)){
-						if ($filehash !== $hash){
-							if (!$details) return false;
-							$blockreport['verification'] .= "\n* " . $file . ' hash ' . $filehash . ' **did not match** ' . $hash;
+				$current_hash = $block['hash'];
+				unset($block['hash']);
+				$block_hash = hash('sha256', UTILITY::json_encode($block));
+				if ($current_hash !== hash('sha256', $previous_hash . $block_hash)) {
+					if (!$details) return false;
+					$blockreport['verification'] .= "\n* **previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' did not resolve to required current hash ' . $current_hash . "!**";
+				}
+				else $blockreport['verification'] .= "\n* previous hash " . $previous_hash . ' and content hash ' . $block_hash . ' do resolve to required current hash ' . $current_hash . ".";
+
+				if (isset($block['attachments'])){
+					$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
+					foreach ($attachments as $file => $hash){
+						$filehash = hash_file('sha256', $file); 
+						if (is_file($file)){
+							if ($filehash !== $hash){
+								if (!$details) return false;
+								$blockreport['verification'] .= "\n* " . $file . ' hash ' . $filehash . ' **did not match** ' . $hash;
+							}
+							else $blockreport['verification'] .= "\n* " . $file . ' **has** hash ' . $filehash;
 						}
-						else $blockreport['verification'] .= "\n* " . $file . ' **has** hash ' . $filehash;
+						else $blockreport['verification'] .= "\n* " . $file . ' **has not been found**';
 					}
-					else $blockreport['verification'] .= "\n* " . $file . ' **has not been found**';
 				}
 			}
-
 			$report[] = $blockreport;
 		}
 		if (!$details) return true;
