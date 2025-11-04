@@ -1564,14 +1564,14 @@ Daten aus dem ERP-System werden abgerufen sofern verfügbar und aktiviert. Für 
 * article_unit
 * article_ean
 * trading_good
-* incorporated (likelyness by being already ordered in the past)
+* incorporated (likeliness by being already ordered in the past)
 * has_expiry_date
 * special_attention
 * stock_item
 * thirdparty_order
 * erp_id
 
-vervollständigt, sofern nicht bereits beschrieben.
+vervollständigt, sofern nicht bereits beschrieben, bzw. im Falle von stock_item, thirdparty_order und erp_id überschrieben, da die ERP-Software es am besten wissen sollte.
 
 Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern übereinstimmen müssen.
 

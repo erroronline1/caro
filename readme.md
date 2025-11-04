@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-* libraries test enable source mapping on ios, maybe the new os is finally able to comply
 
 ## Content
 * [Aims](#aims)
@@ -1665,7 +1664,7 @@ ERP-Data is fetched during product list imports if available and selected. For a
 * thirdparty_order
 * erp_id
 
-is updated if not already set within the system.
+is updated if not already set within the system, definetly overwritten in case of stock_item, thirdparty_order und erp_id, because the ERP-Software should know best.
 
 Needless to elaborate vendor names and unique article numbers must match.
 
