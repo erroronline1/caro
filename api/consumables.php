@@ -1925,9 +1925,9 @@ class CONSUMABLES extends API {
 				$query = SQLQUERY::PREPARE('consumables_put_product_productlist_import');
 				$replace = [
 					':id' => $remainder[$update]['id'],
-					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : 'NULL',
-					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : 'NULL',
-					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : 'NULL',
+					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : $remainder[$update]['article_name'],
+					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : $remainder[$update]['article_unit'],
+					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : $remainder[$update]['article_ean'],
 					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
 					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
 					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
@@ -2039,6 +2039,30 @@ class CONSUMABLES extends API {
 							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
 						];
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
+					}
+
+					// update hidden, if not in erp_dump aka deleted
+					$_batchhidden = [];
+					foreach (array_diff(array_column($remainder, 'article_no'), array_column($productlist->_list[1], 'article_no')) as $row){
+						$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
+						$_batchhidden[] = $remainder[$update]['id'];
+					}
+					if ($_batchhidden){
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_batch'), [
+							':field' => 'erp_id',
+							':value' => 'NULL',
+							':ids' => implode(',', $_batchhidden)
+						]) . '; ');
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_batch'), [
+							':field' => 'stock_item',
+							':value' => 'NULL',
+							':ids' => implode(',', $_batchhidden)
+						]) . '; ');
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_batch'), [
+							':field' => 'hidden',
+							':value' => $this->_pdo->quote(UTILITY::json_encode(['name' => $this->_lang->GET('erpquery.integrations.update_via_erp_interface', [':systemuser' => CONFIG['system']['caroapp']], true), 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')])),
+							':ids' => implode(',', $_batchhidden)
+						]) . '; ');
 					}
 				}
 			}
