@@ -1174,7 +1174,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			WHERE ia.BEZEICHNUNG = 'Lieferanten'
 		) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 		
-		WHERE article.BESTELLSTOP = 0 AND article.STATUS = 0
+		WHERE article.BESTELLSTOP = 0 AND article.STATUS = 0 AND article.PRIMAER_LIEFERANT = 1
 		AND vendor.NAME_1 :as_passed in (:vendors)
 		END;
 
