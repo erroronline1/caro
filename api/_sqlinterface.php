@@ -42,6 +42,7 @@ class SQLQUERY {
 
 				if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
 					$query = SELF::SEARCH($_pdo, $query, $value, (isset($parameters['wildcards']) ? $parameters['wildcards'] : false));
+					if (!$query) return [];
 					unset($parameters['values'][$key]);
 					continue;
 				}
@@ -119,6 +120,7 @@ class SQLQUERY {
 			];
 		}	
 		$expressions = SEARCH::expressions($value);
+		if (!$expressions) return false;
 
 		// delete column conditions as these are supposed to be postprocessed via SEARCH::refine() (_utility.php)
 		foreach($expressions as $index => $expression){
@@ -777,8 +779,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP(1) approved FROM caro_consumables_approved_orders ORDER BY approved ASC"
 		],
 		'order_get_approved_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE 'orderer\":\":user') AND (order_data LIKE :SEARCH)",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE 'orderer\":\":user') AND (order_data LIKE :SEARCH)"
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE '%orderer\":\":user\"%') AND (order_data LIKE :SEARCH)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE '%orderer\":\":user\"%') AND (order_data LIKE :SEARCH)"
 		],
 		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
