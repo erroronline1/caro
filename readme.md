@@ -32,6 +32,8 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+* order filter for stock_items additional/instead of pdf export
+* purchase message on new orders every x minutes from notification instead of every new order, to avoid becoming dulled to notifications
 
 ## Content
 * [Aims](#aims)
