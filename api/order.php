@@ -445,10 +445,9 @@ class ORDER extends API {
 					'wildcards' => true,
 					'replacements' => [
 						':organizational_unit' => implode(",", $units),
-						':user' =>  $_SESSION['user']['id']
+						':user' => $_SESSION['user']['id']
 					]
 				]);
-
 				// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
 				// weighting is reasonable though
 				$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
@@ -505,7 +504,7 @@ class ORDER extends API {
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
 					if (isset($users[$orderer])) $orderer = $users[$orderer];
 					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
-					$unit_intersection = array_intersect([$row['organizational_unit']], $units);
+					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $units)) || $orderer['name'] = $_SESSION['user']['name'];
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -610,7 +609,7 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'partially_delivered':
-								if ($row['delivered'] || !($permission['admin'] || $unit_intersection)){
+								if ($row['delivered'] || !($permission['admin'] || $unit_intersection || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -623,7 +622,7 @@ class ORDER extends API {
 								}
 								// no break
 							case 'archived':
-								if (!($permission['admin'] || $unit_intersection)){
+								if (!($permission['admin'] || $unit_intersection || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -777,10 +776,9 @@ class ORDER extends API {
 		// gather product information on stock item flag
 		$stock_items = $erp_ids = [];
 		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			if ($product['stock_item']) $stock_items[$product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']] = true;
-			if ($product['erp_id']) $erp_ids[$product['erp_id']] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
+			if ($product['stock_item']) $stock_items[trim($product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'])] = true;
+			if ($product['erp_id']) $erp_ids[$product['erp_id']] = trim($product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']);
 		}
-
 		$data = [];
 		$item = 1;
 		foreach ($order as $row) {
@@ -790,7 +788,7 @@ class ORDER extends API {
 			$decoded_order_data = json_decode($row['order_data'], true);
 
 			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])
-				&& !isset($stock_items[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label']])
+				&& !isset($stock_items[trim($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'])])
 			){
 				continue;
 			}
