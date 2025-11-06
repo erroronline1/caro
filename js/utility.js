@@ -588,7 +588,8 @@ export const _client = {
 						],
 					],
 				};
-			new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
+			//new Assemble(cart).initializeSection(nodes[nodes.length - 3]); // always append on bottom of article list
+			new Assemble(cart).initializeSection(nodes[1]); // always append on top of article list
 			new Toast(api._lang.GET("order.added_confirmation", { ":name": data[3] }), "info");
 		},
 
@@ -1707,13 +1708,15 @@ export const _client = {
 			const inputs = {};
 			let bulk;
 			if (data.allowedstateupdates) {
-				let skip = true;
-				for (const input of data.allowedstateupdates) {
-					// skip all previous
-					if (skip) {
-						if (input === data.state || data.state === "unprocessed") skip = false;
-						else continue;
-					}
+				// order of options
+				const possiblestates = ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'];
+				// remove possible states
+				for (let i=0;i<possiblestates.length; i++){
+					if (data.state === "unprocessed" || data.state === possiblestates[i]) break;
+					if (data.state !== possiblestates[i]) delete possiblestates[i];
+				}
+
+				for (const input of possiblestates.filter(value => data.allowedstateupdates.includes(value))) {
 					inputs[api._lang.GET("order.order." + input)] = { value: input, onchange: "_client.order.batchStateUpdate(this)" };
 					if (input === data.state) inputs[api._lang.GET("order.order." + input)].checked = true;
 				}
