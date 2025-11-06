@@ -1148,7 +1148,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				/*tradinggood
 				expirydate
 				specialattention*/
-			article2.MINDEST_BESTAND,
+			storage.LAGERORT,
 			article.ARTIKEL_REFERENZ,
 			CONVERT(varchar(255), article.WARENEINGANGSDATUM, 120) AS WARENEINGANGSDATUM
 		FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
@@ -1161,10 +1161,19 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		LEFT JOIN (
 			SELECT
 				REFERENZ,
-				ZUSATZINFORMATION,
-				MINDEST_BESTAND
+				ZUSATZINFORMATION
 			FROM [eva3_02_viva_souh].[dbo].[wws_artikelstamm]
 		) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
+		LEFT JOIN (
+			SELECT
+				ARTIKEL_REFERENZ,
+				(CASE WHEN LAGERORT IS NULL THEN 'Konsignationslager' ELSE LAGERORT END) AS LAGERORT
+			FROM [eva3_02_viva_souh].[dbo].[wws_lagerbestand] AS strg
+			INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
+			WHERE 
+			(strg_n.BEZEICHNUNG LIKE 'Zentrallager' AND strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null')
+			OR strg_n.BEZEICHNUNG LIKE 'Konsignations%'
+		) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
 		LEFT JOIN (
 			SELECT 
 				v.NAME_1,
@@ -1205,7 +1214,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'trading_good' => null,
 				'has_expiry_date' => null,
 				'special_attention' => null,
-				'stock_item' => $row['MINDEST_BESTAND'] ? 1 : null,
+				'stock_item' => $row['LAGERORT'] ? 1 : null,
 				'erp_id' => $row['ARTIKEL_REFERENZ'],
 				'last_order' => $row['WARENEINGANGSDATUM'] ? : null
 			];
