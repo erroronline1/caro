@@ -656,7 +656,7 @@ class CALENDAR extends API {
 						'projected' => round(floatval($stats_month_row['_projected']), 2),
 						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
 						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => round(floatval($stats_all_row['_overtime'] - $stats_all_row['_initialovertime']), 2),
+						'overtime' => round(floatval($stats_all_row['_overtime'] + $stats_all_row['_initialovertime']), 2),
 						'monthlyovertime' => round(floatval($stats_month_row['_overtime']), 2)
 					];
 				}
