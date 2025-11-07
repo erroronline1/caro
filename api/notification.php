@@ -309,7 +309,9 @@ class NOTIFICATION extends API {
 									'values' => [
 										':timestamp' => date('Y-m-d H:i:s', filemtime($logfile)) 
 									]
-								]); 
+								]);
+								$orders = $orders ? intval($orders[0]['num']) : null;
+
 								if ($orders){
 									$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 								}
