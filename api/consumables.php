@@ -1876,7 +1876,6 @@ class CONSUMABLES extends API {
 		$sqlchunks = [];
 		$date = '';
 
-
 		$log = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $productlist->_log);
 
 		if (!(isset($productlist->_list[1]) && count($productlist->_list[1]))) {
@@ -1900,11 +1899,15 @@ class CONSUMABLES extends API {
 					':ids' => intval($vendorID)
 				]
 			]);
+
+			// prepare hopefully distinguisheable product lists, based on article_no and article_name
 			foreach ($remained as $row) {
-				$remainder[] = [
+				$key = ($row['article_no'] ? trim($row['article_no']): '') . ($row['article_name'] ? trim($row['article_name']): '');
+				$key = mb_convert_encoding($key, 'UTF-8', mb_detect_encoding($key, ['ASCII', 'UTF-8', 'ISO-8859-1']));
+				$remainder[$key] = [ // at least one of both should not be null and the whole string distinct. otherwise screw the source.
 					'id' => $row['id'],
 					'article_no' => $row['article_no'],
-
+					'article_name' => $row['article_name'],
 					'article_unit' => $row['article_unit'],
 					'article_ean' => $row['article_ean'],
 					'trading_good' => $row['trading_good'],
@@ -1914,28 +1917,50 @@ class CONSUMABLES extends API {
 					'incorporated' => $row['incorporated'],
 					'thirdparty_order' => $row['thirdparty_order'],
 					'erp_id' => $row['erp_id'],
+					'last_order' => $row['last_order']
 				];
 			}
 
-			// update remainders where imported article_no match with remainders
-			foreach (array_uintersect(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
+			$imported = [];
+			foreach ($productlist->_list[1] as $row){
+				$row['article_no'] = isset($row['article_no']) ? trim(preg_replace('/\n/', '', $row['article_no'])) : null;
+				$row['article_name'] = isset($row['article_name']) ? trim(preg_replace('/\n/', '', $row['article_name'])) : null;
+				$key = ($row['article_no'] ? : '') . ($row['article_name'] ? : '');
+				$key = mb_convert_encoding($key, 'UTF-8', mb_detect_encoding($key, ['ASCII', 'UTF-8', 'ISO-8859-1']));
+				$imported[$key] = [ // at least one of both should not be null and the whole string distinct. otherwise screw the source.
+					'article_no' => isset($row['article_no']) ? $row['article_no'] : null,
+					'article_name' => isset($row['article_name']) ? $row['article_name'] : null,
+					'article_unit' => isset($row['article_unit']) ? trim(preg_replace('/\n/', '', $row['article_unit'])) : null,
+					'article_ean' => isset($row['article_ean']) ? trim(preg_replace('/\n/', '', $row['article_ean'])) : null,
+					'article_info' => isset($row['article_info']) ? trim(preg_replace('/\n/', '', $row['article_info'])) : null,
+					'trading_good' => isset($row['trading_good']) ? $row['trading_good'] : null,
+					'has_expiry_date' => isset($row['has_expiry_date']) ? $row['has_expiry_date'] : null,
+					'special_attention' => isset($row['special_attention']) ? $row['special_attention'] : null,
+					'stock_item' => isset($row['stock_item']) ? $row['stock_item'] : null,
+					'thirdparty_order' => isset($row['thirdparty_order']) ? $row['thirdparty_order'] : null,
+					'erp_id' => isset($row['erp_id']) ? trim($row['erp_id']) : null,
+					'last_order' => isset($row['last_order']) ? trim($row['last_order']) : null,
+				];
+			}
+			$productlist = null; // release ressources
 
+			// update remainders where imported match with remainders
+			foreach (array_intersect(array_keys($imported), array_keys($remainder)) as $key){
 				// prepare query
 				$query = SQLQUERY::PREPARE('consumables_put_product_productlist_import');
 				$replace = [
-					':id' => $remainder[$update]['id'],
-					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : $remainder[$update]['article_name'],
-					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : $remainder[$update]['article_unit'],
-					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : $remainder[$update]['article_ean'],
-					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
-					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
-					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
-					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
-					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($productlist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
-					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL',
-					':last_order' => isset($productlist->_list[1][$index]['last_order']) ? $this->_pdo->quote($productlist->_list[1][$index]['last_order']) : 'NULL',
-					':thirdparty_order' => isset($productlist->_list[1][$index]['thirdparty_order']) && intval($productlist->_list[1][$index]['thirdparty_order']) ? 1 : 'NULL',
+					':id' => $remainder[$key]['id'],
+					':article_name' => isset($imported[$key]['article_name']) ? $this->_pdo->quote($imported[$key]['article_name']) : $remainder[$key]['article_name'],
+					':article_unit' => isset($imported[$key]['article_unit']) ? $this->_pdo->quote($imported[$key]['article_unit']) : $remainder[$key]['article_unit'],
+					':article_ean' => isset($imported[$key]['article_ean']) ? $this->_pdo->quote($imported[$key]['article_ean']) : $remainder[$key]['article_ean'],
+					':trading_good' => isset($imported[$key]['trading_good']) && intval($imported[$key]['trading_good']) ? 1 : 'NULL',
+					':has_expiry_date' => isset($imported[$key]['has_expiry_date']) && intval($imported[$key]['has_expiry_date']) ? 1 : 'NULL',
+					':special_attention' => isset($imported[$key]['special_attention']) && intval($imported[$key]['special_attention']) ? 1 : 'NULL',
+					':stock_item' => isset($imported[$key]['stock_item']) && intval($imported[$key]['stock_item']) ? 1 : 'NULL',
+					':erp_id' => isset($imported[$key]['erp_id']) && $imported[$key]['erp_id'] ? $this->_pdo->quote($imported[$key]['erp_id']) : ($remainder[$key]['erp_id'] ? : 'NULL'),
+					':incorporated' => $remainder[$key]['incorporated'] ? $this->_pdo->quote($remainder[$key]['incorporated']) : 'NULL',
+					':last_order' => isset($imported[$key]['last_order']) ? $this->_pdo->quote($imported[$key]['last_order']) : 'NULL',
+					':thirdparty_order' => isset($imported[$key]['thirdparty_order']) && intval($imported[$key]['thirdparty_order']) ? 1 : 'NULL',
 				];
 				// iterate over columns and values, strip equals to shorten each query and crunch more into one of the chunks to speed up sql
 				foreach ([
@@ -1951,8 +1976,8 @@ class CONSUMABLES extends API {
 					'incorporated',
 					// 'last_order' does not work for having to be converted
 				] as $column){
-					if ( ($replace[':' . $column] === $remainder[$update][$column])
-						|| (!$remainder[$update][$column] && $replace[':' . $column] === 'NULL')
+					if ( ($replace[':' . $column] === $remainder[$key][$column])
+						|| (!$remainder[$key][$column] && $replace[':' . $column] === 'NULL')
 					) {
 						$query = preg_replace('/,{0,1} ' . $column . ' = :' . $column . '/', '', $query);
 					}
@@ -1960,35 +1985,35 @@ class CONSUMABLES extends API {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 			}
 
-			// insert replacements based on unmatched article_no
+			// insert unmatched with remainders
 			$insertions = [];
-			foreach (array_udiff(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+			foreach (array_diff(array_keys($imported), array_keys($remainder)) as $key){
 				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => isset($productlist->_list[1][$index]['article_no']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_no']) : null,
-					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name']) : null,
+					':article_no' => isset($imported[$key]['article_no']) ? $imported[$key]['article_no'] : null,
+					':article_name' => isset($imported[$key]['article_name']) ? $imported[$key]['article_name'] : null,
 					':article_alias' => null,
-					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit']) : null,
-					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean']) : null,
-					':article_info' => isset($productlist->_list[1][$index]['article_info']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_info']) : null,
+					':article_unit' => isset($imported[$key]['article_unit']) ? $imported[$key]['article_unit'] : null,
+					':article_ean' => isset($imported[$key]['article_ean']) ? $imported[$key]['article_ean'] : null,
+					':article_info' => isset($imported[$key]['article_info']) ? $imported[$key]['article_info'] : null,
 					':hidden' => null,
 					':has_files' => null,
-					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : null,
-					':incorporated' => isset($productlist->_list[1][$index]['last_order']) && $productlist->_list[1][$index]['last_order'] 
+					':trading_good' => isset($imported[$key]['trading_good']) && intval($imported[$key]['trading_good']) ? 1 : null,
+					':incorporated' => isset($imported[$key]['last_order']) && $imported[$key]['last_order'] 
 						? UTILITY::json_encode([[
-							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $productlist->_list[1][$index]['last_order']], true),
+							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $imported[$key]['last_order']], true),
 							'user' => [
 								'name' => CONFIG['system']['caroapp'],
 								'date' => $this->_date['servertime']->format('Y-m-d H:i')
 							]
 						]])
 						: null,
-					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : null,
-					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : null,
-					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : null,
-					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $productlist->_list[1][$index]['erp_id'] : null,
-					':last_order' => isset($productlist->_list[1][$index]['last_order']) && $productlist->_list[1][$index]['last_order'] ? $productlist->_list[1][$index]['last_order'] : null,
-					':thirdparty_order' => isset($productlist->_list[1][$index]['thirdparty_order']) && intval($productlist->_list[1][$index]['thirdparty_order']) ? 1 : null,
+					':has_expiry_date' => isset($imported[$key]['has_expiry_date']) && intval($imported[$key]['has_expiry_date']) ? 1 : null,
+					':special_attention' => isset($imported[$key]['special_attention']) && intval($imported[$key]['special_attention']) ? 1 : null,
+					':stock_item' => isset($imported[$key]['stock_item']) && intval($imported[$key]['stock_item']) ? 1 : null,
+					':erp_id' => isset($imported[$key]['erp_id']) && $imported[$key]['erp_id'] ? $imported[$key]['erp_id'] : null,
+					':last_order' => isset($imported[$key]['last_order']) && $imported[$key]['last_order'] ? $imported[$key]['last_order'] : null,
+					':thirdparty_order' => isset($imported[$key]['thirdparty_order']) && intval($imported[$key]['thirdparty_order']) ? 1 : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
@@ -2039,34 +2064,14 @@ class CONSUMABLES extends API {
 							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no'])),
 							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
 						];
-						// iterate over columns and values, strip equals to shorten each query and crunch more into one of the chunks to speed up sql
-						foreach ([
-							// 'article_name', leave one out to remain a valid query
-							'article_unit',
-							'article_ean',
-							'trading_good',
-							'has_expiry_date',
-							'special_attention',
-							'stock_item',
-							'erp_id',
-							'thirdparty_order',
-							'incorporated',
-							// 'last_order' does not work for having to be converted
-						] as $column){
-							if ( ($replace[':' . $column] === $remainder[$update][$column])
-								|| (!$remainder[$update][$column] && $replace[':' . $column] === 'NULL')
-							) {
-								$query = preg_replace('/,{0,1} ' . $column . ' = :' . $column . '/', '', $query);
-							}
-						}
+
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 					}
 
 					// update hidden, if not in erp_dump aka deleted
 					$_batchhidden = [];
-					foreach (array_diff(array_column($remainder, 'article_no'), array_column($productlist->_list[1], 'article_no')) as $row){
-						$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
-						$_batchhidden[] = $remainder[$update]['id'];
+					foreach (array_diff(array_keys($remainder), array_keys($imported)) as $key){
+						$_batchhidden[] = $remainder[$key]['id'];
 					}
 					if ($_batchhidden){
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_batch'), [
@@ -2230,7 +2235,7 @@ class CONSUMABLES extends API {
 						else $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
 					if ($importfilter){
-						$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
+						$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected')) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport_option')));
 						$vendor[':products']['validity'] = $productlistImportResult[0];
 						if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
