@@ -1450,6 +1450,7 @@
 		"save_failed": "Die Bestellung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"saved": "Die freigegebene Bestellung kann nun vom Einkauf bearbeitet werden.",
 		"saved_to_prepared": "Die Bestellung wurde zu den vorbereiteten Bestellungen hinzugefügt, muss aber noch freigegeben werden.",
+		"stock_filter": "Nur Lagerware anzeigen",
 		"table_info": "Hinweise",
 		"table_order": "Bestellung",
 		"tile_view_groupby": "Gruppieren nach",

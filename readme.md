@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-* order filter for stock_items additional/instead of pdf export
 
 ## Content
 * [Aims](#aims)
@@ -2096,6 +2095,7 @@ mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase" ; display all orders by default, not only for own units
+orderexportstockitems = "purchase" ; permission to export a pdf of ordered stock items, this is less a critical permission than an application behaviour on allowing wasted paper for order processing
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products
@@ -2675,7 +2675,7 @@ Stakeholder identification:
 | Keyboard input jumping to select modal options | User | 2025-04-16 | Implemented; 2025-04-18 |
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 | Stock article flag | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
-| Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
+| Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15<br />Update as config setting in optional addition to onscreen filter; 2025-11-07 |
 | Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17 |
 | Add soon expiring trainings as planned by default | QMO | 2025-05-30 | Implemented; 2025-05-30 |
 | Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
@@ -2692,6 +2692,7 @@ Stakeholder identification:
 | Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 | Implemented; 2025-10-11 |
 | Batch update product alias | User | 2025-10-10 | Implemented; 2025-10-15 |
 | Product property: order via erp or third party ("BISI") | Purchase | 2025-10-10 | Implemented; 2025-10-15 |
+| Autodeletion for messages | User | 2025-11-06 | Implemented as optional user setting; 2025-11-07 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~

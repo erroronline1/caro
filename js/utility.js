@@ -633,6 +633,15 @@ export const _client = {
 					},
 				},
 			]);
+			if (data.stockfilter) {
+				content[content.length - 1].push({
+					type: "button",
+					attributes: {
+						value: api._lang.GET("order.stock_filter"),
+						onclick: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "stock", "' + data.state + '")',
+					},
+				});
+			}
 			if (data.export) {
 				content[content.length - 1].push({
 					type: "button",

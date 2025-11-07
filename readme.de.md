@@ -2002,6 +2002,7 @@ mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen a
 orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen
 ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu stornieren oder Rücksendungen zu veranlassen
 orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
+orderexportstockitems = "purchase" ; Berechtigung um ein PDF bestellter Lagerware zu exportieren; dies is weniger eine kritische Berechtigung als vielmehr ein Anwendungsverhalten ob die Bestellabwicklung Papier verschwenden darf
 orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 

@@ -370,7 +370,8 @@ class ORDER extends API {
 					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
 					'order' => [], 'approval' => [],
 					'allowedstateupdates'=> [],
-					'export' => false]];
+					'export' => false,
+					'stockfilter' => false]];
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
@@ -456,7 +457,8 @@ class ORDER extends API {
 					'products' => PERMISSION::permissionFor('products'),
 					'admin' =>  array_intersect(['admin'], $_SESSION['user']['permissions'])
 				];
-				$response['data']['export'] = $permission['orderprocessing'];
+				$response['data']['export'] = $permission['orderprocessing'] && PERMISSION::permissionFor('orderexportstockitems');
+				$response['data']['stockfilter'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
 				$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -474,6 +476,7 @@ class ORDER extends API {
 
 				foreach ($order as $row) {
 					// filter selected state or default to unprocessed
+					if ($this->_subMethodState === 'unprocessed') $this->_subMethodState = null;
 					if (!$this->_subMethodState && $row['ordered']) continue;
 					if ($this->_subMethodState){
 						if (!$row[$this->_subMethodState]) continue;
@@ -483,9 +486,6 @@ class ORDER extends API {
 							if ($this->_subMethodState === $s) break;
 						}
 					}
-					
-					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
-					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
 
 					$decoded_order_data = json_decode($row['order_data'], true);
 
@@ -493,6 +493,13 @@ class ORDER extends API {
 					if (isset($decoded_order_data['productid']) && isset($products[$decoded_order_data['productid']])){
 						$product = $products[$decoded_order_data['productid']];
 					}
+
+					if ($this->_subMethod === 'stock' &&
+						!isset($product['stock_item'])
+					) continue;
+
+					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
+					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
 
 					// data chunks to be assembled by js _client.order.approved()
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
