@@ -706,6 +706,10 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation",
 			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation"
 		],
+		'message_get_messages_prior_date' => [
+			'mysql' => "SELECT id FROM caro_messages WHERE user_id = :user AND timestamp < :timestamp",
+			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND timestamp < CONVERT(SMALLDATETIME, :timestamp, 120)"
+		],
 		'message_delete_messages' => [
 			'mysql' => "DELETE FROM caro_messages WHERE user_id = :user AND id in (:ids)",
 			'sqlsrv' => "DELETE FROM caro_messages WHERE user_id = :user AND id in (:ids)"

@@ -1839,6 +1839,7 @@
 			"autocomplete_back": "Taste für vorherige Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_forth": "Taste für nächste Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_swipe": "Wischen um Optionen bei mehrzeiligen Textfeldern zu wechseln",
+			"autodelete_messages":"Nachrichten automatisch nach gewählten Wochen löschen (0 für ausschließlich manuelles Löschen)",
 			"dateformat": "Datumformat",
 			"force_desktop": "Desktop-Modus erzwingen",
 			"header": "Anwendungseinstellungen",

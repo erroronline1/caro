@@ -1839,6 +1839,7 @@
 			"autocomplete_back": "Key for former option on multiline text inputs (if available)",
 			"autocomplete_forth": "Key for next option on multiline text inputs (if available)",
 			"autocomplete_swipe": "Swipe to toggle options on multiline text inputs",
+			"autodelete_messages":"Delete messages by default after selected weeks (0 for no autodeletion)",
 			"force_desktop": "Force desktop mode",
 			"dateformat": "Date format",
 			"header": "Application settings",

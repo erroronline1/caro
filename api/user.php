@@ -123,6 +123,7 @@ class USER extends API {
 				$user[':app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.language')) ? : CONFIG['application']['defaultlanguage'];
 				$user[':app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.theme'));
 				$user[':app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.masonry'));
+				$user[':app_settings']['autodeleteMessages'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autodelete_messages'));
 				$user[':app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_forth'));
 				$user[':app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_back'));
 				$user[':app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_swipe'));
@@ -161,7 +162,7 @@ class USER extends API {
 				}
 				// sanitize app settings for empty values
 				foreach ($user[':app_settings'] as $key => $value){
-					if (!$value) unset($user[':app_settings'][$key]);
+					if (!$value || $value === '0') unset($user[':app_settings'][$key]);
 				}
 				$settings = $user[':app_settings'];
 				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
@@ -470,6 +471,19 @@ class USER extends API {
 								$this->_lang->GET('user.settings.order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
 							]
+						], [
+							'type' => 'hr'
+						], [
+
+							'type' => 'range',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings.autodelete_messages'),
+								'min' => 0,
+								'max' => 4 * 6,
+								'step' => '1',
+								'value' => isset($user['app_settings']['autodeleteMessages']) ? strval($user['app_settings']['autodeleteMessages']) : '0',
+							],
+							'datalist' => array_map(Fn($m) => $m * 4, range(0, 6))
 						], [
 							'type' => 'hr'
 						], [

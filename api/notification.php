@@ -530,6 +530,27 @@ class NOTIFICATION extends API {
 							UTILITY::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
 							UTILITY::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
+
+							// delete messages for users with enabled autodeletion
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							foreach($users as $user){
+								$user['app_settings'] = json_decode($user['app_settings'], true);
+								if (isset($user['app_settings']['autodeleteMessages'])){
+									$prior_date = clone $this->_date['servertime'];
+									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
+										'values' => [
+											':user' => $user['id'],
+											':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
+										]
+									])) SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
+											'values' => [
+												':user' => $user['id'],
+												':ids' => implode(',', array_column($messages, 'id'))
+											]
+										]);
+								}
+							}
+
 							$execution = true;
 							break;
 						case 'schedule_archived_orders_review':
