@@ -1838,11 +1838,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 *             _     _               _         _ _     _
-	 *   _ _ ___ _| |___| |_ ___ ___ ___|_|___ ___| |_|___| |_
-	 *  | | | . | . | .'|  _| -_| . |  _| |  _| -_| | |_ -|  _|
-	 *  |___|  _|___|__,|_| |___|  _|_| |_|___|___|_|_|___|_|
-	 *      |_|                 |_|
+	 *             _     _                           _         _   _ _     _   
+	 *   _ _ ___ _| |___| |_ ___       ___ ___ ___ _| |_ _ ___| |_| |_|___| |_ 
+	 *  | | | . | . | .'|  _| -_|     | . |  _| . | . | | |  _|  _| | |_ -|  _|
+	 *  |___|  _|___|__,|_| |___|_____|  _|_| |___|___|___|___|_| |_|_|___|_|  
+	 *      |_|                 |_____|_|
 	 * imports productlist according to set filter and populates product database
 	 * deletes all unprotected entries
 	 * updates all protected entries based on vendor name and order number
@@ -1917,7 +1917,7 @@ class CONSUMABLES extends API {
 				];
 			}
 
-			// update remainders
+			// update remainders where imported article_no match with remainders
 			foreach (array_uintersect(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
 
@@ -1937,7 +1937,7 @@ class CONSUMABLES extends API {
 					':last_order' => isset($productlist->_list[1][$index]['last_order']) ? $this->_pdo->quote($productlist->_list[1][$index]['last_order']) : 'NULL',
 					':thirdparty_order' => isset($productlist->_list[1][$index]['thirdparty_order']) && intval($productlist->_list[1][$index]['thirdparty_order']) ? 1 : 'NULL',
 				];
-				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
+				// iterate over columns and values, strip equals to shorten each query and crunch more into one of the chunks to speed up sql
 				foreach ([
 					// 'article_name', leave one out to remain a valid query
 					'article_unit',
@@ -1960,7 +1960,7 @@ class CONSUMABLES extends API {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 			}
 
-			// insert replacements
+			// insert replacements based on unmatched article_no
 			$insertions = [];
 			foreach (array_udiff(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[] = [
@@ -2015,6 +2015,7 @@ class CONSUMABLES extends API {
 				if (isset($erp_dump[$vendor['name']]) && $erp_dump[$vendor['name']]){
 					$query = SQLQUERY::PREPARE('consumables_put_product_productlist_erp_amendment');
 					foreach($erp_dump[$vendor['name']] as $article){
+						// update articles based on same vendor and article_no
 						if (!$article['article_no']) continue;
 						$replace = [
 							':article_unit' => $article['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['article_unit'])): 'NULL',
@@ -2038,6 +2039,26 @@ class CONSUMABLES extends API {
 							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no'])),
 							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
 						];
+						// iterate over columns and values, strip equals to shorten each query and crunch more into one of the chunks to speed up sql
+						foreach ([
+							// 'article_name', leave one out to remain a valid query
+							'article_unit',
+							'article_ean',
+							'trading_good',
+							'has_expiry_date',
+							'special_attention',
+							'stock_item',
+							'erp_id',
+							'thirdparty_order',
+							'incorporated',
+							// 'last_order' does not work for having to be converted
+						] as $column){
+							if ( ($replace[':' . $column] === $remainder[$update][$column])
+								|| (!$remainder[$update][$column] && $replace[':' . $column] === 'NULL')
+							) {
+								$query = preg_replace('/,{0,1} ' . $column . ' = :' . $column . '/', '', $query);
+							}
+						}
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 					}
 
