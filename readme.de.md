@@ -1081,6 +1081,7 @@ Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
 Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) (siehe unten). Ferner bereinigt er abgelaufene Dateien und [Aufzeichnungen](#löschung-von-aufzeichnungen). Er wird durch Benachrichtigungs-Requests ausgelöst. Die Konfiguration CONFIG[system][cron] beinhaltet Intervall-Einstellungen für
 * [erp_interface_casestate](#erp-anbindung)
 * [erp_interface_orderdata](#erp-anbindung)
+* alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
 * alert_unreceived_orders

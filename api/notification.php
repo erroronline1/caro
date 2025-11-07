@@ -301,6 +301,21 @@ class NOTIFICATION extends API {
 							break;
 
 
+						case 'alert_new_orders':
+							// alert purchase on new orders since last execution
+							// prior to this implementation every approved order did a message resulting in spamming and the fear of them becoming dulled to notifications
+							if (file_exists($logfile)){
+								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed_alert', [
+									'values' => [
+										':timestamp' => date('Y-m-d H:i:s', filemtime($logfile)) 
+									]
+								]); 
+								if ($orders){
+									$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
+								}
+								$execution = true;
+							}
+							break;
 						case 'alert_open_records_and_retention_periods':
 							// alert unclosed records, records not having set lifespan
 							// delete expired records including record attachments and orders that contain identifier e.g. as commission

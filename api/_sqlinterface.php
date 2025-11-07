@@ -786,6 +786,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE '%orderer\":\":user\"%') AND (order_data LIKE :SEARCH)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE '%orderer\":\":user\"%') AND (order_data LIKE :SEARCH)"
 		],
+		'order_get_approved_unprocessed_alert' => [ // for notifications
+			'mysql' => "SELECT count(id) FROM caro_consumables_approved_orders WHERE ordered > :timestamp",
+			'sqlsrv' => "SELECT count(id) FROM caro_consumables_approved_orders WHERE ordered > CONVERT(SMALLDATETIME, :timestamp, 120)"
+		],
 		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",

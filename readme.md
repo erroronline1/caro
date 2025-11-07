@@ -33,7 +33,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * order filter for stock_items additional/instead of pdf export
-* purchase message on new orders every x minutes from notification instead of every new order, to avoid becoming dulled to notifications
 
 ## Content
 * [Aims](#aims)
@@ -1175,6 +1174,7 @@ The application has some options to be maintained by authorized users:
 The 'cron job' initiates automated message alerts and scheduled tasks (see below). It further clears expired files and [records](#record-deletion). It is triggered during notification requests. The configuration CONFIG[system][cron] contains interval settings for
 * [erp_interface_casestate](#erp-interface)
 * [erp_interface_orderdata](#erp-interface)
+* alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
 * alert_unreceived_orders

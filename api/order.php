@@ -259,9 +259,6 @@ class ORDER extends API {
 										':id' => intval($this->_requestedID)
 									]
 								]);
-
-								// alert purchase on change
-								$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 								break;
 							case 'return':
 								// append to order info 
@@ -330,9 +327,6 @@ class ORDER extends API {
 										'msg' => $this->_lang->GET('order.saved'),
 										'type' => 'success'
 									]];
-
-									// alert purchase on "new order"
-									$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
 								}
 								else $response = [
 									'response' => [
@@ -1305,8 +1299,6 @@ class ORDER extends API {
 					'type' => 'success'
 				]
 			];
-			// alert user group on new orders
-			$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 		}
 		else $response = [
 			'response' => [
