@@ -566,6 +566,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	/**
 	 * requires an sql connection to the optadata eva viva database
 	 * readonly is fine, you'll may have to add the port to the host xyz.host.url, 1234
+	 * [readme](./CARO%20App%20ERP%20Interface%20OVEVAVIVA.md)
 	 */
 	private $_pdo = null;
 	public $_instatiated = null;
