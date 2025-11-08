@@ -256,7 +256,6 @@ export const _client = {
 		 * @param {event} event 
 		 */
 		closeParentDialog:(element) => {
-			console.log(element);
 			do {
 				if (element.localName === 'dialog'){
 					element.close();
@@ -264,7 +263,7 @@ export const _client = {
 					return;
 				}
 				element = element.parentNode;
-			} while (element.localname !== 'html'); 
+			} while (element && element.localname !== 'html'); 
 		},
 
 		/**
