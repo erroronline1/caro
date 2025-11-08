@@ -25,9 +25,9 @@ export const Polyfill = {
 	 */
 	a: function (a) {
 		if (!a.dataset.type) a.dataset.type = "downloadlink";
-		a.removeAttribute("target");
 
 		if (!a.href.includes("javascript:") && (this.isIOS() || this.isStandalone() || !("download" in document.createElement("a")))) {
+			a.removeAttribute("target");
 			let href = a.href;
 			a.onclick = function () {
 				fetch(href)
@@ -46,7 +46,26 @@ export const Polyfill = {
 					.catch((error) => new Toast(error + " " + href));
 			};
 			a.href = "javascript: void(0)";
+		} else if (
+			a.download &&
+			a.href &&
+			["pdf", "jpg", "jpeg", "gif", "png"]
+				.map((extension) => {
+					return a.href.endsWith(extension);
+				})
+				.some((element) => {
+					return element === true;
+				})
+		) {
+			/*  download has to be specified in general to detect handling for safari special needs
+			 	howewer if download is specified with a name matching the url anyway,
+				this can be safely removed for some file types in context of proper browsers
+				because it reduces filling up the download directory
+			*/
+			a.target = "_blank";
+			a.removeAttribute("download");
 		}
+
 		return a;
 	},
 	isIOS: () => {
@@ -2002,11 +2021,11 @@ export class Assemble {
 		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
-		function forbiddenName(files){
-			for(const file of Object.values(files)){
+		function forbiddenName(files) {
+			for (const file of Object.values(files)) {
 				console.log(file);
-				if (file.name.match("CAROsignature")){
-					new Toast(api._lang.GET("assemble.render.reserved_name", {':name': "CAROsignature"}));
+				if (file.name.match("CAROsignature")) {
+					new Toast(api._lang.GET("assemble.render.reserved_name", { ":name": "CAROsignature" }));
 					return true;
 				}
 			}
@@ -2015,7 +2034,7 @@ export class Assemble {
 
 		if (this.currentElement.attributes.multiple !== undefined)
 			input.onchange = function () {
-				if (forbiddenName(this.files)){
+				if (forbiddenName(this.files)) {
 					delete this.files;
 					return;
 				}
@@ -2029,7 +2048,7 @@ export class Assemble {
 			};
 		else
 			input.onchange = function () {
-				if (forbiddenName(this.files)){
+				if (forbiddenName(this.files)) {
 					delete this.files;
 					return;
 				}
@@ -2476,8 +2495,8 @@ export class Assemble {
 
 		if (["search", "filter"].includes(type)) {
 			const search_pattern = document.createElement("a"),
-			option = {};
-			option[api._lang.GET('general.ok_button')] = false;
+				option = {};
+			option[api._lang.GET("general.ok_button")] = false;
 			search_pattern.href = "javascript:void(0)";
 			search_pattern.dataset.type = "";
 			search_pattern.classList.add("inline");
@@ -2485,12 +2504,8 @@ export class Assemble {
 				new Dialog({
 					type: "input",
 					header: api._lang.GET("general.search_pattern"),
-					render: [
-						[
-							{ type: "textsection", htmlcontent: api._lang.GET("general.search_pattern_content") }
-						]
-					],
-					options: option
+					render: [[{ type: "textsection", htmlcontent: api._lang.GET("general.search_pattern_content") }]],
+					options: option,
 				});
 			};
 			search_pattern.append(document.createTextNode(api._lang.GET("general.search_pattern")));
@@ -2545,7 +2560,7 @@ export class Assemble {
 	 * 				"href": "#"
 	 * 			},
 	 * 			"Link 2": {
-	 * 				"href": #"",
+	 * 				"href": "javascript: void(0)",
 	 * 				"onclick": "alert('hello')"
 	 * 			}
 	 * 		},
@@ -2742,11 +2757,11 @@ export class Assemble {
 		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
 		else hint = [...this.hint()];
 
-		function forbiddenName(files){
-			for(const file of Object.values(files)){
+		function forbiddenName(files) {
+			for (const file of Object.values(files)) {
 				console.log(file);
-				if (file.name.match("CAROsignature")){
-					new Toast(api._lang.GET("assemble.render.reserved_name", {':name': "CAROsignature"}));
+				if (file.name.match("CAROsignature")) {
+					new Toast(api._lang.GET("assemble.render.reserved_name", { ":name": "CAROsignature" }));
 					return true;
 				}
 			}
@@ -2754,7 +2769,7 @@ export class Assemble {
 		}
 
 		function changeEvent() {
-			if (forbiddenName(this.files)){
+			if (forbiddenName(this.files)) {
 				delete this.files;
 				return;
 			}
