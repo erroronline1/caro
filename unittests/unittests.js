@@ -129,7 +129,7 @@ export function rendertest(element) {
 						description: "Embedded images can be downloaded",
 						attributes: {
 							name: "CARO App Logo",
-							url: "./media/favicon/windows11/SmallTile.scale-100.png",
+							url: "./media/favicon/icon72.png",
 						},
 					},
 				],
@@ -308,7 +308,7 @@ export function rendertest(element) {
 						description: "Eingebundene Bilder können heruntergeladen werden",
 						attributes: {
 							name: "CARO App Logo",
-							url: "./media/favicon/windows11/SmallTile.scale-100.png",
+							url: "./media/favicon/icon72.png",
 						},
 					},
 				],
@@ -1980,7 +1980,7 @@ three \` or ~
 some \`code with <brackets>\`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
-![an external image](./media/favicon/android/android-launchericon-48-48.png) could, but may not work in caro context because of the Service-Worker though  
+![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
 123\. escaped period avoiding a list
 
 ### Nested items in lists
@@ -2091,7 +2091,7 @@ eingefasst sein
 ein \`code mit <Klammern>\`  
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
-![ein externes Bild](./media/favicon/android/android-launchericon-48-48.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
+![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
 123\. maskierter Punkt um eine Liste zu vermeiden
 
 ### Verschachtelte Elemente in Listen
@@ -2233,7 +2233,9 @@ eine@email.addresse und maskierte\@email.addresse
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
 	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
 	if (!distinct) await _.sleep(timeout * 1000);
-
+	
+	document.documentElement.removeAttribute("data-useragent");
+	
 	console.clear();
 	iterator = menucall(0);
 	while ((value = iterator.next().value)) {
