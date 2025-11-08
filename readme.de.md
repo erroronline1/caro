@@ -179,14 +179,14 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
     * können mangels persönlicher Identifizierbarkeit **keine** Stichprobenprüfung und Produkteinführung durchführen
     * haben **keinen** Zugriff auf Arbeitszeitdokumentationen
 * Bereichsleiter
-    * können alle Arbeitszeitdokumentationen der Mitarbeiter zugewiesener Bereiche exportieren
-    * können geplante Kalenderereignisse zugewiesener Bereiche und Arbeitszeiteinträge der Mitarbeiter zugewiesener Bereiche anlegen, ändern und abschließen
+    * können alle Arbeitszeitdokumentationen der Mitarbeitenden zugewiesener Bereiche exportieren
+    * können geplante Kalenderereignisse zugewiesener Bereiche und Arbeitszeiteinträge der Mitarbeitenden zugewiesener Bereiche anlegen, ändern und abschließen
 * Anwendungsadministratoren
     * haben **vollen Zugriff** und **alle Rechte**
     * können als jede berechtige Nutzergruppe Freigaben erteilen
     * können alle Arbeitszeitdokumentationen exportieren
     * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen.
-    * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitern der Leitungsebene erteilt werden
+    * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitenden der Leitungsebene erteilt werden
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
@@ -249,7 +249,7 @@ Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenhe
 ![sample communication menu](http://toh.erroronline.one/caro/kommunikation%20menu%20de.png)
 
 ### Unterhaltungen
-Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
+Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeitende. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
 
 ![conversation screenshot](http://toh.erroronline.one/caro/conversation%20de.png)
 
@@ -507,7 +507,7 @@ Bei der Anzeige von Zusammenfassungen erscheinen Empfehlungen für die Vervollst
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Kennzeichen weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.  
 An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
 
-Versorgungsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeiter, die den Status ändern, haben die Wahl andere Mitarbeiter, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren. Es gibt auch die Möglichkeit eine Rückfrage zum Fall an einen beliebigen Nutzer zu senden, wobei eine direkte Verknüpfung für einen schnellen Zugriff beinhaltet ist.  
+Versorgungsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeitende, die den Status ändern, haben die Wahl andere Mitarbeitende, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren. Es gibt auch die Möglichkeit eine Rückfrage zum Fall an einen beliebigen Nutzer zu senden, wobei eine direkte Verknüpfung für einen schnellen Zugriff beinhaltet ist.  
 Die Ergänzung einer Vorgangsnummer aus dem ERP-System erlaubt den Abgleich bei verfügbarer [ERP Anbindung](#erp-anbindung), mehrere Nummern sind möglich im Falle von Gepflogenheiten eines kalkulatorischen und repräsentativen Vorgangs.  
 Die Auswahl der Aufbewahrungsfrist ermöglicht die [automatische Löschung](#cron) von Aufzeichnungen zur Erfüllung der [Anforderungen an die Datensparsamkeit](#löschung-von-aufzeichnungen).
 
@@ -515,7 +515,7 @@ Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können def
 Aufzeichnungen können ein neues Kennzeichen erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sofern das neue Kennzeichen bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Kennzeichens werden ebenfalls dokumentiert.
 
 Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Dokumenten enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Dokumente hat. Es ist Ermessenssache ob Dokumentenpakete so sinnvoll eingesetzt werden können:
-* Einerseits vereinfacht dies die Übersicht verfügbarer Dokumente und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
+* Einerseits vereinfacht dies die Übersicht verfügbarer Dokumente und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitenden ausgeblendet werden,
 * andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
 Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallstatus) werden ebenfalls aufgezeichnet.
@@ -530,7 +530,7 @@ graph TD;
     mit Kennzeichen"));
     identifiersheet-->input[Eingabedaten];
     input-->|Absenden|print("Bogen ausdrucken und
-    an Mitarbeiter aushändigen");
+    an Mitarbeitende aushändigen");
 
     filldocument((Dokument ausfüllen))=========>selectdocument[Dokument wählen];
     selectdocument==>document_db[("Dokument-
@@ -671,7 +671,7 @@ Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der 
 [Übersicht](#übersicht)
 
 ### Aufgaben
-Es können Aufgaben zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Aufgaben der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst, sofern in der [Zeiterfassung](#zeiterfassung) eingetragen. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
+Es können Aufgaben zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Aufgaben der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeitenden außer Dienst, sofern in der [Zeiterfassung](#zeiterfassung) eingetragen. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
 Aufgaben können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
 
@@ -700,7 +700,7 @@ graph TD;
     permission==>|ja|edit[ändern oder löschen];
     permission==>|nein|complete[abschließen];
     edit==>complete;
-    database==>alert["Mitarbeiter ausgewählter Bereiche
+    database==>alert["Mitarbeitende ausgewählter Bereiche
     einmalig benachrichtigen"]
 
     timesheet((Zeiterfassung))-->select_day2[Auswahl Tag];
@@ -736,14 +736,14 @@ graph TD;
     permission2-->partexport["Bereichsleiter:
     Export aller Zeiterfassungen
     zugewiesener Bereiche"];
-    permission2-->ownexport["Mitarbeiter:
+    permission2-->ownexport["Mitarbeitende:
     Export der eigenen Zeiterfassung"]
 
     landing_page((Startseite))-....->database;
     landing_page-......->database2;
     database-.->summary("Kalenderwoche,
     aktuell geplante Ereignisse,
-    nicht abgeschlossene vergangene Ereignisse, Mitarbeiter dienstbefreit");
+    nicht abgeschlossene vergangene Ereignisse, Mitarbeitende dienstbefreit");
     database2-.->summary;
     summary-......->select_day
 ```
@@ -771,7 +771,7 @@ Gewählte Zeiträume werden auf den ersten Tag des Startmonats und den letzten T
 [Übersicht](#übersicht)
 
 ### Zeiterfassung
-Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst und berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Nutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nur durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung. Die Zeiterfassung findet auf Vertrauensbasis statt, wobei jeder Mitabeiter seine Dienstzeiten manuell einträgt.
+Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeitenden genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst und berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Nutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nur durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung. Die Zeiterfassung findet auf Vertrauensbasis statt, wobei jeder Mitabeiter seine Dienstzeiten manuell einträgt.
 
 Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Daten und eine gemeinsame Übereinkunft über die Zeiterfassung sicherstellen. Ziel ist es allen bekannten Anliegen deutschen Rechts und denen der Personalräte und Gewerkschaften zu entsprechen. Dabei handelt es sich nicht um eine dauerhafte Erfassung, da die Datenbank um Nutzereinträge bei deren Löschung bereinigt wird. Arbeitszeitzusammenfassungen können exportiert werden, was nach aktuellem Stand ein bevorzugter Weg ist und im Sinne einer langfristigeren Datenspeicherung im Sinne von Arbeitszeitgesetzen empfohlen wird. Die Aufzeichnungen entsprechen etablierten Verfahren in Art und Umfang, verbessern die Zugriffssicherheit sensibler Daten auf einen eingeschränkten Personenkreis und vereinfachen die Berechnung ehrlich erfasster Daten. 
 
@@ -922,7 +922,7 @@ Falls der Einkauf auch ein ähnliches Produkt bestellen kann, wird daran erinner
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
 Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.  
-Es muss ein Rücksendegrund angegeben werden. Kritische Rücksendegründe lösen eine Mitteilung an für die Einführung authorisierte Mitarbeiter aus und initiieren eine Neubewertung der Produkteinführung.  
+Es muss ein Rücksendegrund angegeben werden. Kritische Rücksendegründe lösen eine Mitteilung an für die Einführung authorisierte Mitarbeitenden aus und initiieren eine Neubewertung der Produkteinführung.  
 Alle Maßnahmen bieten an eine Nachricht beizufügen.  
 Aus der in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen erzeugt werden um bei der internen Auslieferung eine Zuordnung zu unterstützen.
 
@@ -988,7 +988,7 @@ graph TD;
     return_order======>|kritischer Grund|incorporate;
 
     process_order==>disapprove[zurückweisen];
-    disapprove==>|optional Nachricht anfügen|message_unit["alle Bereichsmitarbeiter
+    disapprove==>|optional Nachricht anfügen|message_unit["alle Bereichsmitarbeitenden
     benachrichtigen"];
     message_unit==>prepared_orders;
 
@@ -1007,13 +1007,13 @@ graph TD;
     process_order==>delete;
     delete==>delete_permission{"Berechtigung
     zur Löschung"};
-    delete_permission==>|Bereichsmitarbeiter|order_deleted;
+    delete_permission==>|Bereichsmitarbeitenden|order_deleted;
     delete_permission==>|Einkauf, unbearbeitete Bestellung|order_deleted;
     delete_permission==>|Einkauf, bearbeitete Bestellung|approved_orders;
 
     process_order====>update_state[Bestellstatusaktualisierung];
     update_state==>append_inform["Information angeben,
-    Bereichsmitarbeiter benachrichtigen"];
+    Bereichsmitarbeitende benachrichtigen"];
     append_inform==>process_order
     
     process_order===>add_orderinfo[Information anfügen];
@@ -1049,7 +1049,7 @@ Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen
 * aktuell gültige, incl. externe Dokumente
 * Lieferantenverzeichnis
 * Stichprobenprüfungen gemäß MDR §14
-* Mitarbeiterqualifikationen und Schulungen mit der Option verpflichtende Schulungen für mehrere Mitarbeiter gleichzeitig einzutragen 
+* Mitarbeiterqualifikationen und Schulungen mit der Option verpflichtende Schulungen für mehrere Mitarbeitende gleichzeitig einzutragen 
 * Qualifikationserfüllung
 * Reklamationen
 * Problembericht für inkonsistent definierte Risiken, incl. strukturiertem Export aller erfassten Risiken
@@ -1650,7 +1650,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 4.2.1 Allgemeine Anforderungen an Dokumentation | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.2.2 Qualitäts-managementhandbuch | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 4.2.3 Medizinproduktakte | teilweise | &bull; Alle Aufzeichnungen für Versorgungen laufen zusammen. Exporte beinhalten diese Daten und erreichen damit eine vollständige Dokumentation der Maßnahmen.<br/>&bull; Aufzeichnungen für Versorgungen erfordern ein Kennzeichen um eine Zuordnung sicherzustellen. | [Aufzeichnungen](#aufzeichnungen) |
-| ISO 13485 4.2.4 Lenkung von Dokumenten | ja | &bull; Die Anwendung ermöglicht es wiederverwendbare Dokumente und deren Komponenten zu gestalten.<br/>&bull; Nur die jüngsten freigegebenen Komponenten und Dokumente sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzwerkverbindung).<br/>&bull; Die Erstellung von Komponenten, Dokumenten, Dokumenten-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.<br/>&bull; Dokumente und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine eingeschränkte nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Dokument selbst freigegeben wurde.<br/>&bull; Neue Dokumente, deren Komponenten, Dokumenten-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Dokumente können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Dokumente sind für eine Verwendung nicht erreichbar.<br/>&bull; Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.<br/>&bull; Dokumente können primär nur von berechtigten Nutzern blanco oder vorausgefüllt exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen.<br/>&bull; Dokumente können von authorisierten Nutzern zu jedem Gültigkeitstag nachgebildet werden um Unterschiede identifizieren zu können.<br/>&bull; Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und des jeweils letzten bearbeitenden Mitarbeiters. | [Dokumente](#dokumente), [Dateien](#dateien) |
+| ISO 13485 4.2.4 Lenkung von Dokumenten | ja | &bull; Die Anwendung ermöglicht es wiederverwendbare Dokumente und deren Komponenten zu gestalten.<br/>&bull; Nur die jüngsten freigegebenen Komponenten und Dokumente sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzwerkverbindung).<br/>&bull; Die Erstellung von Komponenten, Dokumenten, Dokumenten-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.<br/>&bull; Dokumente und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine eingeschränkte nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Dokument selbst freigegeben wurde.<br/>&bull; Neue Dokumente, deren Komponenten, Dokumenten-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Dokumente können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Dokumente sind für eine Verwendung nicht erreichbar.<br/>&bull; Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.<br/>&bull; Dokumente können primär nur von berechtigten Nutzern blanco oder vorausgefüllt exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen.<br/>&bull; Dokumente können von authorisierten Nutzern zu jedem Gültigkeitstag nachgebildet werden um Unterschiede identifizieren zu können.<br/>&bull; Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und des jeweils letzten bearbeitenden Mitarbeitenden. | [Dokumente](#dokumente), [Dateien](#dateien) |
 | ISO 13485 4.2.5 Lenkung von Aufzeichnungen | ja | &bull; Aufzeichnungen laufen zusammen und sind innerhalb der Anwendung nicht löschbar. Jeder Eintrag erhält einen Zeitstempel und den Namen des übermittelnden Nutzers. Zusammenfassungen führen alle Daten zusammen und stellen sie in der Reihenfolge ihrer Übermittlung dar.<br/>&bull; Bilder und Dateien für Aufzeichnungen werden nicht gelöscht. Ihren Dateinamen wird das Kennzeichen und Zeitstempel der Übermittlung beigefügt.<br/>&bull; Es werden nicht nur Aufzeichnungen selbst, sondern auch mögliche Änderungen am Aufzeichnungstyp gespeichert.<br/>&bull; Aufzeichnungen können jederzeit exportiert werden falls eine zusätzliche Revisionssicherheit gewünscht wird oder die Daten mit dritten Parteien geteilt werden müssen.<br/>&bull; Der Zugriff auf die Inhalte der Anwendung inklusive vertraulicher personenbezogener Patientendaten erfordert eine persönliche Anmeldung registrierter Nutzer.<br/>&bull; Aufzeichnungen soll eine Aufbewahrungsfrist zugeordnet werden nach deren Ablauf abgeschlossene Aufzeichnungen gelöscht werden um datenschutzrechtlichen Bestimmungen zu entsprechen | [Nutzer](#nutzer), [Aufzeichnungen](#aufzeichnungen), [Löschung von Aufzeichnungen](#löschung-von-aufzeichnungen) |
 | ISO 13485 5.1 Verantwortung der Leitung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.2 Kundenorientierung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
@@ -1696,7 +1696,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 7.5.9 Rückverfolgbarkeit | teilweise | &bull; Mehrfach-Scannerfelder innerhalb der Vorgangsdokumentation ermöglichen eine Rückverfolgung eingesetzter Waren<br/>Voraussetzung sind entweder<br/>&bull; in der ERP-Software generierte Codes die eine Produktzuordnung ermöglichen, oder<br/>&bull; die Erstellung von Labeln für Artikel in der Bestellverwaltung | [Dokumente](#dokumente), [Bestellung](#bestellung)|
 | ISO 13485 7.5.10 Eigentum des Kunden | | | |
 | ISO 13485 7.5.11 Produkterhaltung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
-| ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln | teilweise | &bull; Entsprechende Dokumente erfordern ein Kennzeichen, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls ein individuelles Kennzeichen zugeteilt bekommen.<br/>&bull; Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Dokumente kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren. | [Dokumente](#dokumente), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender) |
+| ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln | teilweise | &bull; Entsprechende Dokumente erfordern ein Kennzeichen, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls ein individuelles Kennzeichen zugeteilt bekommen.<br/>&bull; Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Dokumente kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeitende zu informieren. | [Dokumente](#dokumente), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender) |
 | ISO 13485 8.1 Allgemeine Überwachungs-, Mess-, Analyse- und Verbesserungsprozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.2.1 Rückmeldungen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.2.2 Reklamations-bearbeitung | teilweise | &bull; Aufzeichnungen können eine Stellungnahme erfordern ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt. Eine Übersicht kann angezeigt werden.<br/>&bull; Das als abgeschlossen Kennzeichnen von Aufzeichnungen, die eine Reklamation beinhalten erfordert eine Aktion aller definierter Rollen.<br/>&bull; Reklamationen beinhalten die Möglichkeit Schulungen zu planen. | [Aufzeichnungen](#aufzeichnungen-1), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |

@@ -13,8 +13,7 @@ graph LR;
     with selected users"];
     alpha-.->it{{IT approval}};
     it-.->network{{Network environment}};
-    network-.->beta{{"Beta testing
-    with with limited modules"}};
+    network-.->beta{{"Beta testing"}};
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
 ```
