@@ -728,11 +728,13 @@ article:has(> article) {
 		vertical-align: top;
 		overflow: hidden;
 		display: inline-block;
-		border: 1px solid var(--3d-border);
 		border-radius: 0.2em;
 		background-color: var(--article);
 		box-shadow: var(--shadow);
 		transition: ease 0.2s;
+	}
+	article[role="link"] {
+		box-shadow: var(--shadow), var(--cta-shadow);
 	}
 	*:not(article) {
 		width: 90%;
@@ -825,17 +827,20 @@ blockquote {
 	padding: 0.5em;
 	display: inline-block;
 	vertical-align: top;
+	border-radius: 0.2em;
 }
 .displayDay {
 	background-color: var(--article);
-	box-shadow: var(--shadow);
+	box-shadow: var(--shadow), var(--cta-shadow);
 	color: var(--foreground);
 }
 .today {
-	border: 2px solid var(--green);
+	outline-offset: 0.25em;
+	outline: dashed var(--orange);
 }
 .selected {
-	border: 2px solid var(--yellow);
+	outline-offset: 0.25em;
+	outline: dashed var(--green);
 }
 .holiday {
 	opacity: 0.4;
@@ -1583,6 +1588,18 @@ button[data-type="calendarbutton"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/shopping-cart.svg");
 	mask-image: url("./media/shopping-cart.svg");
+}
+
+[data-type="certificate"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/file-certificate.svg");
+	mask-image: url("./media/file-certificate.svg");
+}
+button[data-type="certificate"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./file-certificate.svg");
+	mask-image: url("./media/file-certificate.svg");
 }
 
 [data-type="checkbox"]::before {
