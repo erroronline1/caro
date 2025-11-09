@@ -1,4 +1,4 @@
-,=SUM(B:B),"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
+,=SUM(B2:B730),"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
 22.9.23,5,ui
 25.9.23,2,ui
 29.9.23,5,"ui, ui-assembler"
@@ -313,18 +313,18 @@
 29.06.25,1,"consumables-api, order-api, message-api"
 30.06.25,1,api
 02.07.25,3,"order-api, ui-assembler"
-04.07.25,7,"ui-assembler"
+04.07.25,7,ui-assembler
 05.07.23,9,"message-api, install routine, database-update process, code maintenance"
 10.07.25,1,api
 11.07.25,8,"order-api, consumables-api, maintenance-api"
 12.07.25,8,"maintenance-api, unittests, documentation"
 15.07.25,1,documentation
 18.07.25,4,"code maintenance, record-api, pdf-library"
-19.07.25,6,"record-api"
+19.07.25,6,record-api
 25.07.25,8,"consumables-api, install routine, audit-api, texttemplate-api, code maintenance"
 27.07.25,1,unittests
-29.07.25,2,"tool-api"
-01.08.25,9,"markdown"
+29.07.25,2,tool-api
+01.08.25,9,markdown
 02.08.25,11,"markdown, ui-composer, record-api, document-api, tool-api"
 03.08.25,1,markdown
 08.08.25,10,markdown
@@ -346,7 +346,7 @@
 27.09.25,7,"record-api, calendar-api, erp-interface, ui-assembler"
 28.09.25,3,"documentation, code maintenance"
 02.10.25,8,"api, erp-interface"
-03.10.25,9,"erp-interface"
+03.10.25,9,erp-interface
 04.10.25,10,"user-api, erp-interface, code maintenance"
 05.10.25,4,"code maintenance"
 06.10.25,1,"code maintenance"
@@ -355,8 +355,13 @@
 17.10.25,9,"code maintenance, message-api"
 18.10.25,9,"install routine, maintenance-api"
 24.10.25,2,"code maintenance"
-25.10.25,4,"record-api"
-29.10.25,6,"record-api"
+25.10.25,4,record-api
+29.10.25,6,record-api
 30.10.25,6,"record-api, audit-api"
 01.11.25,6,"record-api, audit-api"
 02.11.25,2,"unittests, documentation"
+04.11.25,1,documentation
+05.11.25,1,documentation
+06.11.25,1,"user-api, calendar-api"
+07.11.25,9,"order-api, consumables-api, documentation"
+08.11.25,3,"code maintenance"
