@@ -1625,6 +1625,7 @@ class RECORD extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
+								'data-type' => 'certificate',
 								'value' => $this->_lang->GET('record.verify.verify'),
 								'onclick' => "api.record('get', 'verify', '" . $this->_requestedID . "')"
 							]

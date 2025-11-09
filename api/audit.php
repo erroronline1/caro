@@ -2582,6 +2582,7 @@ class AUDIT extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
+							'data-type' => 'certificate',
 							'name' => BLOCKCHAIN::verified($recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
 						],
 						'htmlcontent' => $this->_markdown->md2html($report)
