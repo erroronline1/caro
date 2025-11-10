@@ -1607,7 +1607,7 @@ Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen wer
 * nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden
 * verfügbare Methoden ohne aktuellen Inhalt können durch den Rückgabewert `[[]]` signalisiert werden
 * für die Verarbeitung von Web-APIs kann `UTILITY::webrequest()` hilfreich sein
-* für die Verarbeitung von regelmäßig breitgestellten CSV-Exporte kann der [CSV Prozessor](#csv-prozessor)) hilfreich sein
+* für die Verarbeitung von regelmäßig breitgestellten CSV-Exporte kann der [CSV Prozessor](#csv-prozessor) hilfreich sein
 * falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
 * für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
 * bereitgestellte Datendateien finden sich unter `UTILITY::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`

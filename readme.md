@@ -1699,7 +1699,7 @@ In case you have to rely on data dumps instead of direct database access, the in
 * signal unavailable methods by returning `null`
 * signal avalable methods without current content by returning `[[]]`
 * if you process Web-APIs you can probably use `UTILITY::webrequest()`
-* if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor))
+* if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor)
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
 * provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
