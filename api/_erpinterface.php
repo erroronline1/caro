@@ -972,7 +972,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$result = $statement->fetchAll();
 		$statement = null;
 
-		$refinequery = ($request['Name'] ? : '') . ($dob ? ' +' . $dob : '') . ($patientnumber ? ' +' . $patientnumber : '');
+		$refinequery = implode(' +', array_filter([$request['Name'], $dob, $patientnumber], Fn($v) => $v));
 
 		$response = [];
 
