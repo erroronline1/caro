@@ -1,4 +1,5 @@
 ![CARO logo](../media/favicon/icon72.png)
+
 # CARO - Cloud Assisted Records and Operations
 Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lokale Apache- oder IIS-Server-Umgebungen.
 
