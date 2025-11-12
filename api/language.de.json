@@ -1078,6 +1078,7 @@
 		},
 		"download": "Datei(en) herunterladen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
 		"integrations": {
+			"about": "Über die ERP-Anbindung",
 			"data_import": "Daten aus der Verwaltungssoftware",
 			"productlist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
 			"productlist_erp_match_selected": "Mit EVA abgleichen",

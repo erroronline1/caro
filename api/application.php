@@ -139,6 +139,26 @@ class APPLICATION extends API {
 			]
 		];
 
+		if (isset($_SESSION['user']) && !array_intersect(['patient'], $_SESSION['user']['permissions']) &&
+			ERPINTERFACE && ERPINTERFACE->_readme){
+			$markdown = new MARKDOWN();
+			$erpmd = file_get_contents(ERPINTERFACE->_readme);
+			$response['render']['content'][] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('erpquery.integrations.about'),
+					'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('erpquery.integrations.about') . "', render: JSON.parse('" . UTILITY::json_encode(
+						[
+							[
+								'type' => 'textsection',
+								'htmlcontent' => preg_replace('/\n/', '<br />', addslashes($markdown->md2html($erpmd)))
+							]
+						]
+					) . "')})"
+				]
+			];
+		}
+
 		array_push($response['render']['content'], ...[
 			[
 				'type' => 'textsection',

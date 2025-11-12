@@ -32,6 +32,11 @@ class _ERPINTERFACE {
 	public $_productsimport = null;
 
 	/**
+	 * path to markdown file explaining the interface
+	 */
+	public $_readme = '';
+
+	/**
 	 * define expected methods to be overridden by actual interface class if available
 	 * the application can check whether content can be expected if a call doe not return null
 	 */
@@ -566,10 +571,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	/**
 	 * requires an sql connection to the optadata eva viva database
 	 * readonly is fine, you'll may have to add the port to the host xyz.host.url, 1234
-	 * [readme](./CARO%20App%20ERP%20Interface%20OVEVAVIVA.md)
 	 */
 	private $_pdo = null;
 	public $_instatiated = null;
+	public $_readme = './CARO App ERP Interface ODEVAVIVA.md';
 
 	/**
 	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 

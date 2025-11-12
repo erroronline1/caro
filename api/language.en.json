@@ -1078,6 +1078,7 @@
 		},
 		"download": "Download file(s). On exporting sensitive data you are responsible for their safety.",
 		"integrations": {
+			"about": "About the ERP-interface",
 			"data_import": "Data from the ERP-software",
 			"productlist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
 			"productlist_erp_match_selected": "Match with ERP database",
