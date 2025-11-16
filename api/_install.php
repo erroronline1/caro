@@ -29,6 +29,10 @@ require_once('_sqlinterface.php');
 require_once('_language.php');
 
 define('DEFAULTSQL', [
+	'installed' => [
+		'mysql' => "SHOW TABLEs FROM caro;",
+		'sqlsrv' => "IF OBJECT_ID (N'caro_user', N'U') IS NOT NULL SELECT 1 AS res ELSE SELECT 0 AS res;"
+	],
 	'install_tables' => [
 		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_announcements` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
@@ -182,9 +186,10 @@ define('DEFAULTSQL', [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`permitted_export` tinyint NULL DEFAULT NULL," .
 				"	`restricted_access` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`patient_access` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -492,7 +497,8 @@ define('DEFAULTSQL', [
 				"	approval varchar(MAX) NULL DEFAULT NULL," .
 				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
 				"	permitted_export tinyint NULL DEFAULT NULL," .
-				"	restricted_access varchar(MAX) NULL DEFAULT NULL" .
+				"	restricted_access varchar(MAX) NULL DEFAULT NULL," .
+				"	patient_access tinyint NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
@@ -881,41 +887,32 @@ class INSTALL {
 	 */
 	public function installDatabase(){
 		//secure fileserver by default
+		if (!file_exists( '../fileserver' )) mkdir('../fileserver');
 		UTILITY::secureDirectory('../fileserver');
 
-		try {
-			// if table is not found this will lead to an exception
-			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'replacements' => [
-					':id' => 1,
-					':name' => $this->_defaultUser
-				]
-			]);
-			$this->printWarning('Databases already installed.');
+		if (SQLQUERY::EXECUTE($this->_pdo, DEFAULTSQL['installed'][$this->_pdoDriver])){
+			return $this->printWarning('Databases already installed.');
 		}
-		catch (\Exception $e){
-			if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
-				$this->printError('There has been an error installing the databases!');
-				die();
-			}
-			$statement->closeCursor();
-			$this->printSuccess('Databases installed.');
+		if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
+			return $this->printError('There has been an error installing the databases!');
+		}
+		$statement->closeCursor();
+		$response = $this->printSuccess('Databases installed.');
 
-			if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-				'values' => [
-					':id' => null,
-					':name' => $this->_defaultUser,
-					':permissions' => 'admin',
-					':units' => '',
-					':token' => REQUEST[1],
-					':orderauth' => '',
-					':image' => 'media/favicon/icon192.png',
-					':app_settings' => '',
-					':skills' => ''
-				]
-			])) $this->printSuccess('Default user has been installed.');
-			else $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
-		}
+		if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+			'values' => [
+				':id' => null,
+				':name' => $this->_defaultUser,
+				':permissions' => 'admin',
+				':units' => '',
+				':token' => REQUEST[1],
+				':orderauth' => '',
+				':image' => 'media/favicon/icon192.png',
+				':app_settings' => '',
+				':skills' => ''
+			]
+		])) $response .= $this->printSuccess('Default user has been installed.');
+		else $response .= $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
 		return '';
 	}
 
@@ -1114,7 +1111,7 @@ class INSTALL {
 				':content' => gettype($entry['content']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['content'])) : $this->_pdo->quote($entry['content']),
 				':hidden' => 'NULL',
 				':approval' => 'NULL',
-				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $this->_pdo->quote($entry['regulatory_context']) : '',
+				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $this->_pdo->quote($entry['regulatory_context']) : 'NULL',
 				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $this->_pdo->quote($entry['permitted_export']) : 'NULL',
 				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $this->_pdo->quote($entry['restricted_access']) : 'NULL',
 				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $this->_pdo->quote($entry['patient_access']) : 'NULL'

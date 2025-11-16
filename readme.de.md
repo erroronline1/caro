@@ -1758,12 +1758,14 @@ Anwendungsunterstützung Legende:
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
 * Apache (nativ) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
+* Apache (nativ) mit PHP 8.3, MariaDB 15.1 (seit 2025-11-16)
 * Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 2022)
 
 Getestete Betriebssysteme, Browser und Geräte:
 * Win 10 Edge 123
 * Win 11 Firefox (bis 2024-05-30)
 * Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
+* Linux Mint 22.2 Firefox 145 (seit 2025-11-16)
 * Android 12 Firefox 133
 * macOS 13 Ventura [Safari 18](#safaris-besondere-bedürfnisse), Edge 131, Firefox 133
 * iOS 18.7.1 [Safari](#safaris-special-needs)
