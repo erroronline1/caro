@@ -1762,7 +1762,8 @@ Getestete Serverumgebungen:
 * Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 2022)
 
 Getestete Betriebssysteme, Browser und Geräte:
-* Win 10 Edge 123
+* Win 10 Edge 123 (bis 2025-11-17)
+* Win 11 Edge 142 (seit 2025-11-18)
 * Win 11 Firefox (bis 2024-05-30)
 * Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
 * Linux Mint 22.2 Firefox 145 (seit 2025-11-16)
