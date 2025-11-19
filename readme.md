@@ -31,6 +31,7 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+* review batch processing of orders, sucess response, but no effect?
 
 ## Content
 * [Aims](#aims)
