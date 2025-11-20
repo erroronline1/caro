@@ -751,8 +751,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
 		],
 		'order_put_approved_order_state' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(SMALLDATETIME, :date, 120) WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id IN (:id)",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(SMALLDATETIME, :date, 120) WHERE id IN (:id)"
 		],
 		'order_put_approved_order_addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",

@@ -84,10 +84,10 @@ class ORDER extends API {
 									// ordered aka processed return orders are received immediately
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										'values' => [
-											':id' => $this->_requestedID,
 											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 										],
 										'replacements' => [
+											':id' => $this->_requestedID,
 											':field' => 'received'
 										]
 									]);
@@ -116,10 +116,10 @@ class ORDER extends API {
 						// generic state update
 						SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 							'values' => [
-								':id' => $this->_requestedID,
 								':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 							],
 							'replacements' => [
+								':id' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID))),
 								':field' => $this->_subMethod // verified safe by being in above array condition
 							]
 						]);
