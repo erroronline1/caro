@@ -702,7 +702,7 @@ export const _client = {
 			render.processAfterInsertion();
 		},
 		batchStateUpdate: (stateinput) => {
-			const marked = document.getElementsByName(api._lang.GET("order.tile_view_mark")),
+			const marked = document.querySelectorAll('[name^="' + api._lang.GET("order.tile_view_mark") + '"'), // include numeration
 				// gather marked orders
 				orders = [];
 			for (const mark of marked) {
@@ -1715,7 +1715,12 @@ export const _client = {
 
 			const inputs = {};
 			let bulk;
-			if (data.allowedstateupdates) {
+			if (data.allowedstateupdates && Object.keys(data.allowedstateupdates).length) {
+				// this is suddenly resolved as an object with integer keys, not an array
+				// may depend on browser, because it worked prior to os update!?
+				// so implementing a security fallback
+				if (!data.allowedstateupdates.isArray && Object.keys(data.allowedstateupdates).length) data.allowedstateupdates = Object.values(data.allowedstateupdates);
+
 				// order of options
 				const possiblestates = ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'];
 				// remove possible states
@@ -1723,7 +1728,6 @@ export const _client = {
 					if (data.state === "unprocessed" || data.state === possiblestates[i]) break;
 					if (data.state !== possiblestates[i]) delete possiblestates[i];
 				}
-
 				for (const input of possiblestates.filter(value => data.allowedstateupdates.includes(value))) {
 					inputs[api._lang.GET("order.order." + input)] = { value: input, onchange: "_client.order.batchStateUpdate(this)" };
 					if (input === data.state) inputs[api._lang.GET("order.order." + input)].checked = true;
