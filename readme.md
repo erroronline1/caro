@@ -31,6 +31,10 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+* maintenance batch productlist update for all vendors
+    * erpinterface hide array_diff(caro, erp), insert array_diff(erp, caro)
+    * no autodeletion for performance reasons?
+* calendar offduty overview with remaining vacation days for authorized users
 
 ## Content
 * [Aims](#aims)
