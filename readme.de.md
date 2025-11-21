@@ -1556,7 +1556,7 @@ ein, sofern ein Wert übermittelt und nicht bereits in der CARO-App-Datenbank vo
 Aktualisierungen betreffen freigegebene Bestellungen denen der Identifikationscode zugeordnet werden kann, bei gleichem Lieferantennamen und Bestellnummer oder, falls diese nicht Teil der Bestellung ist, gleicher Artikelbezeichnung.
 
 ### Datenimport von Kundendaten für Aufzeichnungen
-Kundendaten werden je Anfrage abgeglichen. Die Funktion für Aufzeichnungen, welche in der Lage ist Werte anhand eines Kennzeichens zu importieren, ist auch in der Lage Ergebnisse eines ERP-Abgleichs basierend auf Name und/oder Geburtsdatum zu laden. Die Anwendung stellt die Auswahl da von der aus der gewählte Datensatz in die jeweiligen Dokumentenfelder geladen wird.
+Kundendaten werden je Anfrage abgeglichen. Die Funktion für Aufzeichnungen, welche in der Lage ist Werte anhand eines Kennzeichens zu importieren, ist auch in der Lage Ergebnisse eines ERP-Abgleichs basierend auf Name und/oder Geburtsdatum zu laden. Die Anwendung stellt die Auswahl dar von der aus der gewählte Datensatz in die jeweiligen Dokumentenfelder geladen wird.
 
 Die ERP-Anbindung muss die relevanten Dokumentenfelder berücksichtigen um sinnvolle Ergebnisse für Kundendaten bereitzustellen.
 
@@ -1597,7 +1597,7 @@ Die CARO App speichert Bestellungen standardmäßig für einen relativ kurzen Ze
 Falls verfügbar und aufgeräumt kann die CARO App Artikeldatenbank auch aus dem ERP-System befüllt werden. Dies bietet Vorteile z.B. beim Abgleich mit Bestelldaten und reduziert zweifellos die Menge an Daten, was das System erheblich beschleunigt.
 
 ### Angepasste Datenbankauszüge
-Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
+Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beliebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 
 ### Bereitstellung von Datenquellen
 Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen werden muss, stellt die Elternklasse der ERP-Anbindung ein Beispiel bereit um Dateien, Anwendungsfälle und vorgesehende Dateinamen zu definieren, welche anschließend in den angepassten Methoden verwendet werden können. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf. Dateien werden jeweils überschrieben.
