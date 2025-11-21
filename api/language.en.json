@@ -1085,6 +1085,8 @@
 			"data_import": "Data from the ERP-software",
 			"productlist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
 			"productlist_erp_match_selected": "Match with ERP database",
+			"productlist_erp_update": "Update product lists with ERP-data",
+			"productlist_erp_update_hint": "This does not sanitize the database opposed to direct import within the vendor manager.",
 			"update_via_erp_interface": ":systemuser via ERP interface"
 		},
 		"navigation": {
@@ -1160,6 +1162,7 @@
 		"navigation": {
 			"cron_log": "Cron Log",
 			"maintenance": "Maintenance",
+			"productsupdate": "Product lists update",
 			"records_datalist": "Record datalist",
 			"riskupdate": "Update table of riskanalysis contents",
 			"vendorupdate": "Vendor update"
@@ -1844,7 +1847,7 @@
 			"autocomplete_back": "Key for former option on multiline text inputs (if available)",
 			"autocomplete_forth": "Key for next option on multiline text inputs (if available)",
 			"autocomplete_swipe": "Swipe to toggle options on multiline text inputs",
-			"autodelete_messages":"Delete messages by default after selected weeks (0 for no autodeletion)",
+			"autodelete_messages": "Delete messages by default after selected weeks (0 for no autodeletion)",
 			"force_desktop": "Force desktop mode",
 			"dateformat": "Date format",
 			"header": "Application settings",

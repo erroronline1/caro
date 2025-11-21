@@ -1085,6 +1085,8 @@
 			"data_import": "Daten aus der Verwaltungssoftware",
 			"productlist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
 			"productlist_erp_match_selected": "Mit EVA abgleichen",
+			"productlist_erp_update": "Artikellisten aus EVA aktualisieren",
+			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu einem Import aus der Lieferantenverwaltung heraus.",
 			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
 		},
 		"navigation": {
@@ -1160,6 +1162,7 @@
 		"navigation": {
 			"cron_log": "Cron Log",
 			"maintenance": "Wartung",
+			"productsupdate": "Aktualisierung der Artikellisten",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
 			"riskupdate": "Aktualisierung der Risikoanalyse-Inhalte",
 			"vendorupdate": "Lieferantenupdate"
@@ -1844,7 +1847,7 @@
 			"autocomplete_back": "Taste für vorherige Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_forth": "Taste für nächste Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_swipe": "Wischen um Optionen bei mehrzeiligen Textfeldern zu wechseln",
-			"autodelete_messages":"Nachrichten automatisch nach gewählten Wochen löschen (0 für ausschließlich manuelles Löschen)",
+			"autodelete_messages": "Nachrichten automatisch nach gewählten Wochen löschen (0 für ausschließlich manuelles Löschen)",
 			"dateformat": "Datumformat",
 			"force_desktop": "Desktop-Modus erzwingen",
 			"header": "Anwendungseinstellungen",

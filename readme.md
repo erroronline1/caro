@@ -4289,11 +4289,12 @@ HTTP status code 410 or 404.
 Depending on {task}:
 * Uploads a vendor template file for selection of updates
 * Updates the records_datalist database or return its data dump
+* Initiates the product list update (if available via ERP-interface)
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {task} | path parameter | required | records_datalist, vendorupdate or riskupdate |
+| {task} | path parameter | required | records_datalist, vendorupdate, productsupdate or riskupdate |
 | payload | form data | required | suggestion |
 
 Sample response

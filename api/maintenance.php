@@ -78,12 +78,15 @@ class MAINTENANCE extends API {
 		$response = ['render' => ['content' => []]];
 		$selecttypes = ['...' => []];
 		
-		foreach ([
+		$methods = [
 			'cron_log',
 			'records_datalist',
 			'riskupdate',
 			'vendorupdate',
-			] as $category){
+		];
+		if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()) $methods[] = 'productsupdate';
+
+		foreach ($methods as $category){
 				$selecttypes[$this->_lang->GET('maintenance.navigation.' . $category)] = ['value' => $category];
 				if ($this->_requestedType === $category) $selecttypes[$this->_lang->GET('maintenance.navigation.' . $category)]['selected'] = true;
 		}
@@ -107,6 +110,26 @@ class MAINTENANCE extends API {
 			}
 		}
 		$this->response($response);
+	}
+
+	/**
+	 *                 _         _                 _     _       
+	 *   ___ ___ ___ _| |_ _ ___| |_ ___ _ _ ___ _| |___| |_ ___ 
+	 *  | . |  _| . | . | | |  _|  _|_ -| | | . | . | .'|  _| -_|
+	 *  |  _|_| |___|___|___|___|_| |___|___|  _|___|__,|_| |___|
+	 *  |_|                                 |_|                  
+	 */
+	private function productsupdate () {
+		if (!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables())){
+			$this->response([], 405);
+		}
+
+		require_once('./erpquery.php');
+		$ERPQUERY = new ERPQUERY();
+
+		$this->response([
+			'render' => $ERPQUERY->productsupdate()
+		]);
 	}
 
 	/**

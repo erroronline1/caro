@@ -374,6 +374,71 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
+	/**
+	 *                 _         _                 _     _       
+	 *   ___ ___ ___ _| |_ _ ___| |_ ___ _ _ ___ _| |___| |_ ___ 
+	 *  | . |  _| . | . | | |  _|  _|_ -| | | . | . | .'|  _| -_|
+	 *  |  _|_| |___|___|___|___|_| |___|___|  _|___|__,|_| |___|
+	 *  |_|                                 |_|
+	 * reduced consumables update_productlist without purging but for all vendors instead
+	 */
+	public function productsupdate(){
+		if (!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables())){
+			$this->response([], 405);
+		}
+
+		include('./consumables.php');
+		$consumables = new CONSUMABLES();
+
+		$content = [];
+
+		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+			$response = $importfilter = [];
+			foreach($vendorlist as $vendor){
+				$source = ERPINTERFACE->consumables([$vendor['name']]);
+				if (isset($source[$vendor['name']]) && $source = $source[$vendor['name']]) {
+					$importfilter = [
+						'filesetting' => [
+							'columns' => array_keys($source[0]),
+							'source' => $source
+						]];
+					if ($vendor['products']['erpfilter']) $importfilter = array_merge($importfilter, json_decode($vendor['products']['erpfilter'] ? : '', true));
+					$importfilter = UTILITY::json_encode($importfilter);
+				}
+				else $response[] = $vendor['name'] . ': ' . $this->_lang->GET('consumables.vendor.productlist_update_error');
+				if ($importfilter){
+					$response[] = $consumables->update_productlist($source, $importfilter, $vendor['id'], true, false);
+				}
+			}
+			$content[] = [
+				'type' => 'textsection',
+				'htmlcontent' => nl2br(UTILITY::json_encode($response, JSON_PRETTY_PRINT))
+			];
+
+		}
+		if (!$vendorlist){
+			$content[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('erpquery.null')
+				]
+			];
+		}
+		else
+			$content[] =
+				[
+					'type' => 'submitbutton',
+					'attributes' => [
+						'value' => $this->_lang->GET('general.submit_button')
+					]
+				];
+
+		return $content;
+
+	}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // direct accessible methods
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

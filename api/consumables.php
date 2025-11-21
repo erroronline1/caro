@@ -1849,7 +1849,7 @@ class CONSUMABLES extends API {
 	 * 
 	 * chunkifies requests to avoid overflow
 	 */
-	private function update_productlist($source, $filter, $vendorID, $erp_match = false){
+	public function update_productlist($source, $filter, $vendorID, $erp_match = false, $purge = true){
 		$filter = json_decode($filter, true);
 
 		if (isset($source['productlist'])){
@@ -1887,7 +1887,7 @@ class CONSUMABLES extends API {
 			}
 		if (count($productlist->_list[1])){
 			// purge all unprotected products for a fresh data set
-			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+			if ($purge) SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
 				'values' => [
 					':id' => $vendorID
 				]
@@ -2230,7 +2230,7 @@ class CONSUMABLES extends API {
 									'source' => $source
 								]];
 							if ($vendor[':products']['erpfilter']) $importfilter = array_merge($importfilter, json_decode($vendor[':products']['erpfilter'] ? : '', true));
-							$importfilter = UTILITY::json_encode($importfilter);	
+							$importfilter = UTILITY::json_encode($importfilter);
 						}
 						else $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
