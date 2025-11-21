@@ -871,7 +871,8 @@
 				"sheet_overtime": ":number hours of overtime as of end of this month",
 				"sheet_subject": ":appname ID :id, occupied for :units, at :weeklyhours hours weekly",
 				"sheet_summary": "Summary",
-				"sheet_summary_text": ":name performed :performed hours of :projected hours in :month, achieving :_monthlyovertime hours of overtime.\nTotal overtime is :overtime hours. There are :vacation days of vacation available."
+				"sheet_summary_text": ":name performed :performed hours of :projected hours in :month, achieving :_monthlyovertime hours of overtime.\nTotal overtime is :overtime hours. There are :vacation days of vacation available.",
+				"yearly_summary_text": "performed :performed hours of :projected hours in :year.  \nTotal overtime is :overtime hours. There are :vacation days of vacation available.  \nIn total :name did not come in on :sumpto days, of which :pto"
 			},
 			"foreign_contributor": "Added by",
 			"homeoffice": "Homeoffice",
@@ -899,7 +900,8 @@
 			"start_date": "Start date",
 			"start_time": "Start time",
 			"vacation_warning": "You have :number days of vacation left. Please plan ahead!",
-			"workinghourscorrection": "Working hours correction"
+			"workinghourscorrection": "Working hours correction",
+			"yearly_summary": "Summary for this year"
 		}
 	},
 	"consumables": {

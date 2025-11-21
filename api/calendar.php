@@ -622,7 +622,7 @@ class CALENDAR extends API {
 		// prepare interval for daily hours display
 		$minuteInterval = new \DateInterval('PT1M');
 
-		//iterate over all days of the selected month
+		// iterate over all days of the selected month
 		foreach ($days as $day){
 			if (!$day) continue; // null, beginning of month
 			// iterate over all entries within the selected month
@@ -631,7 +631,7 @@ class CALENDAR extends API {
 					unset($month[$id]); // default delete for next iteration
 					continue;
 				}
-				//retrieve stats for affected user
+				// retrieve stats for affected user
 				$stats_month_row = array_search($entry['affected_user_id'], array_column($timesheet_stats_month, '_id'));
 				if ($stats_month_row === false) continue;
 
@@ -1491,6 +1491,14 @@ class CALENDAR extends API {
 						$response['render']['content'][] = $events;	
 					}
 				}
+				$response['render']['content'][] = [
+						'type' => 'button',
+						'attributes' => [
+							'data-type' => 'download',
+							'value' => $this->_lang->GET('calendar.timesheet.yearly_summary'),
+							'onclick' => "api.calendar('get', 'yearlyTimesheets', '" . $this->_requestedDate . "')"
+						]
+					];
 				break;
 			case 'DELETE':
 				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
@@ -1645,6 +1653,124 @@ class CALENDAR extends API {
 		return $events;
 	}
 
+	public function yearlyTimesheets(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+
+		// setting up a whole year within calendarutility->days leads to a memory overflow.
+		// iterate instantly in this rarely used scenario
+
+		$day = new \DateTime($this->_requestedTimespan ? : 'now');
+		$day->modify('first day of january this year');
+		$day->setTime(0, 0);
+		$lastDay = clone $day;
+		$lastDay->modify('last day of december this year');
+		$lastDay->setTime(23, 59);
+
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		// retrieve stats in advance
+		$timesheet_stats_year = $calendar->timesheetSummary($users, $day->format('Y-m-d'), $lastDay->format('Y-m-d'));
+		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $lastDay->format('Y-m-d'));
+		// item listing still needs another request for all monthly events and entries
+		$year = $calendar->getWithinDateRange($day->format('Y-m-d H:i:s'), $lastDay->format('Y-m-d H:i:s'));
+		
+		$timesheets = [];
+
+		// iterate over all days of the selected year
+		while ($day < $lastDay) {
+			// iterate over all entries within the selected year
+			foreach ($year as $id => $entry){
+				if ($entry['type'] !== 'timesheet'){
+					unset($year[$id]); // default delete for next iteration
+					continue;
+				}
+				if (!(PERMISSION::permissionFor('calendarfulltimesheetexport')
+					|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $entry['affected_user_units']), $_SESSION['user']['units']))
+					|| $entry['affected_user_id'] === $_SESSION['user']['id']
+				)) continue;
+
+				// retrieve stats for affected user
+				$stats_year_row = array_search($entry['affected_user_id'], array_column($timesheet_stats_year, '_id'));
+				if ($stats_year_row === false) continue;
+
+				$stats_year_row = $timesheet_stats_year[$stats_year_row];
+				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
+
+				// add summaries to user if not already set
+				if (!isset($timesheets[$entry['affected_user_id']])) {
+					$units = array_map(Fn($u) => isset($this->_lang->_DEFAULT['units'][$u]) ? $this->_lang->_DEFAULT['units'][$u] : false, explode(',', $entry['affected_user_units']));
+					$pto = [];
+					foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
+						if (isset($stats_year_row[$key])) $pto[$translation] = $stats_year_row[$key];
+					}
+					$timesheets[$entry['affected_user_id']] = [
+						'name' => $entry['affected_user'],
+						'user_id' => $entry['affected_user_id'],
+						'units' => $units[0] ? implode(', ', $units): $this->_lang->_DEFAULT['units']['common'],
+						'year' => $day->format('Y'),
+						'pto' => $pto,
+						'performed' => round(floatval($stats_year_row['_performed']), 2),
+						'projected' => round(floatval($stats_year_row['_projected']), 2),
+						'weeklyhours' => $stats_year_row['_span_end_weeklyhours'],
+						'leftvacation' => $stats_all_row['_leftvacation'],
+						'overtime' => round(floatval($stats_all_row['_overtime'] + $stats_all_row['_initialovertime']), 2),
+					];
+				}
+			}
+			$day->modify('+1 days');
+		}
+		// sort by user name
+		usort($timesheets, function ($a, $b) {
+			return $a['name'] === $b['name'] ? 0 : ($a['name'] < $b['name'] ? -1 : 1); 
+		});
+		// set self to top 
+		$self = array_splice($timesheets, array_search($_SESSION['user']['id'], array_column($timesheets, 'user_id')), 1);
+		array_splice($timesheets, 0, 0, $self);
+
+		$content = [];
+		foreach($timesheets as $userstats){
+			$content[$userstats['name']] =
+				$userstats['units'] . "  \n" .
+				$this->_lang->GET('calendar.timesheet.export.yearly_summary_text', [
+					':name' => $userstats['name'],
+					':performed' => $userstats['performed'],
+					':projected' => $userstats['projected'],
+					':year' => $userstats['year'],
+					':overtime' => $userstats['overtime'],
+					':vacation' => $userstats['leftvacation'],
+					':sumpto' => array_sum($userstats['pto']),
+					':pto' => implode(', ', array_map(Fn($k, $v) => $k . ': ' . $v, array_keys($userstats['pto']), array_values($userstats['pto'])))
+				], true);
+		}
+
+		$summary = [
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.timesheet.yearly_summary', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => $content,
+			'files' => [],
+			'images' => [],
+			'title' => $this->_lang->GET('calendar.timesheet.yearly_summary', [], true),
+			'date' => $this->_date['usertime']->format('Y-m-d H:i')
+		];
+
+		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
+		$downloadfiles[$this->_lang->GET('calendar.timesheet.yearly_summary', [], true)] = [
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
+		];
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('calendar.timesheet.export.proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
 
 	/**
 	 *                 _   _ _     _       

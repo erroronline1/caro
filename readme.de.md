@@ -789,6 +789,8 @@ Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahre
 ```
 Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar.
 
+Es ist auch ein Jahresüberblick verfügbar, der dienstfreie Tage, Resturlaub und Überstunden für das laufende Jahr darstellt, was beispielsweise praktisch ist um Mitarbeiter daran zu erinnern den Urlaub rechtzeitig zu planen. Die Inhalte dieser Übersicht entsprechen denen der Arbeitszeitübersichten (betroffener Nutzer, Bereichtmitarbeiter für Bereichsleiter oder alle für berechtige Nutzer).
+
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
 [Übersicht](#übersicht)

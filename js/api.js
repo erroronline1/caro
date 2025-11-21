@@ -963,6 +963,7 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "monthlyTimesheets":
+					case "yearlyTimesheets":
 						successFn = function (data) {
 							if (data.render !== undefined) {
 								const options = {};

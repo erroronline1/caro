@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
 * maintenance batch productlist update for all vendors
     * erpinterface hide array_diff(caro, erp), insert array_diff(erp, caro)
     * no autodeletion for performance reasons?
-* calendar offduty overview with remaining vacation days for authorized users
 
 ## Content
 * [Aims](#aims)
@@ -890,6 +889,8 @@ For a correct calculation it is neccessary to provide values as *start-date and 
 2026-01-01; 15
 ```
 Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers.
+
+There is a yearly overview available as well that sums up off-duty-days, remaining vacation days and overtime for the current year, which may come in handy to remind employees taking their vacation days in time. Contents for this overview match those of timesheet exports (owning user, unit members for supervisors or all for authorized users).
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
@@ -3566,6 +3567,20 @@ Similar to tasks with slightly adapted inputs for worklists.
 Contributes worklist entries to the calendar
 
 Similar to tasks.
+
+> GET ./api/api.php/calendar/yearlyTimesheets/{date Y-m-d}
+
+Returns a download link to a temporary file based on date.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {date Y-m-d} | path parameter | required | defines the response, none if omitted |
+
+Sample response
+```
+{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Summary for this year":{"href":"./api/api.php/file/stream/./fileserver/tmp/Summary for this year_2025-11-21 2301.pdf","download":"Summary for this year_2025-11-21 2301.pdf"}}}]]}
+```
 
 [Content](#content)
 
