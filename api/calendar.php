@@ -1653,6 +1653,16 @@ class CALENDAR extends API {
 		return $events;
 	}
 
+	/**
+	 *                   _     _   _               _           _       
+	 *   _ _ ___ ___ ___| |_ _| |_|_|_____ ___ ___| |_ ___ ___| |_ ___ 
+	 *  | | | -_| .'|  _| | | |  _| |     | -_|_ -|   | -_| -_|  _|_ -|
+	 *  |_  |___|__,|_| |_|_  |_| |_|_|_|_|___|___|_|_|___|___|_| |___|
+	 *  |___|             |___|
+	 * retrieve all timesheet entries from the database,
+	 * prepare and calculate hours, vacation days and other pto
+	 * returns a link to summary file 
+	 */
 	public function yearlyTimesheets(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 
