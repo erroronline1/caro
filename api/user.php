@@ -997,7 +997,7 @@ class USER extends API {
 								'value' => strval(isset($user['app_settings']['idle']) ? ($user['app_settings']['idle'] / CONFIG['lifespan']['session']['idle'] - 1) : 0),
 							],
 							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['session']['idle']]),
-							'datalist' => array_map(fn($v) => intval(CONFIG['lifespan']['session']['idle']) * $v, range(1, $max_idle_prolonging_factor, 1))
+							'datalist' => [...array_map(fn($v) => intval(CONFIG['lifespan']['session']['idle']) * $v, range(1, $max_idle_prolonging_factor, 1)), 4 * 3600]
 						]
 					], [
 						[
