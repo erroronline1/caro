@@ -1281,7 +1281,7 @@ article > p {
 
 /*textsection*/
 p {
-	user-select: all;
+	user-select: text;
 	overflow-wrap: break-word;
 	a {
 		user-select: none;
