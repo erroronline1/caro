@@ -1667,6 +1667,7 @@ export const _client = {
 					type: "button",
 					attributes: {
 						value: api._lang.GET("order.tile_view_open"),
+						class:"inlinebutton",
 						onclick: function () {
 							new _client.Dialog({
 								type: "input",
@@ -1704,7 +1705,6 @@ export const _client = {
 				tile = {
 					type: "tile",
 					attributes: {
-						role: "link",
 						tabindex: "0",
 					},
 					content: order,
