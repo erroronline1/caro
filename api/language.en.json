@@ -898,6 +898,7 @@
 			"start": "Start",
 			"start_date": "Start date",
 			"start_time": "Start time",
+			"vacation_warning": "You have :number days of vacation left. Please plan ahead!",
 			"workinghourscorrection": "Working hours correction"
 		}
 	},

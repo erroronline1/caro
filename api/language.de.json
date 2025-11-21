@@ -898,6 +898,7 @@
 			"start": "Start",
 			"start_date": "Startdatum",
 			"start_time": "Startzeit",
+			"vacation_warning": "Du hast noch :number Tage Urlaub übrig. Bitte plane die Tage ein!",
 			"workinghourscorrection": "Arbeitszeitkorrektur"
 		}
 	},
