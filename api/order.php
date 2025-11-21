@@ -610,7 +610,7 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'partially_delivered':
-								if ($row['delivered'] || !($permission['admin'] || $unit_intersection || $orderer['name'] === $_SESSION['user']['name'])){
+								if ($row['delivered'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -623,7 +623,7 @@ class ORDER extends API {
 								}
 								// no break
 							case 'archived':
-								if (!($permission['admin'] || $unit_intersection || $orderer['name'] === $_SESSION['user']['name'])){
+								if (!($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
