@@ -1618,9 +1618,9 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (method === "get" && !["productsearch"].includes(request[0])) api.history.write(["purchase", ...request]);
+		if (method === "get" && !["search"].includes(request[0])) api.history.write(["purchase", ...request]);
 
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportproductlist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportproductlist", "search"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -1641,7 +1641,7 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "productsearch":
+					case "search":
 						switch (request[4]) {
 							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
@@ -1763,7 +1763,7 @@ export const api = {
 				break;
 			case "post":
 				switch (request[1]) {
-					case "productsearch":
+					case "search":
 						payload = request[3]; // form data object passed by utility.js
 						request[3] = "null";
 						successFn = function (data) {

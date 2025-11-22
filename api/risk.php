@@ -217,9 +217,7 @@ class RISK extends API {
 					if (isset($this->_lang->_USER['risks'][$selectedrisk]) && isset($risks[$this->_lang->_USER['risks'][$selectedrisk]])) $risks[$this->_lang->_USER['risks'][$selectedrisk]]['checked'] = true;
 				}
 
-				require_once('_shared.php');
-				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
-				$response = ['render' => ['content' => $search->risksearch()]];		
+				$response = ['render' => ['content' => $this->risksearch()]];		
 				
 				// render selection of types and their content, one selection per process
 				$selection = [];
@@ -694,6 +692,97 @@ class RISK extends API {
 	}
 
 	/**
+	 *       _     _                       _   
+	 *   ___|_|___| |_ ___ ___ ___ ___ ___| |_ 
+	 *  |  _| |_ -| '_|_ -| -_| .'|  _|  _|   |
+	 *  |_| |_|___|_,_|___|___|__,|_| |___|_|_|
+	 *  
+	 * returns risk tiles based on search
+	 * @param array $parameter named array, currently with search string
+	 * 
+	 * @return array render content
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function risksearch($parameter = []){
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+
+		$risk_datalist = $parameter['search'] ? SQLQUERY::EXECUTE($this->_pdo, 'risk_search', [
+			'values' => [
+				':SEARCH' => $parameter['search'] ? : '%'
+			],
+			'wildcards' => true,
+		]) : [];
+
+		if ($parameter['search']) {
+			// order matches by relevance; shift to top if all of optional terms have been found
+			$risk_datalist = SEARCH::refine($parameter['search'], $risk_datalist, ['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder']);
+		}
+
+		$productsPerSlide = 0;
+
+		$slides = [
+			[
+				[
+					'type' => 'search',
+					'attributes' => [
+						'name' => $this->_lang->GET('risk.search'),
+						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', encodeURIComponent(this.value)); return false;}",
+						'value' => $parameter['search'] ? : ''
+					]
+				]
+			]
+		];
+		foreach ($risk_datalist as $row){
+			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
+			$row['risk'] = implode(' ', array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
+			if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+				$slides[] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
+						],
+					]
+				];
+			}
+			$slide = count($slides) - 1;
+			$tile = max(1, count($slides[$slide]) - 1);	
+			switch ($row['type']){
+				case 'characteristic': // implement further cases if suitable, according to languagefile
+					$content = $row['process'] . ': ' . $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
+					break;
+				default: // risk
+					$content = $row['process'] . ': ' . ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
+					break;
+			}
+			if ($row['hidden']) $content = UTILITY::hiddenOption($content);
+			$slides[$slide][$tile][] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
+					'onkeydown' => "if (event.key==='Enter') api.risk('get', 'risk', " . $row['id'] . ")",
+					'role' => 'link',
+					'tabindex' => '0',
+					'title' => $this->_lang->GET('risk.tile_title', [':type' => $this->_lang->_USER['risk']['type'][$row['type']]])
+				],
+				'content' => [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->_USER['risk']['type'][$row['type']],
+							'class' => $row['relevance'] ? 'green' : 'red'
+						],
+						'content' => $content
+					]
+				]
+			];
+		}
+		if ($parameter['search'] && !isset($slides[1])) return false;
+		return [array_values($slides)];
+	}
+	
+	/**
 	 *                       _   
 	 *   ___ ___ ___ ___ ___| |_ 
 	 *  |_ -| -_| .'|  _|  _|   |
@@ -701,9 +790,7 @@ class RISK extends API {
 	 * 
 	 */
 	public function search(){
-		require_once('_shared.php');
-		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
-		if ($result = $search->risksearch(['search' => $this->_search])) {
+		if ($result = $this->risksearch(['search' => $this->_search])) {
 			$this->response(['render' => ['content' => $result]]);
 		}
 		$this->response([

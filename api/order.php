@@ -39,8 +39,6 @@ class ORDER extends API {
 	public function approved(){
 		require_once('notification.php');
 		require_once('./_calendarutility.php');
-		require_once('_shared.php');
-		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
 		$notifications = new NOTIFICATION;
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 
@@ -62,7 +60,7 @@ class ORDER extends API {
 							case 'ordered':
 								if ($order['ordertype'] === 'cancellation'){
 									// ordered aka processed canellation orders are deleted immediately 
-									$orderstatistics->update($this->_requestedID); // write to statistics about a cancelled order
+									$this->statistics_update($this->_requestedID); // write to statistics about a cancelled order
 									if ($this->delete_approved_order($order)) {
 										$response = [
 										'response' => [
@@ -347,8 +345,8 @@ class ORDER extends API {
 					];
 
 					// update order statistics
-					if (($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved') $orderstatistics->delete($this->_requestedID);
-					else $orderstatistics->update($this->_requestedID);
+					if (($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved') $this->statistics_delete($this->_requestedID);
+					else $this->statistics_update($this->_requestedID);
 				}
 				break;
 			case 'GET':
@@ -988,8 +986,8 @@ class ORDER extends API {
 				];
 
 				// render search and selection
-				require_once('_shared.php');
-				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
+				require_once('consumables.php');
+				$search = new CONSUMABLES();
 				$response['render'] = ['form' => [
 					'data-usecase' => 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
@@ -1662,5 +1660,89 @@ class ORDER extends API {
 		if (!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
 	}
+
+	/**
+	 *       _       _   _     _   _               
+	 *   ___| |_ ___| |_|_|___| |_|_|___ ___       
+	 *  |_ -|  _| .'|  _| |_ -|  _| |  _|_ -|_ _ _ 
+	 *  |___|_| |__,|_| |_|___|_| |_|___|___|_|_|_|
+	 *
+	 * delete from statistics if requested e.g. in case of revoked ordered state or disapproval
+	 * @param int $order_id primary database key
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function statistics_delete($order_id){
+		if (!$order_id) return;
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_delete_order_statistics', [
+			'values' => [
+				':order_id' => intval($order_id)
+			]
+		]);
+	}
+
+	/**
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function statistics_get(){
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+	}
+
+	/**
+	 * post or put to order statistics once an order is processed
+	 * reduces order data and updates received state by copying relevant date from approved order by id to statistics table
+	 * @param int $order_id primary database key
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function statistics_update($order_id){
+		if (!$order_id) return;
+
+		// get approved order to gather data
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
+			'replacements' => [
+				':ids' => intval($order_id)
+			]
+		]);
+		$order = $order ? $order[0] : null;
+		if (!$order) return;
+		// minimize order data
+		$order['order_data'] = json_decode($order['order_data'], true);
+		foreach ($order['order_data'] as $key => $value){
+			if (!in_array($key, [
+				'quantity_label',
+				'unit_label',
+				'ordernumber_label',
+				'productname_label',
+				'vendor_label',
+				'additional_info'])) unset($order['order_data'][$key]);
+		}
+		$order['order_data'] = UTILITY::json_encode($order['order_data']);
+		
+		// update or insert order statistics
+		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+			'values' => [
+				':order_id' => intval($order_id),
+				':order_data' => $order['order_data'],
+				':ordered' => $order['ordered'],
+				':ordertype' => $order['ordertype']
+			],
+			'replacements' => [
+				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
+				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
+			]
+		]);
+	}
+
+	/**
+	 * truncate table to initiate a new observation period
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function statistics_truncate(){
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
+	}
+
 }
 ?>

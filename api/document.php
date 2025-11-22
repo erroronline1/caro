@@ -1202,266 +1202,6 @@ class DOCUMENT extends API {
 	}
 	
 	/**
-	 *                       _ 
-	 *   ___ _ _ ___ ___ ___| |_
-	 *  | -_|_'_| . | . |  _|  _|
-	 *  |___|_,_|  _|___|_| |_| 
-	 *          |_|
-	 * export a document as pdf, if earlier than requested maxDocumentTimestamp, with data if provided
-	 */
-	public function export(){
-		$document_id = $identifier = null;
-		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
-		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
-		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
-		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
-
-		// used by audit for export of outdated documents
-		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
-		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
-
-		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-			'values' => [
-				':id' => $document_id
-			]
-		]);
-		$document = $document ? $document[0] : null;
-		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
-		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([], 409);
-
-		$entry_timestamp = $entry_date . ' ' . $entry_time;
-		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
-		}
-
-		// create proper identifier with timestamp if not provided
-		// unset checkboxes while relying on a prepared additional dataset
-		// unset empty values
-
-		foreach ($this->_payload as $key => &$value){
-			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
-				$identifier = $value;
-				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
-				unset ($this->_payload->$key);
-				$identifier = UTILITY::identifier($identifier, $entry_timestamp);
-			}
-			if (gettype($value) === 'array') {
-				// empty file arrays to be skipped
-				if (isset($value[0])) unset ($this->_payload->$key);
-				else $value = trim(implode(' ', $value));
-			}
-			
-			/////////////////////////////////////////
-			// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
-			////////////////////////////////////////
-			if (!$value || $value == 'on') unset($this->_payload->$key);
-		}
-		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
-		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
-			'identifier' => $identifier,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)], true)
-		];
-
-		function enumerate($name, $enumerate = [], $number = 1){
-			if (isset($enumerate[$name])) $enumerate[$name] += $number;
-			else $enumerate[$name] = $number;	
-			return $enumerate;
-		}
-
-		/**
-		 * recursive content setting according to the most recent document, markdown parsing if applicable
-		 * @param array $element component and subsets
-		 * @param array $payload
-		 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
-		 * @param array $enumerate names of elements that have to be enumerated
-		 * 
-		 * also see record.php summarizeRecord() 
-		 */
-		function printable($element, $payload, $_lang, $enumerate = []){
-			$content = ['content' => [], 'images' => [], 'fillable' => false];
-			foreach ($element as $subs){
-				if (!isset($subs['type'])){
-					$subcontent = printable($subs, $payload, $_lang, $enumerate);
-					foreach ($subcontent['enumerate'] as $name => $number){
-						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
-					}
-					$content['content'] = array_merge($content['content'], $subcontent['content']);
-					$content['images'] = array_merge($content['images'], $subcontent['images']);
-					$content['fillable'] = $subcontent['fillable'];
-				}
-				else {
-					if (in_array($subs['type'], ['identify', 'hr'])) continue;
-					if (in_array($subs['type'], ['image', 'links'])) {
-						$name = $subs['description'];
-					}
-					elseif (in_array($subs['type'], ['documentbutton'])) {
-						$name = $subs['attributes']['value'];
-					}
-					elseif (in_array($subs['type'], ['calendarbutton'])) {
-						$name = $_lang->GET('assemble.render.export_element.' . $subs['type']);
-					}
-					else $name = $subs['attributes']['name'];
-					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
-					$originName = $name;
-					if ($enumerate[$name] > 1) {
-						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
-					}
-					$postname = $name;
-
-					if (isset($subs['attributes']['required'])) $name .= ' *';
-					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
-						foreach ($subs['content'] as $key => $attributes) {
-							if (!$attributes) break;
-							if (isset($attributes['required'])) {
-								$name .= ' *';
-								break;
-							}
-						}
-					}
-
-					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
-					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						$content['content'][$name] = ['type' => 'selection', 'value' => []];
-						foreach ($subs['content'] as $key => $v){
-							if ($key === '...') continue;
-							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
-							$selected = '';
-
-							// dynamic multiple select
-							$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
-							foreach ($dynamicMultiples as $submitted){
-								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
-							}
-	
-							if (UTILITY::propertySet($payload, $postname) && (
-								($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
-								($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
-								)) $selected = '_____';
-							$content['content'][$name]['value'][] = $selected . $key;
-						}
-					}
-					elseif ($subs['type'] === 'textsection'){
-						if (isset($subs['markdown']) && isset($subs['content'])){
-							$markdown = new MARKDOWN();
-							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
-						}
-						else $content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
-					}
-					elseif ($subs['type'] === 'textarea'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-					}
-					elseif ($subs['type'] === 'signature'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'image'){
-						$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
-						$file = pathinfo($subs['attributes']['url']);
-						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-							$content['images'][] = $subs['attributes']['url'];
-						}
-					}
-					elseif ($subs['type'] === 'range'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
-					}
-					elseif (in_array($subs['type'], ['photo', 'file'])){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];
-					}
-					elseif ($subs['type'] === 'links'){
-						$content['content'][$name] = ['type' => 'links', 'value' => []];
-						foreach (array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
-					}
-					elseif ($subs['type'] === 'documentbutton'){
-						// strip language chunk from wrappers to extract only the linkes documents name
-						$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
-						foreach ($language as $chunk){
-							$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
-							preg_match('/' . $chunk . '/', $name, $document);
-							if (isset($document[1])){
-								$name = $document[1];
-								break;
-							}
-						};
-						$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'calendarbutton'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
-					}
-					else {
-						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
-						foreach ($dynamicMultiples as $submitted){
-							$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
-						}
-					}
-				}
-			}
-			$content['enumerate'] = $enumerate;
-			return $content;
-		};
-
-		$enumerate = [];
-		$fillable = false;
-		// iterate over components and fill fields with provided values if any
-		// maxDocumentTimestamp is used for audit exports of outdated documents on request
-		foreach (explode(',', $document['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent, $maxDocumentTimestamp);
-			if (!$component) continue;
-			// add component version
-			$summary['content'] = array_merge($summary['content'], [
-				$component['name'] . $component['date'] => [
-					'type' => 'version',
-					'value' => $this->_lang->GET('assemble.render.export_component', [
-						':component' => $component['name'],
-						':version' => $component['date']
-					], true)
-				]
-			]);
-			// add component content prefilled by payload
-			$component['content'] = json_decode($component['content'], true);
-			$printablecontent = printable($component['content']['content'], $this->_payload, $this->_lang, $enumerate);
-			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
-			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
-			$enumerate = $printablecontent['enumerate'];
-			if ($printablecontent['fillable']) $fillable = true;
-		}
-		// append default fields for paper that are submitted by default on screen
-		if ($fillable){
-			if (in_array($document['context'], ['casedocumentation'])) {
-				$type = ['type' => 'selection', 'value' => []];
-				foreach ($this->_lang->_DEFAULT['record']['type'] as $key => $value){
-					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
-				}
-				$summary['content'] = array_merge([$this->_lang->GET('record.type_description', [], true) . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
-			}
-			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => $this->_lang->GET('assemble.render.required_asterisk', [], true)], $this->_lang->GET('assemble.render.export_by', [], true) . ' *' => [
-				'type' => 'text',
-				'value' => ''
-			]], $summary['content']);
-		}
-		$summary['content'] = [' ' => $summary['content']];
-		$summary['images'] = [' ' => $summary['images']];
-
-		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('assemble.render.export')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->documentsPDF($summary)
-		];
-		$this->response([
-			'render' => [
-				[
-					'type' => 'links',
-					'description' =>  $this->_lang->GET('assemble.render.export_proceed'),
-					'content' => $downloadfiles
-				]
-			],
-		]);
-	}
-	
-	/**
 	 *     _                           _   
 	 *   _| |___ ___ _ _ _____ ___ ___| |_ 
 	 *  | . | . |  _| | |     | -_|   |  _|
@@ -2013,9 +1753,7 @@ class DOCUMENT extends API {
 		$response = [];
 
 		// get all documents or these fitting the search
-		require_once('_shared.php');
-		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
-		$documents = $search->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
+		$documents = $this->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
 		// also see application.php start()
 		// prepare existing documents lists grouped by context
@@ -2116,6 +1854,346 @@ class DOCUMENT extends API {
 	}
 
 	/**
+	 *     _                           _                       _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ ___ ___ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -| -_| .'|  _|  _|   |
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|___|__,|_| |___|_|_|
+	 * 
+	 * returns documents based on search
+	 * @param array $parameter with search as key
+	 * 
+	 * @return array of document names
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function documentsearch($parameter = []){
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$hidden = $matches = [];
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+
+		/**
+		 * extracts names, descriptions, hints and contents
+		 * @param array $element component
+		 * 
+		 * @return array
+		 */
+		function componentSearcheables($element){
+			$searcheables = [];
+			foreach ($element as $subs){
+				if (!isset($subs['type'])){
+					array_push($searcheables, ... componentSearcheables($subs));
+				}
+				else {
+					foreach (['description', 'content', 'hint'] as $property){
+						if (isset($subs[$property])){
+							if (is_array($subs[$property])){ // links, checkboxes, etc
+								foreach (array_keys($subs[$property]) as $key) $searcheables[] = $key;
+							}
+							else $searcheables[] = $subs[$property];
+						}
+					}
+					if (isset($subs['attributes'])){
+						foreach (['name', 'value'] as $property){
+							if (isset($subs['attributes'][$property])) $searcheables[] = $subs['attributes'][$property];
+						}
+					}
+				}
+			}
+			return $searcheables;
+		}
+
+		foreach ($documents as $row) {
+			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access']) || !PERMISSION::fullyapproved('documentapproval', $row['approval'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden)) {
+
+				if (!$parameter['search']){
+					$matches[] = $row;
+					continue;
+				}
+
+				// translate and reassign regulatory contexts since document search results do not need the language agnostic key
+				$row['regulatory_context'] = implode(', ', array_map(fn($c) => $this->_lang->GET('regulatory.' . $c), explode(',', $row['regulatory_context'] ? : '')));
+				// add component contents to terms
+				$document = $this->recentdocument('document_document_get_by_name', [
+					'values' => [
+						':name' => $row['name']
+					]]);
+				$searchables = componentSearcheables($document['content']);
+				// compare search
+				if (SEARCH::filter($parameter['search'], [$row['name'], $row['alias'], $row['regulatory_context'], ...$searchables])){
+					$row['contents'] = implode (' ', $searchables);
+					$matches[] = $row;
+				}
+			}
+		}
+		if ($parameter['search']) {
+			$matches = SEARCH::refine($parameter['search'], $matches, ['name', 'alias', 'regulatory_context', 'contents']);
+		}
+
+		return $matches;
+	}
+
+	/**
+	 *                       _ 
+	 *   ___ _ _ ___ ___ ___| |_
+	 *  | -_|_'_| . | . |  _|  _|
+	 *  |___|_,_|  _|___|_| |_| 
+	 *          |_|
+	 * export a document as pdf, if earlier than requested maxDocumentTimestamp, with data if provided
+	 */
+	public function export(){
+		$document_id = $identifier = null;
+		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
+		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
+		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
+		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
+
+		// used by audit for export of outdated documents
+		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
+		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
+
+		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+			'values' => [
+				':id' => $document_id
+			]
+		]);
+		$document = $document ? $document[0] : null;
+		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
+		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([], 409);
+
+		$entry_timestamp = $entry_date . ' ' . $entry_time;
+		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
+			$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
+		}
+
+		// create proper identifier with timestamp if not provided
+		// unset checkboxes while relying on a prepared additional dataset
+		// unset empty values
+
+		foreach ($this->_payload as $key => &$value){
+			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
+				$identifier = $value;
+				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
+				unset ($this->_payload->$key);
+				$identifier = UTILITY::identifier($identifier, $entry_timestamp);
+			}
+			if (gettype($value) === 'array') {
+				// empty file arrays to be skipped
+				if (isset($value[0])) unset ($this->_payload->$key);
+				else $value = trim(implode(' ', $value));
+			}
+			
+			/////////////////////////////////////////
+			// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+			////////////////////////////////////////
+			if (!$value || $value == 'on') unset($this->_payload->$key);
+		}
+		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
+		$summary = [
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+			'identifier' => $identifier,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => $document['name'],
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)], true)
+		];
+
+		function enumerate($name, $enumerate = [], $number = 1){
+			if (isset($enumerate[$name])) $enumerate[$name] += $number;
+			else $enumerate[$name] = $number;	
+			return $enumerate;
+		}
+
+		/**
+		 * recursive content setting according to the most recent document, markdown parsing if applicable
+		 * @param array $element component and subsets
+		 * @param array $payload
+		 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
+		 * @param array $enumerate names of elements that have to be enumerated
+		 * 
+		 * also see record.php summarizeRecord() 
+		 */
+		function printable($element, $payload, $_lang, $enumerate = []){
+			$content = ['content' => [], 'images' => [], 'fillable' => false];
+			foreach ($element as $subs){
+				if (!isset($subs['type'])){
+					$subcontent = printable($subs, $payload, $_lang, $enumerate);
+					foreach ($subcontent['enumerate'] as $name => $number){
+						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
+					}
+					$content['content'] = array_merge($content['content'], $subcontent['content']);
+					$content['images'] = array_merge($content['images'], $subcontent['images']);
+					$content['fillable'] = $subcontent['fillable'];
+				}
+				else {
+					if (in_array($subs['type'], ['identify', 'hr'])) continue;
+					if (in_array($subs['type'], ['image', 'links'])) {
+						$name = $subs['description'];
+					}
+					elseif (in_array($subs['type'], ['documentbutton'])) {
+						$name = $subs['attributes']['value'];
+					}
+					elseif (in_array($subs['type'], ['calendarbutton'])) {
+						$name = $_lang->GET('assemble.render.export_element.' . $subs['type']);
+					}
+					else $name = $subs['attributes']['name'];
+					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
+					$originName = $name;
+					if ($enumerate[$name] > 1) {
+						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
+					}
+					$postname = $name;
+
+					if (isset($subs['attributes']['required'])) $name .= ' *';
+					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
+						foreach ($subs['content'] as $key => $attributes) {
+							if (!$attributes) break;
+							if (isset($attributes['required'])) {
+								$name .= ' *';
+								break;
+							}
+						}
+					}
+
+					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
+					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
+						$content['content'][$name] = ['type' => 'selection', 'value' => []];
+						foreach ($subs['content'] as $key => $v){
+							if ($key === '...') continue;
+							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
+							$selected = '';
+
+							// dynamic multiple select
+							$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
+							foreach ($dynamicMultiples as $submitted){
+								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
+							}
+	
+							if (UTILITY::propertySet($payload, $postname) && (
+								($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
+								($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
+								)) $selected = '_____';
+							$content['content'][$name]['value'][] = $selected . $key;
+						}
+					}
+					elseif ($subs['type'] === 'textsection'){
+						if (isset($subs['markdown']) && isset($subs['content'])){
+							$markdown = new MARKDOWN();
+							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
+						}
+						else $content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
+					}
+					elseif ($subs['type'] === 'textarea'){
+						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
+					}
+					elseif ($subs['type'] === 'signature'){
+						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
+					}
+					elseif ($subs['type'] === 'image'){
+						$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
+						$file = pathinfo($subs['attributes']['url']);
+						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+							$content['images'][] = $subs['attributes']['url'];
+						}
+					}
+					elseif ($subs['type'] === 'range'){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
+					}
+					elseif (in_array($subs['type'], ['photo', 'file'])){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];
+					}
+					elseif ($subs['type'] === 'links'){
+						$content['content'][$name] = ['type' => 'links', 'value' => []];
+						foreach (array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
+					}
+					elseif ($subs['type'] === 'documentbutton'){
+						// strip language chunk from wrappers to extract only the linkes documents name
+						$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
+						foreach ($language as $chunk){
+							$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
+							preg_match('/' . $chunk . '/', $name, $document);
+							if (isset($document[1])){
+								$name = $document[1];
+								break;
+							}
+						};
+						$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
+					}
+					elseif ($subs['type'] === 'calendarbutton'){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
+					}
+					else {
+						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
+						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
+						foreach ($dynamicMultiples as $submitted){
+							$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
+						}
+					}
+				}
+			}
+			$content['enumerate'] = $enumerate;
+			return $content;
+		};
+
+		$enumerate = [];
+		$fillable = false;
+		// iterate over components and fill fields with provided values if any
+		// maxDocumentTimestamp is used for audit exports of outdated documents on request
+		foreach (explode(',', $document['content']) as $usedcomponent) {
+			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent, $maxDocumentTimestamp);
+			if (!$component) continue;
+			// add component version
+			$summary['content'] = array_merge($summary['content'], [
+				$component['name'] . $component['date'] => [
+					'type' => 'version',
+					'value' => $this->_lang->GET('assemble.render.export_component', [
+						':component' => $component['name'],
+						':version' => $component['date']
+					], true)
+				]
+			]);
+			// add component content prefilled by payload
+			$component['content'] = json_decode($component['content'], true);
+			$printablecontent = printable($component['content']['content'], $this->_payload, $this->_lang, $enumerate);
+			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
+			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
+			$enumerate = $printablecontent['enumerate'];
+			if ($printablecontent['fillable']) $fillable = true;
+		}
+		// append default fields for paper that are submitted by default on screen
+		if ($fillable){
+			if (in_array($document['context'], ['casedocumentation'])) {
+				$type = ['type' => 'selection', 'value' => []];
+				foreach ($this->_lang->_DEFAULT['record']['type'] as $key => $value){
+					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
+				}
+				$summary['content'] = array_merge([$this->_lang->GET('record.type_description', [], true) . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
+			}
+			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => $this->_lang->GET('assemble.render.required_asterisk', [], true)], $this->_lang->GET('assemble.render.export_by', [], true) . ' *' => [
+				'type' => 'text',
+				'value' => ''
+			]], $summary['content']);
+		}
+		$summary['content'] = [' ' => $summary['content']];
+		$summary['images'] = [' ' => $summary['images']];
+
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$downloadfiles[$this->_lang->GET('assemble.render.export')] = [
+			'href' => './api/api.php/file/stream/' . $PDF->documentsPDF($summary)
+		];
+		$this->response([
+			'render' => [
+				[
+					'type' => 'links',
+					'description' =>  $this->_lang->GET('assemble.render.export_proceed'),
+					'content' => $downloadfiles
+				]
+			],
+		]);
+	}
+	
+	/**
 	 *   _     _           _                                 _
 	 *  | |___| |_ ___ ___| |_ ___ ___ ___ ___ ___ _ _ ___ _| |___ ___ _____ ___
 	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
@@ -2145,6 +2223,145 @@ class DOCUMENT extends API {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 *                   _     _         _                           _   
+	 *   ___ ___ ___ _ _| |___| |_ ___ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . | . | | | | .'|  _| -_| . | . |  _| | |     | -_|   |  _|
+	 *  |  _|___|  _|___|_|__,|_| |___|___|___|___|___|_|_|_|___|_|_|_|  
+	 *  |_|     |_| 
+	 * populate a document with passed payload
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * 
+	 * @return array prefilled document structure
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function populatedocument($element, $values){
+		$content = [];
+		foreach ($element as $subs){
+			if (!isset($subs['type'])){
+				$content[] = self::populatedocument($subs, $values);
+			}
+			else {
+				try {
+					if (!isset($subs['attributes']['name'])) throw new \ErrorException('faulty element construction', 0);
+
+					$name = $subs['attributes']['name'];
+					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$name])){
+						$settings = explode(' | ', $values[$name]);
+						foreach ($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+							else $subs['content'][$key]['checked'] = true;
+						}
+					}
+					elseif (isset($values[$name])){
+						$subs['attributes']['value'] = $values[$name];
+					}
+					$content[] = $subs;
+				}
+				catch (\Exception $e){
+					UTILITY::debug('faulty element construction', $subs, $e);
+					die();
+				}
+			}
+		}
+		return $content;
+	}
+
+	/**
+	 *                       _     _                           _   
+	 *   ___ ___ ___ ___ ___| |_ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  |  _| -_|  _| -_|   |  _| . | . |  _| | |     | -_|   |  _|
+	 *  |_| |___|___|___|_|_|_| |___|___|___|___|_|_|_|___|_|_|_|  
+	 *                                             
+	 * retrieves most recent approved document or component
+	 * and returns the content as body response e.g. for modal
+	 * @param string $query _sqlinterface query
+	 * @param array $parameters _ sqlinterface parameters
+	 * @param string $requestedTimestamp Y-m-d H:i:s as optional past delimiter
+	 * 
+	 * @return array document components or document names within bundles
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	*/
+	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
+		$requestedTimestamp = $requestedTimestamp ? : $this->_date['servertime']->format('Y-m-d H:i:59');
+
+		$result = [];
+		$contentBody = [];
+		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
+		if ($contents){
+			foreach ($contents as $content){
+				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
+			}
+			$content['hidden'] = json_decode($content['hidden'] ? : '', true); 
+			if (!PERMISSION::fullyapproved('documentapproval', $content['approval']) // failsafe if none are approved
+				|| ($content['hidden'] && (!$requestedTimestamp || $content['hidden'] <= $requestedTimestamp)) // if hidden and content younger than hidden date
+				|| !PERMISSION::permissionIn($content['restricted_access']) // user lacks permission to restricted
+				|| $content['date'] > $requestedTimestamp) return []; // document date is younger than requested
+			$result = $content;
+			if ($content['context'] === 'component') {
+				$content['content'] = json_decode($content['content'], true);
+				$contentBody = $content['content']['content'];
+			}
+			elseif ($content['context'] === 'bundle') {
+				$contentBody = explode(',', $content['content']);
+			}
+			else {
+				foreach (explode(',', $content['content']) as $usedcomponent) {
+					// get latest approved by name
+					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
+						'values' => [
+							':name' => $usedcomponent
+						]
+					]);
+					foreach ($components as $component){
+						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
+						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
+						else $component = [];
+					}
+					if ($component){
+						$component['content'] = json_decode($component['content'], true);
+						array_push($contentBody, ...$component['content']['content']);
+					}
+				}
+			}
+		$result['content'] = $contentBody;
+		}
+		return $result;
+	}
+
+	/**
+	 *                     _       _         _                 _           _ 
+	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
+	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
+	 *  |___|_|_|_|_|_|__,|_| |___|_|_|___|___|_| |___|_  |___|_|_| |___|___|
+	 *                                                  |_|   
+	 * check whether all required fields of a document have been considered
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * 
+	 * @return array of unmatched document names
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function unmatchedrequired($element, $values){
+		$content = [];
+		foreach ($element as $subs){
+			if (!isset($subs['type'])){
+				array_push($content, ...self::unmatchedrequired($subs, $values));
+			}
+			else {
+				$name = $subs['attributes']['name'];
+				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$name]) || isset($values[$subs['attributes']['name']]))){
+					$content[] = $subs['attributes']['name'];
+				}
+			}
+		}
+		return $content;
 	}
 }
 ?>

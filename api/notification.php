@@ -240,8 +240,8 @@ class NOTIFICATION extends API {
 									]
 								]);
 								
-								require_once('_shared.php');
-								$orderstatistics = new ORDERSTATISTICS($this->_pdo);
+								require_once('order.php');
+								$orderstatistics = new ORDER();
 								$updates = [];
 
 								$states = [
@@ -291,7 +291,7 @@ class NOTIFICATION extends API {
 												foreach ($updates as $update){
 													SQLQUERY::EXECUTE($this->_pdo, $update);
 												}
-												$orderstatistics->update($order['id']);
+												$orderstatistics->statistics_update($order['id']);
 											}
 										}
 									}

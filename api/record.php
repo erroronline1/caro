@@ -880,8 +880,8 @@ class RECORD extends API {
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 
-				require_once('_shared.php');
-				$documentfinder = new DOCUMENTHANDLER($this->_pdo, $this->_date);
+				require_once('document.php');
+				$documentfinder = new DOCUMENT();
 				$useddocument = $documentfinder->recentdocument('document_get', [
 					'values' => [
 						':id' => $document_id
@@ -1651,9 +1651,7 @@ class RECORD extends API {
 		$response = ['render' => ['content' => []]];
 		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
-		require_once('_shared.php');
-		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
-		$data = $search->recordsearch(['search' => $this->_requestedID]);
+		$data = $this->recordsearch(['search' => $this->_requestedID]);
 
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $contexts = $available_units = [];
@@ -1783,6 +1781,66 @@ class RECORD extends API {
 		$this->response($response);		
 	}
 
+	/**
+	 *                         _                     _   
+	 *   ___ ___ ___ ___ ___ _| |___ ___ ___ ___ ___| |_ 
+	 *  |  _| -_|  _| . |  _| . |_ -| -_| .'|  _|  _|   |
+	 *  |_| |___|___|___|_| |___|___|___|__,|_| |___|_|_|
+	 * 
+	 * returns records based on matching identifier with search
+	 * @param array $parameter with search as key
+	 * 
+	 * @return array of records
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function recordsearch($parameter = []){
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_search', [
+			'values' => [
+				':search' => $parameter['search'] ? : '%',
+				':SEARCH' => $parameter['search'] ? : '%'
+			],
+			'wildcards' => 'all',
+		]);
+
+		if ($parameter['search']) {
+			// order matches by relevance; shift to top if all of optional terms have been found
+			$data = SEARCH::refine($parameter['search'], $data, ['identifier', 'content']);
+		}
+
+		$contexts = [];
+		foreach ($data as $row){
+			// continue if record has been closed unless explicitly searched for
+			if (!$parameter['search'] && (($row['record_type'] !== 'complaint' && $row['closed']) ||
+				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
+			) continue;
+
+			$row['units'] = $row['units'] ? explode(',', $row['units'] ? : '') : [];
+
+			foreach ($this->_lang->_USER['documentcontext'] as $key => $subkeys){
+				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
+			}
+			if (isset($contexts[$row['context']])) {
+				// limit results per context to max_records
+				if (count($contexts[$row['context']]) > CONFIG['limits']['max_records']) continue;
+			}
+			else $contexts[$row['context']] = [];
+
+			$contexts[$row['context']][] = [
+				'identifier' => $row['identifier'],
+				'last_touch' => substr($row['last_touch'], 0, -3),
+				'last_document' => $row['last_document'] ? : $this->_lang->GET('record.altering_pseudodocument_name'),
+				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
+				'complaint' => $row['record_type'] === 'complaint',
+				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
+				'units' => $row['units']
+			];
+		}
+		return $contexts;
+	}
+	
 	/**
 	 *           _   _         _   _ ___     
 	 *   ___ ___|_|_| |___ ___| |_|_|  _|_ _ 
@@ -2142,8 +2200,8 @@ class RECORD extends API {
 
 		if ($export) {
 			// reiterate over document, add textsections and empty document fields
-			require_once('_shared.php');
-			$documentfinder = new DOCUMENTHANDLER($this->_pdo, $this->_date);
+			require_once('document.php');
+			$documentfinder = new DOCUMENT();
 
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;

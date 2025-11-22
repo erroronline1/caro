@@ -603,6 +603,43 @@ class FILE extends API {
 	}
 	
 	/**
+	 *   ___ _ _                         _   
+	 *  |  _|_| |___ ___ ___ ___ ___ ___| |_ 
+	 *  |  _| | | -_|_ -| -_| .'|  _|  _|   |
+	 *  |_| |_|_|___|___|___|__,|_| |___|_|_|
+	 * 
+	 * return paths to files according to parameters
+	 * @param array $parameter having optional search and folder as key
+	 * 
+	 * @return array with paths
+	 * 
+	 * this is a cross-module method this class may be instatiated for
+	 */
+	public function filesearch($parameter = []){
+		$files = [];
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc')); // sharepoint specified or all
+		if (!isset($parameter['folder']) || !$parameter['folder'] || !in_array($parameter['folder'], ['sharepoint', 'external_documents'])){ // all if not specified
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			foreach ($folders as $folder) {
+				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+			}
+		}
+		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path')); // all
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'); // external_document specified
+		
+		// return based on similarity if search is provided
+		// also converting the path
+		$matches = [];
+
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+
+		foreach ($files as $file){
+			if (!$parameter['search'] || fnmatch('*' . $parameter['search'] . '*', pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
+		}
+		return $matches;
+	}
+
+	/**
 	 *   ___ _ _ _
 	 *  |  _|_| | |_ ___ ___
 	 *  |  _| | |  _| -_|  _|
@@ -612,10 +649,8 @@ class FILE extends API {
 	 * responds with paths matching request
 	 */
 	public function filter(){
-		require_once('_shared.php');
-		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		$matches = [];
-		if ($files = $search->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
+		if ($files = $this->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
 			foreach ($files as $file){
 				$matches[] = preg_match('/^\.\.\//', $file) ? substr($file, 1) : $file;
 			}
