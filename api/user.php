@@ -262,7 +262,6 @@ class USER extends API {
 										$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 										($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
 										($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
-										(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings.initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
 										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings.weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
 										(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
 										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings.annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
@@ -648,7 +647,6 @@ class USER extends API {
 				$user[':app_settings']['annualvacation'] = $annualvacation ? : '';
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.weekly_hours'));
 				$user[':app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				$user[':app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
 				// check formats according to _calendarutility.php
 				foreach (['weeklyhours', 'annualvacation'] as $setting){
 					if (isset($user[':app_settings'][$setting])){
@@ -1020,14 +1018,6 @@ class USER extends API {
 						]
 					], [
 						[
-							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => $this->_lang->GET('user.settings.initial_overtime'),
-									'value' => isset($user['app_settings']['initialovertime']) ? $user['app_settings']['initialovertime'] : 0
-								],
-								'hint' => $this->_lang->GET('user.settings.initial_overtime_hint')
-							],
 							[
 								'type' => 'textarea',
 								'attributes' => [

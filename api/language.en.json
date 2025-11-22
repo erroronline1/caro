@@ -1843,7 +1843,7 @@
 		"sessions": "Logins of the past :days days",
 		"settings": {
 			"annual_vacation": "Annual vacation days",
-			"annual_vacation_hint": "YYYY-MM-DD days within every new line\nFirst entry recommended with start date of tracking and left days on this date, earlier entries will be ignored",
+			"annual_vacation_hint": "YYYY-MM-DD days within every new line\nFirst entry recommended with start date of tracking and left days on this date. On starting during the year your can directly add the next year with its annual vacation value from January 1st on.\nEarlier entries will be ignored.",
 			"autocomplete_back": "Key for former option on multiline text inputs (if available)",
 			"autocomplete_forth": "Key for next option on multiline text inputs (if available)",
 			"autocomplete_swipe": "Swipe to toggle options on multiline text inputs",
@@ -1855,8 +1855,6 @@
 			"homeoffice": "Homeoffice",
 			"idle": "Idle time before reauthentification",
 			"idle_hint": "Prolonging the default minimum value of :idle seconds may be required for accessibility reasons or for purchase on complex product list imports.",
-			"initial_overtime": "Overtime hours on starting time tracking",
-			"initial_overtime_hint": "Number of hours",
 			"language": "Language",
 			"language_hint": "System standard is :lang",
 			"masonry": "Masonry view on wide screens",
@@ -1872,7 +1870,7 @@
 			"timezone": "Timezone",
 			"timezone_hint": "Dates and Times will be displayed in your local time",
 			"weekly_hours": "Average weekly hours",
-			"weekly_hours_hint": "YYYY-MM-DD hours within every new line\nFirst entry recommended with start date of tracking, earlier entries will not be calculated"
+			"weekly_hours_hint": "YYYY-MM-DD hours within every new line\nFirst entry recommended with start date of tracking, earlier entries will not be calculated.\nPlease inform the user to utilize the correctional value for overtime on the start of time tracking."
 		},
 		"take_photo": "Take a photo for your profile",
 		"take_photo_hint": "This photo is public to all users, e.g. in messages",

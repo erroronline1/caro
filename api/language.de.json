@@ -1843,7 +1843,7 @@
 		"sessions": "Anmeldungen der letzten :days Tage",
 		"settings": {
 			"annual_vacation": "Jahresurlaub in Tagen",
-			"annual_vacation_hint": "YYYY-MM-DD; Tage in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung und der Resturlaub zu diesem Datum empfohlen. Frühere Kalendereinträge werden nicht mit berechnet.",
+			"annual_vacation_hint": "YYYY-MM-DD; Tage in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung und der Resturlaub zu diesem Datum empfohlen. Bei einem unterjährigen Beginn kann direkt das nächste Jahr mit dem entsprechenden Jahresurlaub ab den 1. Januar angelegt werden.\nFrühere Kalendereinträge werden nicht mit berechnet.",
 			"autocomplete_back": "Taste für vorherige Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_forth": "Taste für nächste Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 			"autocomplete_swipe": "Wischen um Optionen bei mehrzeiligen Textfeldern zu wechseln",
@@ -1855,8 +1855,6 @@
 			"homeoffice": "Homeoffice",
 			"idle": "Zeit nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt",
 			"idle_hint": "Die Verlängerung des Standardmindestwerts von :idle Sekunden kann im Sinne der Barrierefreiheit erforderlich sein, oder für den Einkauf bei komplexen Preislistenimports.",
-			"initial_overtime": "Überzeit zu Beginn der Zeiterfassung",
-			"initial_overtime_hint": "Anzahl in Stunden",
 			"language": "Sprache",
 			"language_hint": "Systemstandard ist :lang",
 			"masonry": "Mauerwerk-Layout auf breiten Bildschirmen",
@@ -1872,7 +1870,7 @@
 			"timezone": "Zeitzone",
 			"timezone_hint": "Daten und Uhrzeiten werden in deiner lokalen Zeit angezeigt",
 			"weekly_hours": "Wochenarbeitszeit",
-			"weekly_hours_hint": "YYYY-MM-DD; Stunden in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung empfohlen, frühere Kalendereinträge werden nicht mit berechnet."
+			"weekly_hours_hint": "YYYY-MM-DD; Stunden in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung empfohlen, frühere Kalendereinträge werden nicht mit berechnet.\nBitte weise den Nutzer darauf hin etwaige Überzeit zu Beginn der Erfassung als Korrekturwert anzugeben."
 		},
 		"take_photo": "Wähle ein Foto für das Profil",
 		"take_photo_hint": "Das Bild ist für alle Nutzer sichtbar, wie z.B. in den Unterhaltungen.",
