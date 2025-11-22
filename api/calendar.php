@@ -656,7 +656,7 @@ class CALENDAR extends API {
 						'projected' => round(floatval($stats_month_row['_projected']), 2),
 						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
 						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => round(floatval($stats_all_row['_overtime'] + $stats_all_row['_initialovertime']), 2),
+						'overtime' => round(floatval($stats_all_row['_overtime']), 2),
 						'monthlyovertime' => round(floatval($stats_month_row['_overtime']), 2)
 					];
 				}
@@ -1291,7 +1291,7 @@ class CALENDAR extends API {
 					'note' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.break_time'))
 				];
-				if ($workinghourscorrection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto.workinghourscorrection'))){
+				if ($workinghourscorrection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.workinghourscorrection'))){
 					$misc['workinghourscorrection'] = $workinghourscorrection;
 				}
 				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
@@ -1568,7 +1568,7 @@ class CALENDAR extends API {
 				$misc = json_decode($row['misc'], true);
 				if (!$row['subject'] && isset($misc['break'])) $display .= $this->_lang->GET('calendar.timesheet.break') . ': ' . $misc['break'] . "\n";
 				if (!$row['subject'] && isset($misc['homeoffice'])) $display .= $this->_lang->GET('calendar.timesheet.homeoffice') . ': ' . $misc['homeoffice'] . "\n";
-				if (!$row['subject'] && isset($misc['workinghourscorrection'])) $display .= $this->_lang->GET('calendar.timesheet.pto.workinghourscorrection') . ': ' . $misc['workinghourscorrection'] . "\n";
+				if (!$row['subject'] && isset($misc['workinghourscorrection'])) $display .= $this->_lang->GET('calendar.timesheet.workinghourscorrection') . ': ' . $misc['workinghourscorrection'] . "\n";
 				if ($row['author_id'] != $row['affected_user_id']) {
 					$hint = $this->_lang->GET('calendar.timesheet.foreign_contributor') . ': ' . $row['author'] . "\n";
 				}
@@ -1722,7 +1722,7 @@ class CALENDAR extends API {
 						'projected' => round(floatval($stats_year_row['_projected']), 2),
 						'weeklyhours' => $stats_year_row['_span_end_weeklyhours'],
 						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => round(floatval($stats_all_row['_overtime'] + $stats_all_row['_initialovertime']), 2),
+						'overtime' => round(floatval($stats_all_row['_overtime']), 2),
 					];
 				}
 			}
