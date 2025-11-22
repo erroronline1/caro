@@ -1372,7 +1372,7 @@ class AUDIT extends API {
 				if (array_key_exists('htmlcontent', $item) && isset($item['attributes']['name']))
 					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];
 				elseif (array_key_exists('content', $item) && isset($item['description'])) // links
-					$summary['content'][$item['description']] = '* ' . implode("\n* ", array_keys($item['content']));
+					$summary['content'][$item['description']] = $item['content'];
 			}
 		}
 		$downloadfiles = [];
