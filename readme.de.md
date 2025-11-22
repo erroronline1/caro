@@ -1074,6 +1074,7 @@ Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
 * Bestehende Lieferanten können in Bezug auf ihre Informationen und die Artikellisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
 * Risiko-Daten können durch entsprechende CSV-Dateien importiert oder aktualisiert werden.
+* Im Falle eines verfügbaren Artikellistenimports durch die [ERP-Anbindung](#erp-anbindung) besteht die Option die gesamte Artikel-Datenbank in einem Rutsch zu aktualisieren.
 
 [Übersicht](#übersicht)
 

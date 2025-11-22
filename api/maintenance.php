@@ -127,9 +127,13 @@ class MAINTENANCE extends API {
 		require_once('./erpquery.php');
 		$ERPQUERY = new ERPQUERY();
 
-		$this->response([
-			'render' => $ERPQUERY->productsupdate()
-		]);
+		$response = ['render' => ['content' => $ERPQUERY->productsupdate()]];
+		$response['render']['form'] = [
+			'data-usecase' => 'maintenance',
+			'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+		];
+
+		return $response;
 	}
 
 	/**

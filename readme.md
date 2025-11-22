@@ -31,9 +31,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-* maintenance batch productlist update for all vendors
-    * erpinterface hide array_diff(caro, erp), insert array_diff(erp, caro)
-    * no autodeletion for performance reasons?
 
 ## Content
 * [Aims](#aims)
@@ -1168,6 +1165,7 @@ The application has some options to be maintained by authorized users:
 * Existing vendors can be updated regarding their information and product list settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 * Risk data can be imported/updated through dedicated CSV-files.
+* In case of an available product list import via the [ERP interface](#erp-interface) there is an option to update the whole product database in one go. 
 
 [Content](#content)
 

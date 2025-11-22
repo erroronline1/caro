@@ -1086,7 +1086,7 @@
 			"productlist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
 			"productlist_erp_match_selected": "Mit EVA abgleichen",
 			"productlist_erp_update": "Artikellisten aus EVA aktualisieren",
-			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu einem Import aus der Lieferantenverwaltung heraus.",
+			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu Imports aus der Lieferantenverwaltung heraus. Kann trotzdem dauern, hol dir einen Kaffee... \nEs kann sein, dass die Anfrage nach 5 Minuten abgebrochen zu sein scheint, der Server arbeitet aber noch weiter. Es dauert im Schnitt ein paar Sekunden pro Lieferant. Bei :count Lieferanten ungefähr :minutes Minuten.",
 			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
 		},
 		"navigation": {

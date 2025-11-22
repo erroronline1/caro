@@ -1950,9 +1950,9 @@ class CONSUMABLES extends API {
 				$query = SQLQUERY::PREPARE('consumables_put_product_productlist_import');
 				$replace = [
 					':id' => $remainder[$key]['id'],
-					':article_name' => isset($imported[$key]['article_name']) ? $this->_pdo->quote($imported[$key]['article_name']) : $remainder[$key]['article_name'],
-					':article_unit' => isset($imported[$key]['article_unit']) ? $this->_pdo->quote($imported[$key]['article_unit']) : $remainder[$key]['article_unit'],
-					':article_ean' => isset($imported[$key]['article_ean']) ? $this->_pdo->quote($imported[$key]['article_ean']) : $remainder[$key]['article_ean'],
+					':article_name' => isset($imported[$key]['article_name']) ? $this->_pdo->quote($imported[$key]['article_name']) : ($remainder[$key]['article_name'] ? : 'NULL'),
+					':article_unit' => isset($imported[$key]['article_unit']) ? $this->_pdo->quote($imported[$key]['article_unit']) : ($remainder[$key]['article_unit'] ? : 'NULL'),
+					':article_ean' => isset($imported[$key]['article_ean']) ? $this->_pdo->quote($imported[$key]['article_ean']) : ($remainder[$key]['article_ean'] ? : 'NULL'),
 					':trading_good' => isset($imported[$key]['trading_good']) && intval($imported[$key]['trading_good']) ? 1 : 'NULL',
 					':has_expiry_date' => isset($imported[$key]['has_expiry_date']) && intval($imported[$key]['has_expiry_date']) ? 1 : 'NULL',
 					':special_attention' => isset($imported[$key]['special_attention']) && intval($imported[$key]['special_attention']) ? 1 : 'NULL',

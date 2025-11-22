@@ -389,10 +389,16 @@ class ERPQUERY extends API {
 
 		include('./consumables.php');
 		$consumables = new CONSUMABLES();
+		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 		$content = [];
-
-		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$content[] = [
+			'type' => 'textsection',
+			'attributes' => [
+				'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_update')
+			],
+			'content' => $this->_lang->GET('erpquery.integrations.productlist_erp_update_hint', [':count' => count($vendorlist), ':minutes' => ceil(count($vendorlist)*5/60)])
+		];
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 			$response = $importfilter = [];
@@ -404,7 +410,8 @@ class ERPQUERY extends API {
 							'columns' => array_keys($source[0]),
 							'source' => $source
 						]];
-					if ($vendor['products']['erpfilter']) $importfilter = array_merge($importfilter, json_decode($vendor['products']['erpfilter'] ? : '', true));
+					$vendor['products'] = json_decode($vendor['products'] ? : '', true);
+					if (isset($vendor['products']['erpfilter'])) $importfilter = array_merge($importfilter, json_decode($vendor['products']['erpfilter'] ? : '', true));
 					$importfilter = UTILITY::json_encode($importfilter);
 				}
 				else $response[] = $vendor['name'] . ': ' . $this->_lang->GET('consumables.vendor.productlist_update_error');
