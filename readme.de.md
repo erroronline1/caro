@@ -781,13 +781,13 @@ Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
-Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX`für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
+Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX` für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll, muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
 ```
 2023-07-01; 15
 2024-01-01; 30
 2026-01-01; 15
 ```
-Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar.
+Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar. Bitte weise den Nutzer darauf hin etwaige Überzeit zu Beginn der Erfassung als Korrekturwert anzugeben.
 
 Es ist auch ein Jahresüberblick verfügbar, der dienstfreie Tage, Resturlaub und Überstunden für das laufende Jahr darstellt, was beispielsweise praktisch ist um Mitarbeiter daran zu erinnern den Urlaub rechtzeitig zu planen. Die Inhalte dieser Übersicht entsprechen denen der Arbeitszeitübersichten (betroffener Nutzer, Bereichtmitarbeiter für Bereichsleiter oder alle für berechtige Nutzer).
 
