@@ -11,7 +11,7 @@ graph LR;
     Prototyping-->test[Test environment];
     test-->alpha["Alpha testing
     with selected users"];
-    alpha-.->it{{IT approval}};
+    alpha-.->it{{IT and data safety approval}};
     it-.->network{{Network environment}};
     network-.->beta{{"Beta testing"}};
     beta-.->union{{Union approval}};
@@ -875,7 +875,7 @@ This is supposed to ensure a transparent communication, data safety and collecti
 
 Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
 
-*Warning: current impementation neither takes changes in public holidays nor change of the users state (if selecteable within user profile) into account. Currently changes will affect past timesheet entries and calculate different results. On changes it is recommended to export the most recent timesheets prior to start tracking anew.*
+*Warning: current impementation neither takes changes in public holidays nor change of the users location-wise state (if selecteable within user profile) into account. Currently changes will affect past timesheet entries and calculate different results. On changes it is recommended to export the most recent timesheets prior to start tracking anew.*
 
 Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
 
@@ -885,7 +885,7 @@ For a correct calculation it is neccessary to provide values as *start-date and 
 2024-01-01; 30
 2026-01-01; 15
 ```
-Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers.
+Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers. Please inform the user to utilize the correctional value for overtime on the start of time tracking.
 
 There is a yearly overview available as well that sums up off-duty-days, remaining vacation days and overtime for the current year, which may come in handy to remind employees taking their vacation days in time. Contents for this overview match those of timesheet exports (owning user, unit members for supervisors or all for authorized users).
 
@@ -2553,7 +2553,7 @@ Evidences of conformity according to the documents described above:
 | Development | Regular meetings to match requirements | Gain required functionality | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible |
 | Development | Arrange meetings with specific users, particularly less tech savvy, supervisors, ceo and qmo | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
 | Development | Early access alpha testing | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
-| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; zip<br/>&bull; regulatory evaluations and summaries | Assess frontend usability | Adapt structure, styling and assemble-framework |
+| Initial deployment | Limit initial use to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; zip<br/>&bull; regulatory evaluations and summaries | Assess frontend usability | Adapt structure, styling and assemble-framework |
 | Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
 
 ### User training recommendations
@@ -2863,11 +2863,6 @@ There is an SQLQUERY class handling
 Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
 
 Helper modules start with _, only endpoints do not. Helper modules are supposed to work without being reliant on other modules and expected formatted output.
-
-_shared.php is an exception with a
-* SEARCHHANDLER class handling inter-module used search and filter operations
-* ORDERSTATISTICS class handling inter-module used database entries for order statistics
-* DOCUMENTHANDLER class handling inter-module used document and record handling
 
 for having application-specific patterns embedded.
 
@@ -3712,7 +3707,7 @@ Sample response
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> POST ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{usecase}
+> POST ./api/api.php/consumables/search/{vendor_id}/{search}/{usecase}
 
 Returns a product search result based on usecase and payload. Current implementation is used for matching manual orders with the products database.
 
@@ -3728,7 +3723,7 @@ Sample response
 ```
 {"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check, as well as automated matching with order state."},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","role":"link","tabindex":"0","title":"add deusith 3,5 by Fritz Minke GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Fritz Minke GmbH  deusith 3,5 "}]},{"type":"textsection","attributes":{"name":"Add article from 3 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('Platte', '3166.35 - 000', 'DEUSITH - Zuschnitte 60 x 45 cm, 70° Shore 3,5 mm, weiß, haut ', 'ab 5 Platten', 'Fritz Minke GmbH'); return false;","onkeydown":....
 ```
-> GET ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{usecase}
+> GET ./api/api.php/consumables/search/{vendor_id}/{search}/{usecase}
 
 Returns a search form based on usecase and products matching {search}. If {_usecase} is set to *product* the returned elements events lead to consumables editing or product information depending on permissions. *productselection* returns only results for the respective widget. *order* results lead to adding the selected product to a new order.
 
@@ -3741,7 +3736,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"button","attributes":{"value":"Add new product","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"null"},....},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"search","attributes":{"name":"Search product by article number or name","onkeydown":"if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'product'); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 1752)"},"content":[{"type":"textsection","content":"Otto Bock HealthCare Deutschland GmbH 99B25 Schlauch-Strumpf PAK"}]}]]]]}}
+{"render":{"content":[[[{"type":"button","attributes":{"value":"Add new product","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"null"},....},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"search","attributes":{"name":"Search product by article number or name","onkeydown":"if (event.key === 'Enter') {api.purchase('get', 'search', document.getElementById('productsearchvendor').value, this.value, 'product'); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 1752)"},"content":[{"type":"textsection","content":"Otto Bock HealthCare Deutschland GmbH 99B25 Schlauch-Strumpf PAK"}]}]]]]}}
 ```
 
 > GET ./api/api.php/consumables/vendor/{name|id}
@@ -5516,6 +5511,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 > O.Purp_3 The web application MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
 
 * [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
 > O.Purp_4 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the web application or the backend system.
 
 * Only active and intentional user input is processed and stored.
@@ -5584,7 +5580,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 ### 3.1.3 Objective (3): Source code
 > O.Source_1 The application MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
 
-* Inputs are masked as strings by the backend by default.
+* Inputs are masked as strings or integers by the backend by default.
 
 > O.Source_2 The application MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
 
@@ -5624,7 +5620,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_11 Sensitive data MUST NOT be included in the URL. The web application MUST process such data in HTTP request headers or POST parameters.
 
-* Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
+* Sensitive data is always handled as PUT, PATCH or POST. [API documentation](#api-documentation)
 
 [Content](#content)
 
@@ -5698,7 +5694,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web and not being able to call any method of sending tokens to any second device. 
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web and not being able to call any method of sending tokens to any third party device. 
 
 > O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -5714,7 +5710,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_7 The application MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
 
-* This is not reasonable for the application used within a network environment not accessible from the web and on shared devices.
+* The login form is returned from the web api where a delay is implemented in case of faulty logins.
 
 > O.Auth_8 If the application was interrupted (put into backend operation), a new authentication MUST be carried out after an appropriate period (grace period) has expired.
 
@@ -5785,6 +5781,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 > O.Data_1 The factory setting of the web application MUST provide maximum security.
 
 * The application has no prefilled sensitive data on installation. New users have to be assigned roles actively. There is no data on opening the application without bein logged in.
+
 > O.Data_2 If the user exports sensitive data without encryption, the web application MUST inform the user that the user is responsible for the data security of this exported data.
 
 * [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
@@ -5887,6 +5884,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 > O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
 
 * This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
+
 > O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
 
 * All contents are delivered by the backend only.
@@ -5988,6 +5986,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 > O.Arch_10 Any service the backend system provides SHOULD run only with privileges necessary. Services reachable from the outside MUST NOT run with administrative, system or root privileges.
 
 * The application does not provide services.
+
 > O.Arch_11 The backend system MUST have a central logging system, collecting all log-messages from any service. Protocols/logs SHOULD be collected on a dedicated system (so-called log server) to counteract any deletion or manipulation on source systems.
 
 * The operator of the infrastructure is responsible for fulfilling these requirements.
@@ -6001,14 +6000,16 @@ This application can be considered using a monolithic architecture. Yet a separa
 ### 3.1.3 Objective (3): Source code
 > O.Source_1 The backend system MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
 
-* Inputs are masked as strings by the backend by default.
+* Inputs are masked as strings or integers by the backend by default.
 
 > O.Source_2 The backend system MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
 
 * Outputs on the front end are parsed as text nodes or unexecuted input values.
+
 > O.Source_3 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
 
 * Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
+
 > O.Source_4 In the event of exceptions during program execution, the backend system SHOULD cancel access to sensitive data and instruct the application to securely delete it from memory.
 
 * Exceptions exit the code execution, the programming languages garbage collector clears the memory by default.
@@ -6019,7 +6020,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
 
-* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file. Also see [Stress test and performance](#stress-test-and-performance) note
+* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file. Also see [Stress test and performance](#stress-test-and-performance) note.
 
 > O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
 
@@ -6031,7 +6032,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
 
-* [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint vor VSC, PHPIntelephense for VSC
+* [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint for VSC, PHPIntelephense for VSC
 
 > O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
 
@@ -6094,7 +6095,7 @@ O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose. 
 O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).  
 O.Cryp_6 All cryptographic keys SHOULD be stored in an environment protected against manipulation and disclosure.  
 O.Cryp_7 All cryptographic operations SHOULD take place in an environment protected from manipulation and disclosure.  
-O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3.1 has to be used. Any connection not using one of these suits, MUS NOT be established
+O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3.1 has to be used. Any connection not using one of these suits, MUST NOT be established
 
 * [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
 
@@ -6122,7 +6123,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web not being able to call any method of sending tokens to any second device.
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web not being able to call any method of sending tokens to any third party device.
 
 > O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -6277,7 +6278,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
     * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v6.10.0
+    * v6.10.1
     * \> 4k stars
     * \> 1k forks
     * [LGPL license](https://github.com/tecnickcom/TCPDF?tab=License-1-ov-file)
@@ -6291,7 +6292,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).
-    * v5.1.1
+    * v5.1.2
     * \> 11k stars
     * \> 2k forks
     * [MIT license](https://github.com/szimek/signature_pad?tab=MIT-1-ov-file)
