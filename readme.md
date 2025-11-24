@@ -31,6 +31,7 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+* autodeletion for non treatment related records, also skip retention period reminder (notification)
 
 ## Content
 * [Aims](#aims)
