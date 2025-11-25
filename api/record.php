@@ -2127,10 +2127,11 @@ class RECORD extends API {
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 		$records = json_decode($data['content'], true);
+		// sort by date
+		// consider backward compatibility, genesis block has no date, supposed to be sorted to front
+		usort($records, Fn($a, $b) => isset($a['date']) && isset($b['date']) ? $a['date'] <=> $b['date'] : (isset($a['date']) ? 1 : -1));
 		// drop blockchain genesis block
 		array_shift($records);
-		//sort by date
-		usort($records, Fn($a, $b) => $a['date'] <=> $b['date']);
 
 		foreach ($records as $record){
 			// append most recent hash for optional validity checking of the blockchain by comparing the hash with the detailed verification output

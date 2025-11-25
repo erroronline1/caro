@@ -2408,10 +2408,11 @@ class AUDIT extends API {
 			$line = [];
 			$skip = false;
 			$row['content'] = json_decode($row['content'], true);
+			// sort by date
+			// consider backward compatibility, genesis block has no date, supposed to be sorted to front
+			usort($records, Fn($a, $b) => isset($a['date']) && isset($b['date']) ? $a['date'] <=> $b['date'] : (isset($a['date']) ? 1 : -1));
 			// drop blockchain genesis block
-			array_shift($row['content']);
-			//sort by date
-			usort($row['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
+			array_shift($records);
 
 			foreach ($row['content'] as $entry){
 				$currentdate = substr($entry['date'], 0, 10);
