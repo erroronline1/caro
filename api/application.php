@@ -554,26 +554,28 @@ class APPLICATION extends API {
 				];
 			}
 
-			// vacation warning
-			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'replacements' => [
-					':id' => $_SESSION['user']['id'],
-					':name' => $_SESSION['user']['name']
-				]
-			]);
-			$user = $user ? $user[0] : null;
-			$timesheet_stats = $calendar->timesheetSummary([$user]);
-			$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
-			if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
-			if (isset($timesheet_stats['_leftvacation']) && isset($timesheet_stats['_annualvacation']) && 
-				$timesheet_stats['_leftvacation'] / $timesheet_stats['_annualvacation'][count($timesheet_stats['_annualvacation']) - 1]['value'] > (365-date('z') + 1) / 365 // left vacation / annual vacation > remaining days of year / annual days
-			){
-				$response['render']['content'][count($response['render']['content']) - 1][] = [
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $this->_lang->GET('calendar.timesheet.vacation_warning', [':number' => $timesheet_stats['_leftvacation']])
+			if (isset($user['app_settings']['weeklyhours']) && isset($user['app_settings']['annualvacation'])){
+				// vacation warning
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => $_SESSION['user']['id'],
+						':name' => $_SESSION['user']['name']
 					]
-				];
+				]);
+				$user = $user ? $user[0] : null;
+				$timesheet_stats = $calendar->timesheetSummary([$user]);
+				$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
+				if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
+				if (isset($timesheet_stats['_leftvacation']) && isset($timesheet_stats['_annualvacation']) && 
+					$timesheet_stats['_leftvacation'] / $timesheet_stats['_annualvacation'][count($timesheet_stats['_annualvacation']) - 1]['value'] > (365-date('z') + 1) / 365 // left vacation / annual vacation > remaining days of year / annual days
+				){
+					$response['render']['content'][count($response['render']['content']) - 1][] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.vacation_warning', [':number' => $timesheet_stats['_leftvacation']])
+						]
+					];
+				}
 			}
 
 			// display current announcements
