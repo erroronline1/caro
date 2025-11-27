@@ -625,7 +625,7 @@
 			"vendors": "Lieferantenliste"
 		},
 		"checks_update_button": "Aktualisiere Einträge seit dem angegeben Zeitpunkt",
-		"compaints": {
+		"complaints": {
 			"case_description": ":identifier von einem der Bereiche :units",
 			"closed": ", als abgeschlossen gekennzeichnet",
 			"summary": ":number Reklamationen in diesem Jahr, von denen :closed als abgeschlossen markiert sind"
