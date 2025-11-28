@@ -26,7 +26,7 @@ export const Polyfill = {
 	a: function (a) {
 		if (!a.dataset.type) a.dataset.type = "downloadlink";
 
-		if (!a.href.includes("javascript:") && (this.isIOS() || this.isStandalone() || !("download" in document.createElement("a")))) {
+		if (!a.href.includes("javascript:") && ((this.isIOS() && this.isStandalone()) || !("download" in document.createElement("a")))) {
 			a.removeAttribute("target");
 			let href = a.href;
 			a.onclick = function () {
@@ -51,7 +51,7 @@ export const Polyfill = {
 			a.href &&
 			["pdf", "jpg", "jpeg", "gif", "png"]
 				.map((extension) => {
-					return a.href.endsWith(extension);
+					return a.href.endsWith(extension); // || a.download.endsWith(extension);  this would have been nice for ERPinterface with data urls as well, but the tested browser has troubles processing them properly
 				})
 				.some((element) => {
 					return element === true;
