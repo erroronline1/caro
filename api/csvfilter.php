@@ -130,13 +130,29 @@ class CSVFILTER extends API {
 						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
 						$writer = new \XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']);
+						$settings = [
+							'header' => [],
+							'row' => []
+						];
+						$header = array_combine($datalist->_setting['filesetting']['columns'], array_map(Fn($v) => 'string', $datalist->_setting['filesetting']['columns']));
+						if (isset($content['xslxformat'])){
+							if (isset($content['xslxformat']['header'])) {
+								if (isset($content['xslxformat']['header']['types'])){
+									$header = array_combine($datalist->_setting['filesetting']['columns'], $content['xslxformat']['header']['types']);
+								}
+								unset ($content['xslxformat']['header']['types']);
+								$settings['header'] = $content['xslxformat']['header'];
+							}
+							if (isset($content['xslxformat']['row'])) $settings['row'] = $content['xslxformat']['row'];
+						}
 						foreach ($datalist->_list as $subsetname => $subset){
 							// datalist may contain multiple subsets based on split setting
 							// write each to xlsx sheet
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
-							$writer->writeSheetRow($subsetname, $datalist->_setting['filesetting']['columns']);
+
+							$writer->writeSheetHeader($subsetname, $header, $settings['header']);
 							foreach ($subset as $line)
-								$writer->writeSheetRow($subsetname, $line);
+								$writer->writeSheetRow($subsetname, $line, $settings['row']);
 						}
 						$writer->writeToFile($tempFile);
 						// provide downloadfile
