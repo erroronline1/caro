@@ -751,6 +751,7 @@ class Listprocessor {
 		foreach ($this->_list as $row => $values){
 			foreach ($values as $column => &$columnvalue){
 				$columnvalue = @mb_convert_encoding(strval($columnvalue), 'UTF-8', $this->_setting['filesetting']['encoding']);
+				if (!$columnvalue) $columnvalue = '';
 			}
 			$this->_list[$row] = $values; // SplFixedArray has problems accessing nested elements, must assign array to key directly
 		}
