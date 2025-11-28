@@ -73,20 +73,22 @@ class CSVFILTER extends API {
 
 				// check if neccessary compare file is provided 
 				$comparefileindex = 0;
-				foreach ($content['filter'] as &$filtertype){
-					if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
-						$comparefile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]) && isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex] : null;
-						if (!$comparefile) $this->response([
-							'response' => [
-								'name' => false,
-								'msg' => $this->_lang->GET('csvfilter.use.filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
-								'type' => 'error'
-							]]);
-						$filtertype['filesetting']['source'] = $comparefile;
-						$comparefileindex++;
+				if (isset($content['filter'])){
+					foreach ($content['filter'] as &$filtertype){
+						if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
+							$comparefile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]) && isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex] : null;
+							if (!$comparefile) $this->response([
+								'response' => [
+									'name' => false,
+									'msg' => $this->_lang->GET('csvfilter.use.filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
+									'type' => 'error'
+								]]);
+							$filtertype['filesetting']['source'] = $comparefile;
+							$comparefileindex++;
+						}
 					}
 				}
-				
+					
 				// process filter
 				$datalist = new Listprocessor($content, [
 					'processedMonth' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_month')),
@@ -127,7 +129,7 @@ class CSVFILTER extends API {
 					case 'xlsx':
 						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
 						$writer = new \XLSXWriter();
-						$writer->setAuthor($_SESSION['user']['name']); 
+						$writer->setAuthor($_SESSION['user']['name']);
 						foreach ($datalist->_list as $subsetname => $subset){
 							// datalist may contain multiple subsets based on split setting
 							// write each to xlsx sheet
@@ -248,16 +250,18 @@ class CSVFILTER extends API {
 					];
 
 					// add inputs for comparison files if applicable
-					foreach ($content['filter'] as $filtertype){
-						if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') array_push($additionalform, [
-							'type' => 'file',
-							'hint' => $this->_lang->GET('csvfilter.use.filter_input_file_hint', [':name' => $filtertype['filesetting']['source']]),
-							'attributes' => [
-								'name' => $this->_lang->GET('csvfilter.use.filter_compare_file') . '[]',
-								'required' => true,
-								'accept' => '.csv'
-							]
-						]);
+					if (isset($content['filter'])){
+						foreach ($content['filter'] as $filtertype){
+							if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') array_push($additionalform, [
+								'type' => 'file',
+								'hint' => $this->_lang->GET('csvfilter.use.filter_input_file_hint', [':name' => $filtertype['filesetting']['source']]),
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.use.filter_compare_file') . '[]',
+									'required' => true,
+									'accept' => '.csv'
+								]
+							]);
+						}
 					}
 
 					// append all filter inputs
