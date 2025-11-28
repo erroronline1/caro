@@ -1094,6 +1094,64 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				AND vorgaenge.ANLAGEDATUM > ':date'
 				order by vorgaenge.REFERENZ ASC
 				END,
+			'EVA-Artikelstamm' => <<<'END'
+				SELECT
+					article.ARTIKEL_REFERENZ,
+					vendor.NAME_1 as LIEFERANTEN_NAME,
+					article.BESTELL_NUMMER,
+					article.BESTELL_TEXT,
+					unit.BEZEICHNUNG AS BESTELLEINHEIT,
+					storage.LAGERORT,
+					storage.LAGER_REFERENZ,
+					CONVERT(varchar(255), article.WARENEINGANGSDATUM, 104) AS WARENEINGANGSDATUM
+				FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
+				INNER JOIN (
+					SELECT
+						BEZEICHNUNG,
+						REFERENZ
+					FROM [eva3_02_viva_souh].[dbo].[inf_einheit]
+				) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
+				INNER JOIN (
+					SELECT
+						REFERENZ,
+						ZUSATZINFORMATION
+					FROM [eva3_02_viva_souh].[dbo].[wws_artikelstamm]
+				) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
+				INNER JOIN (
+					SELECT
+						ARTIKEL_REFERENZ,
+						LAGERORT,
+						strg_n.BEZEICHNUNG as LAGER_REFERENZ
+					FROM [eva3_02_viva_souh].[dbo].[wws_lagerbestand] AS strg
+					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
+					WHERE 
+					(
+						(strg_n.BEZEICHNUNG LIKE 'Zentrallager' OR
+						strg_n.BEZEICHNUNG LIKE 'Gießraum' OR
+						strg_n.BEZEICHNUNG LIKE 'Bandagisten' OR
+						strg_n.BEZEICHNUNG LIKE 'Prothetik' OR
+						strg_n.BEZEICHNUNG LIKE 'Orthetik' OR
+						strg_n.BEZEICHNUNG LIKE 'Armorthetik und -prothetik' OR
+						strg_n.BEZEICHNUNG LIKE 'Dysmelie' OR
+						strg_n.BEZEICHNUNG LIKE 'Kunststoffabteilung' OR
+						strg_n.BEZEICHNUNG LIKE 'Silikonabteilung'
+						)
+					AND strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null' AND strg.LAGER_REFERENZ IS NOT NULL
+					)
+				) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
+				INNER JOIN (
+					SELECT 
+						v.NAME_1,
+						v.REFERENZ
+					FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+					INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
+					WHERE ia.BEZEICHNUNG = 'Lieferanten'
+				) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
+				
+				WHERE article.STATUS = 0
+
+				ORDER BY LAGER_REFERENZ, LAGERORT, LIEFERANTEN_NAME, BESTELL_TEXT
+				END,
 		];
 		$variables = [
 			'Vorgangsexport' => [
