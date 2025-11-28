@@ -206,7 +206,7 @@ Orders can be deleted by administrative users and requesting unit members at any
 * Text recommendations
     * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
 * File sharing
-    * The application has a [sharepoint](#files) for files and an integrated STL-viewer to easily exchange information.
+    * The application has a [sharepoint](#files) for files and an integrated STL/OBJ-viewer to easily exchange information.
 * CSV filtering
     * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
 * Timezones and states
@@ -479,7 +479,7 @@ Available elements for components or rather documents are:
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
 * calendar button
-* file reference picker, optional as multiple. Accesses provided files and returns their location, STL preview included if applicable. Consider that files may not be permanent and this field only suffices for short term information transfer.
+* file reference picker, optional as multiple. Accesses provided files and returns their location, STL/OBJ preview included if applicable. Consider that files may not be permanent and this field only suffices for short term information transfer.
 * document link, just for display or to continue transferring identifier
 * horizontal line for document structure
 
@@ -902,7 +902,7 @@ Exports are ordered by user name with exporting user coming first regardless, fo
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
-STL- and image-files have a preview by default.
+STL/OBJ- and image-files have a preview by default.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
@@ -1758,7 +1758,7 @@ Application support legend:
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.1 Responsibility and authority | yes | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; Responsibilities can be defined and are publicly accessible | [Users](#users), [Personnel register](#personnel-register), [Responsibilities](#responsibilities), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application allows for common or unitwise announcements on the landing page<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists or ERP-stock data imports to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Announcements](#announcements), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application allows for common or unitwise announcements on the landing page<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists or ERP-stock data imports to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL/OBJ-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Announcements](#announcements), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | partial | &bull; The application has a form to add, edit or close management reviews, containing required issues by default. | [Management review](#management-review), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
@@ -2893,7 +2893,7 @@ can be tested and verified importing unittest.js and calling `rendertest('app')`
 * erroronline1.js is fundamental as it handles requests, form data processing and some custom prototype functions.
 
 Other libraries rely on dynamic data and have to be tested in development runtime
-* viewstl: upload an stl-file and view it within the file selection
+* viewstl: upload an stl/obj-file and view it within the file selection
 * TCPDF: generate a record and export it as pdf
 * xlsxwriter: generate orders and export the order statistic from the audit-module
 
@@ -6314,7 +6314,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 1k forks
     * [MIT license](https://github.com/lindell/JsBarcode/?tab=MIT-1-ov-file)
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
-    * renders stl files on the client side
+    * renders stl and obj files on the client side
     * Justification: this library reduces the need of additional software for physically distant units communicating on digital models
     * v1.13
     * \> 200 stars

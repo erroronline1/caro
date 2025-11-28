@@ -405,7 +405,7 @@ class UTILITY {
 	public static function link($attributes){
 		if ($attributes['href']){
 			$file = pathinfo($attributes['href']);
-			if (in_array(strtolower($file['extension']), ['stl'])){
+			if (in_array(strtolower($file['extension']), ['stl', 'obj'])){
 				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'stl', name: '" . $file['basename'] . "', url: '" . $attributes['href'] . "'}})";
 				$attributes['data-type'] = 'stl';
 			}

@@ -779,6 +779,9 @@ class FILE extends API {
 				case 'stl':
 					$mime_type = 'model/stl';
 					break;
+				case 'obj':
+					$mime_type = 'model/obj';
+					break;
 				default:
 					$mime_type = mime_content_type($file);
 			}
