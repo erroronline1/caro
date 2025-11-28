@@ -614,7 +614,6 @@ export class Dialog {
 								},
 							],
 						});
-
 						break;
 					case "qrcode":
 						if (this.previewElements.canvas) {
@@ -2022,7 +2021,6 @@ export class Assemble {
 
 		function forbiddenName(files) {
 			for (const file of Object.values(files)) {
-				console.log(file);
 				if (file.name.match("CAROsignature")) {
 					new Toast(api._lang.GET("assemble.render.reserved_name", { ":name": "CAROsignature" }));
 					return true;
@@ -2758,7 +2756,6 @@ export class Assemble {
 
 		function forbiddenName(files) {
 			for (const file of Object.values(files)) {
-				console.log(file);
 				if (file.name.match("CAROsignature")) {
 					new Toast(api._lang.GET("assemble.render.reserved_name", { ":name": "CAROsignature" }));
 					return true;
