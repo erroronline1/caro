@@ -1094,7 +1094,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				AND vorgaenge.ANLAGEDATUM > ':date'
 				order by vorgaenge.REFERENZ ASC
 				END,
-			'EVA-Artikelstamm' => <<<'END'
+			'EVA-Artikelstamm Lagerware' => <<<'END'
 				SELECT
 					article.ARTIKEL_REFERENZ,
 					vendor.NAME_1 as LIEFERANTEN_NAME,
