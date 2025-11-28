@@ -35,6 +35,7 @@ Things are still in motion. Images may be outdated.
 * handle rounding deviations on timesheet exports (explanation, different display, whatever)
 * timesheet consider user settings, off duty may be a good idea, consider skipping regular workday for users without time tracking?
 * data transfer/import from production to testserver?
+* csv-filter xlswriter sheet options available (column width, sheet title, etc.), consider wrapper class?
 
 ## Content
 * [Aims](#aims)
