@@ -31,11 +31,8 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-* autodeletion for non treatment related records, also skip retention period reminder (notification)
-* handle rounding deviations on timesheet exports (explanation, different display, whatever)
-* timesheet consider user settings, off duty may be a good idea, consider skipping regular workday for users without time tracking?
 * data transfer/import from production to testserver?
-* csv-filter xlswriter sheet options available (column width, sheet title, etc.), consider wrapper class?
+* csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
 
 ## Content
 * [Aims](#aims)
@@ -257,7 +254,7 @@ The application provides a dedicated role management for registered users. The w
 
 Some permissions/restrictions are default set though:
 
-Timesheets are accessible only if weekly hours are defined for the user - even the application admin.
+Contributing to timesheets is accessible only if weekly hours are defined for the user - even the application admin. Off-duty days are accessible for every personalized user though.
 
 * Patients
     * can only access documents marked as patient accessible for common and assigned units

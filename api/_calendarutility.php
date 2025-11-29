@@ -274,6 +274,7 @@ class CALENDARUTILITY {
 		$alert = [$this->_lang->GET('calendar.tasks.alert') => $columns[':alert'] ? ['checked' => true] : []];		
 		$autodelete = [$this->_lang->GET('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
 		$span_start = new \DateTime($columns[':span_start'] ? : 'now');
+		$dialog_callback = '';
 
 		// assemble by type
 		switch ($columns[':type']){
@@ -352,17 +353,10 @@ class CALENDARUTILITY {
 				// resolve encoded misc information
 				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
 				
-				// construct available pto-reasons
-				$ptoselect = [];
-				foreach ($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
-					$ptoselect[$reason] = ['value' => $subject];
-					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
-				}
-
 				$inputs = [];
 
 				// conditional adding affected user
-				if (array_intersect(preg_split('/\W+/', CONFIG['permissions']['calendaraddforeigntimesheet']), $_SESSION['user']['permissions'])){
+				if (PERMISSION::permissionFor('calendaraddforeigntimesheet')){
 					$inputs[] = [
 						'type' => 'select',
 						'content' => $affected_users,
@@ -399,6 +393,64 @@ class CALENDARUTILITY {
 					$this->_lang->GET('calendar.tasks.alert') => ['required' => false, 'display' => false],
 				];
 
+				// construct available pto-reasons
+				// skip time tracking if not set for user
+				// determine selected pto if not regular and apply field visibility accordingly
+				$ptoselect = [];
+				$dialog_callback = "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', true)";
+				foreach ($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
+					if ($subject === 'regular' && !isset($_SESSION['user']['app_settings']['weeklyhours'])) continue;
+					if ($columns[':subject'] && $columns[':subject'] !== 'regular') $dialog_callback = "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', false)";
+					$ptoselect[$reason] = ['value' => $subject];
+					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
+				}
+
+				// add inputs
+				array_push($inputs, ...[
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.pto_exemption'),
+							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', this.value === 'regular')"
+						],
+						'content' => $ptoselect
+					]
+				]);
+
+				array_push($inputs, ...[
+					[
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.start_date'),
+							'value' => $span_start->format('Y-m-d'),
+							'required' => true
+						]
+					]
+				]);
+				// add time inputs only if user tracks time
+				if (isset($_SESSION['user']['app_settings']['weeklyhours'])) array_push($inputs, ...[
+					[
+						'type' => 'time',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.start_time'),
+							'value' => $span_start->format('H:i'),
+							'required' => true,
+							'id' => '_starttime'
+						]
+					]
+				]);
+				array_push($inputs, ...[
+					[
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.end_date'),
+							'value' => $span_end->format('Y-m-d'),
+							'required' => true
+						]
+					]
+				]);
+
+				// add time inputs only if user tracks time
 				// break recommendation according to config
 				$breakrecommendation = '';
 				if(isset($this->_date['locations']['breaks'])){
@@ -416,38 +468,9 @@ class CALENDARUTILITY {
 					}
 					$breakrecommendation .= "if (breaktime) document.getElementById('_break').value = breaktime;";
 				}
-				// add inputs
-				array_push($inputs, ...[
+
+				if (isset($_SESSION['user']['app_settings']['weeklyhours'])) array_push($inputs, ...[
 					[
-						'type' => 'select',
-						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet.pto_exemption'),
-							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', this.value === 'regular')"
-						],
-						'content' => $ptoselect
-					], [
-						'type' => 'date',
-						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet.start_date'),
-							'value' => $span_start->format('Y-m-d'),
-							'required' => true
-						]
-					], [
-						'type' => 'time',
-						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet.start_time'),
-							'value' => $span_start->format('H:i'),
-							'required' => true,
-							'id' => '_starttime'
-						]
-					], [
-						'type' => 'date',
-						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet.end_date'),
-							'value' => $span_end->format('Y-m-d'),
-							'required' => true
-						]
-					], [
 						'type' => 'time',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.end_time'),
@@ -469,7 +492,11 @@ class CALENDARUTILITY {
 							'name' => $this->_lang->GET('calendar.timesheet.workinghourscorrection'),
 							'value' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : ''
 						]
-					], [
+					]
+				]);
+
+				array_push($inputs, ...[
+					[
 						'type' => 'text',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.pto_note'),
@@ -588,7 +615,7 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.tasks.cancel') . "': false, '" . $this->_lang->GET('calendar.tasks.submit') . "': {'value': true, class: 'reducedCTA'}}}, 'FormData')" .
+		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.tasks.cancel') . "': false, '" . $this->_lang->GET('calendar.tasks.submit') . "': {'value': true, class: 'reducedCTA'}}, callback: function(){" . $dialog_callback . "}}, 'FormData')" .
 			".then(response => {if (response) {api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "', response);}})";
 	}
 	
