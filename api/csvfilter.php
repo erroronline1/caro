@@ -14,7 +14,8 @@ namespace CARO\API;
 // add filters and filter csv-files
 // handle erp-interface methods typically involving csv files
 require_once('./_csvprocessor.php');
-require_once("../libraries/xlsxwriter.class.php");
+require_once("../libraries/XLSXWriter.php");
+require_once("../libraries/XLSXWriter_BuffererWriter.php");
 
 class CSVFILTER extends API {
     // processed parameters for readability

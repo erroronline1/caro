@@ -2266,6 +2266,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
         * definitions
         * multiline code within lists
         * inline HTML on purpose
+* Timetracking makes use of time inputs for working hours and breaks which may be confusing if your browsers locale settings forces a 12h-layout. Please speak to your systems operator for a decent locale setting.
 
 [Content](#content)
 
@@ -6284,13 +6285,12 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 4k stars
     * \> 1k forks
     * [LGPL license](https://github.com/tecnickcom/TCPDF?tab=License-1-ov-file)
-* [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
+* [https://github.com/maksimovic/PHP_XLSXWriter](https://github.com/maksimovic/PHP_XLSXWriter)
     * creates XLSX-files on the server side
     * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
-    * v0.39
-    * \> 1k stars
-    * \> 650 forks
-    * [MIT license](https://github.com/mk-j/PHP_XLSXWriter?tab=MIT-1-ov-file)
+    * v1.0.4
+    * maintained fork of [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) with \> 1k stars, \> 650 forks
+    * [MIT license](https://github.com/maksimovic/PHP_XLSXWriter?tab=License-1-ov-file)
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).

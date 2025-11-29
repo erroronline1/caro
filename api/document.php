@@ -1945,8 +1945,7 @@ class DOCUMENT extends API {
 		$document_id = $identifier = null;
 		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
-		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
-		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
+		if ($entry_datetime = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.datetime'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.datetime')});
 
 		// used by audit for export of outdated documents
 		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
@@ -1961,9 +1960,8 @@ class DOCUMENT extends API {
 		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
 		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([], 409);
 
-		$entry_timestamp = $entry_date . ' ' . $entry_time;
-		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
+		if (strlen($entry_datetime) > 16) { // yyyy-mm-ddThh:ii datetime-locale format
+			$entry_datetime = $this->_date['usertime']->format('Y-m-d H:i');
 		}
 
 		// create proper identifier with timestamp if not provided
@@ -1975,7 +1973,7 @@ class DOCUMENT extends API {
 				$identifier = $value;
 				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 				unset ($this->_payload->$key);
-				$identifier = UTILITY::identifier($identifier, $entry_timestamp);
+				$identifier = UTILITY::identifier($identifier, $entry_datetime);
 			}
 			if (gettype($value) === 'array') {
 				// empty file arrays to be skipped
