@@ -427,7 +427,7 @@ class ImageHandler {
 export class Dialog {
 	/**
 	 * @requires api, Html5QrcodeScanner, StlViewer, Assemble
-	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
+	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}, callback: function} options
 	 * @param {string} returntype object (default) or formdata
 	 * @returns promise, prepared answer on resolve according to type
 	 * @example ```js
@@ -475,6 +475,7 @@ export class Dialog {
 		this.header = options.header || null;
 		this.render = options.render || null;
 		this.options = options.options || {};
+		this.callback = options.callback || null;
 		this.scannerElements = {};
 		this.previewElements = {};
 		this.assemble = null;
@@ -645,6 +646,7 @@ export class Dialog {
 				}
 			}
 			if (this.assemble) this.assemble.processAfterInsertion(this.dialog);
+			if (this.callback) this.callback();
 
 			return new Promise((resolve, reject) => {
 				this.dialog.showModal();
