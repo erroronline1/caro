@@ -2173,6 +2173,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
         * Definitionen
         * Mehrzeiliger Code innerhalb von Listen
         * HTML Direkteingabe (absichtlich)
+* Die Zeiterfassung nutzt Eingaben vom Typ `time` für Arbeitszeiten und Pausen, was verwirrend erscheint sofern die Systemeinstellungen im Browser ein 12h-Format erzwingen. Bitte sprechen Sie mit Ihrem Betreiber über vernünftige Systemeinstellungen.
 
 [Übersicht](#übersicht)
 
