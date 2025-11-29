@@ -1953,6 +1953,23 @@ export class Assemble {
 	}
 
 	/**
+	 * creates a date input
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "datetime_local",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
+	 */
+	datetime_local() {
+		return this.input("datetime-local");
+	}
+
+	/**
 	 * creates a delete button (styled)
 	 * @returns {domNodes}
 	 * @example this.currentElement

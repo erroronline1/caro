@@ -1056,6 +1056,7 @@ label {
 	input[type="password"],
 	input[type="date"],
 	input[type="time"],
+	input[type="datetime-local"],
 	input[type="tel"],
 	input[type="email"],
 	input[type="color"],
@@ -1169,7 +1170,9 @@ html[data-useragent*="safari"] body {
 		appearance: initial;
 	}
 	input[type="date"],
-	input[type="time"] {
+	input[type="time"],
+	input[type="datetime-local"]
+	 {
 		width: calc(100% - 3.125rem);
 		-webkit-logical-height: 3em;
 	}
@@ -1565,6 +1568,7 @@ button[data-type="additem"]::before {
 [data-type="calendar"]::before,
 [data-type="calendarbutton"]::before,
 [data-type="date"]::before,
+[data-type="datetime_local"]::before,
 [data-type="longtermplanning_timeline"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/calendar-alt.svg");
