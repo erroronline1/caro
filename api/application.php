@@ -451,7 +451,7 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('assemble.navigation.manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
 
 		// calendar
-		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
+		if (!array_intersect(['group'], $_SESSION['user']['permissions']))
 			$menu[$this->_lang->GET('calendar.navigation.header')][$this->_lang->GET('calendar.navigation.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
 
 		// application
