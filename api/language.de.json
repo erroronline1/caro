@@ -871,7 +871,7 @@
 				"sheet_overtime": ":number Stunden Überzeit im Ende des Monats",
 				"sheet_subject": ":appname ID :id, beschäftigt bei :units, für :weeklyhours Wochenstunden",
 				"sheet_summary": "Zusammenfassung",
-				"sheet_summary_text": ":name hat :performed von :projected Stunden im :month gearbeitet und damit :_monthlyovertime Stunden Überzeit erbracht.\nDie gesamte Überzeit beläuft sich auf :overtime Stunden. Es besteht noch Anspruch auf :vacation Tage Urlaub.",
+				"sheet_summary_text": "Tägliche Arbeitszeiten können Rundungsungenauigkeiten beinhalten. Die Monatsarbeitszeit ist ausschlaggebend. :name hat :performed von :projected Stunden im :month gearbeitet und damit :_monthlyovertime Stunden Überzeit erbracht.\nDie gesamte Überzeit beläuft sich auf :overtime Stunden. Es besteht noch Anspruch auf :vacation Tage Urlaub.",
 				"yearly_summary_text": "hat :performed von :projected Stunden in :year gearbeitet.  \nDie gesamte Überzeit beläuft sich auf :overtime Stunden. Es besteht noch Anspruch auf :vacation Tage Urlaub.  \nInsgesamt fehlte :name an :sumpto Tagen, davon :pto"
 			},
 			"foreign_contributor": "Hinzugefügt von",
