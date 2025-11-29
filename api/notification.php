@@ -358,6 +358,9 @@ class NOTIFICATION extends API {
 									$last = new \DateTime($row['last_touch']);
 									$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
 									if ($row['notified'] < $diff && !$row['lifespan']){
+										// skip non case related records for lifespan reminder
+										if (!in_array($row['context'], ['casedocumentation', 'incident'])) continue;
+
 										$this->alertUserGroup(
 											[
 												// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
