@@ -631,13 +631,12 @@
 			"summary": ":number Reklamationen in diesem Jahr, von denen :closed als abgeschlossen markiert sind"
 		},
 		"documents": {
-			"date": "Datum",
+			"datetime": "Datum und Uhrzeit",
 			"export_timestamp": "am :timestamp",
 			"in_use_approved": "Freigegeben von :permission :name am :date",
 			"in_use_bundles": "Pakete und zugehörige Dokumente",
 			"in_use_documents": "Gültige Dokumente und zugehörige Komponenten",
 			"in_use_external": "Externe Dokumente in Nutzung",
-			"time": "Zeit",
 			"update_button": "Aktualisiere gültige Dokumente zum angebenen Zeitpunkt",
 			"usage_info": ":count mal genutzt. Erstellt am :date für :unit.\nBerücksichtigt :regulatory",
 			"usage_link": "Dokument ansehen",
@@ -753,7 +752,7 @@
 	},
 	"calendar": {
 		"appointment": {
-			"date": "Datum",
+			"datetime": "Datum und Uhrzeit",
 			"download": "Drucke die PDF-Datei aus oder versende die ICS-Datei per Mail oder Nachrichtendienst",
 			"duration": "Ungefähre Dauer in Stunden",
 			"ics": "ICS Kalender Datei",
@@ -764,7 +763,6 @@
 			"reminder": "Erinnerung",
 			"reminder_default": "Sagen Sie uns bitte bescheid, falls Sie den Termin nicht wahrnehmen können.",
 			"reminder_hint": "z.B. Vergessen Sie nicht passende Schuhe mitzubringen",
-			"time": "Zeit",
 			"title": "Ihr Termin"
 		},
 		"daily_title": ":day: :number Einträge",
@@ -1493,7 +1491,7 @@
 		"create_identifier_info": "Erstelle ein Kennzeichen der Datenbankeinträge von Aufzeichnungen verknüpft. Ein aktueller Zeitstempel wird automatisch codiert hinzugefügt. Nach der Übermittlung erhältst du eine PDF-Datei um scanbare QR-Codes ausdrucken zu können. Du kannst ein bestehendes Kennzeichen einscannen um einen Aufkleberbogen zu duplizieren.",
 		"create_identifier_proceed": "Öffne den Link, drucke die Datei und verwende sie sinnvoll.",
 		"create_identifier_type": "Etikett(en) im Format :format",
-		"date": "Datum des Eintrags",
+		"datetime": "Datum und Zeitpunkt des Eintrags",
 		"erp_case_number": "Vorgangsnummer",
 		"erp_case_number_hint": "mehrere Vorgangsnummern können getrennt eingetragen werden, z.B. 12345; 12346",
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
@@ -1565,7 +1563,6 @@
 		"saved": "Die Aufzeichnung wurde gespeichert.",
 		"scan": "Scanne eine Kennzeichen um Aufzeichnungen zu finden",
 		"simplified_export": "Exportiere nur die neuesten Daten dieser Aufzeichnung als PDF",
-		"time": "Zeitpunkt des Eintrags",
 		"type": {
 			"treatment": "Versorgung",
 			"rework": "Nacharbeit",

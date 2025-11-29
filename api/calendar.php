@@ -52,8 +52,7 @@ class CALENDAR extends API {
 
 					$appointment = [];
 					foreach ([
-						'date',
-						'time',
+						'datetime',
 						'occasion',
 						'reminder',
 						'duration'
@@ -61,7 +60,7 @@ class CALENDAR extends API {
 						$appointment[$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.' . $key)) ? : '';
 					}
 
-					if (!$appointment['date'] || !$appointment['time'])	$this->response([], 406);
+					if (!$appointment['datetime'])	$this->response([], 406);
 
 					if ($appointment['reminder'] && !str_ends_with($appointment['reminder'], '.')) $appointment['reminder'].= '.';
 					$appointment['reminder'] .= ' ' . $this->_lang->GET('calendar.appointment.reminder_default', [], true);
@@ -73,8 +72,8 @@ class CALENDAR extends API {
 						"UID:" . implode('-', str_split(md5(CONFIG['system']['caroapp'] . time()), 5)) . "\n" .
 						"CREATED:" . date('Ymd\THis') . "\n" .
 						"DTSTAMP:" . date('Ymd\THis') . "\n" .
-						"DTSTART:" . str_replace('-', '', $appointment['date']) . 'T' . str_replace(':', '', $appointment['time']) . "00\n" .
-						"DTEND:" . date("Ymd\THis", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600) . "\n" .
+						"DTSTART:" . str_replace(['-', ':'], '', $appointment['datetime']) . "00\n" .
+						"DTEND:" . date("Ymd\THis", strtotime($appointment['datetime']) + intval($appointment['duration']) * 3600) . "\n" .
 						wordwrap("DESCRIPTION:" . $appointment['reminder'], 75, "\n ") . "\n" .
 						wordwrap("SUMMARY:" . $appointment['occasion'], 75, "\n ")  . "\n" .
 						"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
@@ -91,14 +90,14 @@ class CALENDAR extends API {
 							$this->_lang->GET('calendar.appointment.readable', [
 								':company' => $this->_lang->GET('company.address'),
 								':occasion' => $appointment['occasion'],
-								':start' => $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false),
-								':end' => $this->convertFromServerTime(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600), true, false),
+								':start' => $this->convertFromServerTime($appointment['datetime'], true, false),
+								':end' => $this->convertFromServerTime(date("Y-m-d H:i", strtotime($appointment['datetime']) + intval($appointment['duration']) * 3600), true, false),
 								':reminder' => $appointment['reminder'],
 								':phone' => $this->_lang->GET('company.phone'),
 								':mail' => $this->_lang->GET('company.mail')
 							], true)
 						],
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false))
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false))
 					];
 					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
@@ -107,14 +106,14 @@ class CALENDAR extends API {
 					];
 
 					// add ics file to send by mail
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false) . '.ics';
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
 						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false) . '.ics'
+						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics'
 					];
 
 					$body = [
@@ -141,16 +140,10 @@ class CALENDAR extends API {
 						'content' => [
 							[
 								[
-									'type' => 'date',
+									'type' => 'datetime_local',
 									'attributes' => [
-										'name' => $this->_lang->GET('calendar.appointment.date'),
-										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.date')) ? : ''
-									]
-								], [
-									'type' => 'time',
-									'attributes' => [
-										'name' => $this->_lang->GET('calendar.appointment.time'),
-										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.time')) ? : ''
+										'name' => $this->_lang->GET('calendar.appointment.datetime'),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.datetime')) ? : ''
 									]
 								], [
 									'type' => 'text',

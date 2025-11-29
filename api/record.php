@@ -404,26 +404,18 @@ class RECORD extends API {
 		if (isset($response['render']['form'])) {
 			// add record timestamp options if this is a fillable document (and not a process instruction) 
 			$record_date = [
-				'type' => 'date',
+				'type' => 'datetime_local',
 				'attributes' => [
-					'name' => 'DEFAULT_' . $this->_lang->GET('record.date'),
-					'value' => $this->_date['usertime']->format('Y-m-d'),
-					'required' => true
-				]
-			];
-			$record_time = [
-				'type' => 'time',
-				'attributes' => [
-					'name' => 'DEFAULT_' . $this->_lang->GET('record.time'),
-					'value' => $this->_date['usertime']->format('H:i'),
+					'name' => 'DEFAULT_' . $this->_lang->GET('record.datetime'),
+					'value' => $this->_date['usertime']->format('Y-m-d\TH:i'),
 					'required' => true
 				]
 			];
 			if (array_intersect(['patient'], $_SESSION['user']['permissions'])) {
-				$record_date['attributes']['readonly'] = $record_time['attributes']['readonly'] = true;
+				$record_date['attributes']['readonly'] = true;
 			}
 
-			$defaults = [$record_date, $record_time];
+			$defaults = [$record_date];
 			// add record types if applicable
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$preset = null;
@@ -876,8 +868,7 @@ class RECORD extends API {
 				// document id is stored to the entry so that the content remains hidden if the document has restricted access
 				// used in summarizeRecord() and not easier to check with the name 
 				if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
-				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
-				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
+				if ($entry_datetime = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.datetime'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.datetime')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 
 				require_once('document.php');
@@ -889,9 +880,8 @@ class RECORD extends API {
 
 				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
-				$entry_timestamp = $entry_date . ' ' . $entry_time;
-				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-					$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
+				if (strlen($entry_datetime) > 16) { // yyyy-mm-ddThh:ii datetime-locale format
+					$entry_datetime = $this->_date['usertime']->format('Y-m-d H:i');
 				}
 
 				// create proper identifier with timestamp if not provided
@@ -902,7 +892,7 @@ class RECORD extends API {
 						$identifier = $value;
 						if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 						unset ($this->_payload->$key);
-						$identifier = UTILITY::identifier($identifier, $entry_timestamp);
+						$identifier = UTILITY::identifier($identifier, $entry_datetime);
 					}
 					if (gettype($value) === 'array') {
 						// empty file arrays to be skipped
@@ -917,14 +907,14 @@ class RECORD extends API {
 				}
 				// check whether a necessary identifier has been submitted 
 				if (!$identifier) {
-					if (!in_array($context, array_keys($this->_lang->_USER['documentcontext']['identify']))) $identifier = $document_name . ' ' . $entry_timestamp;
+					if (!in_array($context, array_keys($this->_lang->_USER['documentcontext']['identify']))) $identifier = $document_name . ' ' . $entry_datetime;
 					else $this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('record.error'),
 							'type' => 'error'
 						]]);
 				}
-				$entry_timestamp .= ':00'; // append seconds for database format
+				$entry_datetime .= ':00'; // append seconds for database format
 
 				// handle attachments and images
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
@@ -1014,7 +1004,7 @@ class RECORD extends API {
 					// set up record
 					$current_record = [
 						'author' => $_SESSION['user']['name'],
-						'date' => $this->convertToServerTime($entry_timestamp),
+						'date' => $this->convertToServerTime($entry_datetime),
 						'document' => $document_id,
 						'content' => UTILITY::json_encode($this->_payload)
 					];

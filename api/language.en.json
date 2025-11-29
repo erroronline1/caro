@@ -631,13 +631,12 @@
 			"summary": ":number complaints within this year, of those :closed records are marked as closed"
 		},
 		"documents": {
-			"date": "Date",
+			"datetime": "Date and time",
 			"export_timestamp": "on :timestamp",
 			"in_use_approved": ":permission :name approved on :date",
 			"in_use_bundles": "Bundles in use with respective documents",
 			"in_use_documents": "Documents in use with respective components",
 			"in_use_external": "External documents in use",
-			"time": "Time",
 			"update_button": "Update documents in use at the given date/time",
 			"usage_info": ":count time used. Created on :date for :unit.\nConsiders :regulatory",
 			"usage_link": "Inspect document",
@@ -753,7 +752,7 @@
 	},
 	"calendar": {
 		"appointment": {
-			"date": "Date",
+			"datetime": "Date and time",
 			"download": "Print out the PDF or send the ICS-file by mail or messenger",
 			"duration": "Approximate duration (hours)",
 			"ics": "ICS calendar file",
@@ -764,7 +763,6 @@
 			"reminder": "Reminder",
 			"reminder_default": "Please let us know if you cannot make the appointment.",
 			"reminder_hint": "e.g. remember bringing shoes",
-			"time": "Time",
 			"title": "Your appointment"
 		},
 		"daily_title": ":day: :number entries",
@@ -1493,7 +1491,7 @@
 		"create_identifier_info": "Create an identifier that will connect database entries. An encoded current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet.",
 		"create_identifier_proceed": "Open the link, print the identifiers and use them where applicable.",
 		"create_identifier_type": "Label(s) in format :format",
-		"date": "Date of record",
+		"datetime": "Date and time of record",
 		"erp_case_number": "ERP case number",
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
 		"error": "Record could not be saved. Please try again.",
@@ -1565,7 +1563,6 @@
 		"saved": "The record has been saved.",
 		"scan": "Scan identifier to find record",
 		"simplified_export": "Export record with only recent entries as PDF",
-		"time": "Time of record",
 		"type": {
 			"treatment": "Treatment",
 			"rework": "Rework",
