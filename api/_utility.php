@@ -206,8 +206,7 @@ class UTILITY {
 		if (!$data) return null;
 		$tmpfiles = [];
 		// determine if data is a set of subsets
-		if (!array_is_list($data) || is_array($data[array_key_first($data)][0])){
-		var_dump($data);
+		if (!array_is_list($data) || is_array($data[array_key_first($data)][array_key_first($data[array_key_first($data)])])){
 			foreach($data as $subsetname => $subset) $tmpfiles[] = self::csv_write($subset, $headers, $options);
 		}
 		else $tmpfiles[] = self::csv_write($data, $headers, $options);
@@ -868,7 +867,7 @@ class UTILITY {
 	 * maybe not as versatile as others but sufficient enough.
 	 * if one day this will be replaced it mostly has to be replaced here and not on other files.
 	 */
-	public static function xslx($data, $headers = [], $filename = '', $options = []){
+	public static function xlsx($data, $headers = [], $filename = '', $options = []){
 		/**
 		 * options = [
 		 * 		'file' => [
@@ -893,7 +892,7 @@ class UTILITY {
 		$tmpfiles = [];
 		// determine if data is a set of subsets
 		// else make it one with int key
-		if (array_is_list($data) || !is_array($data[array_key_first($data)][0])){
+		if (array_is_list($data) || !is_array($data[array_key_first($data)][array_key_first($data[array_key_first($data)])])){
 			$data[1] = $data;
 		}
 		$tmpfiles[] = self::xlsx_write($data, $headers, $options);
