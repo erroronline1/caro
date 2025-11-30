@@ -65,7 +65,6 @@ class UTILITY {
 			imagesavealpha($output, true);
 			imagecolortransparent($output, imagecolorallocate($output, 0, 0, 0));
 			imagecopyresampled($output, $input, 0, 0, 0, 0, $new['w'], $new['h'], $src['w'], $src['h']);
-			imagedestroy($input);
 
 			$scale = .15; // of shorter length
 			$opacity = 20; // for watermark
@@ -81,7 +80,6 @@ class UTILITY {
 				$textcolor = imagecolorallocate($input, 255, 255, 255);
 				imagefttext($input, $height / 2, 0, ceil($height / 6), $height - ceil($height / 6), $textcolor, '../media/UbuntuMono-R.ttf', $label);
 				imagecopymerge($output, $input, 0, $new['h'] - $height, 0, 0, $new['w'], $new['h'], 99);
-				imagedestroy($input);
 			}
 
 			// watermark on lower right
@@ -105,10 +103,8 @@ class UTILITY {
 				$stamp = imagecreatetruecolor($newwm['w'], $newwm['h']);
 				imagecolortransparent($stamp, imagecolorallocate($stamp, 0, 0, 0));
 				imagecopyresampled($stamp, $input, 0, 0, 0, 0, $newwm['w'], $newwm['h'], $wm['w'], $wm['h']);
-				imagedestroy($input);
 
 				imagecopymerge($output, $stamp, $new['w'] - $newwm['w'], $new['h'] - $newwm['h'], 0, 0, $newwm['w'], $newwm['h'], $opacity);
-				imagedestroy($stamp);
 			}
 	
 			if ($destination & UTILITY_IMAGE_REPLACE){
@@ -124,7 +120,6 @@ class UTILITY {
 						imagepng($output, $file, 0);
 						break;
 				}
-				imagedestroy($output);
 				return;
 			}
 
@@ -153,7 +148,6 @@ class UTILITY {
 					imagepng($output, null, 6);
 					break;
 			}
-			imagedestroy($output);
 			if ($destination & UTILITY_IMAGE_STREAM) {
 				ob_flush();
 			}
@@ -862,7 +856,6 @@ class UTILITY {
 			'response' => curl_exec($request),
 			'metadata' => curl_getinfo($request)
 		];
-		curl_close($request);
 		return $response;
 	}
 	
