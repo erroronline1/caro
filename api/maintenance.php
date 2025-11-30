@@ -265,31 +265,24 @@ class MAINTENANCE extends API {
 						if (count($datalist) < $maxlength) array_push($data[$issue], ...array_fill(0, $maxlength - count($datalist), ''));
 					}
 
-					$name = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]);
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $name . '.csv';
-					$file = fopen($tempFile, 'w');
-					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-					fputcsv($file, array_keys($data),
-						CONFIG['csv']['dialect']['separator'],
-						CONFIG['csv']['dialect']['enclosure'],
-						CONFIG['csv']['dialect']['escape']);
-
+					// rotate data matrix - somewhat, since it's a named array
+					$_data = [];
 					for($i = 0; $i < $maxlength; $i++){
 						$row = [];
-						foreach ($data as $issue => $datalist) {
+						foreach ($data as $datalist) {
 							$row[] = $datalist[$i];
 						}
-						fputcsv($file, $row,
-						CONFIG['csv']['dialect']['separator'],
-						CONFIG['csv']['dialect']['enclosure'],
-						CONFIG['csv']['dialect']['escape']);
+						$_data[] = $row;
 					}
-					fclose($file);
-					// provide downloadfile
-					$downloadfiles[pathinfo($tempFile)['basename']] = [
-						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => pathinfo($tempFile)['basename']
-					];
+
+					if ($files = UTILITY::csv($_data, array_keys($data),
+						preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
+
+						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'])] = [
+							'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+							'download' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'
+						];
+					}
 					$this->response(['links' => $downloadfiles]);
 				}
 				break;

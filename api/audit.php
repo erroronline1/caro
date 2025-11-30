@@ -2442,24 +2442,13 @@ class AUDIT extends API {
 			$defaultColumn['until'],
 			$defaultColumn['type'],
 		);
-	
-		// write csv file
-		$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv';
-		$file = fopen($tempFile, 'w');
-		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-		// header
-		fputcsv($file, $keys,
-			CONFIG['csv']['dialect']['separator'],
-			CONFIG['csv']['dialect']['enclosure'],
-			CONFIG['csv']['dialect']['escape']);
-		// rows
-		foreach ($result as $line){
+		foreach ($result as $i => $line){
 			// complete and sort line columns, unshift default columns
 			foreach (array_diff($keys, array_keys($line)) as $nkey){
-				$line[$nkey] = '';
+				$result[$i][$nkey] = '';
 			}
 			ksort($line, SORT_REGULAR);
-			$line = array_merge([
+			$result[$i] = array_merge([
 				$defaultColumn['identifier'] => $line[$defaultColumn['identifier']],
 				$defaultColumn['erp_case_number'] => $line[$defaultColumn['erp_case_number']],
 				$defaultColumn['units'] => $line[$defaultColumn['units']],
@@ -2467,20 +2456,18 @@ class AUDIT extends API {
 				$defaultColumn['until'] => $this->convertFromServerTime($line[$defaultColumn['until']]),
 				$defaultColumn['type'] => $line[$defaultColumn['type']]
 			], $line);
-
-			// write to file
-			fputcsv($file, $line,
-			CONFIG['csv']['dialect']['separator'],
-			CONFIG['csv']['dialect']['enclosure'],
-			CONFIG['csv']['dialect']['escape']);
 		}
-		fclose($file);
-
+		
 		// provide downloadfile
-		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
-			'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-			'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
-		];
+		$downloadfiles = [];
+		if ($files = UTILITY::csv($result, $keys,
+			$this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv')){
+
+			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
+				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+				'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
+			];
+		}
 
 		$body = [];
 		array_push($body, 

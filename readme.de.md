@@ -1614,7 +1614,7 @@ Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen wer
 * falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
 * für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
 * bereitgestellte Datendateien finden sich unter `UTILITY::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
-* angepasste Datenbankauszüge sollten bevorzugt in `UTILITY::directory('tmp')` im Sinne einer regelmäßigen Bereinigung gespeichert werden
+* angepasste Datenbankauszüge sollten bevorzugt mit `UTILITY::csv()` erstellt werden
 
 `UTILITY`-Methoden finden sich in api/_utility.php.
 

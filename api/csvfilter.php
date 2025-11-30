@@ -97,38 +97,25 @@ class CSVFILTER extends API {
 				]);
 
 				//create and write to file
-				$downloadfiles=[];
+				$downloadfiles = [];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
-						foreach ($datalist->_list as $subsetname => $subset){
-							// datalist may contain multiple subsets based on split setting
-							// write each to temp file
-							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
-							$subsetname = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $subsetname);
-							$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $subsetname . '.csv';
-							$file = fopen($tempFile, 'w');
-							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-							fputcsv($file, $datalist->_setting['filesetting']['columns'],
-								$datalist->_setting['filesetting']['dialect']['separator'],
-								$datalist->_setting['filesetting']['dialect']['enclosure'],
-								$datalist->_setting['filesetting']['dialect']['escape']);
-							foreach ($subset as $line) {
-								fputcsv($file, $line,
-								$datalist->_setting['filesetting']['dialect']['separator'],
-								$datalist->_setting['filesetting']['dialect']['enclosure'],
-								$datalist->_setting['filesetting']['dialect']['escape']);
+						if ($files = UTILITY::csv($datalist->_list, $datalist->_setting['filesetting']['columns'],
+							$content['filesetting']['destination'], [
+							'separator' => $datalist->_setting['filesetting']['separator'],
+							'enclosure' => $datalist->_setting['filesetting']['enclosure'],
+							'escape' => $datalist->_setting['filesetting']['escape']])){
+							foreach($files as $file){
+								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
+									'href' => './api/api.php/file/stream/' . substr($file, 1),
+									'download' => pathinfo($file)['basename']
+								];
 							}
-							fclose($file);
-							// provide downloadfile
-							$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
-								'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-								'download' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
-							];
 						}
 						break;
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
-						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
+						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s') . '.xlsx';
 						$writer = new \XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']);
 						$settings = [

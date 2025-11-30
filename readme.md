@@ -33,6 +33,8 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
+* validate csvfilter.php split export
+* implement UTILITY::xslsx()
 
 ## Content
 * [Aims](#aims)
@@ -1708,7 +1710,7 @@ In case you have to rely on data dumps instead of direct database access, the in
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
 * provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
-* custom csv dumps are recommended to be stored within `UTILITY::directory('tmp')` for regular cleanup
+* custom csv dumps are recommended to be created with `UTILITY::csv()`
 
 `UTILITY`-methods can be found in api/_utility.php.
 
@@ -2835,6 +2837,7 @@ There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
 * image processing
+* CSV- and XLSX-exports 
 
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 Directory handling creates a .htaccess- / web.config-file preventing direct access to files; these are available through the file/stream-endpoint only. Linking files requires ./api/api.php/file/stream/ as a prefix to otherwise native processed paths.

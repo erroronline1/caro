@@ -1173,21 +1173,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$statement = null;
 
 		if ($result) {
-			$tempFile = UTILITY::directory('tmp') . '/' . $key . date(' Y-m-d H-i-s') . '.csv';
-			$file = fopen($tempFile, 'w');
-			fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-			fputcsv($file, array_keys($result[0]),
-				CONFIG['csv']['dialect']['separator'],
-				CONFIG['csv']['dialect']['enclosure'],
-				CONFIG['csv']['dialect']['escape']);
-			foreach ($result as $line) {
-				fputcsv($file, $line,
-				CONFIG['csv']['dialect']['separator'],
-				CONFIG['csv']['dialect']['enclosure'],
-				CONFIG['csv']['dialect']['escape']);
+			if ($files = UTILITY::csv($result, array_keys($result[0]),
+				$key . date(' Y-m-d H-i-s') . '.csv')){
+
+				return substr($files[0], 1);
 			}
-			fclose($file);
-			return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
 		}
 		return [];
 	}

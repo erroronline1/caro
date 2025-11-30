@@ -15,6 +15,9 @@ define("UTILITY_IMAGE_REPLACE", 0x1);
 define("UTILITY_IMAGE_STREAM", 0x2);
 define("UTILITY_IMAGE_RESOURCE", 0x4);
 
+require_once("../libraries/XLSXWriter.php");
+require_once("../libraries/XLSXWriter_BuffererWriter.php");
+
 class UTILITY {
 
 	/**
@@ -197,6 +200,50 @@ class UTILITY {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @param array $data
+	 * @param array $headers
+	 * @param array $options
+	 * @return array file path to tempfile
+	 */
+	public static function csv($data, $headers = [], $filename = '', $options = ['separator' => CONFIG['csv']['dialect']['separator'], 'enclosure' => CONFIG['csv']['dialect']['enclosure'], 'escape' => CONFIG['csv']['dialect']['escape']]){
+		if (!$data) return null;
+		$tmpfiles = [];
+		// determine if data is a set of subsets
+		if (!array_is_list($data) || is_array($data[array_key_first($data)][0])){
+		var_dump($data);
+			foreach($data as $subsetname => $subset) $tmpfiles[] = self::csv_write($subset, $headers, $options);
+		}
+		else $tmpfiles[] = self::csv_write($data, $headers, $options);
+
+		foreach($tmpfiles as &$path){
+			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), true);
+		}
+		return $tmpfiles;
+	}
+	private static function csv_write($data, $headers = [], $options = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
+		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+		$file = fopen($tmp_name, 'w');
+		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+		if ($headers) fputcsv($file,
+			$headers,
+			$options['separator'],
+			$options['enclosure'],
+			$options['escape']
+		);
+		foreach($data as $row){
+			fputcsv(
+				$file,
+				$row,
+				$options['separator'],
+				$options['enclosure'],
+				$options['escape']
+			);
+		}
+		fclose($file);
+		return $tmp_name;
 	}
 
 	/**
@@ -817,6 +864,84 @@ class UTILITY {
 		];
 		curl_close($request);
 		return $response;
+	}
+	
+	/**
+	 * @param array $data
+	 * @param array $headers
+	 * @param array $options
+	 * @return array file path to tempfile
+	 * at time of writing xlsxwriter is a suitable small library to handle these files.
+	 * maybe not as versatile as others but sufficient enough.
+	 * if one day this will be replaced it mostly has to be replaced here and not on other files.
+	 */
+	public static function xslx($data, $headers = [], $filename = '', $options = []){
+		/**
+		 * options = [
+		 * 		'file' => [
+		 * 			'author' => string,
+		 * 			'name' => string
+		 * 		],
+		 * 		'header' => [ // according to xslxwriter implementation
+		 *			'font-size' => 8,
+		 *			'widths' => [7, 12, 20, 35, 10, 17, null, 5, 8, 5],
+		 *			'types' => ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']
+		 * 		],
+		 * 		'row' => [ // according to xslxwriter implementation
+		 * 			'height': 40,
+		 *			'wrap_text': true,
+		 *			'font-size': 8,
+		 *			'halign': 'left',
+		 *			'valign': 'top'
+		 * 		]
+		 * ]
+		 */
+		if (!$data) return null;
+		$tmpfiles = [];
+		// determine if data is a set of subsets
+		// else make it one with int key
+		if (array_is_list($data) || !is_array($data[array_key_first($data)][0])){
+			$data[1] = $data;
+		}
+		$tmpfiles[] = self::xlsx_write($data, $headers, $options);
+		foreach($tmpfiles as &$path){
+			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), true);
+		}
+		return $tmpfiles;
+	}
+	private static function xlsx_write($data, $headers = [], $options = []){
+		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+		$writer = new \XLSXWriter();
+		if (isset($options['file']) && isset($options['file']['author'])) $writer->setAuthor($options['file']['author']);
+		$settings = [
+			'header' => [],
+			'row' => []
+		];
+		if ($headers) $header = array_combine($headers, array_map(Fn($v) => 'string', $headers));
+
+		if (isset($content['options']['header'])) {
+			if (isset($content['options']['header']['types'])){
+				$header = array_combine($headers, $content['options']['header']['types']);
+			}
+			unset ($content['options']['header']['types']);
+			$settings['header'] = $content['options']['header'];
+		}
+		if (isset($content['options']['row'])) $settings['row'] = $content['options']['row'];
+
+		foreach ($data as $subsetname => $subset){
+			// datalist may contain multiple subsets based on split setting
+			// this application names these, if subsetname is int there is only one subset
+			// write each to xlsx sheet
+			if (intval($subsetname) && isset($options['file']) && isset($options['file']['name'])) {
+				$subsetname = $options['file']['name'];
+			}
+
+			if ($header) $writer->writeSheetHeader($subsetname, $header, $settings['header']);
+			foreach ($subset as $line)
+				$writer->writeSheetRow($subsetname, $line, $settings['row']);
+		}
+		$writer->writeToFile($tmp_name);
+		return $tmp_name;
 	}
 }
 

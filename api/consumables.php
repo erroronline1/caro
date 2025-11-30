@@ -149,7 +149,7 @@ class CONSUMABLES extends API {
 	 */
 	public function exportproductlist(){
 		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
-		$products = [];
+		$products = $downloadfiles = [];
 		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
 			'values' => [
 				':id' => intval($this->_requestedID)
@@ -174,24 +174,23 @@ class CONSUMABLES extends API {
 
 		// create csv
 		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order', 'last_order'];
-		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'productlist.csv';
-		$file = fopen($tempFile, 'w');
-		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-		fputcsv($file, $columns,
-			CONFIG['csv']['dialect']['separator'],
-			CONFIG['csv']['dialect']['enclosure'],
-			CONFIG['csv']['dialect']['escape']);
+
+		// reduce data to required columns, convert null to ''
 		foreach ($products as $row) {
-			fputcsv($file, array_map(fn($column) => $row[$column], $columns),
-			CONFIG['csv']['dialect']['separator'],
-			CONFIG['csv']['dialect']['enclosure'],
-			CONFIG['csv']['dialect']['escape']);
+			foreach (array_diff($columns, array_keys($row)) as $nkey){
+				$row[$nkey] = '';
+			}
+			$result[] = array_map(fn($column) => $row[$column], $columns);
 		}
-		fclose($file);
-		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-			'href' => './api/api.php/file/stream/' . substr($tempFile, 1),
-			'download' => pathinfo($tempFile)['basename']
-		];
+		if ($files = UTILITY::csv($result, $columns,
+			$this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
+
+			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'])] = [
+				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+				'download' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'
+			];
+		}
+
 		// create stupid filter for export files if none is provided
 		$vendor['products'] = json_decode($vendor['products'] ? : '', true);
 		$filter = isset($vendor['products']['filefilter']) && json_decode($vendor['products']['filefilter'], true) ? json_decode($vendor['products']['filefilter'], true) : [
