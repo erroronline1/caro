@@ -1005,7 +1005,7 @@
 			"phone": "Phone",
 			"productlist_empty": "There are no products to export",
 			"productlist_export": "Export article list",
-			"productist_export_hint": "This is recommended for small article lists that do not trace back to an import. The filter operates for exported lists only. Proper product lists and well formulated filters are preferred.",
+			"productlist_export_hint": "This is recommended for small article lists that do not trace back to an import. The filter operates for exported lists only. Proper product lists and well formulated filters are preferred.",
 			"productlist_filter": "product list file import filter",
 			"productlist_filter_json_error": "There is an issue with your :filter. Please ensure proper JSON.",
 			"productlist_match": "Match ERP-dump for ERP-ids based on import filter",
