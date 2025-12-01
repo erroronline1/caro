@@ -2274,22 +2274,34 @@ class AUDIT extends API {
 				$deliverytime
 			];
 		}
-		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
-		$writer = new \XLSXWriter();
-		$writer->setAuthor($_SESSION['user']['name']); 
+		ksort($vendor_orders);
 
-		foreach ($vendor_orders as $vendor => $orders){
-			$writer->writeSheetRow($vendor, array_values($columns));
-			foreach ($orders as $line)
-				$writer->writeSheetRow($vendor, $line, array('height' => 30, 'wrap_text' => true));
+		$downloadfiles = [];
+		$tempFile = preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
+		if ($files = UTILITY::xlsx($vendor_orders, array_values($columns), $tempFile, [
+			'file' => [
+				'author' => $_SESSION['user']['name']
+			],
+			'header' => [ // according to xslxwriter implementation
+					'font-size' => 8,
+					'types' => array_map(Fn($v) => 'string', array_values($columns))
+				],
+				'row' => [ // according to xslxwriter implementation
+					'height' => 40,
+					'wrap_text' => true,
+					'font-size' => 8,
+					'halign' => 'left',
+					'valign' => 'top'
+				]
+		])){
+			foreach($files as $file){
+				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
+					'href' => './api/api.php/file/stream/' . substr($file, 1),
+					'download' => pathinfo($file)['basename']
+				];
+			}
 		}
-
-		$writer->writeToFile($tempFile);
-		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . substr($tempFile, 1),
-			'download' => pathinfo($tempFile)['basename']
-		];
-
+		
 		$body = [];
 		array_push($body, 
 			[[
