@@ -35,6 +35,10 @@ Things are still in motion. Images may be outdated.
 * csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
 * validate csvfilter.php split export
 * implement UTILITY::xslsx()
+* excel nagging
+    * on same sheet names (case insensitive)
+    * on formulas
+
 
 ## Content
 * [Aims](#aims)
