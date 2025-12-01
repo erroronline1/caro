@@ -881,8 +881,7 @@ class UTILITY {
 		/**
 		 * options = [
 		 * 		'file' => [
-		 * 			'author' => string,
-		 * 			'name' => string
+		 * 			'author' => string
 		 * 		],
 		 * 		'header' => [ // according to xslxwriter implementation
 		 *			'font-size' => 8,
@@ -890,11 +889,11 @@ class UTILITY {
 		 *			'types' => ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']
 		 * 		],
 		 * 		'row' => [ // according to xslxwriter implementation
-		 * 			'height': 40,
-		 *			'wrap_text': true,
-		 *			'font-size': 8,
-		 *			'halign': 'left',
-		 *			'valign': 'top'
+		 * 			'height' => 40,
+		 *			'wrap_text' => true,
+		 *			'font-size' => 8,
+		 *			'halign' => 'left',
+		 *			'valign' => 'top'
 		 * 		]
 		 * ]
 		 */
@@ -921,14 +920,14 @@ class UTILITY {
 		];
 		if ($headers) $header = array_combine($headers, array_map(Fn($v) => 'string', $headers));
 
-		if (isset($content['options']['header'])) {
-			if (isset($content['options']['header']['types'])){
-				$header = array_combine($headers, $content['options']['header']['types']);
+		if (isset($options['header'])) {
+			if (isset($options['header']['types'])){
+				$header = array_combine($headers, $options['header']['types']);
 			}
-			unset ($content['options']['header']['types']);
-			$settings['header'] = $content['options']['header'];
+			unset ($options['header']['types']);
+			$settings['header'] = $options['header'];
 		}
-		if (isset($content['options']['row'])) $settings['row'] = $content['options']['row'];
+		if (isset($options['row'])) $settings['row'] = $options['row'];
 
 		foreach ($data as $subsetname => $subset){
 			// datalist may contain multiple subsets based on split setting
