@@ -231,6 +231,12 @@ class UTILITY {
 			$options['enclosure'],
 			$options['escape']
 		);
+		else fputcsv($file,
+			array_keys($data[0]),
+			$options['separator'],
+			$options['enclosure'],
+			$options['escape']
+		);
 		foreach($data as $row){
 			fputcsv(
 				$file,
@@ -918,8 +924,10 @@ class UTILITY {
 			'header' => [],
 			'row' => []
 		];
+		// default to string to avoid weird number formatting
 		if ($headers) $header = array_combine($headers, array_map(Fn($v) => 'string', $headers));
 
+		// required that all headers of subsets are the same
 		if (isset($options['header'])) {
 			if (isset($options['header']['types'])){
 				$header = array_combine($headers, $options['header']['types']);
@@ -937,7 +945,13 @@ class UTILITY {
 				$subsetname = $options['file']['name'];
 			}
 
-			if ($header) $writer->writeSheetHeader($subsetname, $header, $settings['header']);
+			if ($headers) $writer->writeSheetHeader($subsetname, $header, $settings['header']);
+			else {
+				// no header defined, make first line header defining default to string to avoid weird number formatting
+				$firstline = $subset[0];
+				$header = array_combine(array_keys($firstline), array_map(Fn($v) => 'string', $firstline));
+				$writer->writeSheetHeader($subsetname, $header, isset($settings['header']) ? $settings['header'] : null);
+			}
 			foreach ($subset as $line)
 				$writer->writeSheetRow($subsetname, $line, $settings['row']);
 		}
