@@ -2283,16 +2283,16 @@ class AUDIT extends API {
 				'author' => $_SESSION['user']['name']
 			],
 			'header' => [ // according to xslxwriter implementation
-					'font-size' => 8,
-					'types' => array_map(Fn($v) => 'string', array_values($columns))
-				],
-				'row' => [ // according to xslxwriter implementation
-					'height' => 40,
-					'wrap_text' => true,
-					'font-size' => 8,
-					'halign' => 'left',
-					'valign' => 'top'
-				]
+				'font-size' => 8,
+				'types' => array_map(Fn($v) => 'string', array_values($columns))
+			],
+			'row' => [ // according to xslxwriter implementation
+				'height' => 40,
+				'wrap_text' => true,
+				'font-size' => 8,
+				'halign' => 'left',
+				'valign' => 'top'
+			]
 		])){
 			foreach($files as $file){
 				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
@@ -2971,33 +2971,46 @@ class AUDIT extends API {
 					];
 			}
 		}
+		$downloadfiles = [];
 		if ($entries){
-			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
-			$writer = new \XLSXWriter();
-			$writer->setAuthor($_SESSION['user']['name']); 
+			// rebuild result array to match xlsx requirements
+			$result = [];
 			foreach ($entries as $process => $types){
 				foreach ($types as $type => $lines){
-					// write each to xlsx sheet
 					$sheetname = '';
 					preg_match_all('/\w+/', $process . ' ' . $type, $words);
 					foreach ($words[0] as $word){
 						$sheetname .= substr($word, 0, 1) . preg_replace('/[\Waeiou]/i', '', substr($word, 1));
 					}
-					$writer->writeSheetRow($sheetname, [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => $this->convertFromServerTime($requestedTimestamp, true)], true)]);
-					$writer->writeSheetRow($sheetname, []);
-
-					$writer->writeSheetRow($sheetname, array_keys($lines[0]));
-					foreach ($lines as $line)
-						$writer->writeSheetRow($sheetname, array_values($line));				
+					// append effective date
+					$lines[] = [];
+					$lines[] = [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => $this->convertFromServerTime($requestedTimestamp, true)], true)];
+					$result[$sheetname] = $lines;
 				}
 			}
-			$writer->writeToFile($tempFile);
-
-			// provide downloadfile			
-			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-				'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-				'download' => pathinfo($tempFile)['basename']
-			];
+			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
+			if ($files = UTILITY::xlsx($result, [], $tempFile, [
+				'file' => [
+					'author' => $_SESSION['user']['name']
+				],
+				'header' => [ // according to xslxwriter implementation
+					'font-size' => 8
+				],
+				'row' => [ // according to xslxwriter implementation
+					'height' => 40,
+					'wrap_text' => true,
+					'font-size' => 8,
+					'halign' => 'left',
+					'valign' => 'top'
+				]
+		])){
+				foreach($files as $file){
+					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+						'href' => './api/api.php/file/stream/' . substr($file, 1),
+						'download' => pathinfo($file)['basename']
+					];
+				}
+			}
 		}
 
 		$body = [];
