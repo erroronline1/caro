@@ -102,9 +102,9 @@ class CSVFILTER extends API {
 					case 'csv':
 						if ($files = UTILITY::csv($datalist->_list, $datalist->_setting['filesetting']['columns'],
 							$content['filesetting']['destination'], [
-							'separator' => $datalist->_setting['filesetting']['separator'],
-							'enclosure' => $datalist->_setting['filesetting']['enclosure'],
-							'escape' => $datalist->_setting['filesetting']['escape']])){
+							'separator' => isset($datalist->_setting['filesetting']['separator']) ? $datalist->_setting['filesetting']['separator'] : CONFIG['csv']['dialect']['separator'],
+							'enclosure' => isset($datalist->_setting['filesetting']['enclosure']) ? $datalist->_setting['filesetting']['enclosure'] : CONFIG['csv']['dialect']['enclosure'],
+							'escape' => isset($datalist->_setting['filesetting']['escape']) ? $datalist->_setting['filesetting']['escape'] : CONFIG['csv']['dialect']['escape']])){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
 									'href' => './api/api.php/file/stream/' . substr($file, 1),
@@ -115,40 +115,33 @@ class CSVFILTER extends API {
 						break;
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
-						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s') . '.xlsx';
-						$writer = new \XLSXWriter();
-						$writer->setAuthor($_SESSION['user']['name']);
-						$settings = [
-							'header' => [],
-							'row' => []
-						];
-						$header = array_combine($datalist->_setting['filesetting']['columns'], array_map(Fn($v) => 'string', $datalist->_setting['filesetting']['columns']));
-						if (isset($content['xslxformat'])){
-							if (isset($content['xslxformat']['header'])) {
-								if (isset($content['xslxformat']['header']['types'])){
-									$header = array_combine($datalist->_setting['filesetting']['columns'], $content['xslxformat']['header']['types']);
-								}
-								unset ($content['xslxformat']['header']['types']);
-								$settings['header'] = $content['xslxformat']['header'];
-							}
-							if (isset($content['xslxformat']['row'])) $settings['row'] = $content['xslxformat']['row'];
-						}
-						foreach ($datalist->_list as $subsetname => $subset){
-							// datalist may contain multiple subsets based on split setting
-							// write each to xlsx sheet
-							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
-
-							$writer->writeSheetHeader($subsetname, $header, $settings['header']);
-							foreach ($subset as $line)
-								$writer->writeSheetRow($subsetname, $line, $settings['row']);
-						}
-						$writer->writeToFile($tempFile);
-						// provide downloadfile
+						$downloadfiles = [];
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
-						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
-							'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-							'download' => $content['filesetting']['destination']
+						$format = [
+							'file' => [
+								'author' => $_SESSION['user']['name']
+							],
+							'header' => [ // according to xslxwriter implementation
+								'font-size' => 8,
+							],
+							'row' => [ // according to xslxwriter implementation
+								//'height' => 40,
+								//'wrap_text' => true,
+								'font-size' => 8,
+								'halign' => 'left',
+								'valign' => 'top'
+							]
 						];
+						if (isset($content['xslxformat'])) $format = array_merge($format, $content['xslxformat']);
+
+						if ($files = UTILITY::xlsx($datalist->_list, [], $content['filesetting']['destination'], $format)){
+							foreach($files as $file){
+								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
+									'href' => './api/api.php/file/stream/' . substr($file, 1),
+									'download' => pathinfo($file)['basename']
+								];
+							}
+						}
 						break;
 				}
 				
