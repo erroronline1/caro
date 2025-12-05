@@ -38,7 +38,9 @@ Things are still in motion. Images may be outdated.
 * excel nagging
     * on same sheet names (case insensitive)
     * on formulas
-
+* define affiliations beside unit (e.g. admin)
+    * does mess up caselists otherwise
+    * still should be considered for calendar?
 
 ## Content
 * [Aims](#aims)
