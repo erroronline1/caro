@@ -1369,6 +1369,7 @@ Ein beliebiges Beispiel:
     "filesetting": {
         "source": "Export.+?\\.csv",
         "headerrow": 0,
+		"destination": "FilteredList.csv",
         "columns": [
             "ORIGININDEX",
             "SOMEDATE",
@@ -1529,6 +1530,31 @@ Ein beliebiges Beispiel:
 ```
 
 RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl(?:ä|Ä)ngerung` lauten. Die Zeichencodierung löst dies zu `verl(?:Ã¤|Ã„)ngerung` auf und verfehlt daher die Gruppierung `[äÄ]` die zu `[Ã¤Ã„]` aufgelöst wird.
+
+Sofern die Ausgabe eines verarbeiteten Filters (z.B. for einen CSV-Filter) in einer XLSX-Datei erfolgen soll (festgelegt durch die Dateinamenerweiterung in [filesetting][destination]), sind einige Formatierungsoptionen durch die zusätzliche `xslxformat`-Eigenschaft verfügbar:
+
+```javascript
+"xslxformat": {
+    "file": {
+        "orientation": "portrait"
+    },
+    "header": {
+        "font-size": 8,
+        "widths": [7, 12, 20, 35, 10, 17, null, 5, 8, 5], // Spaltenbreite
+        "types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", ""] // Formate der Spalten, wobei "" zu Standard aufgelöst wird
+    },
+    "row": {
+        "height": 40,
+        "wrap_text": true,
+        "font-size": 8,
+        "halign": "left",
+        "valign": "top",
+        "border": "top",
+        "border-style": "thin"
+    }
+}
+```
+Für weitere Optionen wird auf die Dokumentation der [XLSXWriter-Bibliothek](https://github.com/maksimovic/PHP_XLSXWriter) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
 
 [Übersicht](#übersicht)
 

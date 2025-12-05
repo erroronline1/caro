@@ -33,17 +33,9 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
-* excel nagging
-    * on same sheet names (case insensitive)
-        * try enumarating
-    * on formulas
-        * refactor utility::xlsx, drop default string, xlsxwriter can not detect format properly otherwise
-        * needs english format for respective filters
-        * summarize options within readme
 * define affiliations beside unit (e.g. admin)
     * does mess up caselists otherwise
     * still should be considered for calendar?
-* filter out stock products, like display only but reversed
 
 ## Content
 * [Aims](#aims)
@@ -1474,6 +1466,7 @@ A generic sample:
     "filesetting": {
         "source": "Export.+?\\.csv",
         "headerrow": 1,
+		"destination": "FilteredList.csv",
         "columns": [
             "ORIGININDEX",
             "SOMEDATE",
@@ -1634,6 +1627,31 @@ A generic sample:
 ```
 
 RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl(?:ä|Ä)ngerung`. Character encoding resolves this to `verl(?:Ã¤|Ã„)ngerung`, thus failing if just using `[äÄ]` grouping being resolved to `[Ã¤Ã„]`.
+
+In case the output of a processed filter (e.g. for the CSV-filter) is supposed to be an XLSX-file (defined by the extension of [filesetting][destination]) there are some formatting options via an additional `xslxformat`-propery available:
+
+```javascript
+"xslxformat": {
+    "file": {
+        "orientation": "portrait"
+    },
+    "header": {
+        "font-size": 8,
+        "widths": [7, 12, 20, 35, 10, 17, null, 5, 8, 5], // widths of columns
+        "types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", ""] // formats of columns where "" resolves to general
+    },
+    "row": {
+        "height": 40,
+        "wrap_text": true,
+        "font-size": 8,
+        "halign": "left",
+        "valign": "top",
+        "border": "top",
+        "border-style": "thin"
+    }
+}
+```
+Please consult the documentation for the [XLSXWriter-library](https://github.com/maksimovic/PHP_XLSXWriter) for available options. Formulas have to follow the english notation.
 
 [Content](#content)
 
