@@ -33,14 +33,17 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
-* validate csvfilter.php split export
-* implement UTILITY::xslsx()
 * excel nagging
     * on same sheet names (case insensitive)
+        * try enumarating
     * on formulas
+        * refactor utility::xlsx, drop default string, xlsxwriter can not detect format properly otherwise
+        * needs english format for respective filters
+        * summarize options within readme
 * define affiliations beside unit (e.g. admin)
     * does mess up caselists otherwise
     * still should be considered for calendar?
+* filter out stock products, like display only but reversed
 
 ## Content
 * [Aims](#aims)
