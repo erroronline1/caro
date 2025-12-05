@@ -881,7 +881,7 @@ class UTILITY {
 	 * @return array file path to tempfile
 	 * at time of writing xlsxwriter is a suitable small library to handle these files.
 	 * maybe not as versatile as others but sufficient enough.
-	 * if one day this will be replaced it mostly has to be replaced here and not on other files.
+	 * if one day this will be replaced the logic is supposed to mostly being replaced here and not on other files.
 	 */
 	public static function xlsx($data, $headers = [], $filename = '', $options = []){
 		/**
@@ -892,7 +892,7 @@ class UTILITY {
 		 * 		'header' => [ // according to xslxwriter implementation
 		 *			'font-size' => 8,
 		 *			'widths' => [7, 12, 20, 35, 10, 17, null, 5, 8, 5],
-		 *			'types' => ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']
+		 *			'types' => ['number', 'string', 'integer', 'date', 'datetime', ...]
 		 * 		],
 		 * 		'row' => [ // according to xslxwriter implementation
 		 * 			'height' => 40,
@@ -924,16 +924,28 @@ class UTILITY {
 			'header' => [],
 			'row' => []
 		];
-		// default to string to avoid weird number formatting
+
 		$headerformat = [];
-		if ($headers) $headerformat = array_combine($headers, array_map(Fn($v) => 'string', $headers));
+		// apply option header types and general setting for header if applicable
 		if (isset($options['header'])){
 			// assuming that all headers of subsets are the same
 			if (isset($options['header']['types'])) $headerformat = $options['header']['types'];
 			unset ($options['header']['types']);
 			$settings['header'] = $options['header'];
 		}
+		// setup of header type or fill up with empty resolving to xlsxwriters *general* type
+		if ($headers) {
+			if (!$headerformat) $headerformat = array_combine($headers, array_map(Fn($v) => '', $headers));
+			else {
+				for($i = 0; $i < count($headers); $i++){
+					if (!isset($headerformat[$i])) $headerformat[$i] = '';
+				}
+			}
+		}
+
+		// apply general row settings if applicable
 		if (isset($options['row'])) $settings['row'] = $options['row'];
+
 
 		foreach ($data as $subsetname => $subset){
 			// datalist may contain multiple subsets based on split setting
@@ -943,11 +955,11 @@ class UTILITY {
 				$subsetname = $options['file']['name'];
 			}
 
-			if ($headers) $writer->writeSheetHeader($subsetname, array_combine($headers, $headerformat, $settings['header']));
+			if ($headers) $writer->writeSheetHeader($subsetname, array_combine($headers, $headerformat), $settings['header']);
 			else {
-				// no header defined, make first line header defining default to string to avoid weird number formatting
+				// no header defined, make first line header defining default to empty resolving to xlsxwriters *general* type
 				$firstline = $subset[0];
-				$format = (count($headerformat) === count($firstline)) ? $headerformat : array_map(Fn($v) => 'string', $firstline);
+				$format = (count($headerformat) === count($firstline)) ? $headerformat : array_map(Fn($v) => '', $firstline);
 				$writer->writeSheetHeader($subsetname, array_combine(array_keys($firstline), $format), isset($settings['header']) ? $settings['header'] : null);
 			}
 			foreach ($subset as $line)
