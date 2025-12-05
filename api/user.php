@@ -165,7 +165,7 @@ class USER extends API {
 					if (!$value || $value === '0') unset($user[':app_settings'][$key]);
 				}
 				$settings = $user[':app_settings'];
-				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
+				$user[':app_settings'] = $user[':app_settings'] ? UTILITY::json_encode($user[':app_settings']) : null;
 
 				// update user
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
@@ -232,7 +232,7 @@ class USER extends API {
 				else $primary_casestates[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 
 				// gather current skills
-				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				$user['skills'] = explode(',', $user['skills'] ? : '');
 				$skillmatrix = '';
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
@@ -676,7 +676,7 @@ class USER extends API {
 				foreach ($user[':app_settings'] as $key => $value){
 					if (!$value) unset($user[':app_settings'][$key]);
 				}
-				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
+				$user[':app_settings'] = $user[':app_settings'] ? UTILITY::json_encode($user[':app_settings']) : null;
 
 				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
@@ -687,7 +687,7 @@ class USER extends API {
 						}
 					}
 				}
-				$user[':skills'] = implode(',', $user[':skills']);
+				$user[':skills'] = $user[':skills'] ? implode(',', $user[':skills']) : null;
 
 				// generate order auth
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
