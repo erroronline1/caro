@@ -13,8 +13,6 @@ namespace CARO\API;
 
 // audit overview and export
 require_once('./_pdf.php');
-require_once("../libraries/XLSXWriter.php");
-require_once("../libraries/XLSXWriter_BuffererWriter.php");
 require_once('./_calendarutility.php');
 
 class AUDIT extends API {
