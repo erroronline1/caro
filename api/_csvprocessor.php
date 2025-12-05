@@ -205,6 +205,9 @@ class Listprocessor {
 	 * @return string|float|int result of arithmetic operation or imploded string
 	 */
 	public function calculate($expression = []){
+		// early return without decimal conversion e.g. for formulas
+		if (count($expression) < 2) return implode('', $expression);
+
 		$expression = str_replace(',', '.', implode('', $expression));
 		if (preg_match($this->_delimiter . '^[0-9\+\-\*\/\(\)\.]+$' . $this->_delimiter, $expression)) {
 			return round(eval('return ' . $expression . ';'));
