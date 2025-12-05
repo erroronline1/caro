@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
-* csv-filter xlswriter sheet options available (landscape, sheet title, etc.), consider wrapper class?
 * define affiliations beside unit (e.g. admin)
     * does mess up caselists otherwise
     * still should be considered for calendar?

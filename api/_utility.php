@@ -901,6 +901,7 @@ class UTILITY {
 		 * ]
 		 */
 		if (!$data) return null;
+		$options['file']['name'] = $filename; 
 		$tmpfiles = [];
 		// determine if data is a set of subsets
 		// else make it one with int key
@@ -975,6 +976,7 @@ class UTILITY {
 			}
 			foreach ($subset as $line)
 				$writer->writeSheetRow($subsetname, $line, $settings['row']);
+			$writer->finalizeSheet($subsetname, $header = (isset($options['file']['name']) ? $options['file']['name'] . ' - ' : '') . $subsetname . ' - '.  date('Y-m-d'));
 		}
 		$writer->writeToFile($tmp_name);
 		return $tmp_name;
@@ -1904,10 +1906,11 @@ class XLSXWrapper extends \XLSXWriter{
 	private $orientation = 'landscape';
 	public function __construct($orientation = 'landscape'){
 		parent::__construct();
+		
 		$this->orientation = $orientation;
 	}
 	// customized override
-    protected function finalizeSheet($sheet_name)
+    public function finalizeSheet($sheet_name, $header = '&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A', $footer = '- &amp;P -')
     {
         if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized)
             return;
@@ -1934,8 +1937,8 @@ class XLSXWrapper extends \XLSXWriter{
         $sheet->file_writer->write(    '<pageMargins left="0.5" right="0.5" top="1.0" bottom="1.0" header="0.5" footer="0.5"/>');
         $sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="' . $this->orientation . '" pageOrder="downThenOver" paperSize="1" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
         $sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
-        $sheet->file_writer->write(        '<oddHeader>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A</oddHeader>');
-        $sheet->file_writer->write(        '<oddFooter>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12Page &amp;P</oddFooter>');
+        $sheet->file_writer->write(        '<oddHeader>' . $header . '</oddHeader>');
+        $sheet->file_writer->write(        '<oddFooter>' . $footer . '</oddFooter>');
         $sheet->file_writer->write(    '</headerFooter>');
         $sheet->file_writer->write('</worksheet>');
 
@@ -1946,7 +1949,6 @@ class XLSXWrapper extends \XLSXWriter{
         $sheet->file_writer->close();
         $sheet->finalized=true;
     }
-
 }
 
 ?>
