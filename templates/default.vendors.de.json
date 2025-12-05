@@ -6695,6 +6695,29 @@
 		}
 	},
 	{
+		"name": "TTS Technisches Textil Stüben",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Riecklinger Weg 30, 21368 Dahlenburg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Uniprox GmbH & Co. KG",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
