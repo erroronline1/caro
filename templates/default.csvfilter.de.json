@@ -13,7 +13,7 @@
 			"modify": {
 				"add": {
 					"Anzahl": "",
-					"Abwertung": "IF(DATEDIF(INDIRECT(\"H\"&ROW()),TODAY(),\"y\")>4,100,DATEDIF(INDIRECT(\"H\"&ROW()),TODAY(),\"y\")*10)&\" %\""
+					"Abwertung": "=IF(DATEDIF(INDIRECT(\"H\"&ROW()),TODAY(),\"y\")>4,100,DATEDIF(INDIRECT(\"H\"&ROW()),TODAY(),\"y\")*10)&\" %\""
 				}
 			},
 			"split": {
