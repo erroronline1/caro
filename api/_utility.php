@@ -217,7 +217,7 @@ class UTILITY {
 		else $tmpfiles[] = self::csv_write($data, $headers, $options);
 
 		foreach($tmpfiles as &$path){
-			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), true);
+			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), false);
 		}
 		return $tmpfiles;
 	}
@@ -925,13 +925,11 @@ class UTILITY {
 			'row' => []
 		];
 		// default to string to avoid weird number formatting
-		if ($headers) $header = array_combine($headers, array_map(Fn($v) => 'string', $headers));
-
-		// required that all headers of subsets are the same
-		if (isset($options['header'])) {
-			if (isset($options['header']['types'])){
-				$header = array_combine($headers, $options['header']['types']);
-			}
+		$headerformat = [];
+		if ($headers) $headerformat = array_combine($headers, array_map(Fn($v) => 'string', $headers));
+		if (isset($options['header'])){
+			// assuming that all headers of subsets are the same
+			if (isset($options['header']['types'])) $headerformat = $options['header']['types'];
 			unset ($options['header']['types']);
 			$settings['header'] = $options['header'];
 		}
@@ -945,12 +943,12 @@ class UTILITY {
 				$subsetname = $options['file']['name'];
 			}
 
-			if ($headers) $writer->writeSheetHeader($subsetname, $header, $settings['header']);
+			if ($headers) $writer->writeSheetHeader($subsetname, array_combine($headers, $headerformat, $settings['header']));
 			else {
 				// no header defined, make first line header defining default to string to avoid weird number formatting
 				$firstline = $subset[0];
-				$header = array_combine(array_keys($firstline), array_map(Fn($v) => 'string', $firstline));
-				$writer->writeSheetHeader($subsetname, $header, isset($settings['header']) ? $settings['header'] : null);
+				$format = (count($headerformat) === count($firstline)) ? $headerformat : array_map(Fn($v) => 'string', $firstline);
+				$writer->writeSheetHeader($subsetname, array_combine(array_keys($firstline), $format), isset($settings['header']) ? $settings['header'] : null);
 			}
 			foreach ($subset as $line)
 				$writer->writeSheetRow($subsetname, $line, $settings['row']);
