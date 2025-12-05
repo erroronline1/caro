@@ -117,6 +117,7 @@ class CSVFILTER extends API {
 					case 'xlsx':
 						$downloadfiles = [];
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
+						// some reasonable defaults
 						$format = [
 							'file' => [
 								'author' => $_SESSION['user']['name']
@@ -125,8 +126,7 @@ class CSVFILTER extends API {
 								'font-size' => 8,
 							],
 							'row' => [ // according to xslxwriter implementation
-								//'height' => 40,
-								//'wrap_text' => true,
+								'wrap_text' => true,
 								'font-size' => 8,
 								'halign' => 'left',
 								'valign' => 'top'
