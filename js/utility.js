@@ -637,7 +637,16 @@ export const _client = {
 					type: "button",
 					attributes: {
 						value: api._lang.GET("order.stock_filter"),
+						class: "inlinebutton",
 						onclick: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "stock", "' + data.state + '")',
+					},
+				});
+				content[content.length - 1].push({
+					type: "button",
+					attributes: {
+						value: api._lang.GET("order.stock_filter_none"),
+						class: "inlinebutton",
+						onclick: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "stock_none", "' + data.state + '")',
 					},
 				});
 			}
@@ -646,6 +655,7 @@ export const _client = {
 					type: "button",
 					attributes: {
 						value: api._lang.GET("order.export"),
+						class: "inlinebutton",
 						onclick: 'api.purchase("get", "export", document.getElementById("productsearch").value || "null", "null", "' + data.state + '")',
 					},
 				});

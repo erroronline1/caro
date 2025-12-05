@@ -1456,6 +1456,7 @@
 		"saved": "Approved order can now be processed by the purchase department.",
 		"saved_to_prepared": "Order has been saved to prepared orders but has still to be approved.",
 		"stock_filter": "Display stock items only",
+		"stock_filter_none": "Display no stock items",
 		"table_info": "Information",
 		"table_order": "Order",
 		"tile_view_groupby": "Group by",

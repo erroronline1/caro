@@ -492,8 +492,9 @@ class ORDER extends API {
 						$product = $products[$decoded_order_data['productid']];
 					}
 
-					if ($this->_subMethod === 'stock' &&
-						!isset($product['stock_item'])
+					if (
+						($this->_subMethod === 'stock' && !isset($product['stock_item']))
+						|| ($this->_subMethod === 'stock_none' && isset($product['stock_item']))
 					) continue;
 
 					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)

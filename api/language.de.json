@@ -1456,6 +1456,7 @@
 		"saved": "Die freigegebene Bestellung kann nun vom Einkauf bearbeitet werden.",
 		"saved_to_prepared": "Die Bestellung wurde zu den vorbereiteten Bestellungen hinzugefügt, muss aber noch freigegeben werden.",
 		"stock_filter": "Nur Lagerware anzeigen",
+		"stock_filter_none": "Keine Lagerware anzeigen",
 		"table_info": "Hinweise",
 		"table_order": "Bestellung",
 		"tile_view_groupby": "Gruppieren nach",
