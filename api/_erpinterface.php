@@ -1126,17 +1126,30 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
 					WHERE 
 					(
-						(strg_n.BEZEICHNUNG LIKE 'Zentrallager' OR
-						strg_n.BEZEICHNUNG LIKE 'Gießraum' OR
-						strg_n.BEZEICHNUNG LIKE 'Bandagisten' OR
-						strg_n.BEZEICHNUNG LIKE 'Prothetik' OR
-						strg_n.BEZEICHNUNG LIKE 'Orthetik' OR
-						strg_n.BEZEICHNUNG LIKE 'Armorthetik und -prothetik' OR
-						strg_n.BEZEICHNUNG LIKE 'Dysmelie' OR
-						strg_n.BEZEICHNUNG LIKE 'Kunststoffabteilung' OR
-						strg_n.BEZEICHNUNG LIKE 'Silikonabteilung'
+						(
+							strg_n.BEZEICHNUNG LIKE 'Zentrallager' OR
+							strg_n.BEZEICHNUNG LIKE 'Gießraum' OR
+							strg_n.BEZEICHNUNG LIKE 'Bandagisten' OR
+							strg_n.BEZEICHNUNG LIKE 'Prothetik' OR
+							strg_n.BEZEICHNUNG LIKE 'Orthetik' OR
+							strg_n.BEZEICHNUNG LIKE 'Armorthetik und -prothetik' OR
+							strg_n.BEZEICHNUNG LIKE 'Dysmelie' OR
+							strg_n.BEZEICHNUNG LIKE 'Kunststoffabteilung' OR
+							strg_n.BEZEICHNUNG LIKE 'Silikonabteilung'
 						)
-					AND strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null' AND strg.LAGER_REFERENZ IS NOT NULL
+						AND (
+							(
+								strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null' AND strg.LAGER_REFERENZ IS NOT NULL
+							) OR (
+								strg.LAGER_MINDESTBESTAND > 0
+							) 
+						)
+					) OR
+					(
+						strg_n.BEZEICHNUNG LIKE 'Ambulan%' OR
+						strg_n.BEZEICHNUNG LIKE 'Kopfklinik%' OR
+						strg_n.BEZEICHNUNG LIKE 'B1%' OR
+						strg_n.BEZEICHNUNG LIKE 'OP%'
 					)
 				) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
 				INNER JOIN (
@@ -1221,12 +1234,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		LEFT JOIN (
 			SELECT
 				ARTIKEL_REFERENZ,
-				(CASE WHEN LAGERORT IS NULL THEN 'Konsignationslager' ELSE LAGERORT END) AS LAGERORT
+				(CASE WHEN LAGERORT IS NULL AND LAGER_MINDESTBESTAND = 0 THEN 'Konsignationslager' ELSE LAGERORT END) AS LAGERORT
 			FROM [eva3_02_viva_souh].[dbo].[wws_lagerbestand] AS strg
 			INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
 			WHERE 
 			(strg_n.BEZEICHNUNG LIKE 'Zentrallager' AND strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null')
 			OR strg_n.BEZEICHNUNG LIKE 'Konsignations%'
+			OR strg.LAGER_MINDESTBESTAND > 0
 		) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
 		LEFT JOIN (
 			SELECT 
