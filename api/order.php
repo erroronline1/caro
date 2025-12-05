@@ -389,11 +389,11 @@ class ORDER extends API {
 					// reduce properties to necessities regarding memory load
 					$products[$product['id']]= [
 						'id' => $product['id'],
-						'stock_item' =>$product['stock_item'],
-						'erp_id' =>$product['erp_id'],
-						'last_order' =>$product['last_order'],
-						'special_attention' =>$product['special_attention'],
-						'thirdparty_order' =>$product['thirdparty_order'],
+						'stock_item' => $product['stock_item'],
+						'erp_id' => $product['erp_id'],
+						'last_order' => $product['last_order'],
+						'special_attention' => $product['special_attention'],
+						'thirdparty_order' => $product['thirdparty_order'],
 						'incorporated' => json_decode($product['incorporated'] ? : '', true)
 					];
 
@@ -773,10 +773,10 @@ class ORDER extends API {
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 		// gather product information on stock item flag
-		$stock_items = $erp_ids = [];
+		$stock_items = $erp_ids = []; 
 		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			if ($product['stock_item']) $stock_items[trim($product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'])] = true;
-			if ($product['erp_id']) $erp_ids[$product['erp_id']] = trim($product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']);
+			if ($product['stock_item']) $stock_items[$product['id']] = true;
+			if ($product['erp_id']) $erp_ids[$product['id']] =$product['erp_id'];
 		}
 		$data = [];
 		$item = 1;
@@ -786,8 +786,7 @@ class ORDER extends API {
 			
 			$decoded_order_data = json_decode($row['order_data'], true);
 
-			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])
-				&& !isset($stock_items[trim($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'])])
+			if (!isset($decoded_order_data['productid']) || (isset($decoded_order_data['productid']) && !isset($stock_items[$decoded_order_data['productid']]))
 			){
 				continue;
 			}
@@ -797,8 +796,8 @@ class ORDER extends API {
 			else $orderer = $this->_lang->GET('general.deleted_user');
 
 			$erp_id = null;
-			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])){
-				$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
+			if (isset($decoded_order_data['productid']) && isset($stock_items[$decoded_order_data['productid']])){
+				$erp_id = $erp_ids[$decoded_order_data['productid']];
 			}
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
 				':quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
