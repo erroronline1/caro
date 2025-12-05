@@ -946,13 +946,24 @@ class UTILITY {
 		// apply general row settings if applicable
 		if (isset($options['row'])) $settings['row'] = $options['row'];
 
-
+		ksort($data);
+		$subsetnames = [];
 		foreach ($data as $subsetname => $subset){
 			// datalist may contain multiple subsets based on split setting
 			// this application names these, if subsetname is int there is only one subset
 			// write each to xlsx sheet
 			if (intval($subsetname) && isset($options['file']) && isset($options['file']['name'])) {
 				$subsetname = $options['file']['name'];
+			}
+			else {
+				// possible enumeration of subsetnames for excel nags about same names case insensitive
+				$enumeration = '';
+				if (isset($subsetnames[strtolower($subsetname)])) {
+					$enumeration = '(' . $subsetnames[strtolower($subsetname)]++ . ')';
+					
+				}
+				else $subsetnames[strtolower($subsetname)] = 2;
+				$subsetname = $enumeration . $subsetname;
 			}
 
 			if ($headers) $writer->writeSheetHeader($subsetname, array_combine($headers, $headerformat), $settings['header']);
