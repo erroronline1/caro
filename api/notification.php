@@ -1022,7 +1022,10 @@ class NOTIFICATION extends API {
 			if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
 				|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 				// rise counter for unit member
-				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units'] ? : ''), $_SESSION['user']['units'])) $number++;
+				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(
+					array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
+					$_SESSION['user']['units']
+				)) $number++;
 			}
 		}
 		return $number;
@@ -1081,7 +1084,7 @@ class NOTIFICATION extends API {
 		$number = 0;
 		// find all users within current users units
 		foreach ($users as $user){
-			if (array_intersect($_SESSION['user']['units'], explode(',', $user['units'] ? : ''))) $unitusers[] = $user['id'];
+			if (array_intersect(array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) $unitusers[] = $user['id'];
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 			'replacements' => [
@@ -1142,7 +1145,7 @@ class NOTIFICATION extends API {
 		$uncompleted = 0;
 		foreach ($events as $row){
 			if (!$row['organizational_unit']) continue; 
-			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'worklists' && !$row['closed']) $uncompleted++;
+			if (array_intersect(array_filter(explode(',', $row['organizational_unit'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']) && $row['type'] === 'worklists' && !$row['closed']) $uncompleted++;
 		}
 		return $uncompleted;
 	}

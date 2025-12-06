@@ -32,9 +32,7 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
-* define affiliations beside unit (e.g. admin)
-    * does mess up caselists otherwise
-    * still should be considered for calendar?
+* check where else to array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])
 
 ## Content
 * [Aims](#aims)

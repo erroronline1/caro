@@ -25,8 +25,9 @@ Append if additional custom modules require specific permissions. `permissions` 
 Organizational units.
 
 First item (common) is hardcoded and used as default for texttemplates assignments and possibly other select options, admin and office are hardcoded as well.
-Once defined keys remain in the database, so it should be appended at best! `units` order is passed to application. On appending the sourcecode should be reviewed, e.g.
+Once defined keys remain in the database, so it should be appended at best! `units` order is passed to application. On appending, the sourcecode should be reviewed, e.g.
 * notification.php for excluding messaging all users of `common, admin and office` on open records and `common and admin` on expiring trainings
+* unit intersections should exclude admin to reduce amount of case documentations and scheduled trainings
 
 ### skills
 Can be adjusted during runtime, extend or reduce to appropriate length.

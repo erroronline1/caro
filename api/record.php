@@ -1657,7 +1657,7 @@ class RECORD extends API {
 
 				// filter results by selected unit
 				if (!$this->_requestedID && (
-					(!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units']))
+					(!$this->_unit && !array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
 					|| ($this->_unit === '_unassigned' && $record['units'])
 					|| ($this->_unit && $this->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_unit, $record['units'])))
 				)) continue;
