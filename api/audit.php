@@ -2239,8 +2239,8 @@ class AUDIT extends API {
 			'productname_label' => $this->_lang->GET('order.productname_label'),
 			'additional_info' => $this->_lang->GET('order.additional_info'),
 			'ordered' => $this->_lang->GET('order.order.ordered'),
-			'partially_received' => $this->_lang->GET('order.order.partially_received'),
-			'received' => $this->_lang->GET('order.order.received'),
+			'delivered_partially' => $this->_lang->GET('order.order.delivered_partially'),
+			'delivered_full' => $this->_lang->GET('order.order.delivered_full'),
 			'deliverytime' => $this->_lang->GET('audit.orderstatistics.delivery_time_column')
 		];
 
@@ -2249,10 +2249,10 @@ class AUDIT extends API {
 		foreach ($orders as $order){
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
-			if ($order['received']){
+			if ($order['delivered_full']){
 				$ordered = $order['ordered'] ? new \DateTime($order['ordered']) : '-';
-				$received = $order['received'] ? new \DateTime($order['received']) : '-';
-				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
+				$delivered_full = $order['delivered_full'] ? new \DateTime($order['delivered_full']) : '-';
+				$deliverytime = ($order['ordered'] && $order['delivered_full']) ? intval($ordered->diff($delivered_full)->format('%a')) : '-';
 			}
 
 			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = $this->_lang->GET('audit.orderstatistics.undefined_vendor');
@@ -2267,8 +2267,8 @@ class AUDIT extends API {
 				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
 				$this->convertFromServerTime($order['ordered']),
-				$this->convertFromServerTime($order['partially_received']),
-				$this->convertFromServerTime($order['received']),
+				$this->convertFromServerTime($order['delivered_partially']),
+				$this->convertFromServerTime($order['delivered_full']),
 				$deliverytime
 			];
 		}

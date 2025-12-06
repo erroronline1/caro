@@ -1021,11 +1021,11 @@ Sometimes purchase knows better about favourable terms. If an ordering user does
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin, personal access token or signature, based on [configuration settings](#runtime-variables).
 
-Approved orders can be marked as *ordered*, *partially received*, *received*, *partially delivered*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.  
+Approved orders can be marked as *ordered*, *partially delivered*, *filly delivered*, *partially issued*, *fully issued* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet delivered items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.  
 If purchase is allowed to order something similar there will be a reminder to update the order for the correct product if necessary, to not mess up the system im terms of incorporation, sample checks or traceability. 
 
 Information can be added anytime.  
-Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.  
+Processed but not yet delivered orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Delivered products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as delivered simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.  
 A reason for return must be provided. Critical return reasons alert incorporation authorized users and append an incorporation review.  
 All actions offer to append a message.  
 A label can be created directly from the commission field to support allocation of products during internal delivery.
@@ -1072,7 +1072,6 @@ graph TD;
     select_similar==>productdb[(product database)]
     incorporate_similar==>|no|insert_data[insert data];
     insert_data==>productdb;
-    productdb==>checksdb[(checks database)];
     regulatory==>sample_check[sample check];
     sample_check==>productdb;
 
@@ -1095,8 +1094,7 @@ graph TD;
     order_type==>|return|auto_delete;
     order_type==>|service|auto_delete;
     order_type==>|cancellation|order_deleted(order deleted)
-    mark==>|received|auto_delete;
-    mark==>|delivered|auto_delete;
+    mark==>|issued|auto_delete;
     mark==>|archived|delete[delete manually];
     auto_delete==>order_deleted;
     
@@ -1180,7 +1178,7 @@ The 'cron job' initiates automated message alerts and scheduled tasks (see below
 * alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
-* alert_unreceived_orders
+* alert_undelivered_orders
 * delete_files_and_calendar
 * schedule_archived_orders_review
 * schedule_outdated_consumables_documents_review
@@ -1200,8 +1198,8 @@ The application handles some automated reminders and schedules
 * expired responsibilites trigger a message to plan anew
 * unclosed records trigger a message to proceed or close
 * new orders trigger a message to process
-* unreceived orders trigger a message to ask the vendor about estimated delivery
-* received but not delivered orders trigger a message to ask procurement to deliver or mark as delivered
+* undelivered orders trigger a message to ask the vendor about estimated delivery
+* delivered but not issued orders trigger a message to ask procurement to, or mark as issued
 * trainings will be scheduled for evaluation
 * expiring trainings will be scheduled for re-training
 * expired vendor documents will be scheduled for renewal
@@ -1671,8 +1669,8 @@ are set if a given value is provided and not already present within the CARO-App
 ### Updates on order data
 Order data updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_orderdata] value. If data is generally available the application presents an identification-code within orders, that has to be appended to the order text for a future matching of order processing dates. The update inserts respective dates to the database columns
 * ordered
-* partially_received
-* received
+* delivered_partially
+* delivered_full
 
 if provided and not already present within the CARO-App database.
 
@@ -2058,10 +2056,10 @@ calendar[autodelete] = 365 ; DAYS after compleded calendar entries are deleted i
 files[sharepoint] = 48 ; HOURS, after these files will be deleted
 files[tmp] = 24 ; HOURS, after these files will be deleted
 
-order[autodelete] = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-order[undelivered] = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
-order[unreceived] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for regular orders
-service[unreceived] = 21 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for service or warranty cases
+order[autodelete] = 182 ; DAYS, after these orders marked as issued but not archived will be deleted
+order[unissued] = 3 ; DAYS, after these unit members will be reminded to mark as issued or enquire delivery
+order[undelivered] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for regular orders
+service[undelivered] = 21 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for service or warranty cases
 
 product[documents] = 365 ; DAYS, after the last provision of a file a reminder will be made to verify or update the currency
 product[mdr14_sample_interval] = 93 ; default DAYS until a new sample check is required as default value
@@ -4604,11 +4602,11 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {search} | path parameter | optional | true, false |
 | {null} | path parameter | optional but necessary by use of {state} |  |
-| {state} | path parameter | optional | ordered, received, delivered, archived |
+| {state} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
 
 Sample response
 ```
-{"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"partially_received":{"data-partially_received":"false"},"received":{"data-received":"false"},"partially_delivered":{"data-partially_delivered":"false"},....
+{"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"delivered_partially":{"data-delivered_partially":"false"},"delivered_full":{"data-delivered_full":"false"},"issued_partially":{"data-issued_partially":"false"},....
 ```
 
 > PATCH ./api/api.php/order/approved/{ids}/{update}/{state}
@@ -4619,11 +4617,11 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {ids} | path parameter | required | order item database id (int) or _-concatenated for bulk update |
-| {update} | path parameter | required | ordered, received, delivered, archived, addinformation, disapproved, cancellation, return |
+| {update} | path parameter | required | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, addinformation, disapproved, cancellation, return |
 | {state} | path parameter | optional | true, false |
 | payload | form data | optional | messages |
 
-* *ordered*, *received*, *delivered*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
+* *ordered*, *delivered_partially*, *delivered_full*, *issued_partially*, *issued_full*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
 * *addinformation* appends payload to order info, alerts ordering unit on matching special words (order state changes)
 * *disapproved* transfers to prepared orders, payload message to ordering unit
 * *cancellation*, *return* convert to unprocessed order setting the respective database flag
@@ -4642,7 +4640,7 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {search} | path parameter | optional | true, false |
 | {null} | path parameter | optional but necessary by use of {state} |  |
-| {state} | path parameter | optional | ordered, received, delivered, archived |
+| {state} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
 
 Sample response
 ```

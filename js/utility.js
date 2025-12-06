@@ -1,10 +1,10 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -253,17 +253,17 @@ export const _client = {
 
 		/**
 		 * closes a dialog if triggered from within on any child node events as this
-		 * @param {event} event 
+		 * @param {event} event
 		 */
-		closeParentDialog:(element) => {
+		closeParentDialog: (element) => {
 			do {
-				if (element.localName === 'dialog'){
+				if (element.localName === "dialog") {
 					element.close();
 					element.remove();
 					return;
 				}
 				element = element.parentNode;
-			} while (element && element.localname !== 'html'); 
+			} while (element && element.localname !== "html");
 		},
 
 		/**
@@ -607,10 +607,10 @@ export const _client = {
 			// construct filter checkboxes with events
 			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value)' };
 			filter[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "ordered")' };
-			filter[api._lang.GET("order.order.partially_received")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "partially_received")' };
-			filter[api._lang.GET("order.order.received")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "received")' };
-			filter[api._lang.GET("order.order.partially_delivered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "partially_delivered")' };
-			filter[api._lang.GET("order.order.delivered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered")' };
+			filter[api._lang.GET("order.order.delivered_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered_partially")' };
+			filter[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered_full")' };
+			filter[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "issued_partially")' };
+			filter[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "issued_full")' };
 			filter[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "archived")' };
 			filter[api._lang.GET("order.order." + data.state)].checked = true;
 
@@ -672,14 +672,17 @@ export const _client = {
 						})) {
 							groupby[api._lang.GET("order." + lang)] = api._settings.session.orderTilesGroupBy === key ? { selected: true, value: key } : { value: key };
 						}
-						content[content.length - 1].push({
-							type: "select",
-							attributes: {
-								name: api._lang.GET("order.tile_view_groupby"),
-								onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
-							},
-							content: groupby,
-						});
+						content[content.length - 1].push(
+							{ type: "br" },
+							{
+								type: "select",
+								attributes: {
+									name: api._lang.GET("order.tile_view_groupby"),
+									onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
+								},
+								content: groupby,
+							}
+						);
 
 						content.push(..._client.order.table(data));
 						break;
@@ -691,14 +694,17 @@ export const _client = {
 						})) {
 							groupby[api._lang.GET("order." + lang)] = api._settings.session.orderTilesGroupBy === key ? { selected: true, value: key } : { value: key };
 						}
-						content[content.length - 1].push({
-							type: "select",
-							attributes: {
-								name: api._lang.GET("order.tile_view_groupby"),
-								onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
-							},
-							content: groupby,
-						});
+						content[content.length - 1].push(
+							{ type: "br" },
+							{
+								type: "select",
+								attributes: {
+									name: api._lang.GET("order.tile_view_groupby"),
+									onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
+								},
+								content: groupby,
+							}
+						);
 
 						content.push(..._client.order.tiles(data));
 						break;
@@ -781,14 +787,14 @@ export const _client = {
 
 				// append thirdparty_order information
 				if (element.thirdparty_order)
-				collapsible.push({
-					type: "textsection",
-					attributes: {
-						name: api._lang.GET("consumables.product.thirdparty_order"),
-						class: "orange",
-					},
-				});
-			
+					collapsible.push({
+						type: "textsection",
+						attributes: {
+							name: api._lang.GET("consumables.product.thirdparty_order"),
+							class: "orange",
+						},
+					});
+
 				// append commission
 				if (element.commission) {
 					buttons = {};
@@ -856,7 +862,7 @@ export const _client = {
 							name: api._lang.GET("order.administrative_mark"),
 							readonly: true,
 							class: "imagealigned",
-							onclick: "_client.application.toClipboard(this)"
+							onclick: "_client.application.toClipboard(this)",
 						},
 						hint: api._lang.GET("order.copy_value"),
 					});
@@ -917,7 +923,7 @@ export const _client = {
 							},
 						];
 						for (const [label, setting] of Object.entries(api._settings.config.label)) {
-							// receival date is not passed to label because it is not possible to determine if the label is for partial or remaining deliveries
+							// delivery date is not passed to label because it is not possible to determine if the label is for partial or remaining deliveries
 							labels.push({
 								type: "button",
 								attributes: {
@@ -1172,14 +1178,14 @@ export const _client = {
 						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('patch', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				// conditional customizing
-				if (states[api._lang.GET("order.order.partially_received")] && !states[api._lang.GET("order.order.partially_received")].disabled) {
+				if (states[api._lang.GET("order.order.delivered_partially")] && !states[api._lang.GET("order.order.delivered_partially")].disabled) {
 					buttons = {};
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
 					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-					states[api._lang.GET("order.order.partially_received")].onchange = function () {
-						api.purchase("patch", "approved", "element.id", "partially_received", this.checked);
-						this.setAttribute("data-partially_received", this.checked.toString());
+					states[api._lang.GET("order.order.delivered_partially")].onchange = function () {
+						api.purchase("patch", "approved", "element.id", "delivered_partially", this.checked);
+						this.setAttribute("data-delivered_partially", this.checked.toString());
 						if (this.checked)
 							new _client.Dialog(
 								{
@@ -1382,15 +1388,15 @@ export const _client = {
 				}
 
 				// append calendar button
-				if (element.calendar){
+				if (element.calendar) {
 					collapsible.push({
 						type: "calendarbutton",
-						attributes:{
+						attributes: {
 							value: api._lang.GET("order.calendarbutton"),
-							onclick:element.calendar
+							onclick: element.calendar,
 						},
-						hint: api._lang.GET("order.calendarbutton_hint")
-					})
+						hint: api._lang.GET("order.calendarbutton_hint"),
+					});
 				}
 
 				// append delete button
@@ -1677,7 +1683,7 @@ export const _client = {
 					type: "button",
 					attributes: {
 						value: api._lang.GET("order.tile_view_open"),
-						class:"inlinebutton",
+						class: "inlinebutton",
 						onclick: function () {
 							new _client.Dialog({
 								type: "input",
@@ -1704,12 +1710,13 @@ export const _client = {
 					if (["order"].includes(element.ordertype) && element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
 					if (["order"].includes(element.ordertype) && element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
 					if (element.addproduct) tileinfo.push(api._lang.GET("order.product_not_in_database"));
-					order.push({
-						type: "textsection",
-						attributes: {
-							name: tileinfo.join(", "),
-						},
-					});
+					if (tileinfo.length)
+						order.push({
+							type: "textsection",
+							attributes: {
+								name: tileinfo.join(", "),
+							},
+						});
 				}
 
 				tile = {
@@ -1732,13 +1739,13 @@ export const _client = {
 				if (!data.allowedstateupdates.isArray && Object.keys(data.allowedstateupdates).length) data.allowedstateupdates = Object.values(data.allowedstateupdates);
 
 				// order of options
-				const possiblestates = ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'];
+				const possiblestates = ["ordered", "delivered_partially", "delivered_full", "issued_partially", "issued_full", "archived"];
 				// remove possible states
-				for (let i=0;i<possiblestates.length; i++){
+				for (let i = 0; i < possiblestates.length; i++) {
 					if (data.state === "unprocessed" || data.state === possiblestates[i]) break;
 					if (data.state !== possiblestates[i]) delete possiblestates[i];
 				}
-				for (const input of possiblestates.filter(value => data.allowedstateupdates.includes(value))) {
+				for (const input of possiblestates.filter((value) => data.allowedstateupdates.includes(value))) {
 					inputs[api._lang.GET("order.order." + input)] = { value: input, onchange: "_client.order.batchStateUpdate(this)" };
 					if (input === data.state) inputs[api._lang.GET("order.order." + input)].checked = true;
 				}

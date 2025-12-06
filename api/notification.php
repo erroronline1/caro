@@ -246,12 +246,12 @@ class NOTIFICATION extends API {
 
 								$states = [
 									'ordered',
-									'partially_received',
-									'received'
+									'delivered_partially',
+									'delivered_full'
 								];
 
 								foreach ($orders as $order){
-									if ($order['ordered'] && $order['received']) continue;
+									if ($order['ordered'] && $order['delivered_full']) continue;
 									
 									if ($identifiers = array_filter($erpdata, fn($o) => isset($o['identifier']) ? $o['identifier'] === UTILITY::identifier(' ', $order['approved']) : false)){ // identifier matched unless $erpdata ist an empty [[]]-array
 
@@ -466,11 +466,11 @@ class NOTIFICATION extends API {
 							}
 							$execution = true;
 							break;
-						case 'alert_unreceived_orders':
-							// alert requesting unreceived orders or marking received as delivered
+						case 'alert_undelivered_orders':
+							// alert requesting undelivered orders or marking delivered as issued
 							$alerts = [];
-							$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived_undelivered');
-							foreach ($undelivered as $order){
+							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
+							foreach ($unissued as $order){
 								$update = false;
 								$decoded_order_data = null;
 
@@ -480,18 +480,18 @@ class NOTIFICATION extends API {
 								$ordered = new \DateTime($order['ordered'] ? : '');
 								switch($order['ordertype']){
 									case "service":
-										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['unreceived']));
+										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['undelivered']));
 										break;
 									default:
-										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
+										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
 										break;
 								}
-								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
-								if ($order['ordered'] && $order['notified_received'] < $receive_interval){
+								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
+								if ($order['ordered'] && $order['delivered_notified'] < $receive_interval){
 									$decoded_order_data = json_decode($order['order_data'], true);
 									$this->alertUserGroup(
 										['permission' => ['purchase']],
-										$this->_lang->GET('order.alert_unreceived_order', [
+										$this->_lang->GET('order.alert_undelivered_order', [
 											':days' => $ordered->diff($this->_date['servertime'])->days,
 											':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 											':quantity' => $decoded_order_data['quantity_label'],
@@ -504,36 +504,36 @@ class NOTIFICATION extends API {
 										], true)
 									);
 									$update = true;
-								} else $receive_interval = $order['notified_received'];
+								} else $receive_interval = $order['delivered_notified'];
 
-								// alert unit members to mark as received for orders and items returned from service
-								// return or cancellation don't matter as these are not received
-								$received = new \DateTime($order['received'] ? : '');
-								$delivery_interval = intval(abs($received->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
-								if ($order['received'] && in_array($order['ordertype'], ['order', 'service']) && $order['notified_delivered'] < $delivery_interval){
+								// alert unit members to mark as issued for orders and items returned from service
+								// return or cancellation don't matter as these are not delivered
+								$delivered_full = new \DateTime($order['delivered_full'] ? : '');
+								$delivery_interval = intval(abs($delivered_full->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unissued']));
+								if ($order['delivered_full'] && in_array($order['ordertype'], ['order', 'service']) && $order['issued_notified'] < $delivery_interval){
 									if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 									$this->alertUserGroup(
 										['unit' => [$order['organizational_unit']]],
-										$this->_lang->GET('order.alert_undelivered_order', [
-											':days' => $received->diff($this->_date['servertime'])->days,
-											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'null\', \'received\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
+										$this->_lang->GET('order.alert_unissued_order', [
+											':days' => $delivered_full->diff($this->_date['servertime'])->days,
+											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'null\', \'delivered_full\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 											':quantity' => $decoded_order_data['quantity_label'],
 											':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
 											':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
 											':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
 											':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
 											':commission' => $decoded_order_data['commission'],
-											':receival' => $this->convertFromServerTime($order['received'], true)
+											':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
 										], true)
 									);
 									$update = true;
-								} else $delivery_interval = $order['notified_delivered'];
+								} else $delivery_interval = $order['issued_notified'];
 
 								// prepare alert flags
 								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
 									[
-										':notified_received' => $receive_interval ? : 'NULL',
-										':notified_delivered' => $delivery_interval ? : 'NULL',
+										':delivered_notified' => $receive_interval ? : 'NULL',
+										':issued_notified' => $delivery_interval ? : 'NULL',
 										':id' => $order['id']
 									]) . '; ');
 

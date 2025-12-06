@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_10_12'] as $update){
+		foreach (['_2025_12_06'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -287,6 +287,31 @@ class UPDATE{
 				"    ALTER TABLE caro_consumables_products" .
 				"    ADD thirdparty_order tinyint NULL DEFAULT NULL" .
 				" END; ",
+			]
+		];
+	}
+
+	private function _2025_12_06(){
+		return [
+			'mysql' => [
+				"ALTER TABLE `caro_consumables_approved_orders` CHANGE `partially_received` `delivered_partially` DATETIME NULL DEFAULT NULL, " .
+				"CHANGE `received` `delivered_full` DATETIME NULL DEFAULT NULL, " .
+				"CHANGE `partially_delivered` `issued_partially` DATETIME NULL DEFAULT NULL, " .
+				"CHANGE `delivered` `issued_full` DATETIME NULL DEFAULT NULL, " .
+				"CHANGE `notified_received` `delivered_notified` INT(11) NULL DEFAULT NULL, " .
+				"CHANGE `notified_delivered` `issued_notified` INT(11) NULL DEFAULT NULL; ",
+				"ALTER TABLE `caro_consumables_order_statistics` CHANGE `partially_received` `delivered_partially` DATETIME NULL DEFAULT NULL, " .
+				"CHANGE `received` `delivered_full` DATETIME NULL DEFAULT NULL; "
+			],
+			'sqlsrv' => [
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.partially_received', 'delivered_partially', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.received', 'delivered_full', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.partially_delivered', 'issued_partially', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.delivered', 'issued_full', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.notified_received', 'delivered_notified', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.notified_delivered', 'issued_notified', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_order_statistics.partially_received', 'delivered_partially', 'COLUMN';",
+				"EXEC sp_rename 'car.dbo.caro_consumables_order_statistics.received', 'delivered_full', 'COLUMN';",
 			]
 		];
 	}

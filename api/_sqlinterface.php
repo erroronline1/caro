@@ -747,8 +747,8 @@ class SQLQUERY {
 
 		// on duplicate key update / merging does not make sense for approved orders, for entries are micro-updated anyway
 		'order_post_approved_order' => [
-			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, ordertype, delivered_notified, issued_notified) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, ordertype, delivered_notified, issued_notified) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
 		],
 		'order_put_approved_order_state' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id IN (:id)",
@@ -759,20 +759,20 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
 		],
 		'order_put_approved_order_cancellation' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, delivered_partially = NULL, delivered_full = NULL, issued_partially = NULL, issued_full = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, delivered_partially = NULL, delivered_full = NULL, issued_partially = NULL, issued_full = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 		'order_notified' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET delivered_notified = :delivered_notified, issued_notified = :issued_notified WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET delivered_notified = :delivered_notified, issued_notified = :issued_notified WHERE id = :id"
 		],
 		'order_get_approved_order_by_ids' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)"
 		],
-		'order_get_approved_order_by_delivered' => [ // preselection for safe deletion
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < :date_time AND archived IS NULL",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
+		'order_get_approved_order_by_issued' => [ // preselection for safe deletion
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full < :date_time AND archived IS NULL",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
 		'order_get_approved_order_by_substr' => [ // CASE SENSITIVE JUST TO BE SURE, compares order data to detect reused attachments in case of deletion
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
@@ -794,9 +794,9 @@ class SQLQUERY {
 			'mysql' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 			'sqlsrv' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 		],
-		'order_get_approved_unreceived_undelivered' => [ // for system message reminders
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
+		'order_get_approved_undelivered_unissued' => [ // for system message reminders
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (delivered_full IS NULL OR issued_full IS NULL)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (delivered_full IS NULL OR issued_full IS NULL)",
 		],
 		'order_get_approved_archived' => [ // for system message reminders
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
@@ -811,14 +811,14 @@ class SQLQUERY {
 
 		// kudos https://stackoverflow.com/a/30660857/6087758
 		'order_post_order_statistics' => [
-			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, partially_received, received, ordertype) " .
-						"VALUES (:order_id, :order_data, :ordered, :partially_received, :received, :ordertype) " .
-						"ON DUPLICATE KEY UPDATE order_data = :order_data, partially_received = :partially_received, received = :received, ordertype = :ordertype",
+			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) " .
+						"VALUES (:order_id, :order_data, :ordered, :delivered_partially, :delivered_full, :ordertype) " .
+						"ON DUPLICATE KEY UPDATE order_data = :order_data, delivered_partially = :delivered_partially, delivered_full = :delivered_full, ordertype = :ordertype",
 			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :partially_received, 120) AS partially_received, CONVERT(SMALLDATETIME, :received, 120) AS received, :ordertype AS ordertype) AS source " .
-						"(order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id) " .
-						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype " .
-						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype);"
+						"(SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :delivered_partially, 120) AS delivered_partially, CONVERT(SMALLDATETIME, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
+						"(order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) ON (target.order_id = source.order_id) " .
+						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, delivered_partially = CONVERT(SMALLDATETIME, :delivered_partially, 120), delivered_full = CONVERT(SMALLDATETIME, :delivered_full, 120), ordertype = :ordertype " .
+						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :delivered_partially, 120), CONVERT(SMALLDATETIME, :delivered_full, 120), :ordertype);"
 													// ^^^^^^^^ insert id here as opposed to other merged queries because most other tables have id as auto increment, but this is primary only	
 		],
 		'order_get_order_statistics' => [

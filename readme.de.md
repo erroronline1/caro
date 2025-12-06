@@ -974,8 +974,6 @@ graph TD;
     datenbank")]
     incorporate_similar==>|nein|insert_data[Daten anfügen];
     insert_data==>productdb;
-    productdb==>checksdb[("Prüfungs-
-    datenbank")];
     regulatory==>sample_check[Stichprobenprüfung];
     sample_check==>productdb;
 
@@ -1001,8 +999,7 @@ graph TD;
     order_type==>|Rücksendung|auto_delete;
     order_type==>|Service|auto_delete;
     order_type==>|Storno|order_deleted(Bestellung gelöscht)
-    mark==>|erhalten|auto_delete;
-    mark==>|ausgeliefert|auto_delete;
+    mark==>|ausgehändigt|auto_delete;
     mark==>|archiviert|delete[manuelle Löschung];
     auto_delete==>order_deleted;
     
@@ -1087,7 +1084,7 @@ Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Au
 * alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
-* alert_unreceived_orders
+* alert_undelivered_orders
 * delete_files_and_calendar
 * schedule_archived_orders_review
 * schedule_outdated_consumables_documents_review
@@ -1577,8 +1574,8 @@ eingetragen, sofern ein Wert übermittelt und nicht bereits in den CARO-App-Aufz
 ### Aktualisierung der Bestelldaten
 Die Aktualisierung von Bestelldaten geschieht wärend des [CRON-Jobs](#cron). Der Interval kann innerhalb der Konfigurationsdatei mit dem Wert für CONFIG[system][cron][erp_interface_orderdata] bestimmt werden. Sofern Daten grundsätzlich verfübar sind zeigt die Anwendung bei freigegebenen Bestellungen einen Identifikations-Code an, welcher dem Bestelltext beigefügt werden soll um einen späteren Abgleich der Bestelldaten zu ermöglichen. Die Aktualisierung trägt die entsprechenden Daten in die Datenbank-Spalten
 * ordered
-* partially_received
-* received
+* delivered_partially
+* delivered_full
 
 ein, sofern ein Wert übermittelt und nicht bereits in der CARO-App-Datenbank vorhanden ist.
 
@@ -1964,10 +1961,10 @@ calendar[autodelete] = 365 ; Tage nach denen abgeschlossene Kalendereinträge ge
 files[sharepoint] = 48 ; Stunden, nach denen Dateien gelöscht werden
 files[tmp] = 24 ; Stunden nach denen Dateien gelöscht werden
 
-order[autodelete] = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
-order[undelivered] = 3 ; Tage nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
-order[unreceived] = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für gewöhnliche Bestellungen
-service[unreceived] = 21 ; TAGE, nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für Service und Garantiefälle
+order[autodelete] = 182 ; Tage nach denen ausgelieferte Bestellungen die nicht archiviert sind gelöscht werden
+order[unissued] = 3 ; Tage nach denen Bereiche daran erinnert werden Auslieferungen zu markieren oder sich nach dem Sachstand zu erkundigen
+order[undelivered] = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für gewöhnliche Bestellungen
+service[undelivered] = 21 ; TAGE, nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für Service und Garantiefälle
 
 product[documents] = 365 ; Tage nach der letzten Bereitstellung einer Datei, nach denen eine Erinnerung zur Verifizierung oder Erneuerung der Aktualität erstellt wird
 product[mdr14_sample_interval] = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist

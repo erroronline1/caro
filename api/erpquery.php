@@ -268,7 +268,7 @@ class ERPQUERY extends API {
 								':ordered' => $order['ordered'] ? $this->convertFromServerTime($order['ordered']) : '?',
 								':vendor' => $order['vendor'],
 								':amount' => $order['amount'],
-								':received' => $order['received'] ? $this->convertFromServerTime($order['received']) : '?'
+								':delivered_full' => $order['delivered_full'] ? $this->convertFromServerTime($order['delivered_full']) : '?'
 							]
 						)] = ['href' => "javascript: api.purchase('get', 'order'); api.purchase('get', 'productsearch', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order')"];
 					}

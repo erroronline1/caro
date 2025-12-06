@@ -93,14 +93,14 @@ define('DEFAULTSQL', [
 				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`approved` datetime NOT NULL," .
 				"	`ordered` datetime NULL DEFAULT NULL," .
-				"	`partially_received` datetime NULL DEFAULT NULL," .
-				"	`received` datetime NULL DEFAULT NULL," .
-				"	`partially_delivered` datetime NULL DEFAULT NULL," .
-				"	`delivered` datetime NULL DEFAULT NULL," .
+				"	`delivered_partially` datetime NULL DEFAULT NULL," .
+				"	`delivered_full` datetime NULL DEFAULT NULL," .
+				"	`issued_partially` datetime NULL DEFAULT NULL," .
+				"	`issued_full` datetime NULL DEFAULT NULL," .
 				"	`archived` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`notified_received` int NULL DEFAULT NULL," .
-				"	`notified_delivered` int NULL DEFAULT NULL," .
+				"	`delivered_notified` int NULL DEFAULT NULL," .
+				"	`issued_notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -108,8 +108,8 @@ define('DEFAULTSQL', [
 				"	`order_id` int NOT NULL," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`ordered` datetime NULL DEFAULT NULL," .
-				"	`partially_received` datetime NULL DEFAULT NULL," .
-				"	`received` datetime NULL DEFAULT NULL," .
+				"	`delivered_partially` datetime NULL DEFAULT NULL," .
+				"	`delivered_full` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`order_id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -401,14 +401,14 @@ define('DEFAULTSQL', [
 				"	approval varchar(MAX) NOT NULL," .
 				"	approved smalldatetime NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
-				"	partially_received smalldatetime NULL DEFAULT NULL," .
-				"	received smalldatetime NULL DEFAULT NULL," .
-				"	partially_delivered smalldatetime NULL DEFAULT NULL," .
-				"	delivered smalldatetime NULL DEFAULT NULL," .
+				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
+				"	delivered_full smalldatetime NULL DEFAULT NULL," .
+				"	issued_partially smalldatetime NULL DEFAULT NULL," .
+				"	issued_full smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(255) NOT NULL," .
-				"	notified_received int NULL DEFAULT NULL," .
-				"	notified_delivered int NULL DEFAULT NULL" .
+				"	delivered_notified int NULL DEFAULT NULL," .
+				"	issued_notified int NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
@@ -417,8 +417,8 @@ define('DEFAULTSQL', [
 				"	order_id int NOT NULL," .
 				"	order_data varchar(MAX) NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
-				"	partially_received smalldatetime NULL DEFAULT NULL," .
-				"	received smalldatetime NULL DEFAULT NULL," .
+				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
+				"	delivered_full smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(255) NOT NULL" .
 				");"
 				.
