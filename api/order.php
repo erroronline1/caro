@@ -52,10 +52,10 @@ class ORDER extends API {
 				if (!$orders) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 
 				foreach($orders as $order) {
-					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), ['common', $_SESSION['user']['units']]))) $this->response([], 401);
 
 					// set order process states
-					if (in_array($this->_subMethod, ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'])){
+					if (in_array($this->_subMethod, ['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'])){
 						switch ($this->_subMethod){
 							case 'ordered':
 								if ($order['ordertype'] === 'cancellation'){
@@ -79,19 +79,28 @@ class ORDER extends API {
 									continue 2;
 								}
 								elseif ($order['ordertype'] === 'return') {
-									// ordered aka processed return orders are received immediately
+									// ordered aka processed return orders are delivered and issued immediately
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										'values' => [
 											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 										],
 										'replacements' => [
 											':id' => $this->_requestedID,
-											':field' => 'received'
+											':field' => 'delivered_full'
+										]
+									]);
+									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
+										'values' => [
+											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
+										],
+										'replacements' => [
+											':id' => $this->_requestedID,
+											':field' => 'issued_full'
 										]
 									]);
 								}
 								break;
-							case 'delivered':
+							case 'issued_full':
 								// sets last order date for next overview
 								$decoded_order_data = json_decode($order['order_data'], true);
 								if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'])){
@@ -265,8 +274,8 @@ class ORDER extends API {
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered_full', [], true) . ': ' . $order['delivered_full'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 
 								// determine criticality of return reason
@@ -350,8 +359,8 @@ class ORDER extends API {
 				}
 				break;
 			case 'GET':
-				// delete old received unarchived orders
-				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_delivered', [
+				// delete old delivered unarchived orders
+				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_issued', [
 					'values' => [
 						':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
 					]
@@ -373,7 +382,8 @@ class ORDER extends API {
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
-								
+				$units[] = 'common'; // add common by default
+
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
@@ -479,7 +489,7 @@ class ORDER extends API {
 					if ($this->_subMethodState){
 						if (!$row[$this->_subMethodState]) continue;
 						// skip whatever has the next logical steps already set
-						foreach (array_reverse(['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived']) as $s){
+						foreach (array_reverse(['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived']) as $s){
 							if ($this->_subMethodState !== $s && $row[$s]) continue 2;
 							if ($this->_subMethodState === $s) break;
 						}
@@ -527,11 +537,11 @@ class ORDER extends API {
 						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))]) : null,
 						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
-						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || $unit_intersection)) ? $statechange : [],
+						'orderstatechange' => ($row['ordered'] && !$row['delivered_full'] && !$row['issued_full'] && ($permission['orderaddinfo'] || $unit_intersection)) ? $statechange : [],
 						'state' => [],
-						'disapprove' => (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])),
-						'cancel' => $permission['regularuser'] && ($row['ordered'] && !($row['received'] || $row['delivered']) && ($permission['ordercancel'] || $unit_intersection)),
-						'return' => (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || $unit_intersection)),
+						'disapprove' => (!($row['ordered'] || $row['delivered_full'] || $row['issued_full']) && in_array($row['ordertype'], ['order', 'service'])),
+						'cancel' => $permission['regularuser'] && ($row['ordered'] && !($row['delivered_full'] || $row['issued_full']) && ($permission['ordercancel'] || $unit_intersection)),
+						'return' => (($row['delivered_full'] || $row['issued_full']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || $unit_intersection)),
 						'attachments' => [],
 						'delete' => $permission['regularuser'] && ($permission['ordercancel'] || $unit_intersection),
 						'autodelete' => null,
@@ -543,7 +553,7 @@ class ORDER extends API {
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
 						'identifier' => $erp_interface_available && $permission['orderprocessing'] ? UTILITY::identifier(' ', $row['approved']) : null,
-						'calendar' => $row['received'] ? $calendar->dialog([
+						'calendar' => $row['delivered_full'] ? $calendar->dialog([
 							':type' => 'tasks',
 							':subject' => (UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '') . ' ' .
 										(UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '') . ' ' .
@@ -578,7 +588,7 @@ class ORDER extends API {
 					}
 
 					// append order processing states
-					foreach (['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'] as $s){
+					foreach (['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'] as $s){
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
@@ -586,7 +596,7 @@ class ORDER extends API {
 						}
 						switch ($s){
 							case 'ordered':
-								if (!$row['received'] && $data['aut_idem']){
+								if (!$row['delivered_full'] && $data['aut_idem']){
 									$data['state'][$s]['onchange'] =
 										"new _client.Dialog({type:'confirm', header:'" . 
 										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer']['name'], ':product' => $data['name']]) .
@@ -596,27 +606,27 @@ class ORDER extends API {
 										"else {this.checked = false; return}" .
 										"});";
 								}
-							case 'received':
+							case 'delivered_full':
 								if (!$permission['orderprocessing']){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
-							case 'partially_received':
-								if ($row['received'] || !$permission['orderprocessing']){
+							case 'delivered_partially':
+								if ($row['delivered_full'] || !$permission['orderprocessing']){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
-							case 'partially_delivered':
-								if ($row['delivered'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
+							case 'issued_partially':
+								if ($row['issued_full'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
-							case 'delivered':
-								if ($row['received']){
-									$delete = new \DateTime($row['received']);
+							case 'issued_full':
+								if ($row['delivered_full']){
+									$delete = new \DateTime($row['delivered_full']);
 									$delete->modify('+ ' . CONFIG['lifespan']['order']['autodelete'] . 'days');
 									$data['autodelete'] = $this->_lang->GET('order.autodelete', [':date' => $this->convertFromServerTime($delete->format('Y-m-d')), ':unit' => $this->_lang->_USER['units'][$data['organizationalunit']]]);
 								}
@@ -1691,7 +1701,7 @@ class ORDER extends API {
 
 	/**
 	 * post or put to order statistics once an order is processed
-	 * reduces order data and updates received state by copying relevant date from approved order by id to statistics table
+	 * reduces order data and updates delivery state by copying relevant date from approved order by id to statistics table
 	 * @param int $order_id primary database key
 	 * 
 	 * this is a cross-module method this class may be instatiated for
@@ -1729,8 +1739,8 @@ class ORDER extends API {
 				':ordertype' => $order['ordertype']
 			],
 			'replacements' => [
-				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
-				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
+				':delivered_partially' => $order['delivered_partially'] ? : ($order['delivered_partially'] ? : 'NULL'),
+				':delivered_full' => $order['delivered_full'] ? : ($order['issued_full'] ? : 'NULL'),
 			]
 		]);
 	}
