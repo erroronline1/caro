@@ -917,9 +917,7 @@ class UTILITY {
 	private static function xlsx_write($data, $headers = [], $options = []){
 
 		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
-		$writer = new XLSXWrapper(
-			$orientation = isset($options['file']) && isset($options['file']['orientation']) ? $options['file']['orientation'] : 'landscape'
-		);
+		$writer = new XLSXWrapper();
 		if (isset($options['file']) && isset($options['file']['author'])) $writer->setAuthor($options['file']['author']);
 		$settings = [
 			'header' => [],
@@ -976,7 +974,7 @@ class UTILITY {
 			}
 			foreach ($subset as $line)
 				$writer->writeSheetRow($subsetname, $line, $settings['row']);
-			$writer->finalizeSheet($subsetname, $header = (isset($options['file']['name']) ? $options['file']['name'] . ' - ' : '') . $subsetname . ' - '.  date('Y-m-d'));
+			$writer->finalizeSheet($subsetname, ['orientation' => 'landscape', 'header' => (isset($options['file']['name']) ? $options['file']['name'] . ' - ' : '') . $subsetname . ' - '.  date('Y-m-d')]);
 		}
 		$writer->writeToFile($tmp_name);
 		return $tmp_name;
@@ -1903,52 +1901,71 @@ class BLOCKCHAIN {
 require_once("../libraries/XLSXWriter.php");
 require_once("../libraries/XLSXWriter_BuffererWriter.php");
 class XLSXWrapper extends \XLSXWriter{
-	private $orientation = 'landscape';
-	public function __construct($orientation = 'landscape'){
+	public function __construct(){
 		parent::__construct();
-		
-		$this->orientation = $orientation;
 	}
+
 	// customized override
-    public function finalizeSheet($sheet_name, $header = '&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A', $footer = '- &amp;P -')
-    {
-        if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized)
-            return;
+	public function finalizeSheet($sheet_name, $options = [])
+	{
+		if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized)
+			return;
 
-        $sheet = &$this->sheets[$sheet_name];
+		$default_options = [
+			'orientation' => 'portrait',
+			'header' => '&amp;C&amp;A',
+			'footer' => '- &amp;P -',
+			'paperSize' => '1',
+			'margins' => [
+				'left' => '0.5',
+				'right' => '0.5',
+				'top' => '1',
+				'bottom' => '1',
+				'header' => '0.5',
+				'footer' => '0.5',
+			],
+			'printOptions' => [
+				'headings' => 'false',
+				'gridLines' => 'false'
+			]
 
-        $sheet->file_writer->write(    '</sheetData>');
+		];
+		$options = array_merge($default_options, $options);
 
-        if (!empty($sheet->merge_cells)) {
-            $sheet->file_writer->write(    '<mergeCells>');
-            foreach ($sheet->merge_cells as $range) {
-                $sheet->file_writer->write(        '<mergeCell ref="' . $range . '"/>');
-            }
-            $sheet->file_writer->write(    '</mergeCells>');
-        }
+		$sheet = &$this->sheets[$sheet_name];
 
-        $max_cell = self::xlsCell($sheet->row_count - 1, count($sheet->columns) - 1);
+		$sheet->file_writer->write(    '</sheetData>');
 
-        if ($sheet->auto_filter) {
-            $sheet->file_writer->write(    '<autoFilter ref="A1:' . $max_cell . '"/>');
-        }
+		if (!empty($sheet->merge_cells)) {
+			$sheet->file_writer->write(    '<mergeCells>');
+			foreach ($sheet->merge_cells as $range) {
+				$sheet->file_writer->write(        '<mergeCell ref="' . $range . '"/>');
+			}
+			$sheet->file_writer->write(    '</mergeCells>');
+		}
 
-        $sheet->file_writer->write(    '<printOptions headings="false" gridLines="false" gridLinesSet="true" horizontalCentered="false" verticalCentered="false"/>');
-        $sheet->file_writer->write(    '<pageMargins left="0.5" right="0.5" top="1.0" bottom="1.0" header="0.5" footer="0.5"/>');
-        $sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="' . $this->orientation . '" pageOrder="downThenOver" paperSize="1" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
-        $sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
-        $sheet->file_writer->write(        '<oddHeader>' . $header . '</oddHeader>');
-        $sheet->file_writer->write(        '<oddFooter>' . $footer . '</oddFooter>');
-        $sheet->file_writer->write(    '</headerFooter>');
-        $sheet->file_writer->write('</worksheet>');
+		$max_cell = self::xlsCell($sheet->row_count - 1, count($sheet->columns) - 1);
 
-        $max_cell_tag = '<dimension ref="A1:' . $max_cell . '"/>';
-        $padding_length = $sheet->max_cell_tag_end - $sheet->max_cell_tag_start - strlen($max_cell_tag);
-        $sheet->file_writer->fseek($sheet->max_cell_tag_start);
-        $sheet->file_writer->write($max_cell_tag.str_repeat(" ", $padding_length));
-        $sheet->file_writer->close();
-        $sheet->finalized=true;
-    }
+		if ($sheet->auto_filter) {
+			$sheet->file_writer->write(    '<autoFilter ref="A1:' . $max_cell . '"/>');
+		}
+
+		$sheet->file_writer->write(    '<printOptions headings="' . $options['printOptions']['headings']. '" gridLines="' . $options['printOptions']['gridLines']. '" gridLinesSet="true" horizontalCentered="false" verticalCentered="false"/>');
+		$sheet->file_writer->write(    '<pageMargins left="' . $options['margins']['left']. '" right="' . $options['margins']['right']. '" top="' . $options['margins']['top']. '" bottom="' . $options['margins']['bottom']. '" header="' . $options['margins']['header']. '" footer="' . $options['margins']['footer']. '"/>');
+		$sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="' . $options['orientation'] . '" pageOrder="downThenOver" paperSize="' . $options['paperSize'] . '" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
+		$sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
+		$sheet->file_writer->write(        '<oddHeader>' . $options['header'] . '</oddHeader>');
+		$sheet->file_writer->write(        '<oddFooter>' . $options['footer'] . '</oddFooter>');
+		$sheet->file_writer->write(    '</headerFooter>');
+		$sheet->file_writer->write('</worksheet>');
+
+		$max_cell_tag = '<dimension ref="A1:' . $max_cell . '"/>';
+		$padding_length = $sheet->max_cell_tag_end - $sheet->max_cell_tag_start - strlen($max_cell_tag);
+		$sheet->file_writer->fseek($sheet->max_cell_tag_start);
+		$sheet->file_writer->write($max_cell_tag.str_repeat(" ", $padding_length));
+		$sheet->file_writer->close();
+		$sheet->finalized=true;
+	}
 }
 
 ?>
