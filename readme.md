@@ -6321,7 +6321,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).
-    * v5.1.2
+    * v5.1.3
     * \> 11k stars
     * \> 2k forks
     * [MIT license](https://github.com/szimek/signature_pad?tab=MIT-1-ov-file)
