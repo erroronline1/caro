@@ -260,25 +260,25 @@ class NOTIFICATION extends API {
 										$articles = array_filter($identifiers, fn($o) => 
 											$o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
 											(
-												$o['article_no'] === $order['order_data']['ordernumber_label'] || // either article number matches
-												(!$order['order_data']['ordernumber_label'] && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
+												(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
+												(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
 											)
 										);
 
 										if ($articles && count($articles) === 1){
-
+											$article = $articles[array_key_first($articles)];
 											foreach ($states as $state){
-												if ($order[$state] === null && $articles[0][$state]){
+												if ($order[$state] === null && $article[$state]){
 													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
 														[
 															':id' => $order['id'],
 															':field' => $state,
-															':date' => $this->_pdo->quote($articles[0][$state])
+															':date' => $this->_pdo->quote($article[$state])
 														]) . '; ');
 												}
 											}
-											if ($articles[0]['order_reference'] && !isset($order['order_data']['order_reference'])) {
-												$order['order_data']['order_reference'] = $articles[0]['order_reference'];
+											if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
+												$order['order_data']['order_reference'] = $article['order_reference'];
 													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_addinformation'),
 														[
 															':id' => $order['id'],
@@ -487,7 +487,7 @@ class NOTIFICATION extends API {
 										break;
 								}
 								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
-								if ($order['ordered'] && $order['delivered_notified'] < $receive_interval){
+								if ($order['ordered'] && !$order['issued_full'] && $order['delivered_notified'] < $receive_interval){
 									$decoded_order_data = json_decode($order['order_data'], true);
 									$this->alertUserGroup(
 										['permission' => ['purchase']],
@@ -1114,7 +1114,8 @@ class NOTIFICATION extends API {
 		$today->setTime(0, 0);
 
 		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
-		$alerts = $calendar->alert($today->format('Y-m-d'));
+		// $alerts = $calendar->alert($today->format('Y-m-d'));
+		$alerts = $calendar->alert(); // given date not supported anymore?
 		foreach ($alerts as $event){
 			// alert current events including workmates pto if alert is set
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')], $this->_lang->GET('calendar.tasks.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
