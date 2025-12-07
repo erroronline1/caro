@@ -1913,8 +1913,8 @@ class XLSXWrapper extends \XLSXWriter{
 
 		$default_options = [
 			'orientation' => 'portrait',
-			'header' => '&amp;C&amp;A',
-			'footer' => '- &amp;P -',
+			'header' => '&C&A',
+			'footer' => '- &P -',
 			'paperSize' => '1',
 			'margins' => [
 				'left' => '0.5',
@@ -1954,8 +1954,8 @@ class XLSXWrapper extends \XLSXWriter{
 		$sheet->file_writer->write(    '<pageMargins left="' . $options['margins']['left']. '" right="' . $options['margins']['right']. '" top="' . $options['margins']['top']. '" bottom="' . $options['margins']['bottom']. '" header="' . $options['margins']['header']. '" footer="' . $options['margins']['footer']. '"/>');
 		$sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="' . $options['orientation'] . '" pageOrder="downThenOver" paperSize="' . $options['paperSize'] . '" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
 		$sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
-		$sheet->file_writer->write(        '<oddHeader>' . $options['header'] . '</oddHeader>');
-		$sheet->file_writer->write(        '<oddFooter>' . $options['footer'] . '</oddFooter>');
+		$sheet->file_writer->write(        '<oddHeader>' . self::xmlspecialchars($options['header']) . '</oddHeader>');
+		$sheet->file_writer->write(        '<oddFooter>' . self::xmlspecialchars($options['footer']) . '</oddFooter>');
 		$sheet->file_writer->write(    '</headerFooter>');
 		$sheet->file_writer->write('</worksheet>');
 

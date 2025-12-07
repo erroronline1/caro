@@ -776,12 +776,15 @@ class CALENDARUTILITY {
 							case 'tasks':
 							case 'worklists':
 								if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
-									if (!$row['closed'])
-									$numbers++;
+									if (!$row['closed']) $numbers++;
 								break;
 							case 'timesheet':
-								if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']]))
-								$numbers++;
+								if ($row['type'] === $type && (
+									PERMISSION::permissionFor('calendarfulltimesheetexport')
+									|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))
+									|| $row['affected_user'] === $_SESSION['user']['id']
+								))
+									$numbers++;
 								break;
 						}
 					}
