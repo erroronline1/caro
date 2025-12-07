@@ -1581,6 +1581,7 @@ class RECORD extends API {
 					// append option to close record
 					if ($content['record_type'] === 'complaint' && PERMISSION::permissionFor('complaintclosing')){
 						foreach (PERMISSION::pending('complaintclosing', $content['closed']) as $position){
+							if (!array_intersect(['admin', $position], $_SESSION['user']['permissions'])) continue;
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
@@ -1592,6 +1593,7 @@ class RECORD extends API {
 					}
 					elseif (!$content['closed'] && PERMISSION::permissionFor('recordsclosing')) {
 						foreach (PERMISSION::pending('recordsclosing', $content['closed']) as $position){
+							if (!array_intersect(['admin', $position], $_SESSION['user']['permissions'])) continue;
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".

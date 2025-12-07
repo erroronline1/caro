@@ -215,6 +215,7 @@ class DOCUMENT extends API {
 
 					// get remaining approval options
 					foreach (PERMISSION::pending('documentapproval', $approve['approval']) as $position){
+						if (array_intersect(['admin', $position], $_SESSION['user']['permissions'])) continue;
 						$approvalposition[$this->_lang->GET('permissions.' . $position)] = [];
 					}
 
