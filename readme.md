@@ -33,6 +33,7 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * check where else to array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])
+* messages to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
 
 ## Content
 * [Aims](#aims)
