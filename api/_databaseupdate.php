@@ -304,14 +304,14 @@ class UPDATE{
 				"CHANGE `received` `delivered_full` DATETIME NULL DEFAULT NULL; "
 			],
 			'sqlsrv' => [
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.partially_received', 'delivered_partially', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.received', 'delivered_full', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.partially_delivered', 'issued_partially', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.delivered', 'issued_full', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.notified_received', 'delivered_notified', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_approved_orders.notified_delivered', 'issued_notified', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_order_statistics.partially_received', 'delivered_partially', 'COLUMN';",
-				"EXEC sp_rename 'car.dbo.caro_consumables_order_statistics.received', 'delivered_full', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.partially_received', 'delivered_partially', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.received', 'delivered_full', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.partially_delivered', 'issued_partially', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.delivered', 'issued_full', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.notified_received', 'delivered_notified', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.notified_delivered', 'issued_notified', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_order_statistics.partially_received', 'delivered_partially', 'COLUMN';",
+				"EXEC sp_rename 'caro.dbo.caro_consumables_order_statistics.received', 'delivered_full', 'COLUMN';",
 			]
 		];
 	}
