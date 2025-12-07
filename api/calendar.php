@@ -1538,13 +1538,11 @@ class CALENDAR extends API {
 		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
 			$due = new \DateTime($row['span_end']);
-			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
-			$row['organizational_unit'] = explode(',', $row['organizational_unit']);
 			if ($row['type'] !== 'timesheet'
 				|| !($row['affected_user_id'] === $_SESSION['user']['id']
 				|| PERMISSION::permissionFor('calendarfulltimesheetexport')
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
-				&& array_intersect($row['organizational_unit'], $_SESSION['user']['units']))
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
+				&& in_array($row['affected_user_units'], $_SESSION['user']['units']))
 			)) continue; // skip what is no matter to you
 
 			// replace deleted user names
@@ -1588,7 +1586,7 @@ class CALENDAR extends API {
 			// completion can only be done by authorized and supervisors of affected user unit
 			if (!(PERMISSION::permissionFor('calendarfullaccess')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
-				&& array_intersect($row['organizational_unit'], $_SESSION['user']['units']))))
+				&& in_array($row['affected_user_units'], $_SESSION['user']['units']))))
 				$completed[$this->_lang->GET('calendar.timesheet.approve')]['disabled'] = true;
 			
 			// create closed info
