@@ -554,7 +554,7 @@ class NOTIFICATION extends API {
 							// delete messages for users with enabled autodeletion
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							foreach($users as $user){
-								$user['app_settings'] = json_decode($user['app_settings'], true);
+								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 								if (isset($user['app_settings']['autodeleteMessages'])){
 									$prior_date = clone $this->_date['servertime'];
 									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
