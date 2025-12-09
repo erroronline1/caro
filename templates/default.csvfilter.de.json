@@ -3,7 +3,7 @@
 		"name": "Inventurlisten nach Bereichen",
 		"content": {
 			"useCase": "Für die Aktualisierung der Bereichslager-Bestandslisten wird zunächst der Artikelstamm exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
-			"postProcessing": "Die Spalte mit der Formel am Ende muss jeweils blattweise in das Standard-Format gesetzt und mit einem = am Anfang aktiviert werden, anschließend blattweise ausdrucken, ggf. Ausrichtung anpassen.",
+			"postProcessing": "Blattweise ausdrucken, ggf. Ausrichtung anpassen.",
 			"filesetting": {
 				"source": "EVA-Artikelstamm Lagerware....CSV",
 				"headerrow": 1,
@@ -22,7 +22,7 @@
 			"xslxformat": {
 				"header": {
 					"font-size": 8,
-					"widths": [7, 12, 20, 35, 10, 17, null, 5, 8, 5],
+					"widths": [7, 12, 20, 45, 10, 17, 0.1, 5, 8, 5],
 					"types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", ""]
 				},
 				"row": {
