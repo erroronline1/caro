@@ -52,7 +52,7 @@ class ORDER extends API {
 				if (!$orders) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 
 				foreach($orders as $order) {
-					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), ['common', $_SESSION['user']['units']]))) $this->response([], 401);
+					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), ['common', ...$_SESSION['user']['units']]))) $this->response([], 401);
 
 					// set order process states
 					if (in_array($this->_subMethod, ['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'])){
@@ -619,7 +619,7 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'issued_partially':
-								if ($row['issued_full'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
+								if ($row['issued_full'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $units) || $orderer['name'] === $_SESSION['user']['name'])){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -657,10 +657,10 @@ class ORDER extends API {
 								$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.neccessary_by_user');
 							}
 						}
-						elseif (isset($product['incorporated']['_denied'])) {
+						elseif (isset($product['incorporated'][count($product['incorporated']) - 1]['_denied'])) {
 							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
 						}
-						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
+						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'][count($product['incorporated']) - 1])) {
 							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
 						}						
 					}
@@ -754,7 +754,7 @@ class ORDER extends API {
 	 *  | -_|_'_| . | . |  _|  _|
 	 *  |___|_,_|  _|___|_| |_|
 	 *          |_|
-	 * export a printable list from approved orders
+	 * export a printable list from approved orders of stock items
 	 */
 	public function export(){
 		require_once('./_pdf.php');
