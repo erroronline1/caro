@@ -1458,7 +1458,7 @@ export const _client = {
 									api._lang.GET("consumables.product.edit_product_request"),
 									"purchasemembers",
 									api._lang
-										.GET("order.edit_product_request_message", {
+										.GET("consumables.product.edit_product_request_message", {
 											":number": "element.ordernumber",
 											":name": "element.name",
 											":vendor": "element.vendor",
@@ -1806,7 +1806,7 @@ export const _client = {
 						document.getElementById("_selectedfile").value = this.value;
 					},
 				};
-				if (path.endsWith(".stl")) {
+				if (["stl", "STL", "obj", "OBJ"].some(extension => path.endsWith(extension))) {
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",
@@ -1819,6 +1819,7 @@ export const _client = {
 							},
 							options: previewoptions,
 						}).then((response) => {
+							console.log(response);
 							if (!response) {
 								this.checked = false;
 								document.getElementById("_selectedfile").value = "";
@@ -1828,7 +1829,7 @@ export const _client = {
 						.toString()
 						._replaceArray(["filename", "stlpath", "stlurl", "previewoptions"], [filename[filename.length - 1], path, url, JSON.stringify(previewoptions)]);
 				}
-				if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) {
+				if (["png", "PNG", "jpg", "JPG", "jpeg", "JPEG", "gif", "GIF"].some(extension => path.endsWith(extension))) {
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",
