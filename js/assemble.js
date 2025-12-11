@@ -736,6 +736,10 @@ export class Dialog {
 									if (empty) result = false;
 									break;
 								default:
+									// transfer previews for file references have no inputs to read from
+									// a confirmation just has to return the selected file
+									if (this.render && this.render.transfer) return this.render.name;
+
 									result = dialogForm2Obj(this.dialog);
 									// check for empty object
 									for (const prop in result) {
@@ -926,7 +930,10 @@ export class Dialog {
 			this.previewElements.canvas = div;
 
 			if (this.render.transfer) {
-				return [div, ...this.confirm()];
+				const hidden = document.createElement("input");
+				hidden.hidden = true;
+				hidden.value=this.render.name;
+				return [div, hidden, ...this.confirm()];
 			} else {
 				a.href = this.render.url;
 				a.download = this.render.name || this.render.url;
@@ -2207,6 +2214,7 @@ export class Assemble {
 			new Dialog({
 				type: "input",
 				header: api._lang.GET("file.file_filter_label"),
+				id: "_fileselectionDialog",
 				render: [
 					[
 						{
@@ -2398,7 +2406,8 @@ export class Assemble {
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
-		if (type === "search" || ("onkeydown" in this.currentElement.attributes && !this.currentElement.attributes.onkeydown.contains("event.preventDefault()"))) this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET("assemble.render.search_hint");
+		if (type === "search" || ("onkeydown" in this.currentElement.attributes && !this.currentElement.attributes.onkeydown.contains("event.preventDefault()")))
+			this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET("assemble.render.search_hint");
 		hint = this.hint();
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
