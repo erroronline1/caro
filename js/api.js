@@ -1127,7 +1127,7 @@ export const api = {
 							// filereference coming from assemble.js widget
 							api.preventDataloss.monitor = false;
 							successFn = function (data) {
-								let article = document.querySelector("#inputmodal form article");
+								let article = document.querySelector("#_fileselectionDialog form article");
 								let sibling = article.children[2], // as per assemble after label and hidden input
 									deletesibling;
 								sibling = sibling.nextSibling;
