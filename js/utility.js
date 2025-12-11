@@ -1783,7 +1783,7 @@ export const _client = {
 				});
 		},
 		/**
-		 * radio selection with stl preview
+		 * radio selection with preview
 		 * @param {array} files array
 		 * @returns assemble radio widget
 		 */
@@ -1819,7 +1819,6 @@ export const _client = {
 							},
 							options: previewoptions,
 						}).then((response) => {
-							console.log(response);
 							if (!response) {
 								this.checked = false;
 								document.getElementById("_selectedfile").value = "";
