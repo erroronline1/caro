@@ -379,7 +379,7 @@ class USER extends API {
 									'type' => 'image',
 									'description' => $this->_lang->GET('user.export_user_image'),
 									'attributes' => [
-										'name' => $user['name'] . '_pic',
+										'name' => pathinfo($user['image'])['basename'],
 										'url' => './api/api.php/file/stream/' . $user['image']
 									]
 								]
@@ -1073,7 +1073,7 @@ class USER extends API {
 									'type' => 'image',
 									'description' => $this->_lang->GET('user.export_user_image'),
 									'attributes' => [
-										'name' => $user['name'] . '_pic',
+										'name' => pathinfo($user['image'])['basename'],
 										'url' => './api/api.php/file/stream/' . $user['image']
 									]
 								]
@@ -1110,7 +1110,7 @@ class USER extends API {
 								'type' => 'image',
 								'description' => $this->_lang->GET('user.export_qr_token'),
 								'attributes' => [
-									'name' => $user['name'] . '_token',
+									'name' => $user['name'] . '_token.png',
 									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name']))
 								],
 								'dimensions' => [
