@@ -470,6 +470,8 @@ class NOTIFICATION extends API {
 							// alert requesting undelivered orders or marking delivered as issued
 							$alerts = [];
 							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
+							// userlist to decode orderer
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							foreach ($unissued as $order){
 								$update = false;
 								$decoded_order_data = null;
@@ -512,8 +514,15 @@ class NOTIFICATION extends API {
 								$delivery_interval = intval(abs($delivered_full->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unissued']));
 								if ($order['delivered_full'] && in_array($order['ordertype'], ['order', 'service']) && $order['issued_notified'] < $delivery_interval){
 									if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
+
+									$organizational_unit = [$order['organizational_unit']];
+									// if unit is common, add ordering users units except admin
+									if ($organizational_unit === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))){
+										array_push($organizational_unit, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
+									}
+
 									$this->alertUserGroup(
-										['unit' => [$order['organizational_unit']]],
+										['unit' => $organizational_unit],
 										$this->_lang->GET('order.alert_unissued_order', [
 											':days' => $delivered_full->diff($this->_date['servertime'])->days,
 											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'null\', \'delivered_full\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',

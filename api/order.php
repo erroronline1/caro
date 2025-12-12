@@ -232,6 +232,9 @@ class ORDER extends API {
 								// alert userGroup on vendor sided order-state change 
 								if (str_starts_with(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info')), $this->_lang->GET('order.orderstate_description'))){
 									// inform user group
+									// userlist to decode orderer
+									$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
 									$messagepayload = [];
 									foreach (['quantity' => 'quantity_label',
 										'unit' => 'unit_label',
@@ -243,7 +246,14 @@ class ORDER extends API {
 										$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 									}
 									$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-									$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
+
+									$organizational_unit = [$prepared['organizational_unit']];
+									// if unit is common, add ordering users units except admin
+									if ($organizational_unit === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))){
+										array_push($organizational_unit, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
+									}
+
+									$this->alertUserGroup(['unit' => [$organizational_unit]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
 										':order' => $this->_lang->GET('order.message', $messagepayload, true),
 										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
 										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
