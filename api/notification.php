@@ -993,10 +993,17 @@ class NOTIFICATION extends API {
 		if (!$_SESSION['user']['orderauth']) return 0;
 		$prepared = 0;
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
-		$units = $_SESSION['user']['units']; // see only orders for own units
+		// userlist to decode orderer
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
 		foreach ($orders as $row) {
 			$order_data = json_decode($row['order_data'], true);
-			if (array_intersect([$order_data['organizational_unit']], $units)) {
+			// if unit intersects, or orderer is own unit member including self, except admin
+			$unit_intersection = boolval(array_intersect([UTILITY::propertySet($order_data, 'organizational_unit') ? : ''], $_SESSION['user']['units']));
+			if (!$unit_intersection && $user = array_search(UTILITY::propertySet($order_data, 'orderer'), array_column($users, 'id'))){
+				$unit_intersection = boolval(array_intersect($_SESSION['user']['units'], array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin']))));
+			}
+			if ($unit_intersection) {
 				$prepared++;
 			}
 		}

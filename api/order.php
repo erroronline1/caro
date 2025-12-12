@@ -382,7 +382,6 @@ class ORDER extends API {
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
-				$units[] = 'common'; // add common by default
 
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
@@ -477,7 +476,7 @@ class ORDER extends API {
 				foreach ($preUsers as $user){
 					$user['permissions'] = explode(',', $user['permissions'] ? : '');
 					if (array_intersect(['purchase', 'admin'], $user['permissions'])) $permission['purchasemembers'][] = $user['name'];
-					$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
+					$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image'], 'units' => $user['units']];
 				}
 
 				$erp_interface_available = (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata());
@@ -511,10 +510,16 @@ class ORDER extends API {
 					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
 
 					// data chunks to be assembled by js _client.order.approved()
-					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
-					if (isset($users[$orderer])) $orderer = $users[$orderer];
+					$orderer_id = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
+					if (isset($users[$orderer_id])) $orderer = $users[$orderer_id];
 					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
-					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $units)) || $orderer['name'] = $_SESSION['user']['name'];
+
+					// if unit intersects, orderer is viewing user or common orders are done by own unit members
+					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $units)) || $orderer['name'] === $_SESSION['user']['name'];
+					if (!$unit_intersection && array_intersect([$row['organizational_unit']], ['common']) && $orderer_id){
+						$unit_intersection = boolval(array_intersect([$row['organizational_unit']], explode(',', $users[$orderer_id]['units'])));
+					}
+
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -619,7 +624,7 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'issued_partially':
-								if ($row['issued_full'] || !($permission['admin'] || array_intersect([$row['organizational_unit']], $units) || $orderer['name'] === $_SESSION['user']['name'])){
+								if ($row['issued_full'] || !($permission['admin'] || $unit_intersection)){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -632,7 +637,7 @@ class ORDER extends API {
 								}
 								// no break
 							case 'archived':
-								if (!($permission['admin'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']) || $orderer['name'] === $_SESSION['user']['name'])){
+								if (!($permission['admin'] || $unit_intersection)){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -1424,12 +1429,19 @@ class ORDER extends API {
 				// display all orders assigned to organizational unit
 				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
 				else $units = $_SESSION['user']['units']; // see only orders for own units
+				// userlist to decode orderer
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// filter by organizational unit
 				$organizational_orders = [];
 				foreach ($orders as $key => $row) {
-					$order_data = json_decode($row['order_data'], true);
-					if (array_intersect([$order_data['organizational_unit']], $units)) {
+					$order_data = json_decode(UTILITY::propertySet($row, 'order_data') ? : '', true);
+					// if unit intersects, or orderer is own unit member including self, except admin unless explicitly selected
+					$unit_intersection = boolval(array_intersect([UTILITY::propertySet($order_data, 'organizational_unit') ? : ''], $units));
+					if (!$this->_requestedID && !$unit_intersection && $user = array_search(UTILITY::propertySet($order_data, 'orderer'), array_column($users, 'id'))){
+						$unit_intersection = boolval(array_intersect($_SESSION['user']['units'], array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin']))));
+					}
+					if ($unit_intersection) {
 						array_push($organizational_orders, $row);
 					}
 				}
