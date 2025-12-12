@@ -1596,6 +1596,9 @@ export const api = {
 				}
 				break;
 			case "delete":
+					// passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
+					payload = request[2];
+					delete request[2];
 				break;
 			default:
 				return;

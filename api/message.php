@@ -332,7 +332,7 @@ class MESSAGE extends API {
 									"}}).then(confirmation => { if (confirmation) {" .
 										"let ids = [];" .
 										"document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
-										"api.message('delete', 'conversation', ids.join('_'));" .
+										"api.message('delete', 'conversation', {_selectedconversation: ids.join('_')});" . // passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
 									"} })"
 							]
 						]
@@ -425,7 +425,8 @@ class MESSAGE extends API {
 						':user' => $_SESSION['user']['id']
 					],
 					'replacements' => [
-						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_conversation)))
+						// passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
+						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', UTILITY::propertySet($this->_payload, '_selectedconversation') ? : '')))
 					]
 				]);
 				$this->response([
