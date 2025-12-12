@@ -32,11 +32,14 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
-* check where else to array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])
+* csv filter testing w/o storing?
 * messages to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
     * DELETE ./api/api.php/message/conversation/{message ids} -> message_ids
     * ? PATCH ./api/api.php/order/approved/{ids}/{update}/{state} => ids
 * review order flowchart
+* review history, extend exceptions (exports etc)
+* review order unit intersection for alerts, messages and tasks as well (see order.php ln 1440)
+    * consider excluding admin unit? array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['admin'])), $_SESSION['user']['units'])
 
 ## Content
 * [Aims](#aims)
