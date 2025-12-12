@@ -2092,7 +2092,7 @@ class DOCUMENT extends API {
 					elseif ($subs['type'] === 'image'){
 						$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
 						$file = pathinfo($subs['attributes']['url']);
-						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+						if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'gif', 'png'])) {
 							$content['images'][] = $subs['attributes']['url'];
 						}
 					}
