@@ -657,12 +657,16 @@ class ORDER extends API {
 								$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.neccessary_by_user');
 							}
 						}
-						elseif (isset($product['incorporated'][count($product['incorporated']) - 1]['_denied'])) {
-							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
+						else {
+							// get latest incorporation entry;
+							$product['incorporated'] = array_pop($product['incorporated']);
+							if (isset($product['incorporated']['_denied'])) {
+								$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
+							}
+							if (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
+								$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
+							}						
 						}
-						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'][count($product['incorporated']) - 1])) {
-							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
-						}						
 					}
 					
 					// request MDR §14 sample check
@@ -1021,7 +1025,8 @@ class ORDER extends API {
 								'value' => isset($order['commission']) ? $order['commission'] : '',
 								'data-loss' => 'prevent',
 								'id' => 'commission'
-							]
+							],
+							'datalist' => $this->_lang->_DEFAULT['order']['commission_defaults']
 						], [
 							'type' => 'scanner',
 							'destination' => 'commission'
@@ -1218,7 +1223,11 @@ class ORDER extends API {
 				$order = $order ? $order[0] : null;
 				if (!$order) $this->response([], 404);
 				$order = json_decode($order['order_data'], true);
-				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+				if (!(
+					PERMISSION::permissionFor('orderprocessing') // are allowed to delete all
+					|| array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']) // regular users are allowed to delete own unit ones
+					|| ($_SESSION['user']['orderauth'] && array_intersect(explode(',', $order['organizational_unit']), ['common'])) // order authorized are allowed to delete from special selected units as well
+					)) $this->response([], 401);
 				// delete attachments
 				if (isset($order['attachments'])){
 					$files = explode(',', $order['attachments']);
