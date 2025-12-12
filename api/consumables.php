@@ -1966,6 +1966,8 @@ class CONSUMABLES extends API {
 					if (!$row['incorporated']) $incorporationState = $this->_lang->GET('order.incorporation.neccessary');
 					else {
 						$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
+						// get latest incorporation entry;
+						$row['incorporated'] = array_pop($row['incorporated']);
 						if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 						elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 					}
