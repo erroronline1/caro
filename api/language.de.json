@@ -1344,6 +1344,7 @@
 		"cancellation_message_cancel": "Nein danke",
 		"cancellation_message_ok": "Ja, stornieren",
 		"commission": "Kommission oder Begründung",
+		"commission_defaults": ["Materialtest", "Werkstattbestellung"],
 		"commission_hint": "Name, Geburtsdatum, Fallnummer, Genehmigungsvermerk, etc. Die Fallnummer eines genehmigten Vorgangs ist zulässig und kann ohne weitere Bestellberechtigung unterschrieben werden.",
 		"copy_or_labelsheet": "Klicke oder tippe auf das Feld um den Wert zu kopieren oder einen Aufkleberbogen zu erstellen",
 		"copy_value": "Klicke oder tippe auf das Feld um den Wert zu kopieren",
