@@ -794,7 +794,7 @@ export const api = {
 	 */
 	audit: (method, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["audit", ...request]);
+		if (method === "get" && !request[0].startsWith('export')) api.history.write(["audit", ...request]);
 
 		request.splice(0, 0, "audit");
 		let payload,
@@ -933,7 +933,7 @@ export const api = {
 	 */
 	calendar: (method, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["calendar", ...request]);
+		if (method === "get" && !["monthlyTimesheets", "yearlyTimesheets"].includes(request[0])) api.history.write(["calendar", ...request]);
 
 		request.splice(0, 0, "calendar");
 		let payload,
