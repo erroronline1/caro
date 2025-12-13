@@ -32,14 +32,7 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
-* csv filter testing w/o storing?
-* messages to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
-    * DELETE ./api/api.php/message/conversation/{message ids} -> message_ids
-    * ? PATCH ./api/api.php/order/approved/{ids}/{update}/{state} => ids
 * review order flowchart
-* review history, extend exceptions (exports etc)
-* review order unit intersection for alerts, messages and tasks as well (see order.php ln 1440)
-    * consider excluding admin unit? array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['admin'])), $_SESSION['user']['units'])
 
 ## Content
 * [Aims](#aims)
@@ -1972,7 +1965,7 @@ If you are going to prepare the deployment you are free to create multiple files
 After installation you can
 * import [risks](#risk-management) through the [maintenance](#maintenance)-module; presets are found within the template files
 * import product lists for the possibly previously installed vendors
-* consider incorporation and document approval handling through the [_stresstest](#stress-test-and-performance)-tool or
+* consider incorporation, document and CSV-filter approval handling through the [_stresstest](#stress-test-and-performance)-tool or
 * approve possibly previously installed documents manually
 
 [Content](#content)
@@ -2117,7 +2110,7 @@ calendarfullaccess = "ceo" ; edit, delete or complete events and entries
 calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
 complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case documentation containing a complaint
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
-csvrules = "qmo" ; add csv filter
+csvrules = "ceo, qmo, prrc" ; add csv filter, BUT SEE WARNING ABOVE - also approve csv filter
 erpimport = "purchase, office" ; provide erp data sources, more details within _erpinterface regarding usecase if applicable
 erpcasedata = "user" ; search and display erp case data if applicable
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
@@ -3867,6 +3860,20 @@ Sample response
 {"response":{"name":"test","msg":"The filter named test has been saved.","type":"success"}}
 ```
 
+> DELETE ./api/api.php/csvfilter/rule/{id}
+
+Deletes an unapproved filter.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | filter to be deleted |
+
+Sample response
+```
+{"response":{"name":"test","msg":"Filter test deleted","type":"success"}}
+```
+
 [Content](#content)
 
 ### Document endpoints
@@ -4465,14 +4472,14 @@ Sample response
 {"render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2025-07-05\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"Concerns just\"},\"content\":{\"Common\":[],\"Orthotics I\":[],\"Orthotics II\":[],\"Prosthetics I\":[],\"Prosthetics II\":[],\"CAD\":[],\"Polymer Tech\":[],\"Silicone Lab\":[],\"Office/Purchase\":[],\"Administration\":[]}}]]'), options:{'Ok': {value: true},}}, 'FormData').then(response => {if (response) { api.message('post', 'announcement', 0, response);}});"}},[{"type":"announcementsection","attributes":{"name":"This is a test announcement"},"content":....
 ```
 
-> DELETE ./api/api.php/message/conversation/{message ids}
+> DELETE ./api/api.php/message/conversation
 
 Delete all messages of the conversation with the passed message ids.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {message ids} | path parameter | required | int ids chained with _ |
+| payload | query string | required | _selectedconversation = int ids chained with _ |
 
 Sample response
 ```

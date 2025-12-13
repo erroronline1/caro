@@ -40,6 +40,7 @@ class NOTIFICATION extends API {
 
 			'audit_closing' => $this->audits(),
 			'consumables_pendingincorporation' => $this->consumables(),
+			'csvfilter_approval' => $this->csvfilter(),
 			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
 			'order_prepared' => $this->preparedorders(),
@@ -872,6 +873,32 @@ class NOTIFICATION extends API {
 		}
 		return null;
 	}
+
+
+	/**
+	 *               ___ _ _ _           
+	 *   ___ ___ _ _|  _|_| | |_ ___ ___ 
+	 *  |  _|_ -| | |  _| | |  _| -_|  _|
+	 *  |___|___|\_/|_| |_|_|_| |___|_|  
+	 *  
+	 * alerts eligible users about csv-filters having to be approved
+	 */
+	public function csvfilter(){
+		if (!PERMISSION::permissionFor('csvrules')) return 0;
+		// prepare all unapproved elements
+		$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
+		$unapproved = 0;
+		$hidden = [];
+		foreach ($filters as $element){
+			if ($element['hidden']) $hidden[] = $element['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($element['name'], $hidden)){
+				if (PERMISSION::pending('csvrules', $element['approval'])) $unapproved++;
+				$hidden[] = $element['name']; // hide previous versions at all costs
+			}
+		}
+		return $unapproved;
+	}
+
 
 	/**
 	 *     _                           _       

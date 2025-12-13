@@ -162,6 +162,7 @@ define('DEFAULTSQL', [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"   `hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -470,7 +471,8 @@ define('DEFAULTSQL', [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL" .
+				"	hidden varchar(MAX) NULL DEFAULT NULL," .
+				"	approval varchar(MAX) NULL DEFAULT NULL" .
 				");" 
 				.
 				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .

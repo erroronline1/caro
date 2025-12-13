@@ -542,14 +542,19 @@ class SQLQUERY {
 
 
 
-		// on duplicate key update / merging does not make sense for csvfilters, for entries are micro-updated and handled by one post method only anyway
 		'csvfilter_post' => [
-			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
+			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden, approval) " .
+						"VALUES (:id, :name, CURRENT_TIMESTAMP, :author, :content, :hidden, :approval) " .
+						"ON DUPLICATE KEY UPDATE name = :name, author = :author, content = :content, hidden = :hidden, approval = :approval",
+			'sqlsrv' => "MERGE INTO caro_csvfilter WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :name AS name, :content AS content) AS source " .
+						"(id, name, content) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET name = :name, author = :author, content = :content, hidden = :hidden, approval = :approval " .
+						"WHEN NOT MATCHED THEN INSERT (name, date, author, content, hidden, approval) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden, :approval);"
 		],
-		'csvfilter_put' => [
-			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
+		'csvfilter_put_approve' => [
+			'mysql' => "UPDATE caro_csvfilter SET approval = :approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_csvfilter SET approval = :approval WHERE id = :id"
 		],
 		'csvfilter_datalist' => [
 			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
@@ -562,6 +567,10 @@ class SQLQUERY {
 		'csvfilter_get_latest_by_name' => [
 			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC"
+		],
+		'csvfilter_delete' => [
+			'mysql' => "DELETE FROM caro_csvfilter WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_csvfilter WHERE id = :id"
 		],
 
 

@@ -1022,6 +1022,10 @@
 	},
 	"csvfilter": {
 		"edit": {
+			"delete":"Filter ohne vollständige Freigabe löschen",
+			"delete_confirm_header": ":name dauerhaft löschen?",
+			"delete_error": "Filter konnte nicht gelöscht werden, bitte versuche es erneut.",
+			"delete_success": "Filter :name wurde gelöscht.",
 			"edit_hidden_set": "Verborgen am :date von :name",
 			"error_filter_not_found": "Der Filter :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 			"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte versuche etwas anderes.",
@@ -1032,10 +1036,11 @@
 			"filter_content": "Inhalt",
 			"filter_content_hint": "Bitte beachte ein valides JSON-Format um einen funktionierenden CSV-Filter zu beschreiben. Ein Programmierer kann dir dabei helfen.",
 			"filter_hidden": "verborgen",
-			"filter_availability_hint": "Verborgene Filter sind für Benutzer nicht erreichbar.",
+			"filter_availability_hint": "Verborgene Filter und Filter ohne vollständige Freigabe sind für reguläre Benutzer nicht erreichbar.",
 			"filter_name": "Name",
 			"filter_new": "Neuer Filter",
 			"filter_not_saved": "Der Filter konnte nicht gespeichert werden.",
+			"filter_request_alert": "Ein neuer CSV-Filter benötigt eine Freigabe. Bitte prüfe :name.",
 			"filter_saved": "Der Filter :name wurde gespeichert.",
 			"filter_select": "Neueste Filter bearbeiten"
 		},

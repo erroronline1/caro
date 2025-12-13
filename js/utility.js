@@ -132,6 +132,24 @@ export const _serviceWorker = {
 			notif = document.querySelector("[for=userMenu" + api._lang.GET("consumables.navigation.header").replace(" ", "_") + "]");
 			if (notif) notif.setAttribute("data-notification", order_prepared + order_unprocessed + consumables_pendingincorporation); // main menu label
 		},
+
+		/**
+		 * updates styleable data-for=userMenu for tool menu
+		 * @requires api
+		 * @param {object} data containing csvfilter_approval
+		 * @event sets querySelector attribute data-notification
+		 */
+		consumables: function (data) {
+			let notif,
+				csvfilter_approval = 0;
+			if ("csvfilter_approval" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("csvfilter.navigation.filter").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.csvfilter_approval);
+				csvfilter_approval = parseInt(data.csvfilter_approval, 10);
+			}
+			notif = document.querySelector("[for=userMenu" + api._lang.GET("tool.navigation.header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", csvfilter_approval); // main menu label
+		},
 	},
 
 	/**

@@ -23,6 +23,21 @@ class STRESSTEST extends INSTALL{
 	public $_orderentries = 1000;
 	public $_csvInput = '../unittests/sample-csv-files-sample-6.csv';
 
+	public $_csvfilterApproval = [ // null;
+		"qmo"=> [ // roles according to the configuration csvfilterapproval permission
+			"name"=> "CARO App",
+			"date"=> "2025-12-12 23:56"
+		],
+		"prrc"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-12-12 23:56"
+		],
+		"ceo"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-12-12 23:56"
+		],
+	];
+
 	public $_documentApproval = [ // null;
 		"supervisor"=> [ // roles according to the configuration documentapproval permission
 			"name"=> "CARO App", // appropriate name of responsible persons
@@ -324,6 +339,44 @@ class STRESSTEST extends INSTALL{
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
 		return $this->printSuccess($del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted');
+	}
+
+	/**
+	 * approve all csv filters
+	 */
+	public function approveCSVFilter(){
+		if ($this->_csvfilterApproval) {
+			$sqlchunks = [];
+			$response = '';
+			$DBall = [
+				...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist')
+			];
+			foreach ($DBall as $row){
+				if (PERMISSION::fullyapproved('csvrules', $row['approval'])) continue;
+
+				$row['approval'] = json_decode($row['approval'] ? : '', true) ? : [];
+				$row['approval'] = $row['approval'] + $this->_csvfilterApproval;
+				$row['approval'] = UTILITY::json_encode($row['approval']);
+				$update = [];
+				foreach($row as $key => $value){
+					$update[':' . $key] = $value ? $this->_pdo->quote($value) : 'NULL';
+				}
+
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('csvfilter_post'), $update) . '; ');
+			}
+			foreach ($sqlchunks as $chunk){
+				try {
+					SQLQUERY::EXECUTE($this->_pdo, $chunk);
+				}
+				catch (\Exception $e) {
+					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
+				}
+			}
+			$response .= $this->printSuccess('all csv filters in the database have been approved.');
+
+			return $response;
+		}
+		return $this->printError('csv filter approval has not been defined');
 	}
 
 	/**

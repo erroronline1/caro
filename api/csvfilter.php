@@ -181,10 +181,15 @@ class CSVFILTER extends API {
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
 				foreach ($filters as $row) {
+					$display = $row['name'];
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
+					if (PERMISSION::pending('csvrules', $row['approval'])) $display = UTILITY::hiddenOption($display);
+
+					// users authorized to author and approve filters can execute unapproved filters for drafting purposes
+					if (!isset($options[$display]) && !in_array($row['name'], $hidden) && (PERMISSION::fullyapproved('csvrules', $row['approval']) || PERMISSION::permissionFor('csvrules'))) {
 						$filterdatalist[] = $row['name'];
-						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$options[$display] = ['value' => $row['id']];
+						if ($row['name'] == $filter['name']) $options[$display]['selected'] = true;
 					}
 				}
 				ksort($options);
@@ -301,10 +306,12 @@ class CSVFILTER extends API {
 			case 'POST':
 				// set up filter properties by payload
 				$filter = [
+					':id' => null,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':approval' => null
 				];
 
 				// early exit
@@ -312,26 +319,46 @@ class CSVFILTER extends API {
 
 				// ensure valid json for filters
 				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.filter_content_hint'), 'type' => 'error']]);
+				$filter[':content'] = UTILITY::json_encode(json_decode($filter[':content'], true), JSON_PRETTY_PRINT);
 
-				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
 					'values' => [
 						':name' => $filter[':name']
 					]
 				]);
 				$exists = $exists ? $exists[0] : null;
-				if ($exists && $exists['content'] === $filter[':content']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_put', [
-						'values' => [
-							':hidden' => $filter[':hidden'],
-							':id' => $exists['id']
-						]
-					])) $this->response([
-						'response' => [
-							'name' => $filter[':name'],
-							'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
-							'type' => 'success'
-						]]);	
+
+				if ($exists){
+					// overwrite if content remains the same or not fully approved yet (draft mode)
+					if ($exists['content'] === $filter[':content'] || PERMISSION::pending('csvrules', $exists['approval'])){
+						$filter[':id'] = $exists['id'];
+						$filter[':approval'] = $exists['approval'];
+
+						// combine approvals
+						$approveas = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.approve.as_select')) ? : '';
+						$approveas = explode(' | ', $approveas);
+						// append passed approvals
+						$filter[':approval'] = $filter[':approval'] ? json_decode($filter[':approval'], true) : []; 
+						$tobeapprovedby = PERMISSION::permissionFor('csvrules', true);
+						foreach ($tobeapprovedby as $permission){
+							if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array($this->_lang->GET('permissions.' . $permission), $approveas)){
+								$filter[':approval'][$permission] = [
+									'name' => $_SESSION['user']['name'],
+									'date' => $this->_date['servertime']->format('Y-m-d H:i')
+								];
+							}
+						}
+						$filter[':approval'] = UTILITY::json_encode($filter[':approval']) ? : null;
+						if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
+							'values' => $filter
+						])) $this->response([
+							'response' => [
+								'name' => $filter[':name'],
+								'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
+								'type' => 'success'
+							]]);	
+						// early exit
+					}
 				}
 
 				// check forbidden names
@@ -340,12 +367,21 @@ class CSVFILTER extends API {
 				// post filter
 				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
 					'values' => $filter
-				])) $this->response([
+				])) {
+					if (!$filter[':id']){
+						// alert roles of a new filter to be approved
+						$filter_id = $this->_pdo->lastInsertId();
+						$message = $this->_lang->GET('csvfilter.edit.filter_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.csvfilter(\'get\', \'rule\', ' . $filter_id . ')"> ' . $filter[':name'] . '</a>'], true);
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('csvrules', true)], $message);
+					}
+
+					$this->response([
 						'response' => [
 							'name' => $filter[':name'],
 							'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
 							'type' => 'success'
 						]]);
+				}
 				else $this->response([
 					'response' => [
 						'name' => false,
@@ -394,7 +430,7 @@ class CSVFILTER extends API {
 					}
 					
 					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
-					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					if ($row['hidden'] || PERMISSION::pending('csvrules', $row['approval'])) $display = UTILITY::hiddenOption($display);
 					$alloptions[$display] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 
@@ -475,8 +511,79 @@ class CSVFILTER extends API {
 						$hidden['hint'] .= ' ' . $this->_lang->GET('csvfilter.edit.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					array_push($response['render']['content'][1], $hidden);
+
+					// display approval state
+					$approvals = '';
+					$filter['approval'] = json_decode($filter['approval'] ? : '', true);
+					foreach (PERMISSION::permissionFor('csvrules', true) as $permission){
+						if (isset($filter['approval'][$permission])) $approvals .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $filter['approval'][$permission]['name'] . ' ' . $this->convertFromServerTime($filter['approval'][$permission]['date']);
+						else $approvals .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' => $this->_lang->_USER['permissions'][$permission]]);
+					}
+					array_push($response['render']['content'][1], [
+						'type' => 'textsection',
+						'content' => $approvals
+					]);
+
+					// get remaining approval options
+					$approvalposition = [];
+					foreach (PERMISSION::pending('csvrules', $filter['approval']) as $position){
+						if (!array_intersect(['admin', $position], $_SESSION['user']['permissions'])) continue;
+						$approvalposition[$this->_lang->GET('permissions.' . $position)] = [];
+					}
+					if ($approvalposition){
+						array_push($response['render']['content'][1], [
+							'type' => 'checkbox',
+							'content' => $approvalposition,
+							'attributes' => [
+								'name' => $this->_lang->GET('assemble.approve.as_select')
+							]
+						]);
+					}
+
+					// delete option for unapproved filters
+					if (PERMISSION::pending('csvrules', $filter['approval'])) {
+						array_push($response['render']['content'][1], [
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('csvfilter.edit.delete'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('csvfilter.edit.delete_confirm_header', [':name' => $filter['name']]) ."', options:{".
+								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+								"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (confirmation) {api.csvfilter('delete', 'rule', " . $filter['id'] . "); this.disabled = true;}})"
+							]
+						]);
+
+					}
 				}
+
 				$this->response($response);
+				break;
+
+			case 'DELETE':
+				$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$filter = $filter ? $filter[0] : null;
+				if ($filter && PERMISSION::pending('csvrules', $filter['approval']) && 
+					SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_delete', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					])
+				) $this->response([
+						'response' => [
+							'name' => $filter['name'],
+							'msg' => $this->_lang->GET('csvfilter.edit.delete_success', [':name' => $filter['name']]),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('csvfilter.edit.delete_error'),
+						'type' => 'error'
+					]]);
 				break;
 		}					
 	}

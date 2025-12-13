@@ -1078,6 +1078,8 @@ export const api = {
 			case "post":
 				payload = _.getInputs("[data-usecase=csvfilter]", true);
 				break;
+			case "delete":
+				break;
 			default:
 				return;
 		}

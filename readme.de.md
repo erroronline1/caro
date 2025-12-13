@@ -1870,7 +1870,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 Nach der Installation können
 * [Risiken](#risikomanagement) durch das [Wartungs](#wartung)-Modul importiert werden; Vorlagen finden sich bei den Template-Dateien
 * Artikellisten der möglicherweise zuvor installierten Lieferanten importiert werden
-* die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung oder Dokumentenfreigabe im Sonderfall erwogen werden, oder
+* die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung, Dokumentenfreigabe oder Freigabe von CSV-Filtern im Sonderfall erwogen werden, oder
 * die möglicherweise zuvor installierten Dokumente manuell freigegeben werden
 
 [Übersicht](#übersicht)
@@ -2015,7 +2015,7 @@ calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderere
 calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller Nutzer, zu fremden Arbeitszeiten beitragen
 complaintclosing = "supervisor, qmo, prrc" ; obige Warnung beachten - Dokumentationen mit Reklamationen als abgeschlossen kennzeichnen
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
-csvrules = "qmo" ; neue CSV-Filter anlegen
+csvrules = "ceo, qmo, prrc" ; neue CSV-Filter anlegen, ABER obige Warnung beachten - auch Freigabe von CSV-Filtern
 erpimport = "purchase, office" ; Bereitstellung von ERP Datenquellen, mehr dazu unter _erpinterface.php sofern anwendbar
 erpcasedata = "user" ; Suche und Anzeige von ERP Vorgangsdaten sofern anwendbar
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente

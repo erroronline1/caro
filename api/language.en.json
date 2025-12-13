@@ -1022,6 +1022,10 @@
 	},
 	"csvfilter": {
 		"edit": {
+			"delete":"Delete filter while not being fully approved",
+			"delete_confirm_header": "Delete :name permanently?",
+			"delete_error": "Filter could not be deleted, please try again.",
+			"delete_success": "Filter :name deleted",
 			"edit_hidden_set": "Hidden on :date by :name",
 			"error_filter_not_found": "Filter :name could not be found in database, please try something else.",
 			"error_forbidden_name": "The name :name is not allowed please use another!",
@@ -1032,10 +1036,11 @@
 			"filter_content": "Content",
 			"filter_content_hint": "Please adhere to proper JSON format to describe a working CSV filter. A programmer can help you with that.",
 			"filter_hidden": "hidden",
-			"filter_availability_hint": "Hidden filters are unreachable for users.",
+			"filter_availability_hint": "Hidden and not fully approved filters are unreachable for regular users.",
 			"filter_name": "Name",
 			"filter_new": "New filter",
 			"filter_not_saved": "Filter could not be saved.",
+			"filter_request_alert": "A new CSV filter awaits approval. Please revise :name.",
 			"filter_saved": "The filter named :name has been saved.",
 			"filter_select": "Edit latest filter"
 		},

@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_12_06'] as $update){
+		foreach (['_2025_12_12'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -312,6 +312,21 @@ class UPDATE{
 				"EXEC sp_rename 'caro.dbo.caro_consumables_approved_orders.notified_delivered', 'issued_notified', 'COLUMN';",
 				"EXEC sp_rename 'caro.dbo.caro_consumables_order_statistics.partially_received', 'delivered_partially', 'COLUMN';",
 				"EXEC sp_rename 'caro.dbo.caro_consumables_order_statistics.received', 'delivered_full', 'COLUMN';",
+			]
+		];
+	}
+
+	private function _2025_12_12(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_csvfilter ADD COLUMN IF NOT EXISTS approval text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_csvfilter', 'approval') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_csvfilter" .
+				"    ADD approval varchar(MAX) NULL DEFAULT NULL" .
+				" END; ",
 			]
 		];
 	}
