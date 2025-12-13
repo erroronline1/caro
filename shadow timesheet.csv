@@ -368,7 +368,8 @@
 16.11.25,4,"code maintenance"
 21.11.25,8,"calendar-api, consumables-api"
 22.11.25,6,"code maintenance, calendar-api, user-api"
-28.11.25,6,"calendar-api"
+28.11.25,6,calendar-api
 29.11.25,7,"code maintenance"
 05.12.25,8,"order-api, csvfilter-api"
 06.12.25,7,"code maintenance"
+12.12.25,8,"order-api, message-api, csvfilter-api"

@@ -1772,6 +1772,7 @@ Anwendungsunterstützung Legende:
     * PHP >= 8.2
     * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst/ergänzt werden)
     * SSL (Kamerazugriff für den Scanner, Service-Worker und SHA256-Verschlüsselung können sonst technisch nicht genutzt werden)
+    * Der erforderliche Speicherpatz ist kaum ermittelbar und abhängig von der Unternehmensgröße. Ein mittelständiges Unternehmen mit jährlich etwa 6000 Fällen benötigt etwa 10 GB pro Jahr. Die Datenbankgröße sollte sich dynamisch anpassen. 
 * Netzwerkzugriff für Endgeräte und einen Browser
     * Desktop PCs
     * mobile Geräte

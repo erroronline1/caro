@@ -1867,6 +1867,7 @@ Application support legend:
     * PHP >= 8.2
     * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted/extended)
     * SSL (camera access for qr-scanner, Service-Worker and sha256 encryption don't work otherwise)
+    * Storage requirements are hardly determinable and depend on your company size. A medium sized company with about 6000 yearly cases may need about 10 GB per year. Database size should be able to grow dynamically
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
