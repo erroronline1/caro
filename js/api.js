@@ -23,6 +23,7 @@ export const api = {
 			textareaAutocompleteIndex: null,
 			textareaAutocompleteSwipe: null,
 			orderTilesGroupBy: "commission",
+			orderUnits:null,
 			toasttimeout: {},
 		},
 	},

@@ -4608,7 +4608,7 @@ Sample response
 {"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/approved/{search}/{null}/{state}
+> GET ./api/api.php/order/approved/{search}/{null|unit|stock}/{state}
 
 Returns approved orders as data.
 
@@ -4616,7 +4616,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {search} | path parameter | optional | true, false |
-| {null} | path parameter | optional but necessary by use of {state} |  |
+| {null|unit|stock} | path parameter | optional | null at least necessary by use of {state}, orders by unit OR stock or non stock only |
 | {state} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
 
 Sample response

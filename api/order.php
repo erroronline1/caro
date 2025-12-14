@@ -514,6 +514,7 @@ class ORDER extends API {
 					if (
 						($this->_subMethod === 'stock' && !isset($product['stock_item']))
 						|| ($this->_subMethod === 'stock_none' && isset($product['stock_item']))
+						|| (isset($this->_lang->_USER['units'][$this->_subMethod]) && $this->_subMethod !== $row['organizational_unit'])
 					) continue;
 
 					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)

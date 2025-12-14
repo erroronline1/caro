@@ -620,16 +620,20 @@ export const _client = {
 			if (!data) return;
 			let content = [],
 				filter = {},
-				groupby = {};
+				groupby = {},
+				organizational_units = {};
 
 			// construct filter checkboxes with events
-			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value)' };
-			filter[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "ordered")' };
-			filter[api._lang.GET("order.order.delivered_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered_partially")' };
-			filter[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered_full")' };
-			filter[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "issued_partially")' };
-			filter[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "issued_full")' };
-			filter[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "archived")' };
+			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits)', value: "unprocessed" };
+			filter[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "ordered")', value: "ordered" };
+			filter[api._lang.GET("order.order.delivered_partially")] = {
+				onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "delivered_partially")',
+				value: "delivered_partially",
+			};
+			filter[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "delivered_full")', value: "delivered_full" };
+			filter[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "issued_partially")', value: "issued_partially" };
+			filter[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "issued_full")', value: "issued_full" };
+			filter[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "archived")', value: "archived" };
 			filter[api._lang.GET("order.order." + data.state)].checked = true;
 
 			content.push([
@@ -644,13 +648,43 @@ export const _client = {
 					type: "filtered",
 					attributes: {
 						name: api._lang.GET("order.order_filter_label"),
-						onkeydown: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value);}",
+						onkeydown: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value, api._settings.session.orderUnits);}",
 						id: "productsearch",
 						value: data.filter ? data.filter : "",
 					},
 				},
 			]);
 			if (data.stockfilter) {
+				// construct unit selection
+				// limiting to units may speed up rendering for purchase members with this permission if necessary
+				organizational_units[api._lang.GET("order.all_units")] = {
+					onchange:
+						'api._settings.session.orderUnits = null; api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, document.querySelector("[name=' +
+						api._lang.GET("order.order_filter") +
+						']:checked").value)',
+					checked: true,
+					value:"null"
+				};
+				for (const [key, value] of Object.entries(api._lang._USER.units)) {
+					organizational_units[value] = {
+						onchange:
+							'api._settings.session.orderUnits = "' +
+							key +
+							'"; api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, document.querySelector("[name=' +
+							api._lang.GET("order.order_filter") +
+							']:checked").value)',
+						value:key
+					};
+					if (api._settings.session.orderUnits === key) organizational_units[value].checked = true;
+				}
+				content[content.length - 1].push({
+					type: "radio",
+					attributes: {
+						name: api._lang.GET("order.organizational_unit"),
+					},
+					content: organizational_units,
+				});
+
 				content[content.length - 1].push({
 					type: "button",
 					attributes: {
@@ -1824,7 +1858,7 @@ export const _client = {
 						document.getElementById("_selectedfile").value = this.value;
 					},
 				};
-				if (["stl", "STL", "obj", "OBJ"].some(extension => path.endsWith(extension))) {
+				if (["stl", "STL", "obj", "OBJ"].some((extension) => path.endsWith(extension))) {
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",
@@ -1846,7 +1880,7 @@ export const _client = {
 						.toString()
 						._replaceArray(["filename", "stlpath", "stlurl", "previewoptions"], [filename[filename.length - 1], path, url, JSON.stringify(previewoptions)]);
 				}
-				if (["png", "PNG", "jpg", "JPG", "jpeg", "JPEG", "gif", "GIF"].some(extension => path.endsWith(extension))) {
+				if (["png", "PNG", "jpg", "JPG", "jpeg", "JPEG", "gif", "GIF"].some((extension) => path.endsWith(extension))) {
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",

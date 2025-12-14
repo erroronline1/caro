@@ -1330,6 +1330,7 @@
 		"alert_purchase": "New orders are awaiting processing :)",
 		"alert_undelivered_order": "The order (:ordertype) of :quantity :unit :number :name by :vendor for :commission has not yet been delivered for :days days. Please get in touch with :vendor to enquire the expected arrival. :orderer will be grateful!",
 		"alert_unissued_order": "The order (:ordertype) of :quantity :unit :number :name by :vendor for :commission has been delivered on :deliverydate but not marked as issued for :days days. Please mark as issued to clear things up for purchase or enquire delivery.",
+		"all_units": "all units",
 		"approval_image": "Approval Signature",
 		"approved_on": "Approved on",
 		"attach_file": "Attach files",
