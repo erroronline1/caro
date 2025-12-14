@@ -22,8 +22,8 @@ class MEASURE extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_requestedVote = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_requestedVote = REQUEST[3] ?? null;
 	}
 
 	/**
@@ -193,7 +193,7 @@ class MEASURE extends API {
 						$measure['votes'] = json_decode($measure['votes'] ? : '', true);
 						$approval = strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0);
 						$rejection = strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0);
-						$uservote = isset($measure['votes'][$_SESSION['user']['id']]) ? $measure['votes'][$_SESSION['user']['id']] : 0;
+						$uservote = $measure['votes'][$_SESSION['user']['id']] ?? 0;
 						$measurecontent[] = [
 							'type' => 'button',
 							'attributes' => [

@@ -24,8 +24,8 @@ class DOCUMENT extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_unit = REQUEST[3] ?? '';
 	}
 
 	/**
@@ -2081,7 +2081,7 @@ class DOCUMENT extends API {
 							$markdown = new MARKDOWN();
 							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
 						}
-						else $content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
+						else $content['content'][$name] = ['type' => 'textsection', 'value' => $subs['content'] ?? ''];
 					}
 					elseif ($subs['type'] === 'textarea'){
 						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
@@ -2097,7 +2097,7 @@ class DOCUMENT extends API {
 						}
 					}
 					elseif ($subs['type'] === 'range'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
+						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . ($subs['attributes']['min'] ?? 0) . ' - ' . ($subs['attributes']['max'] ?? 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
 					}
 					elseif (in_array($subs['type'], ['photo', 'file'])){
 						$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];

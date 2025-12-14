@@ -24,7 +24,7 @@ class ERPQUERY extends API {
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 		if (!(ERPINTERFACE && ERPINTERFACE->_instatiated)) $this->response([], 405);
 
-		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedType = REQUEST[2] ?? null;
 	}
 
 	/**

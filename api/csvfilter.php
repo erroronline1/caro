@@ -24,7 +24,7 @@ class CSVFILTER extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
 	}
 
 	/**
@@ -100,9 +100,9 @@ class CSVFILTER extends API {
 					case 'csv':
 						if ($files = UTILITY::csv($datalist->_list, $datalist->_setting['filesetting']['columns'],
 							$content['filesetting']['destination'], [
-							'separator' => isset($datalist->_setting['filesetting']['separator']) ? $datalist->_setting['filesetting']['separator'] : CONFIG['csv']['dialect']['separator'],
-							'enclosure' => isset($datalist->_setting['filesetting']['enclosure']) ? $datalist->_setting['filesetting']['enclosure'] : CONFIG['csv']['dialect']['enclosure'],
-							'escape' => isset($datalist->_setting['filesetting']['escape']) ? $datalist->_setting['filesetting']['escape'] : CONFIG['csv']['dialect']['escape']])){
+							'separator' => $datalist->_setting['filesetting']['separator'] ?? CONFIG['csv']['dialect']['separator'],
+							'enclosure' => $datalist->_setting['filesetting']['enclosure'] ?? CONFIG['csv']['dialect']['enclosure'],
+							'escape' => $datalist->_setting['filesetting']['escape'] ?? CONFIG['csv']['dialect']['escape']])){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
 									'href' => './api/api.php/file/stream/' . substr($file, 1),

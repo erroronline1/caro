@@ -27,7 +27,7 @@ class TOOL extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedType = REQUEST[2] ?? null;
 	}
 
 	/**

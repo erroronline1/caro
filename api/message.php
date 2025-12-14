@@ -23,7 +23,7 @@ class MESSAGE extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_conversation = $this->_announcement = $this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_conversation = $this->_announcement = $this->_requestedID = REQUEST[2] ?? null;
 	}
 
 	/**
@@ -209,7 +209,7 @@ class MESSAGE extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.subject'),
 						'required' => true,
-						'value' => isset($preset['subject']) ? $preset['subject'] : ''
+						'value' => $preset['subject'] ?? ''
 					]
 				], [
 					'type' => 'textarea',
@@ -237,7 +237,7 @@ class MESSAGE extends API {
 					'type' => 'date',
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.end'),
-						'value' => isset($preset['span_end']) ? $preset['span_end'] : ''
+						'value' => $preset['span_end'] ?? ''
 					]
 				], [
 					'type' => 'checkbox',

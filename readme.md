@@ -33,6 +33,7 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * review order flowchart
+* more implementation of coalesce operator, find with isset(.+?) \?.+?:
 
 ## Content
 * [Aims](#aims)

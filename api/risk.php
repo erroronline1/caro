@@ -23,7 +23,7 @@ class RISK extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedID = $this->_search = REQUEST[2] ?? null;
 	}
 
 	/**

@@ -23,9 +23,9 @@ class TEXTTEMPLATE extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_modal = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_clientimport = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_modal = REQUEST[3] ?? null;
+		$this->_clientimport = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -731,7 +731,7 @@ class TEXTTEMPLATE extends API {
 			$usedreplacements = $usedtexts = [];
 			foreach (json_decode($template['content']) as $paragraph){
 				foreach ($paragraph as $chunk){
-					$add = isset($texts[$chunk]) ? $texts[$chunk] : $chunk . "\n";
+					$add = $texts[$chunk] ?? $chunk . "\n";
 					preg_match_all('/' . $pattern . $delimiter . '/m', $add, $placeholders);
 					foreach ($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);

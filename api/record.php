@@ -34,9 +34,9 @@ class RECORD extends API {
 			!in_array(REQUEST[1], ['document', 'record'])
 		) $this->response([], 401);
 
-		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
-		$this->_caseStateValue = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_requestedID = $this->_appendDate = REQUEST[2] ?? null;
+		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = REQUEST[3] ?? '';
+		$this->_caseStateValue = REQUEST[4] ?? null;
 	}
 
 
@@ -1751,7 +1751,7 @@ class RECORD extends API {
 		if ($contexts){
 			foreach ($contexts as $context => $tiles){
 				if ($tiles){
-					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], isset($_SESSION['user']['app_settings']['primaryRecordState']) ? $_SESSION['user']['app_settings']['primaryRecordState'] : null))
+					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], $_SESSION['user']['app_settings']['primaryRecordState'] ?? null))
 					array_push($content, $casestate);
 
 					$article = [];
@@ -2272,7 +2272,7 @@ class RECORD extends API {
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
 				$summary['date'] = $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), $export);
 				$summary['title'] = $useddocument['name'];
-				$summary['attachments'] = [' ' => isset($summary['attachments'][$useddocument['name']]) ? $summary['attachments'][$useddocument['name']] : []];
+				$summary['attachments'] = [' ' => $summary['attachments'][$useddocument['name']] ?? []];
 			}
 		}
 		return $summary;

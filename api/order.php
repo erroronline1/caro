@@ -24,8 +24,8 @@ class ORDER extends API {
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
-		$this->_subMethod = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_subMethodState = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_subMethod = REQUEST[3] ?? null;
+		$this->_subMethodState = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -188,7 +188,7 @@ class ORDER extends API {
 									'commission' => 'commission'] as $key => $value){
 									$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 								}
-								$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
+								$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
 								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
@@ -245,7 +245,7 @@ class ORDER extends API {
 										'commission' => 'commission'] as $key => $value){
 										$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 									}
-									$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
+									$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
 
 									$organizational_unit = [$prepared['organizational_unit']];
 									// if unit is common, add ordering users units except admin
@@ -355,7 +355,7 @@ class ORDER extends API {
 						}
 					}
 					// construct result toast
-					$response = isset($response) ? $response : [
+					$response = $response ?? [
 						'response' => [
 							'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
 							'type' => 'info'
@@ -1038,7 +1038,7 @@ class ORDER extends API {
 							'attributes' => [
 								'required' => true,
 								'name' => $this->_lang->GET('order.commission'),
-								'value' => isset($order['commission']) ? $order['commission'] : '',
+								'value' => $order['commission'] ?? '',
 								'data-loss' => 'prevent',
 								'id' => 'commission'
 							],
@@ -1050,7 +1050,7 @@ class ORDER extends API {
 							'type' => 'scanner',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.administrative_mark'),
-								'value' => isset($order['administrative_mark']) ? $order['administrative_mark'] : '',
+								'value' => $order['administrative_mark'] ?? '',
 								'data-loss' => 'prevent',
 							]
 						], [
@@ -1063,7 +1063,7 @@ class ORDER extends API {
 							'type' => 'date',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.delivery_date'),
-								'value' => isset($order['delivery_date']) ? $order['delivery_date'] : ''
+								'value' =>$order['delivery_date'] ?? ''
 							]
 						], [
 							'type' => 'textarea',
@@ -1103,7 +1103,7 @@ class ORDER extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('order.orderer_group_identify'),
 								'required' => true,
-								'value' => isset($order['orderer_group_identify']) ? $order['orderer_group_identify'] : '',
+								'value' => $order['orderer_group_identify'] ?? '',
 							]
 						]]
 					);

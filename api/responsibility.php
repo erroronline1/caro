@@ -22,8 +22,8 @@ class RESPONSIBILITY extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_unit = REQUEST[3] ?? null;
 	}
 
 	/**

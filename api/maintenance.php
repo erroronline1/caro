@@ -21,7 +21,7 @@ class MAINTENANCE extends API {
 		parent::__construct();
 		if (!PERMISSION::permissionFor('maintenance') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedType = REQUEST[2] ?? null;
 	}
 
 	/**
@@ -425,15 +425,15 @@ class MAINTENANCE extends API {
 						':process' => $process,
 						':risk' => '',
 						':relevance' => isset($importrisk['relevance']) ? ($importrisk['relevance'] === $this->_lang->GET('risk.relevance_yes', [], true) ? 1 : 0): null,
-						':cause' => isset($importrisk['cause']) ? $importrisk['cause']: null,
-						':effect' => isset($importrisk['effect']) ? $importrisk['effect']: null,
+						':cause' => $importrisk['cause'] ?? null,
+						':effect' => $importrisk['effect'] ?? null,
 						':probability' => null,
 						':damage' => null,
-						':measure' => isset($importrisk['measure']) ? $importrisk['measure']: null,
+						':measure' => $importrisk['measure'] ?? null,
 						':measure_probability' => isset($importrisk['measure_probability']) ? array_search($importrisk['measure_probability'], $this->_lang->_DEFAULT['risk']['probabilities']) + 1 : null,
 						':measure_damage' => isset($importrisk['measure_damage']) ? array_search($importrisk['measure_damage'], $this->_lang->_DEFAULT['risk']['damages']) + 1 : null,
-						':risk_benefit' => isset($importrisk['risk_benefit']) ? $importrisk['risk_benefit']: null,
-						':measure_remainder' => isset($importrisk['measure_remainder']) ? $importrisk['measure_remainder']: null,
+						':risk_benefit' => $importrisk['risk_benefit'] ?? null,
+						':measure_remainder' => $importrisk['measure_remainder'] ?? null,
 						':proof' => null,
 						':hidden' => null,
 						':author' => $_SESSION['user']['name']
@@ -665,10 +665,10 @@ class MAINTENANCE extends API {
 						$vendor['products'] = json_decode($vendor['products'] ? : '', true);
 
 						$newproductlistfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])) ? UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT) : null;
-						$vendor['products']['filefilter'] = $newproductlistfilter ? : (isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : null);
+						$vendor['products']['filefilter'] = $newproductlistfilter ? : ($vendor['products']['filefilter'] ?? null);
 
 						$newerpfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['erpfilter'])) ? UTILITY::json_encode($entry['products']['erpfilter'], JSON_PRETTY_PRINT) : null;
-						$vendor['products']['erpfilter'] = $newerpfilter ? : (isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : null);
+						$vendor['products']['erpfilter'] = $newerpfilter ? : ($vendor['products']['erpfilter'] ?? null);
 
 						if(isset($entry['products']['samplecheck_interval']) && $entry['products']['samplecheck_interval']) $vendor['products']['samplecheck_interval'] = $entry['products']['samplecheck_interval'];
 						if(isset($entry['products']['samplecheck_reusable']) && $entry['products']['samplecheck_reusable']) $vendor['products']['samplecheck_reusable'] = $entry['products']['samplecheck_reusable'];

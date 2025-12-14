@@ -27,8 +27,8 @@ class USER extends API {
 			!in_array(REQUEST[1], ['profile'])
 		) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_prefilledTrainingUser = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_prefilledTrainingUser = REQUEST[3] ?? null;
 	}
 
 	/**
@@ -489,7 +489,7 @@ class USER extends API {
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.settings.autocomplete_forth'),
-								'value' => isset($user['app_settings']['autocomplete_forth']) ? $user['app_settings']['autocomplete_forth'] : 'Alt',
+								'value' => $user['app_settings']['autocomplete_forth'] ?? 'Alt',
 								'onkeydown' => 'event.preventDefault(); this.value = event.key',
 								'onkeyup' => 'event.preventDefault()'
 							]
@@ -497,7 +497,7 @@ class USER extends API {
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.settings.autocomplete_back'),
-								'value' => isset($user['app_settings']['autocomplete_back']) ? $user['app_settings']['autocomplete_back'] : 'AltGraph',
+								'value' => $user['app_settings']['autocomplete_back'] ?? 'AltGraph',
 								'onkeydown' => 'event.preventDefault(); this.value = event.key',
 								'onkeyup' => 'event.preventDefault()'
 							]
@@ -605,13 +605,13 @@ class USER extends API {
 
 				//set up user properties
 				$user = [
-					':id' => isset($user['id']) ? $user['id'] : null,
+					':id' => $user['id'] ?? null,
 					':name' => $submittedName,
 					':permissions' => null,
 					':units' => null,
-					':token' => isset($user['token']) ? $user['token'] : '',
-					':orderauth' => isset($user['orderauth']) ? $user['orderauth'] : '',
-					':image' => isset($user['image']) ? $user['image'] : '',
+					':token' => $user['token'] ?? '',
+					':orderauth' => $user['orderauth'] ?? '',
+					':image' => $user['image'] ?? '',
 					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
 					':skills' => [],
 				];
@@ -1022,7 +1022,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('user.settings.weekly_hours'),
-									'value' => isset($user['app_settings']['weeklyhours']) ? $user['app_settings']['weeklyhours'] : ''
+									'value' => $user['app_settings']['weeklyhours'] ?? ''
 								],
 								'hint' => $this->_lang->GET('user.settings.weekly_hours_hint')
 							]
@@ -1031,7 +1031,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('user.settings.annual_vacation'),
-									'value' => isset($user['app_settings']['annualvacation']) ? $user['app_settings']['annualvacation'] : ''
+									'value' =>$user['app_settings']['annualvacation'] ?? ''
 								],
 								'hint' => $this->_lang->GET('user.settings.annual_vacation_hint')
 							]
@@ -1236,9 +1236,9 @@ class USER extends API {
 				}
 
 				$training = [
-					':id' => isset($training['id']) ? $training['id'] : null,
+					':id' => $training['id'] ?? null,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training')),
-					':user_id' => isset($training['user_id']) ? $training['user_id'] : null,
+					':user_id' => $training['user_id'] ?? null,
 					':date' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date'))) ? : null,
 					':expires' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires'))) ? : null,
 					':experience_points' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_experience_points')) ? : 0,

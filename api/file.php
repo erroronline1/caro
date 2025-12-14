@@ -28,7 +28,7 @@ class FILE extends API {
 		) $this->response([], 401);
 
 		$this->_requestedFolder = $this->_requestedId = isset(REQUEST[2]) && REQUEST[2] !== 'null' ? REQUEST[2] : null;
-		$this->_requestedFile = $this->_accessible = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedFile = $this->_accessible = REQUEST[3] ?? null;
 	}
 
 	/**
