@@ -482,7 +482,7 @@ class CSVFILTER extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.edit.filter_content'),
 									'value' => $filter['content'],
-									'rows' => 16,
+									'style' => 'height:45em',
 									'id' => 'content',
 									'required' => true,
 									'data-loss' => 'prevent'

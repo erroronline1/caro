@@ -3024,11 +3024,20 @@ class CONSUMABLES extends API {
 							// add erpfilter input
 							$productlist[] = [
 								[
-									'type' => 'code',
+									'type' => 'collapsible',
 									'attributes' => [
-										'name' => $this->_lang->GET('erpquery.consumables.erpfilter'),
-										'value' => isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : '',
-										'placeholder' => $this->erpfiltersample
+										'class' => 'em12'
+									],
+									'content' => [
+										[
+											'type' => 'code',
+											'attributes' => [
+												'name' => $this->_lang->GET('erpquery.consumables.erpfilter'),
+												'value' => isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : '',
+												'placeholder' => $this->erpfiltersample,
+												'style' => 'height:45em'
+											]
+										]
 									]
 								]
 							];
@@ -3084,11 +3093,20 @@ class CONSUMABLES extends API {
 							// add filefilter input
 							$productlist[] = [
 								[
-									'type' => 'code',
+									'type' => 'collapsible',
 									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
-										'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
-										'placeholder' => $this->filefiltersample
+										'class' => 'em12'
+									],
+									'content' => [
+										[
+											'type' => 'code',
+											'attributes' => [
+												'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
+												'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
+												'placeholder' => $this->filefiltersample,
+												'style' => 'height:45em'
+											]
+										]
 									]
 								]
 							];

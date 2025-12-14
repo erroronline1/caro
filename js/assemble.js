@@ -1898,6 +1898,8 @@ export class Assemble {
 	 * 		}
 	 * 	}
 	 * ```
+	 * unlike textarea a row attribute does not work for being wrapped.
+	 * use inline style instead
 	 */
 	code() {
 		this.currentElement.editor = true;
