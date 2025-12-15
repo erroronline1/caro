@@ -258,7 +258,7 @@ class API {
 			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
 			//||
 			(isset($_SESSION['lastrequest'])
-			&& (time() - $_SESSION['lastrequest'] > (isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
+			&& (time() - $_SESSION['lastrequest'] > ($_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
@@ -310,13 +310,13 @@ class API {
 					],
 					'config' => [
 						'application' => [
-							'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+							'defaultlanguage' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
 							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'],
 							'debugging' => CONFIG['application']['debugging'],
 						],
 						'lifespan' => [
 							'session' => [
-								'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
+								'idle' => $_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
 							]
 						],
 						'limits' => [

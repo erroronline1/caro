@@ -696,7 +696,7 @@ class UTILITY {
 	 * @return array|string|bool property value or false
 	 */
 	public static function propertySet($object, $property){
-		if (gettype($object) === 'array') return isset($object[$property]) ? $object[$property] : false;
+		if (gettype($object) === 'array') return $object[$property] ?? false;
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
@@ -970,7 +970,7 @@ class UTILITY {
 				// no header defined, make first line header defining default to empty resolving to xlsxwriters *general* type
 				$firstline = $subset[0];
 				$format = (count($headerformat) === count($firstline)) ? $headerformat : array_map(Fn($v) => '', $firstline);
-				$writer->writeSheetHeader($subsetname, array_combine(array_keys($firstline), $format), isset($settings['header']) ? $settings['header'] : null);
+				$writer->writeSheetHeader($subsetname, array_combine(array_keys($firstline), $format), $settings['header'] ?? null);
 			}
 			foreach ($subset as $line)
 				$writer->writeSheetRow($subsetname, $line, $settings['row']);
@@ -1523,10 +1523,10 @@ class MARKDOWN {
 						case 1:
 							break;
 						case 0:
-							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<th' . (isset($alignment[$i]) ? $alignment[$i] : '') . '>' . trim($column) . '</th>', array_keys($columns), $columns)) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<th' . ($alignment[$i] ?? '') . '>' . trim($column) . '</th>', array_keys($columns), $columns)) . '</tr>';
 							break;
 						default:
-							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<td' . (isset($alignment[$i]) ? $alignment[$i] : '') . '>' . trim($column) . '</td>', array_keys($columns), $columns)) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<td' . ($alignment[$i] ?? '') . '>' . trim($column) . '</td>', array_keys($columns), $columns)) . '</tr>';
 					}
 				}
 				$output .= '</table>';
@@ -1557,7 +1557,7 @@ class SEARCH{
 			// for it may be common to look for "surName, givenName" and surnames are unlikely to end on comma
 			$expression[3] = preg_replace('/^[,;]|[,;]$/', '', $expression[3]);
 			// assign regular expression unless explicit quoted 
-			$term = isset($expression[4]) ? $expression[4] : $expression[3];
+			$term = $expression[4] ?? $expression[3];
 			// assign column if applicable
 			$column = isset($expression[2]) ? substr($expression[2], 0, -1) : null;
 			

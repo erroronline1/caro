@@ -29,9 +29,9 @@ class CALENDAR extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedTimespan = $this->_requestedId = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_requestedDate = $this->_requestedComplete = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_requestedCalendarType = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_requestedTimespan = $this->_requestedId = REQUEST[2] ?? null;
+		$this->_requestedDate = $this->_requestedComplete = REQUEST[3] ?? null;
+		$this->_requestedCalendarType = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -297,7 +297,7 @@ class CALENDAR extends API {
 						foreach ($schedule['misc']['content'] as $name => $importtimeunit){
 							$imports = [];
 							foreach ($defaulttimeunits as $label => $color){
-								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
+								$imports[$label] = $importtimeunit[$label] ?? $color;
 							}
 							$content[$name] = $imports;
 						}
@@ -334,7 +334,7 @@ class CALENDAR extends API {
 					$response['render']['content'][] = [
 						[
 							'type' => 'longtermplanning_topics',
-							'content' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
+							'content' => $schedule['misc']['preset'] ?? null
 						]
 					];
 				} 
@@ -633,7 +633,7 @@ class CALENDAR extends API {
 
 				// add summaries to user if not already set
 				if (!isset($timesheets[$entry['affected_user_id']])) {
-					$units = array_map(Fn($u) => isset($this->_lang->_DEFAULT['units'][$u]) ? $this->_lang->_DEFAULT['units'][$u] : false, explode(',', $entry['affected_user_units']));
+					$units = array_map(Fn($u) => $this->_lang->_DEFAULT['units'][$u] ?? false, explode(',', $entry['affected_user_units']));
 					$pto = [];
 					foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
 						if (isset($stats_month_row[$key])) $pto[$key] = $stats_month_row[$key];
@@ -672,16 +672,16 @@ class CALENDAR extends API {
 
 						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
 							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
-							'break' => isset($misc['break']) ? $misc['break'] : '',
-							'homeoffice' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
-							'workinghourscorrection' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : '',
-							'note' => isset($misc['note']) ? $misc['note'] : '',
+							'break' => $misc['break'] ?? '',
+							'homeoffice' => $misc['homeoffice'] ?? '',
+							'workinghourscorrection' => $misc['workinghourscorrection'] ?? '',
+							'note' => $misc['note'] ?? '',
 							'hours' => round($dailyhours, 2),
 						];
 					}
 
 					// else state subject
-					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => $this->_lang->_DEFAULT['calendar']['timesheet']['pto'][$entry['subject']], 'note' => isset($misc['note']) ? $misc['note'] : ''];
+					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => $this->_lang->_DEFAULT['calendar']['timesheet']['pto'][$entry['subject']], 'note' => $misc['note'] ?? ''];
 				}
 			}
 		}
@@ -1698,7 +1698,7 @@ class CALENDAR extends API {
 
 				// add summaries to user if not already set
 				if (!isset($timesheets[$entry['affected_user_id']])) {
-					$units = array_map(Fn($u) => isset($this->_lang->_DEFAULT['units'][$u]) ? $this->_lang->_DEFAULT['units'][$u] : false, explode(',', $entry['affected_user_units']));
+					$units = array_map(Fn($u) => $this->_lang->_DEFAULT['units'][$u] ?? false, explode(',', $entry['affected_user_units']));
 					$pto = [];
 					foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
 						if (isset($stats_year_row[$key])) $pto[$translation] = $stats_year_row[$key];

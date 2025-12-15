@@ -26,7 +26,7 @@ class APPLICATION extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedManual = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedManual = $this->_search = REQUEST[2] ?? null;
 	}
 
 	/**
@@ -492,7 +492,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('application.timeout_aria', [':minutes' => round((isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))) / 60)])
+					'name' => $this->_lang->GET('application.timeout_aria', [':minutes' => round(($_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))) / 60)])
 				]
 			]
 		];

@@ -41,7 +41,7 @@ class SQLQUERY {
 			foreach ($parameters['values'] as $key => $value){
 
 				if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
-					$query = SELF::SEARCH($_pdo, $query, $value, (isset($parameters['wildcards']) ? $parameters['wildcards'] : false));
+					$query = SELF::SEARCH($_pdo, $query, $value, ($parameters['wildcards'] ?? false));
 					if (!$query) return [];
 					unset($parameters['values'][$key]);
 					continue;
@@ -114,7 +114,7 @@ class SQLQUERY {
 		foreach($matchedcolumns as $column){
 			$columns[] = [
 				'match' => $column[0],
-				'and_or' => isset($column[2]) ? $column[2] : null,
+				'and_or' =>$column[2] ?? null,
 				'replace' => $column[3],
 				'column' => $column[4],
 			];

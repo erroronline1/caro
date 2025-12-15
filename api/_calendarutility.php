@@ -246,7 +246,7 @@ class CALENDARUTILITY {
 		foreach ([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
 		foreach ([':id', ':alert', ':autodelete'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
 		foreach ([':author_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
-		$columns[':affected_user_id'] = isset($columns[':affected_user_id']) ? $columns[':affected_user_id'] : null; 
+		$columns[':affected_user_id'] = $columns[':affected_user_id'] ?? null; 
 
 		// prepare lists and datetime types for modification 
 		$units = [];
@@ -482,7 +482,7 @@ class CALENDARUTILITY {
 						'type' => 'time',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.break_time'),
-							'value' => isset($misc['break']) ? $misc['break'] : '',
+							'value' => $misc['break'] ?? '',
 							'required' => true,
 							'id' => '_break'
 						]
@@ -490,7 +490,7 @@ class CALENDARUTILITY {
 						'type' => 'number',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.workinghourscorrection'),
-							'value' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : ''
+							'value' => $misc['workinghourscorrection'] ?? ''
 						]
 					]
 				]);
@@ -500,7 +500,7 @@ class CALENDARUTILITY {
 						'type' => 'text',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.pto_note'),
-							'value' => isset($misc['note']) ? $misc['note'] : '',
+							'value' => $misc['note'] ?? '',
 						]
 					], [
 						'type' => 'checkbox',
@@ -523,7 +523,7 @@ class CALENDARUTILITY {
 							'type' => 'time',
 							'attributes' => [
 								'name' => $this->_lang->GET('calendar.timesheet.homeoffice'),
-								'value' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
+								'value' => $misc['homeoffice'] ?? '',
 								'required' => true
 							]
 						]
@@ -739,7 +739,7 @@ class CALENDARUTILITY {
 	public function post($columns = []){
 		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 			'values' => $columns
-		])) return isset($columns[':id']) ? $columns[':id'] : $this->_pdo->lastInsertId();
+		])) return $columns[':id'] ?? $this->_pdo->lastInsertId();
 		return false;
 	}
 	

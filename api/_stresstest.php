@@ -263,7 +263,7 @@ class STRESSTEST extends INSTALL{
 					':lifespan' => null,
 					':erp_case_number' => null,
 					':note' => null,
-					':id' => isset($exists['id']) ? $exists['id'] : null,
+					':id' => $exists['id'] ?? null,
 				]
 			]);
 		}

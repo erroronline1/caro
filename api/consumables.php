@@ -134,9 +134,9 @@ class CONSUMABLES extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_search = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_usecase = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_requestedID = REQUEST[2] ?? null;
+		$this->_search = REQUEST[3] ?? null;
+		$this->_usecase = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -2195,16 +2195,16 @@ class CONSUMABLES extends API {
 				$key = ($row['article_no'] ? : '') . ($row['article_name'] ? : '');
 				$key = mb_convert_encoding($key, 'UTF-8', mb_detect_encoding($key, ['ASCII', 'UTF-8', 'ISO-8859-1']));
 				$imported[$key] = [ // at least one of both should not be null and the whole string distinct. otherwise screw the source.
-					'article_no' => isset($row['article_no']) ? $row['article_no'] : null,
-					'article_name' => isset($row['article_name']) ? $row['article_name'] : null,
+					'article_no' => $row['article_no'] ?? null,
+					'article_name' => $row['article_name'] ?? null,
 					'article_unit' => isset($row['article_unit']) ? trim(preg_replace('/\n/', '', $row['article_unit'])) : null,
 					'article_ean' => isset($row['article_ean']) ? trim(preg_replace('/\n/', '', $row['article_ean'])) : null,
 					'article_info' => isset($row['article_info']) ? trim(preg_replace('/\n/', '', $row['article_info'])) : null,
-					'trading_good' => isset($row['trading_good']) ? $row['trading_good'] : null,
-					'has_expiry_date' => isset($row['has_expiry_date']) ? $row['has_expiry_date'] : null,
-					'special_attention' => isset($row['special_attention']) ? $row['special_attention'] : null,
-					'stock_item' => isset($row['stock_item']) ? $row['stock_item'] : null,
-					'thirdparty_order' => isset($row['thirdparty_order']) ? $row['thirdparty_order'] : null,
+					'trading_good' => $row['trading_good'] ?? null,
+					'has_expiry_date' => $row['has_expiry_date'] ?? null,
+					'special_attention' => $row['special_attention'] ?? null,
+					'stock_item' => $row['stock_item'] ?? null,
+					'thirdparty_order' => $row['thirdparty_order'] ?? null,
 					'erp_id' => isset($row['erp_id']) ? trim($row['erp_id']) : null,
 					'last_order' => isset($row['last_order']) ? trim($row['last_order']) : null,
 				];
@@ -2257,12 +2257,12 @@ class CONSUMABLES extends API {
 			foreach (array_diff(array_keys($imported), array_keys($remainder)) as $key){
 				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => isset($imported[$key]['article_no']) ? $imported[$key]['article_no'] : null,
-					':article_name' => isset($imported[$key]['article_name']) ? $imported[$key]['article_name'] : null,
+					':article_no' => $imported[$key]['article_no'] ?? null,
+					':article_name' => $imported[$key]['article_name'] ?? null,
 					':article_alias' => null,
-					':article_unit' => isset($imported[$key]['article_unit']) ? $imported[$key]['article_unit'] : null,
-					':article_ean' => isset($imported[$key]['article_ean']) ? $imported[$key]['article_ean'] : null,
-					':article_info' => isset($imported[$key]['article_info']) ? $imported[$key]['article_info'] : null,
+					':article_unit' => $imported[$key]['article_unit'] ?? null,
+					':article_ean' =>$imported[$key]['article_ean'] ?? null,
+					':article_info' => $imported[$key]['article_info'] ?? null,
 					':hidden' => null,
 					':has_files' => null,
 					':trading_good' => isset($imported[$key]['trading_good']) && intval($imported[$key]['trading_good']) ? 1 : null,
@@ -2428,7 +2428,7 @@ class CONSUMABLES extends API {
 				}
 
 				$vendor = [
-					':id' => isset($vendor['id']) ? $vendor['id'] : null,
+					':id' => $vendor['id'] ?? null,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					':info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
@@ -2812,7 +2812,7 @@ class CONSUMABLES extends API {
 				else {
 					// display form for adding a new or edit a current vendor
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
-					$latest_vendor_evaluation = isset($vendor['evaluation'][count($vendor['evaluation']) - 1]) ? $vendor['evaluation'][count($vendor['evaluation']) - 1] : [];
+					$latest_vendor_evaluation = $vendor['evaluation'][count($vendor['evaluation']) - 1] ?? [];
 					// fill evaluation document with last vendor values
 					$evaluationdocument = $document->populatedocument($evaluationdocument, $latest_vendor_evaluation);
 					if (isset($latest_vendor_evaluation['_author'])) $evaluationdocument[0][] = [
@@ -2853,7 +2853,7 @@ class CONSUMABLES extends API {
 									'type' => 'textarea',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.info'),
-										'value' => isset($vendor['info']['infotext']) ? $vendor['info']['infotext']: '',
+										'value' => $vendor['info']['infotext'] ?? '',
 										'rows' => 8
 									],
 									'hint' => $this->_lang->GET('consumables.vendor.info_hint')
@@ -2861,38 +2861,38 @@ class CONSUMABLES extends API {
 									'type' => 'email',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.mail'),
-										'value' => isset($vendor['info']['mail']) ? $vendor['info']['mail']: '',
+										'value' => $vendor['info']['mail'] ?? '',
 									]
 								], [
 									'type' => 'tel',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.phone'),
-										'value' => isset($vendor['info']['phone']) ? $vendor['info']['phone']: '',
+										'value' =>$vendor['info']['phone'] ?? '',
 									]
 								], [
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.address'),
-										'value' => isset($vendor['info']['address']) ? $vendor['info']['address']: '',
+										'value' => $vendor['info']['address'] ?? '',
 									]
 								], [
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.sales_representative'),
-										'value' => isset($vendor['info']['sales_representative']) ? $vendor['info']['sales_representative']: '',
+										'value' => $vendor['info']['sales_representative'] ?? '',
 									]
 								], [
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.customer_id'),
-										'value' => isset($vendor['info']['customer_id']) ? $vendor['info']['customer_id']: '',
+										'value' => $vendor['info']['customer_id'] ?? '',
 										'id' => '_vendor_customer_id'
 									]
 								], [
 									'type' => 'textarea',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.purchase_info'),
-										'value' => isset($vendor['info']['purchase_info']) ? $vendor['info']['purchase_info']: '',
+										'value' => $vendor['info']['purchase_info'] ?? '',
 										'rows' => 8
 									],
 								], [
@@ -2993,14 +2993,14 @@ class CONSUMABLES extends API {
 									'type' => 'number',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
-										'value' => isset($vendor['products']['samplecheck_interval']) ? $vendor['products']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
+										'value' => $vendor['products']['samplecheck_interval'] ?? CONFIG['lifespan']['product']['mdr14_sample_interval']
 									]
 								],
 								[
 									'type' => 'number',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
-										'value' => isset($vendor['products']['samplecheck_reusable']) ? $vendor['products']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
+										'value' => $vendor['products']['samplecheck_reusable'] ?? CONFIG['lifespan']['product']['mdr14_sample_reusable']
 									]
 								]
 							];
@@ -3033,7 +3033,7 @@ class CONSUMABLES extends API {
 											'type' => 'code',
 											'attributes' => [
 												'name' => $this->_lang->GET('erpquery.consumables.erpfilter'),
-												'value' => isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : '',
+												'value' => $vendor['products']['erpfilter'] ?? '',
 												'placeholder' => $this->erpfiltersample,
 												'style' => 'height:45em'
 											]
@@ -3102,7 +3102,7 @@ class CONSUMABLES extends API {
 											'type' => 'code',
 											'attributes' => [
 												'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
-												'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
+												'value' => $vendor['products']['filefilter'] ?? '',
 												'placeholder' => $this->filefiltersample,
 												'style' => 'height:45em'
 											]

@@ -39,9 +39,9 @@ class AUDIT extends API {
 		parent::__construct();
 		if (!PERMISSION::permissionFor('regulatory') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedType = $this->_requestedTemplate = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_requestedDatetime = $this->_requestedID = $this->_requestedOption = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_requestedDatetime2 = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_requestedType = $this->_requestedTemplate = REQUEST[2] ?? null;
+		$this->_requestedDatetime = $this->_requestedID = $this->_requestedOption = REQUEST[3] ?? null;
+		$this->_requestedDatetime2 = REQUEST[4] ?? null;
 		$this->_markdown = new MARKDOWN();
 	}
 
@@ -68,14 +68,14 @@ class AUDIT extends API {
 
 				// set up general properties
 				$audit = [
-					':id' => isset($audit['id']) ? $audit['id'] : null, 
+					':id' => $audit['id'] ?? null,
 					':template' => $template['id'],
 					':unit' => $template['unit'],
 					':content' => [],
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null,
-					':last_touch' => isset($audit['last_touch']) ? $audit['last_touch'] : null,			
-					':notified' => isset($audit['notified']) ? $audit['notified'] : null
+					':last_touch' => $audit['last_touch'] ?? null,
+					':notified' => $audit['notified'] ?? null
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 				$audit[':content'] = [
@@ -142,7 +142,7 @@ class AUDIT extends API {
 											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 											break;
 										case 'regulatory':
-											$summary .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
+											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 											break;
 										default:
 										$summary .= implode("\n", $values);
@@ -224,9 +224,9 @@ class AUDIT extends API {
 				if (!$audit){
 					$audit = [
 						'id' => null,
-						'template' => isset($template['id']) ? $template['id'] : null,
+						'template' => $template['id'] ?? null,
 						'content' => $recent ? $recent['content'] : '',
-						'unit' => isset($template['unit']) ? $template['unit'] : null,
+						'unit' => $template['unit'] ?? null,
 						'last_touch' => null,
 					];
 				}
@@ -379,7 +379,7 @@ class AUDIT extends API {
 							], [
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => implode(', ' , array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, explode(',', $question['regulatory'])))
+									'name' => implode(', ' , array_map(fn($r) => $this->_lang->_USER['regulatory'][$r] ?? $r, explode(',', $question['regulatory'])))
 								],
 								'content' => $question['hint'] ? : ' '
 							], [
@@ -412,7 +412,7 @@ class AUDIT extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $this->_lang->GET('audit.audit.execute.summary'),
-								'value' => isset($audit['content']['summary']) ? $audit['content']['summary'] : ''
+								'value' => $audit['content']['summary'] ?? ''
 							],
 							'hint' => $this->_lang->GET('audit.audit.execute.summary_hint')
 						], [
@@ -520,7 +520,7 @@ class AUDIT extends API {
 							$summary['content'][$currentquestion] .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 							break;
 						case 'regulatory':
-							$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
+							$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 							break;
 						default:
 							$summary['content'][$currentquestion] .= implode("  \n", $values);
@@ -596,7 +596,7 @@ class AUDIT extends API {
 								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 								break;
 							case 'regulatory':
-								$currentanswer .= "\n* " . implode("\n* " , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
+								$currentanswer .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 								break;
 							default:
 								$currentanswer .= implode("  \n", $values);
@@ -793,7 +793,7 @@ class AUDIT extends API {
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
 					foreach ($template['content'] as &$question){
 						$question['regulatory'] = explode(',', $question['regulatory']);
-						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, $question['regulatory']));
+						$question['regulatory'] = implode(', ', array_map(fn($r) => $this->_lang->_USER['regulatory'][$r] ?? $r, $question['regulatory']));
 					}
 					$response['selected'] = $template['content'];
 				}
@@ -1244,7 +1244,7 @@ class AUDIT extends API {
 				}
 			}
 			foreach (explode(',', $document['regulatory_context'] ? : '') as $context){
-				$entry .= "\n* " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
+				$entry .= "\n* " . ($this->_lang->_USER['regulatory'][$context] ?? $context);
 			}
 
 			$documentscontent[] = [
@@ -1309,7 +1309,7 @@ class AUDIT extends API {
 				}
 				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $this->convertFromServerTime($file['activated'], true)]);
 				foreach (explode(',', $file['regulatory_context'] ? : '') as $context){
-					if ($context) $display .= " | " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
+					if ($context) $display .= " | " . ($this->_lang->_USER['regulatory'][$context] ?? $context);
 				}
 				$links[$display] = ['href' => $file['url'], 'target' => 'blank'];
 			}
@@ -1439,7 +1439,7 @@ class AUDIT extends API {
 		foreach ($usedname as $name => $count){
 			$document = $documents[array_search($name, array_column($documents, 'name'))]; // since the document datalist is ordered by date desc the first match is suitable
 
-			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => isset($this->_lang->_USER['regulatory'][$c]) ? $this->_lang->_USER['regulatory'][$c] : $c, explode(',', $document['regulatory_context']));
+			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => $this->_lang->_USER['regulatory'][$c] ?? $c, explode(',', $document['regulatory_context']));
 
 			$color = end($usedname) ? 200 * $count / end($usedname) : 0; // avoid division by zero
 			$content[] = [
@@ -1691,14 +1691,14 @@ class AUDIT extends API {
 				}
 
 				$managementreview = [
-					':id' => isset($managementreview['id']) ? $managementreview['id'] : null,
+					':id' => $managementreview['id'] ?? null,
 					':template' => null,
 					':unit' => null,
 					':content' => isset($managementreview['content']) ? json_decode($managementreview['content'], true) : [],
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null,
-					':notified' => isset($managementreview['notified']) ? $managementreview['notified'] : null,
-					':last_touch' => isset($managementreview['last_touch']) ? $managementreview['last_touch'] : null
+					':notified' => $managementreview['notified'] ?? null,
+					':last_touch' =>$managementreview['last_touch'] ?? null
 				];
 				// process content according to required fields
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
@@ -1802,7 +1802,7 @@ class AUDIT extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $issue,
-								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : '',
+								'value' => $managementreview['content'][$key] ?? '',
 								'data-loss' => 'prevent',
 								'onblur' => '_client.audit.managementreview()'
 							],
@@ -1887,7 +1887,7 @@ class AUDIT extends API {
 		$summary['content'][$managementreview['last_user']] = '';
 		foreach ($managementreview['content'] as $issue => $review){
 			// translate or keep issue if not found in languagefile 
-			$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
+			$key = $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] ?? $issue;
 			$summary['content'][$key] = $review . "\n";
 		}
 		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary') . '*';
@@ -1939,7 +1939,7 @@ class AUDIT extends API {
 			foreach ($managementreview['content'] as $issue => $review){
 				$currentquestion = $currentanswer = '';
 				// translate or keep issue if not found in languagefile 
-				$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
+				$key = $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] ?? $issue;
 				$currentquestion = $key;
 				$currentanswer = $review . "\n";
 
@@ -2259,12 +2259,12 @@ class AUDIT extends API {
 			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
 
 			$vendor_orders[$order['order_data']['vendor_label']][] = [
-				isset($order['order_data']['vendor_label']) ? $order['order_data']['vendor_label'] : '',
+				$order['order_data']['vendor_label'] ?? '',
 				$this->_lang->GET('order.ordertype.' . $order['ordertype']),
-				isset($order['order_data']['quantity_label']) ? $order['order_data']['quantity_label'] : '',
-				isset($order['order_data']['unit_label']) ? $order['order_data']['unit_label'] : '',
-				isset($order['order_data']['ordernumber_label']) ? $order['order_data']['ordernumber_label'] : '',
-				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
+				$order['order_data']['quantity_label'] ?? '',
+				$order['order_data']['unit_label'] ?? '',
+				$order['order_data']['ordernumber_label'] ?? '',
+				$order['order_data']['productname_label'] ?? '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
 				$this->convertFromServerTime($order['ordered']),
 				$this->convertFromServerTime($order['delivered_partially']),
@@ -2833,7 +2833,7 @@ class AUDIT extends API {
 				if (!$value) continue;
 
 				$issuecontent = implode("  \n", $value);
-				if (!in_array($key, ['assignmenterror'])) $issuecontent = "\n* " . implode("\n* ", array_values(array_map(fn($r) => isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, $value)));
+				if (!in_array($key, ['assignmenterror'])) $issuecontent = "\n* " . implode("\n* ", array_values(array_map(fn($r) => $this->_lang->_USER['risks'][$r] ?? null, $value)));
 				$issues[] = [
 					'type' => 'textsection',
 					'attributes' => [
@@ -2933,7 +2933,7 @@ class AUDIT extends API {
 			}
 
 			// translate
-			$risk['risk'] = implode("\n", array_values(array_map(fn($r) => isset($this->_lang->_DEFAULT['risks'][$r]) ? $this->_lang->_DEFAULT['risks'][$r] : $r, explode(',', $risk['risk'] ? : ''))));
+			$risk['risk'] = implode("\n", array_values(array_map(fn($r) => $this->_lang->_DEFAULT['risks'][$r] ?? $r, explode(',', $risk['risk'] ? : ''))));
 			$risk['relevance'] = $risk['relevance'] ? $this->_lang->GET('risk.relevance_yes', [], true) : $this->_lang->GET('risk.relevance_no', [], true);
 
 			// sort to process and type, consider form fields and names within GET RISK->risk() as well
@@ -3659,7 +3659,7 @@ class AUDIT extends API {
 				$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
 				$info .= implode("  \n", array_map(Fn($key, $value) => $this->_lang->GET($vendor_info[$key]) . ': ' . $value, array_keys($vendor['info']), $vendor['info'])) . "  \n";
 			}
-			$vendor['products'] = isset($vendor['products']) ? $vendor['products'] : [];
+			$vendor['products'] = $vendor['products'] ?? [];
 			$productlist = json_decode($vendor['products'] ? : '', true);
 			if (isset($productlist['validity']) && $productlist['validity']) $info .= $this->_lang->GET('consumables.vendor.productlist_validity') . ' ' . $this->convertFromServerTime($productlist['validity'], true) . "  \n";
 			if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $this->convertFromServerTime($lastchecks[$samplecheck]['checked'], true) . "  \n";

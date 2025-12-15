@@ -19,15 +19,15 @@ class PDF{
 
 	public function __construct($setup){
 		$this->_setup = [
-			'format' => isset($setup['format']) ? $setup['format'] : 'A4',
-			'unit' => isset($setup['unit']) ? $setup['unit'] : PDF_UNIT,
-			'orientation' => isset($setup['orientation']) ? $setup['orientation'] : PDF_PAGE_ORIENTATION,
+			'format' => $setup['format'] ?? 'A4',
+			'unit' => $setup['unit'] ?? PDF_UNIT,
+			'orientation' => $setup['orientation'] ?? PDF_PAGE_ORIENTATION,
 			'margintop' => isset($setup['margintop']) ? intval($setup['margintop']) : 30,
 			'marginright' => isset($setup['marginright']) ? intval($setup['marginright']) : 15,
 			'marginbottom' => isset($setup['marginbottom']) ? intval($setup['marginbottom']) : 20,
 			'marginleft' => isset($setup['marginleft']) ? intval($setup['marginleft']) : 20,
-			'header_image' => isset($setup['header_image']) ? $setup['header_image'] : null,
-			'footer_image' => isset($setup['footer_image']) ? $setup['footer_image'] : null,
+			'header_image' => $setup['header_image'] ?? null,
+			'footer_image' => $setup['footer_image'] ?? null,
 			'exportimage_maxwidth' => isset($setup['exportimage_maxwidth']) ? min(130, intval($setup['exportimage_maxwidth'])) : 130,
 			'exportimage_maxheight' => isset($setup['exportimage_maxheight']) ? intval($setup['exportimage_maxheight']) : 75,
 			'rows' => isset($setup['rows']) ? intval($setup['rows']) : 1,
@@ -35,8 +35,8 @@ class PDF{
 			'fontsize' => isset($setup['fontsize']) ? intval($setup['fontsize']) : 12,
 			'codesizelimit' => isset($setup['codesizelimit']) ? intval($setup['codesizelimit']) : null,
 			'codepadding' => isset($setup['codepadding']) ? intval($setup['codepadding']) : 0,
-			'header' => isset($setup['header']) ? $setup['header'] : true,
-			'footer' => isset($setup['footer']) ? $setup['footer'] : true,
+			'header' => $setup['header'] ?? true,
+			'footer' => $setup['footer'] ?? true,
 		];
 		$customsetup = preg_split('/\D{1,}/', $this->_setup['format']);
 		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
@@ -47,7 +47,7 @@ class PDF{
 	private function init($content){
 		// create new PDF document and set initial properties
 		$this->_pdf = new RECORDTCPDF($this->_setup, true, 'UTF-8', false, false,
-		20, isset($content['identifier']) ? $content['identifier'] : null, ['title' => isset($content['title']) ? $content['title'] : '', 'date' => isset($content['date']) ? $content['date'] : '']);
+		20, $content['identifier'] ?? null, ['title' => $content['title'] ?? '', 'date' => $content['date'] ?? '']);
 
 		// set document information
 		$this->_pdf->SetCreator(CONFIG['system']['caroapp']);
@@ -402,7 +402,7 @@ class PDF{
 			if ($page++)$this->_pdf->AddPage();
 			foreach ($user as $row){
 				$key = isset($row[0]) ? $row[0][0] : '';
-				$value = isset($row[1]) ? $row[1] : '';
+				$value = $row[1] ?? '';
 				if (isset($row[0]) && $row[0][1]) $this->_pdf->SetTextColor(192, 192, 192);
 				$this->_pdf->MultiCell(50, 2, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 				$this->_pdf->SetTextColor(0, 0, 0);

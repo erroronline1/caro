@@ -941,7 +941,7 @@ class INSTALL {
 				continue;
 			}
 
-			$entry['hint'] = isset($entry['hint']) ? $entry['hint'] : null;
+			$entry['hint'] = $entry['hint'] ?? null;
 			// keep only by current unit
 			$similar = array_filter($DBall, fn($audit) => $audit['unit'] === $entry['unit']);
 			// keep only by current objectives
@@ -1014,7 +1014,7 @@ class INSTALL {
 
 				$insertions[] = [
 					':name' => $entry['name'],
-					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+					':author' => $entry['author'] ?? $this->_defaultUser,
 					':content' => $entry['content'],
 					':hidden' => null,
 				];
@@ -1237,7 +1237,7 @@ class INSTALL {
 				$insertions[] = [
 					':name' => $entry['name'],
 					':unit' => $entry['unit'],
-					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+					':author' => $entry['author'] ?? $this->_defaultUser,
 					':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
 					':type' => $entry['type'],
 					':hidden' => null

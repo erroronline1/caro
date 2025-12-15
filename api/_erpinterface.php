@@ -903,7 +903,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		
 		if (!$request) {
 			// this may handle available languages as well!
-			$language = isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'];
+			$language = $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'];
 			switch($language){
 				case 'en':
 					return [
@@ -1501,7 +1501,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		if (!$request) {
 			// this may handle available languages as well!
-			$language = isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'];
+			$language = $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'];
 			switch($language){
 				case 'en':
 					return [
