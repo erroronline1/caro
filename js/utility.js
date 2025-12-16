@@ -139,7 +139,7 @@ export const _serviceWorker = {
 		 * @param {object} data containing csvfilter_approval
 		 * @event sets querySelector attribute data-notification
 		 */
-		consumables: function (data) {
+		tool: function (data) {
 			let notif,
 				csvfilter_approval = 0;
 			if ("csvfilter_approval" in data) {
@@ -182,6 +182,7 @@ export const _serviceWorker = {
 		this.notif.consumables(data);
 		this.notif.calendar(data);
 		this.notif.records(data);
+		this.notif.tool(data);
 	},
 
 	/**
@@ -657,15 +658,13 @@ export const _client = {
 			if (data.stockfilter) {
 				// construct unit selection
 				// limiting to units may speed up rendering for purchase members with this permission if necessary
-				organizational_units[api._lang.GET("order.all_units")] = {
-					onchange:
-						'api._settings.session.orderUnits = null; api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, document.querySelector("[name=' +
-						api._lang.GET("order.order_filter") +
-						']:checked").value)',
-					checked: true,
-					value:"null"
-				};
-				for (const [key, value] of Object.entries(api._lang._USER.units)) {
+
+				// extend unit filter with stock or stock_none option as this affects the filter the same way
+				const units = {};
+				units['null'] = api._lang.GET("order.all_units");
+				units['stock'] = api._lang.GET("order.stock_filter");
+				units['stock_none'] =  api._lang.GET("order.stock_filter_none");
+				for (const [key, value] of Object.entries({...units, ...api._lang._USER.units})) {
 					organizational_units[value] = {
 						onchange:
 							'api._settings.session.orderUnits = "' +
@@ -675,7 +674,7 @@ export const _client = {
 							']:checked").value)',
 						value:key
 					};
-					if (api._settings.session.orderUnits === key) organizational_units[value].checked = true;
+					if (api._settings.session.orderUnits === key || (!api._settings.session.orderUnits && key === 'null')) organizational_units[value].checked = true;
 				}
 				content[content.length - 1].push({
 					type: "radio",
@@ -683,23 +682,6 @@ export const _client = {
 						name: api._lang.GET("order.organizational_unit"),
 					},
 					content: organizational_units,
-				});
-
-				content[content.length - 1].push({
-					type: "button",
-					attributes: {
-						value: api._lang.GET("order.stock_filter"),
-						class: "inlinebutton",
-						onclick: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "stock", "' + data.state + '")',
-					},
-				});
-				content[content.length - 1].push({
-					type: "button",
-					attributes: {
-						value: api._lang.GET("order.stock_filter_none"),
-						class: "inlinebutton",
-						onclick: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "stock_none", "' + data.state + '")',
-					},
 				});
 			}
 			if (data.export) {
