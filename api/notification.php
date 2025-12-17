@@ -198,7 +198,7 @@ class NOTIFICATION extends API {
 										}
 										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_post'),
 											[
-												':context' => $case['context'],
+												':context' => $this->_pdo->quote($case['context']),
 												':case_state' => $this->_pdo->quote(UTILITY::json_encode($case['case_state'])),
 												':record_type' => $this->_pdo->quote($case['record_type']) ? : 'NULL',
 												':identifier' => $this->_pdo->quote($case['identifier']),
@@ -572,12 +572,10 @@ class NOTIFICATION extends API {
 											':user' => $user['id'],
 											':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
 										]
-									])) SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
-											'values' => [
-												':user' => $user['id'],
-												':ids' => implode(',', array_column($messages, 'id'))
-											]
-										]);
+									])) SQLQUERY::EXECUTE($this->_pdo, strtr(SQLQUERY::PREPARE('message_delete_messages'),[
+											':user' => $user['id'],
+											':ids' => implode(',', array_column($messages, 'id')) 
+										]));
 								}
 							}
 
