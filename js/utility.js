@@ -664,6 +664,7 @@ export const _client = {
 				units['null'] = api._lang.GET("order.all_units");
 				units['stock'] = api._lang.GET("order.stock_filter");
 				units['stock_none'] =  api._lang.GET("order.stock_filter_none");
+				units['returns'] =  api._lang.GET("order.return_filter");
 				for (const [key, value] of Object.entries({...units, ...api._lang._USER.units})) {
 					organizational_units[value] = {
 						onchange:

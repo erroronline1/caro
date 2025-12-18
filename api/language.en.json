@@ -1444,6 +1444,7 @@
 		"productname_label": "Product name",
 		"quantity_label": "Quantity",
 		"return": "Return product",
+		"return_filter": "Display returns only",
 		"return_message": "Add addition information for purchase, like serial number, etc.",
 		"return_message_cancel": "No, thank you",
 		"return_message_ok": "Yes, return",
