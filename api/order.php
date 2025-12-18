@@ -52,7 +52,14 @@ class ORDER extends API {
 				if (!$orders) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 
 				foreach($orders as $order) {
-					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), ['common', ...$_SESSION['user']['units']]))) $this->response([], 401);
+					// resolve order data
+					$decoded_order_data = json_decode($order['order_data'], true);
+
+					if (!(
+						PERMISSION::permissionFor('orderprocessing')
+						|| $decoded_order_data['orderer'] === $_SESSION['user']['id']
+						|| array_intersect(explode(',', $order['organizational_unit']), ['common', ...$_SESSION['user']['units']])
+						)) $this->response([], 401);
 
 					// set order process states
 					if (in_array($this->_subMethod, ['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'])){
@@ -102,7 +109,6 @@ class ORDER extends API {
 								break;
 							case 'issued_full':
 								// sets last order date for next overview
-								$decoded_order_data = json_decode($order['order_data'], true);
 								if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'])){
 									$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
 										'values' => [
@@ -134,8 +140,6 @@ class ORDER extends API {
 
 					// disapprove, addinformation, cancel, return order
 					else {
-						// resolve order data
-						$decoded_order_data = json_decode($order['order_data'], true);
 						// prepare possible keys
 						$prepared = [
 							'items' => [[]],
@@ -389,9 +393,6 @@ class ORDER extends API {
 					'allowedstateupdates'=> [],
 					'export' => false,
 					'stockfilter' => false]];
-				// set available units
-				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
-				else $units = $_SESSION['user']['units']; // display only orders for own units
 
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
@@ -448,6 +449,19 @@ class ORDER extends API {
 				}
 				ksort($statechange);
 
+				// set available units
+				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
+				else $units = $_SESSION['user']['units']; // display only orders for own units
+				$units[] = 'common'; // append common for for sqlquery by default
+				// override unit if explicit selected, _subMethod can be *stock* or *stock_none* as well, therefore the language key check
+				if (isset($this->_lang->_USER['units'][$this->_subMethod])) $units = [$this->_subMethod];
+
+				// determine if filtered for orderidentifier, strip if applicable
+				$orderidentifier = null;
+				if ($this->_requestedID){
+					$orderidentifier = UTILITY::identifier(' ' . $this->_requestedID, null, null, true);
+					if ($orderidentifier) $this->_requestedID =  trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
+				}
 				// get all approved orders filtered by
 				// applicable units, state and search
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
@@ -514,7 +528,8 @@ class ORDER extends API {
 					if (
 						($this->_subMethod === 'stock' && !isset($product['stock_item']))
 						|| ($this->_subMethod === 'stock_none' && isset($product['stock_item']))
-						|| (isset($this->_lang->_USER['units'][$this->_subMethod]) && $this->_subMethod !== $row['organizational_unit'])
+						|| ($this->_subMethod === 'returns' && $row['ordertype'] !== 'return')
+						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
 					) continue;
 
 					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
@@ -525,11 +540,13 @@ class ORDER extends API {
 					if (isset($users[$orderer_id])) $orderer = $users[$orderer_id];
 					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
 
-					// if unit intersects, orderer is viewing user or common orders are done by own unit members
-					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $units)) || $orderer['name'] === $_SESSION['user']['name'];
+					// if unit intersects, orderer is viewing user...
+					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) || $orderer['name'] === $_SESSION['user']['name'];
+					// ... or common orders are done by own unit members
 					if (!$unit_intersection && array_intersect([$row['organizational_unit']], ['common']) && $orderer_id){
 						$unit_intersection = boolval(array_intersect([$row['organizational_unit']], explode(',', $users[$orderer_id]['units'])));
 					}
+					if (!$unit_intersection && !$permission['orderprocessing'] && !$permission['admin']) continue;
 
 					$data = [
 						'id' => $row['id'],
@@ -781,6 +798,16 @@ class ORDER extends API {
 		// set available units
 		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 		else $units = $_SESSION['user']['units']; // display only orders for own units
+		$units[] = 'common'; // append common for for sqlquery by default
+		// override unit if explicit selected, _subMethod can be *stock* or *stock_none* as well, therefore the language key check
+		if (isset($this->_lang->_USER['units'][$this->_subMethod])) $units = [$this->_subMethod];
+
+		// determine if filtered for orderidentifier, strip if applicable
+		$orderidentifier = null;
+		if ($this->_requestedID){
+			$orderidentifier = UTILITY::identifier(' ' . $this->_requestedID, null, null, true);
+			if ($orderidentifier) $this->_requestedID =  trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
+		}
 		// sanitize search
 		$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
 		$this->_subMethodState = $this->_subMethodState === 'unprocessed' ? null : $this->_subMethodState;
@@ -821,6 +848,12 @@ class ORDER extends API {
 			){
 				continue;
 			}
+			/*if (
+				($this->_subMethod === 'stock' && !isset($stock_items[$decoded_order_data['productid']]))
+				|| ($this->_subMethod === 'stock_none' && isset($stock_items[$decoded_order_data['productid']]))
+				|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
+			) continue;
+*/
 
 			$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
 			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
