@@ -1150,6 +1150,7 @@
 							"name": "Gangtyp N.A.P. Gait Classification"
 						},
 						"content": {
+							"kein pathologisches Gangbild": [],
 							"Typ 1a: Hyperextension, Inversion": [],
 							"Typ 1b: Hyperextension, Eversion": [],
 							"Typ 2a: Hyperflexion, Inversion": [],
@@ -3555,6 +3556,7 @@
 							"name": "Zusätze Fuß"
 						},
 						"content": {
+							"...": [],
 							"Otto Bock Carbonverstärkung SL=ME-CXXX": []
 						}
 					},
@@ -3591,6 +3593,7 @@
 							"name": "Knöchelgelenke"
 						},
 						"content": {
+							"...": [],
 							"Otto Bock Fußschiene für Kinder 17F53=5": [],
 							"Otto Bock Fußschiene Edelstahl 17F24=4 oder 5": [],
 							"Otto Bock Systemknöchelgelenk 17B66 + 17B113 + 651P4=16": [],
@@ -3630,6 +3633,7 @@
 							"name": "Kniegelenke"
 						},
 						"content": {
+							"...": [],
 							"Otto Bock Kniegelenk mit verdeckter Sperre 17B23 + 17B85": [],
 							"Otto Bock Kniegelenk mit verdeckter Schweizer Sperre 17KL20=13-A": []
 						}

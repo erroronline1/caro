@@ -1165,6 +1165,7 @@
 							"name": "Anziehtechnik"
 						},
 						"content": {
+							"Medco Anziehlubricant 26851 AS": [],
 							"Otto Bock Anziehlubricant 633S2": [],
 							"Protheseus BOA PK022013005 + 20.3003 KA": [],
 							"Otto Bock Einzugrohr 99B13=21 + 20.3000 KA": [],
@@ -1257,6 +1258,7 @@
 							"Otto Bock MyoEnergy Integral 3450mAH 757B35=5": [],
 							"Otto Bock MyoCharge 757L35": [],
 							"Neuhof Motion Control zweigeteilt 512B18": [],
+							"TASKA PowerCore TASKA-21AB31": [],
 							"zusätzliches Akkusystem 20.30201 KA": []
 						}
 					},
@@ -1284,9 +1286,13 @@
 						},
 						"content": {
 							"Otto Bock 7in1 9E420": [],
+							"Otto Bock MyoSmart 13E522": [],
+							"Otto Bock MyoSmart+ TR 13E523=TR-1": [],
+							"Otto Bock MyoSmart+ TH 13E523=TH-1": [],
 							"Otto Bock Myorotronic 13E205": [],
 							"Otto Bock Analogadapter für DynamicArm 13E100": []
-						}
+						},
+						"hint": "MyoSmart max. 4 Elektroden, MyoSmart+ max. 8 Elektroden, Myorotronic nicht in Verbindung mit UA MyoSmart oder 12K100"
 					},
 					{
 						"type": "productselection",
@@ -1418,12 +1424,15 @@
 							"...": [],
 							"Otto Bock Eingussring für Kinderhand 10S16=34": [],
 							"TASKA Laminiermanschette 45mm TASKA-12BB01": [],
+							"TASKA LP Laminier-Set Gen1 152-20-031": [],
 							"Otto Bock Eingussring QWD 10S1": [],
 							"Otto Bock Kupplungseinsatz/Koaxialstecker 10S4 + 9E169": [],
 							"Össur WD-Eingussplatte SA149003": [],
+							"Otto Bock modular wrist flex 10V61=1": [],
+							"Otto Bock modular wrist EQD 10V62=1": [],
+							"Otto Bock modular wrist short 10V63=1": [],
+							"Otto Bock modular wrist transcarpal 10V64=1": [],
 							"Otto Bock Rotator 10S17 + 20.3502 KA": [],
-							"Otto Bock AxonAdapter (passiv) 9S501": [],
-							"Otto Bock Axon Rotation 9S503": [],
 							"Neuhof Multiflex mit QWD 508Z18": [],
 							"Endoskelettalaufnahme für QWD 20.3503 KA": [],
 							"Otto Bock Verschlussautomat mit Gewindeaufnahme 11S47=44": [],
@@ -1497,8 +1506,8 @@
 							"Otto Bock Kinderhand 8E51": [],
 							"Neuhof ProHand 508D09": [],
 							"Neuhof Arbeitsgreifer ETD2 508D37": [],
-							"Otto Bock DMC transcarpal 8E44=6": [],
-							"Otto Bock VariPlus QWD 8E38=9": [],
+							"Otto Bock Speedhand 8E2 + SP=8E2=3+3": [],
+							"Otto Bock Michelangelo 8E5 + SP=8E5=3+3": [],
 							"Össur iLimb PK3 TBX50472 + TBX5017(3-5)": [],
 							"Össur iLimb PK4 (Flexion) TBX50473 + TBX5017(3-5)": [],
 							"TASKA CX QWD TASKA DxFx31-U1 + TASKA-DHEW-03": [],
@@ -1513,7 +1522,7 @@
 							"name": "Handpassteil Artikel",
 							"multiple": true
 						},
-						"hint": "falls abweichend zzgl. Gerantie, (Zusatz-)Adapter oder Befestigungsrahmen"
+						"hint": "falls abweichend zzgl. Garantie, (Zusatz-)Adapter oder Befestigungsrahmen"
 					},
 					{
 						"type": "text",
@@ -1543,7 +1552,8 @@
 							"Össur iLimb Skin natural (Pack) TBX50126": [],
 							"Mehraufwand Silikonhandschuh 20.3701 KA": [],
 							"Mehraufwand Oberflächenbehandlung 20.3809 KA": []
-						}
+						},
+						"hint": "Axon Skin Silikon nur für Michelangelo 7 3/4"
 					},
 					{
 						"type": "productselection",
