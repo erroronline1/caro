@@ -938,17 +938,19 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			}
 		}
 
-		if (
-			(!isset($request['Name']) || !trim($request['Name'] ? : '')) &&
-			(!isset($request['Date of birth']) || !trim($request['Date of birth'] ? : '')) &&
-			(!isset($request['Patient number']) || !trim($request['Patient number'] ? : '')) &&
+		// read and sanitize requested parameters
+		$requested_name = $request['Name'] ?? $request['Name'];
+		$requested_name = $requested_name ? trim($requested_name) : '';
+		$requested_dob = $request['Date of birth'] ?? $request['Geburtsdatum'];
+		$requested_dob = $requested_dob ? trim($requested_dob) : '';
+		$requested_patientnumber = $request['Patient number'] ?? $request['FiBu-Nummer'];
+		$requested_patientnumber = $requested_patientnumber ? trim($requested_patientnumber) : '';
 
-			(!isset($request['Name']) || !trim($request['Name'] ? : '')) &&
-			(!isset($request['Geburtsdatum']) || !trim($request['Geburtsdatum'] ? : '')) &&
-			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer'] ? : ''))
+		if (
+			!($requested_name || $requested_dob || $requested_patientnumber)
 		) return [];
 		
-		$name = SEARCH::expressions($request['Name'] ? : '');
+		$name = SEARCH::expressions($requested_name);
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
@@ -956,19 +958,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			}
 		}
 
-		$dob = $request['Date of birth'] ?? $request['Geburtsdatum'];
-		$dob = $dob ? trim($dob) : '';
-		$patientnumber = $request['Patient number'] && $request['FiBu-Nummer'];
-		$patientnumber = $patientnumber ? trim($patientnumber) : '';
-
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':dob' => $dob ? 'pat.GEBURTSDATUM = CONVERT(DATETIME, ' . $this->_pdo->quote($dob . ' 00:00:00.000') . ', 21)': '',
-				':patientnumber' => $patientnumber
-					? ($dob ? ' AND ' : '') . 'pat.FIBU_NUMMER = ' . $this->_pdo->quote($patientnumber)
+				':dob' => $requested_dob ? 'pat.GEBURTSDATUM = CONVERT(DATETIME, ' . $this->_pdo->quote($requested_dob . ' 00:00:00.000') . ', 21)': '',
+				':patientnumber' => $requested_patientnumber
+					? ($requested_dob ? ' AND ' : '') . 'pat.FIBU_NUMMER = ' . $this->_pdo->quote($requested_patientnumber)
 					: '',
 				':namesearch' => $namesearch 
-					? ($dob || $patientnumber ? ' AND ' : '') . '(' . implode(' OR ', $namesearch) . ')'
+					? ($requested_dob || $requested_patientnumber ? ' AND ' : '') . '(' . implode(' OR ', $namesearch) . ')'
 					: ''
 				]));
 			$statement->execute();	
@@ -979,7 +976,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$result = $statement->fetchAll();
 		$statement = null;
 
-		$refinequery = implode(' +', array_filter([$request['Name'], $dob, $patientnumber], Fn($v) => $v));
+		$refinequery = implode(' +', array_filter([$requested_name, $requested_dob, $requested_patientnumber], Fn($v) => $v));
 
 		$response = [];
 
