@@ -393,28 +393,30 @@ class UTILITY {
 		if (!$identifier) return $identifier;
 
 		preg_match('/(.+?)(?:\s*#([a-z0-9]+))*$/', $identifier, $components);
-		if ($components && isset($components[2]) && $components[2]);
-		try {
-			// try to convert to unixtime int
-			@$unixtime = intval(base_convert($components[2], 36, 10));
-			// narrow down to recent time
-			if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) { // 2025-08-15 - 2079-06-06
-				$datetime = new \DateTime();
-				$datetime->setTimestamp($unixtime);
-				// if no error has risen the identifier is likely valid
+		if ($components && isset($components[2]) && $components[2]){
+			try {
+				// try to convert to unixtime int
+				@$unixtime = intval(base_convert($components[2], 36, 10));
+				// narrow down to recent time
+				if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) { // 2025-08-15 - 2079-06-06
+					$datetime = new \DateTime();
+					$datetime->setTimestamp($unixtime);
+					// if no error has risen the identifier is likely valid
 
-				if ($verified_timestamp) return '#' . $components[2]; // proper trailing timestamp with separator
-				if ($translate_timestamp) return $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
-				if ($strip_date){
-					if (isset($components[1]) && $components[1]) return $components[1];
+					if ($verified_timestamp) return '#' . $components[2]; // proper trailing timestamp with separator
+					if ($translate_timestamp) return $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
+					if ($strip_date){
+						if (isset($components[1]) && $components[1]) return $components[1];
+					}
+					return $identifier;
 				}
-				return $identifier;
+			}
+			catch (\Exception $e){
+			// do nothing, return null by default if checks are supposed to be applied. valid responses have been returned in advance
 			}
 		}
-		catch (\Exception $e){
-			if ($verified_timestamp) return null;
-			if ($translate_timestamp) return null;
-		}
+		if ($verified_timestamp) return null;
+		if ($translate_timestamp) return null;
 		if ($default_date) {
 			$unixtime = strtotime($default_date);
 			$identifier .= ' #' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
