@@ -35,7 +35,6 @@ Things are still in motion. Images may be outdated.
 * review order flowchart
 * order
     * multiple attachments not processed properly, only last (photo) shows up - processOrderForm()
-    * search for timestamp only (but not str_starts_with #)
 * order statistics
     * no truncate, autodelete after 10 years
     * query timespan instead
@@ -2737,6 +2736,8 @@ Stakeholder identification:
 | Batch update product alias | User | 2025-10-10 | Implemented; 2025-10-15 |
 | Product property: order via erp or third party ("BISI") | Purchase | 2025-10-10 | Implemented; 2025-10-15 |
 | Autodeletion for messages | User | 2025-11-06 | Implemented as optional user setting; 2025-11-07 |
+| Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 |  |
+| Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
