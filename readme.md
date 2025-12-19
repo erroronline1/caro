@@ -33,6 +33,26 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * review order flowchart
+* order
+    * multiple attachments not processed properly, only last (photo) shows up - processOrderForm()
+    * review export for proper filter application
+        * export endpoint processing approved output to have proper filters
+    * table view display order type
+    * search for timestamp only (but not str_starts_with #)
+    * stock filter also per unit - review approved api path parameters and their order
+    * allow print export summary after order processing grouped by commission, regarding commissioned handing over to workshop
+        * export by timespan?
+        * include commission qrcode, orderer, whatnot
+        * possible to combine with export endpoint?
+* order statistics
+    * no truncate, autodelete after 10 years
+    * query timespan instead
+    * vendor filter optional
+    * add unit column
+* manual cron init beside deletion (purchase updating order states as required)
+* review start init on language change (render/race condition issue on first reload?)
+* review/validate network loss fallback especially on safari?
+* review form submission on enter for erpquery
 
 ## Content
 * [Aims](#aims)
