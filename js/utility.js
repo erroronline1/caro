@@ -612,6 +612,20 @@ export const _client = {
 		},
 
 		/**
+		 * read filter options and return input values to create filter options payload
+		 * called from api.js on get approved requests
+		 * but set here near the form generation
+		 */
+		approvedFilter: () => {
+			const filter = {};
+			if (document.getElementById("filterterm")) filter.term = document.getElementById("filterterm").value;
+			if (document.getElementById("timespan")) filter.timespan = document.getElementById("timespan").value;
+			if (document.querySelector("[name='" + api._lang.GET("order.organizational_unit") + "']:checked")) filter.unit = document.querySelector("[name='" + api._lang.GET("order.organizational_unit") + "']:checked").value;
+			if (document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked")) filter.etc = document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked").value;
+			return filter;
+		},
+
+		/**
 		 * render approved orders on the client side to reduce payload for transmission from the server side
 		 * @requires api, _client Dialog, Assemble
 		 * @param {object} data containing data-array, approval-array
@@ -620,22 +634,18 @@ export const _client = {
 		approved: (data = undefined) => {
 			if (!data) return;
 			let content = [],
-				filter = {},
-				groupby = {},
-				organizational_units = {};
+				orderstate = {},
+				groupby = {};
 
 			// construct filter checkboxes with events
-			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits)', value: "unprocessed" };
-			filter[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "ordered")', value: "ordered" };
-			filter[api._lang.GET("order.order.delivered_partially")] = {
-				onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "delivered_partially")',
-				value: "delivered_partially",
-			};
-			filter[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "delivered_full")', value: "delivered_full" };
-			filter[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "issued_partially")', value: "issued_partially" };
-			filter[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "issued_full")', value: "issued_full" };
-			filter[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, "archived")', value: "archived" };
-			filter[api._lang.GET("order.order." + data.state)].checked = true;
+			orderstate[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", null, "unprocessed")', value: "unprocessed" };
+			orderstate[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", null, "ordered")', value: "ordered" };
+			orderstate[api._lang.GET("order.order.delivered_partially")] = { onchange: 'api.purchase("get", "approved",null, "delivered_partially")', value: "delivered_partially" };
+			orderstate[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", null, "delivered_full")', value: "delivered_full" };
+			orderstate[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", null,"issued_partially")', value: "issued_partially" };
+			orderstate[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", null, "issued_full")', value: "issued_full" };
+			orderstate[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", null, "archived")', value: "archived" };
+			orderstate[api._lang.GET("order.order." + data.state)].checked = true;
 
 			content.push([
 				{
@@ -643,58 +653,85 @@ export const _client = {
 					attributes: {
 						name: api._lang.GET("order.order_filter"),
 					},
-					content: filter,
+					content: orderstate,
 				},
 				{
-					type: "filtered",
+					type: "text",
 					attributes: {
 						name: api._lang.GET("order.order_filter_label"),
-						onkeydown: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value, api._settings.session.orderUnits);}",
-						id: "productsearch",
-						value: data.filter ? data.filter : "",
+						id: "filterterm",
+						value: data.filter.term ? data.filter.term : "",
 					},
 				},
 			]);
 			if (data.stockfilter) {
 				// construct unit selection
 				// limiting to units may speed up rendering for purchase members with this permission if necessary
-
-				// extend unit filter with stock or stock_none option as this affects the filter the same way
-				const units = {};
-				units['null'] = api._lang.GET("order.all_units");
-				units['stock'] = api._lang.GET("order.stock_filter");
-				units['stock_none'] =  api._lang.GET("order.stock_filter_none");
-				units['returns'] =  api._lang.GET("order.return_filter");
-				for (const [key, value] of Object.entries({...units, ...api._lang._USER.units})) {
+				const organizational_units = {};
+				for (const [key, value] of Object.entries({
+					null: api._lang.GET("order.all_units"),
+					...api._lang._USER.units,
+				})) {
 					organizational_units[value] = {
-						onchange:
-							'api._settings.session.orderUnits = "' +
-							key +
-							'"; api.purchase("get", "approved", document.getElementById("productsearch").value || "null", api._settings.session.orderUnits, document.querySelector("[name=' +
-							api._lang.GET("order.order_filter") +
-							']:checked").value)',
-						value:key
+						value: key,
 					};
-					if (api._settings.session.orderUnits === key || (!api._settings.session.orderUnits && key === 'null')) organizational_units[value].checked = true;
+					if (data.filter.unit === key || (!data.filter.unit && key === "null")) organizational_units[value].checked = true;
 				}
-				content[content.length - 1].push({
-					type: "radio",
-					attributes: {
-						name: api._lang.GET("order.organizational_unit"),
+
+				// construct other filters
+				const etc = {};
+				for (const [key, value] of Object.entries({
+					stock: api._lang.GET("order.stock_filter"),
+					stock_none: api._lang.GET("order.stock_filter_none"),
+					returns: api._lang.GET("order.return_filter"),
+				})) {
+					etc[value] = {
+						value: key,
+					};
+					if (data.filter.etc === key || (!data.filter.etc && key === "null")) etc[value].checked = true;
+				}
+
+				content[content.length - 1].push(
+					{
+						type: "radio",
+						attributes: {
+							name: api._lang.GET("order.organizational_unit"),
+						},
+						content: organizational_units,
 					},
-					content: organizational_units,
-				});
-			}
-			if (data.export) {
-				content[content.length - 1].push({
-					type: "button",
-					attributes: {
-						value: api._lang.GET("order.export"),
-						class: "inlinebutton",
-						onclick: 'api.purchase("get", "export", document.getElementById("productsearch").value || "null", "null", "' + data.state + '")',
+					{
+						type: "radio",
+						attributes: {
+							name: api._lang.GET("order.order_filter_etc"),
+						},
+						content: etc,
 					},
-				});
+					{
+						type: "datetime_local",
+						attributes: {
+							name: api._lang.GET("order.order_filter_datetime"),
+							id: "timespan",
+							value: data.filter.timespan || "",
+						},
+					},
+					{
+						type: "button",
+						attributes: {
+							value: api._lang.GET("order.export"),
+							class: "inlinebutton",
+							onclick: 'api.purchase("get", "export", "null", "' + data.state + '")',
+						},
+					}
+				);
 			}
+			content[content.length - 1].push({
+				type: "button",
+				attributes: {
+					value: api._lang.GET("order.refresh"),
+					class: "inlinebutton",
+					onclick: 'api.purchase("get", "approved", null, "' + data.state + '")',
+				},
+			});
 
 			if (api._settings.user.app_settings.orderLayout) {
 				switch (api._settings.user.app_settings.orderLayout) {
@@ -1611,6 +1648,9 @@ export const _client = {
 							":vendor": element.vendor ? element.vendor : "",
 							":aut_idem": element.aut_idem ? element.aut_idem : "",
 						}),
+						a: {
+							"data-type": element.ordertype,
+						},
 					},
 					{ c: api._lang.GET("order.ordertype." + element.ordertype) + " " + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }) },
 				];

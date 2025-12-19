@@ -419,7 +419,7 @@ class APPLICATION extends API {
 			$this->_lang->GET('consumables.navigation.header') => [
 				$this->_lang->GET('order.navigation.order') => ['onclick' => "api.purchase('get', 'order')"],
 				$this->_lang->GET('order.navigation.prepared_orders') => ['onclick' => "api.purchase('get', 'prepared')"],
-				$this->_lang->GET('order.navigation.approved_orders') => ['onclick' => "api.purchase('get', 'approved', 'null', api._settings.session.orderUnits)"],
+				$this->_lang->GET('order.navigation.approved_orders') => ['onclick' => "api.purchase('get', 'approved')"],
 				$this->_lang->GET('consumables.navigation.vendor') => ['onclick' => "api.purchase('get', 'vendor')"],
 				$this->_lang->GET('consumables.navigation.product') => ['onclick' => "api.purchase('get', 'product')"],
 			],

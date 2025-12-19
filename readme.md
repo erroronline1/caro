@@ -35,15 +35,9 @@ Things are still in motion. Images may be outdated.
 * review order flowchart
 * order
     * multiple attachments not processed properly, only last (photo) shows up - processOrderForm()
-    * review export for proper filter application
-        * export endpoint processing approved output to have proper filters
-    * table view display order type
     * search for timestamp only (but not str_starts_with #)
-    * stock filter also per unit - review approved api path parameters and their order
     * allow print export summary after order processing grouped by commission, regarding commissioned handing over to workshop
-        * export by timespan?
-        * include commission qrcode, orderer, whatnot
-        * possible to combine with export endpoint?
+        * pagewise by commission
 * order statistics
     * no truncate, autodelete after 10 years
     * query timespan instead
@@ -2147,7 +2141,6 @@ mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase" ; display all orders by default, not only for own units
-orderexportstockitems = "purchase" ; permission to export a pdf of ordered stock items, this is less a critical permission than an application behaviour on allowing wasted paper for order processing
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products
@@ -4628,23 +4621,22 @@ Sample response
 {"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/approved/{search}/{null|unit|stock}/{state}
+> GET ./api/api.php/order/approved/null/{orderstate}?{payload}
 
 Returns approved orders as data.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | true, false |
-| {null|unit|stock} | path parameter | optional | null at least necessary by use of {state}, orders by unit OR stock or non stock only |
-| {state} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
+| {orderstate} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
+| {payload} | query parameters | optional | term, timespan, unit, etc |
 
 Sample response
 ```
-{"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"delivered_partially":{"data-delivered_partially":"false"},"delivered_full":{"data-delivered_full":"false"},"issued_partially":{"data-issued_partially":"false"},....
+{"data":{"filter":{"term":[],"timespan":[],"unit":"prosthetics2"},"state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Stock item\n \nOrganizational unit: Prosthetics II\nApproved: 2025-11-22 23:18:55 ","quantity":"1","unit":"Packung","barcode":"4,03E+12","name":"Schlauch-Strumpf","vendor":"Otto Bock Healthcare GmbH","ordernumber":"99B25","commission":"rth","approval":0,"addinformation":true,"orderer":{"name":"error on line 1","image":"./api/api.php/file/stream/fileserver/users/profilepic_error on line 1_dev.png","units":"prosthetics2,cad,silicone,admin"},"organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"delivered_partially":{"data-delivered_partially":"false"},"delivered_full":{"data-delivered_full":"false"},"issued_partially":{"data-issued_partially":"false"},"issued_full":{"data-issued_full":"false"},"archived":{"data-archived":"false"}},"disapprove":true,"delete":true,"samplecheck":{"item":4084},"productid":4084}],"approval":["data:image/png;base64,iVBORw0KGgoAAAANSUhE....
 ```
 
-> PATCH ./api/api.php/order/approved/{ids}/{update}/{state}
+> PATCH ./api/api.php/order/approved/{ids}/{orderstate}/{state}
 
 Updates approved orders (states, appending information, etc.) or transfer to prepared order revoking order authorization.
 
@@ -4652,7 +4644,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {ids} | path parameter | required | order item database id (int) or _-concatenated for bulk update |
-| {update} | path parameter | required | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, addinformation, disapproved, cancellation, return |
+| {orderstate} | path parameter | required | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, addinformation, disapproved, cancellation, return |
 | {state} | path parameter | optional | true, false |
 | payload | form data | optional | messages |
 
@@ -4666,16 +4658,12 @@ Sample response
 {"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/export/{search}/{null}/{state}
+> GET ./api/api.php/order/export/null/{orderstate}?{payload}
 
 Returns a PDF-export of approved order by selected state.
 
 Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | true, false |
-| {null} | path parameter | optional but necessary by use of {state} |  |
-| {state} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
+see GET ./api/api.php/order/approved/null/{orderstate}?{payload}
 
 Sample response
 ```

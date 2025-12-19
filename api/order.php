@@ -16,16 +16,16 @@ class ORDER extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
-	private $_subMethod = null;
-	private $_subMethodState = null;
+	private $_orderState = null;
+	private $_stateSet = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
-		$this->_subMethod = REQUEST[3] ?? null;
-		$this->_subMethodState = REQUEST[4] ?? null;
+		$this->_requestedID = isset(REQUEST[2]) ? (!in_array(REQUEST[2], ['false', 'null']) ? REQUEST[2]: null) : null;
+		$this->_orderState =  isset(REQUEST[3]) ? (REQUEST[3] != 'null' ? REQUEST[3]: null) : null;
+		$this->_stateSet = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -36,7 +36,7 @@ class ORDER extends API {
 	 *      |_| |_|
 	 * handle approved orders, set states and alert userGroups
 	 */
-	public function approved(){
+	public function approved($export = false){
 		require_once('notification.php');
 		require_once('./_calendarutility.php');
 		$notifications = new NOTIFICATION;
@@ -62,8 +62,8 @@ class ORDER extends API {
 						)) $this->response([], 401);
 
 					// set order process states
-					if (in_array($this->_subMethod, ['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'])){
-						switch ($this->_subMethod){
+					if (in_array($this->_orderState, ['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived'])){
+						switch ($this->_orderState){
 							case 'ordered':
 								if ($order['ordertype'] === 'cancellation'){
 									// ordered aka processed canellation orders are deleted immediately 
@@ -89,7 +89,7 @@ class ORDER extends API {
 									// ordered aka processed return orders are delivered and issued immediately
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										'values' => [
-											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
+											':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 										],
 										'replacements' => [
 											':id' => $this->_requestedID,
@@ -98,7 +98,7 @@ class ORDER extends API {
 									]);
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										'values' => [
-											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
+											':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 										],
 										'replacements' => [
 											':id' => $this->_requestedID,
@@ -129,11 +129,11 @@ class ORDER extends API {
 						// generic state update
 						SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 							'values' => [
-								':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
+								':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 							],
 							'replacements' => [
 								':id' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID))),
-								':field' => $this->_subMethod // verified safe by being in above array condition
+								':field' => $this->_orderState // verified safe by being in above array condition
 							]
 						]);
 					}
@@ -164,7 +164,7 @@ class ORDER extends API {
 						foreach ($prepared as $key => $value) {
 							if (!$value) unset($prepared[$key]);
 						}
-						switch ($this->_subMethod){
+						switch ($this->_orderState){
 							case 'disapproved':
 								// add to prepared orders
 								SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
@@ -361,14 +361,14 @@ class ORDER extends API {
 					// construct result toast
 					$response = $response ?? [
 						'response' => [
-							'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
+							'msg' => in_array($this->_orderState, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_orderState) : $this->_lang->GET('order.order_type_' . ($this->_stateSet === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_orderState)]),
 							'type' => 'info'
 						],
 						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
 					];
 
 					// update order statistics
-					if (($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved') $this->statistics_delete($this->_requestedID);
+					if (($this->_orderState === 'ordered' && $this->_stateSet === 'false') || $this->_orderState === 'disapproved') $this->statistics_delete($this->_requestedID);
 					else $this->statistics_update($this->_requestedID);
 				}
 				break;
@@ -383,15 +383,22 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				// sanitize search
-				$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
+				// resolve filters
+				foreach($this->_payload as $key => $value){
+					if (!$value || $value === 'null') unset($this->_payload->{$key}); 
+				}
+				$filter = [];
+				foreach(['term','timespan','unit','etc'] as $f){
+					$filter[$f] = UTILITY::propertySet($this->_payload, $f) ? : null;
+					$filter[$f] = $filter[$f] === 'null' ? null : $filter[$f];
+					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00';
+				}
 
 				$response = ['data' => [
-					'filter' => $this->_requestedID ? : '', // preset search term
-					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
+					'filter' => $this->_payload ? (array)$this->_payload : '', // preset filters passed as query parameter
+					'state' => $this->_orderState ? : 'unprocessed', // preset the appropriate language key
 					'order' => [], 'approval' => [],
 					'allowedstateupdates'=> [],
-					'export' => false,
 					'stockfilter' => false]];
 
 				// get unchecked articles for MDR §14 sample check
@@ -454,19 +461,19 @@ class ORDER extends API {
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 				$units[] = 'common'; // append common for for sqlquery by default
 				// override unit if explicit selected, _subMethod can be *stock* or *stock_none* as well, therefore the language key check
-				if (isset($this->_lang->_USER['units'][$this->_subMethod])) $units = [$this->_subMethod];
+				if (isset($this->_lang->_USER['units'][$filter['unit']])) $units = [$filter['unit']];
 
 				// determine if filtered for orderidentifier, strip if applicable
 				$orderidentifier = null;
-				if ($this->_requestedID){
-					$orderidentifier = UTILITY::identifier($this->_requestedID, null, false, true);
-					if ($orderidentifier) $this->_requestedID = trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
+				if ($filter['term']){
+					$orderidentifier = UTILITY::identifier($filter['term'], null, false, true);
+					if ($orderidentifier) $filter['term'] = trim(UTILITY::identifier(' ' . $filter['term'], null, true));
 				}
 				// get all approved orders filtered by
 				// applicable units, state and search
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 					'values' => [
-						':SEARCH' => $this->_requestedID ? : '%'
+						':SEARCH' => $filter['term'] ? : '%'
 					],
 					'wildcards' => true,
 					'replacements' => [
@@ -476,8 +483,8 @@ class ORDER extends API {
 				]);
 				// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
 				// weighting is reasonable though
-				if ($this->_requestedID) {
-					$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
+				if ($filter['term']) {
+					$order = SEARCH::refine($filter['term'], $order, ['order_data']);
 				}
 		
 				// request permissions once, avoiding repetitive comparisons within loop
@@ -490,7 +497,6 @@ class ORDER extends API {
 					'products' => PERMISSION::permissionFor('products'),
 					'admin' =>  array_intersect(['admin'], $_SESSION['user']['permissions'])
 				];
-				$response['data']['export'] = $permission['orderprocessing'] && PERMISSION::permissionFor('orderexportstockitems');
 				$response['data']['stockfilter'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
@@ -509,14 +515,14 @@ class ORDER extends API {
 
 				foreach ($order as $row) {
 					// filter selected state or default to unprocessed
-					if ($this->_subMethodState === 'unprocessed') $this->_subMethodState = null;
-					if (!$this->_subMethodState && $row['ordered']) continue;
-					if ($this->_subMethodState){
-						if (!$row[$this->_subMethodState]) continue;
+					if ($this->_orderState === 'unprocessed') $this->_orderState = null;
+					if (!$this->_orderState && $row['ordered']) continue;
+					if ($this->_orderState){
+						if (!$row[$this->_orderState]) continue;
 						// skip whatever has the next logical steps already set
 						foreach (array_reverse(['ordered', 'delivered_partially', 'delivered_full', 'issued_partially', 'issued_full', 'archived']) as $s){
-							if ($this->_subMethodState !== $s && $row[$s]) continue 2;
-							if ($this->_subMethodState === $s) break;
+							if ($this->_orderState !== $s && $row[$s]) continue 2;
+							if ($this->_orderState === $s) break;
 						}
 					}
 
@@ -527,10 +533,12 @@ class ORDER extends API {
 						$product = $products[$decoded_order_data['productid']];
 					}
 
+					// filter
 					if (
-						($this->_subMethod === 'stock' && !isset($product['stock_item']))
-						|| ($this->_subMethod === 'stock_none' && isset($product['stock_item']))
-						|| ($this->_subMethod === 'returns' && $row['ordertype'] !== 'return')
+						($filter['etc'] === 'stock' && !isset($product['stock_item']))
+						|| ($filter['etc'] === 'stock_none' && isset($product['stock_item']))
+						|| ($filter['etc'] === 'returns' && $row['ordertype'] !== 'return')
+						|| ($filter['timespan'] && $row[$this->_orderState ? : 'approved'] < $filter['timespan'])
 						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
 					) continue;
 
@@ -725,6 +733,8 @@ class ORDER extends API {
 					array_push($response['data']['order'], array_filter($data, fn($property) => $property || $property === 0));
 				}
 				$response['data']['allowedstateupdates'] = array_unique($response['data']['allowedstateupdates']);
+
+				if ($export) return $response;
 				break;
 			case 'DELETE':
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
@@ -797,94 +807,36 @@ class ORDER extends API {
 	 */
 	public function export(){
 		require_once('./_pdf.php');
-		// set available units
-		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
-		else $units = $_SESSION['user']['units']; // display only orders for own units
-		$units[] = 'common'; // append common for for sqlquery by default
-		// override unit if explicit selected, _subMethod can be *stock* or *stock_none* as well, therefore the language key check
-		if (isset($this->_lang->_USER['units'][$this->_subMethod])) $units = [$this->_subMethod];
 
-		// determine if filtered for orderidentifier, strip if applicable
-		$orderidentifier = null;
-		if ($this->_requestedID){
-			$orderidentifier = UTILITY::identifier($this->_requestedID, null, false, true);
-			if ($orderidentifier) $this->_requestedID =  trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
-		}
-		// sanitize search
-		$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
-		$this->_subMethodState = $this->_subMethodState === 'unprocessed' ? null : $this->_subMethodState;
+		$approved = $this->approved(true);
 
-		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
-			'values' => [
-				':SEARCH' => $this->_requestedID ? : '%'
-			],
-			'wildcards' => true,
-			'replacements' => [
-				':organizational_unit' => implode(",", $units),
-				':user' =>  $_SESSION['user']['id']
-			]
-		]);
-
-		// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
-		// weighting is reasonable though
-		if ($this->_requestedID) {
-			$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
-		}
-
-		// userlist to decode orderer
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-
-		// gather product information on stock item flag
-		$stock_items = $erp_ids = []; 
-		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			if ($product['stock_item']) $stock_items[$product['id']] = true;
-			if ($product['erp_id']) $erp_ids[$product['id']] =$product['erp_id'];
-		}
 		$data = [];
+
+		if($approved['data']['filter']) $data['filter'] = (isset($approved['data']['filter']['term']) && $approved['data']['filter']['term'] ? $this->_lang->GET("order.order_filter_label") . ': ' . $approved['data']['filter']['term'] . "  \n" : '')
+			. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . $approved['data']['filter']['unit'] . "  \n" : '')
+			. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . $approved['data']['filter']['etc'] . "  \n" : '')
+			. (isset($approved['data']['filter']['timespan']) && $approved['data']['filter']['timespan'] ? $this->_lang->GET("order.order_filter_datetime") . ': ' . $this->convertToServerTime($approved['data']['filter']['timespan']): '');
+
 		$item = 1;
-		foreach ($order as $row) {
-			// filter selected state or default to unprocessed
-			if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
-			
-			$decoded_order_data = json_decode($row['order_data'], true);
-
-			if (!isset($decoded_order_data['productid']) || (isset($decoded_order_data['productid']) && !isset($stock_items[$decoded_order_data['productid']]))
-			){
-				continue;
-			}
-			/*if (
-				($this->_subMethod === 'stock' && !isset($stock_items[$decoded_order_data['productid']]))
-				|| ($this->_subMethod === 'stock_none' && isset($stock_items[$decoded_order_data['productid']]))
-				|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
-			) continue;
-*/
-
-			$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
-			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
-			else $orderer = $this->_lang->GET('general.deleted_user');
-
-			$erp_id = null;
-			if (isset($decoded_order_data['productid']) && isset($stock_items[$decoded_order_data['productid']])){
-				$erp_id = $erp_ids[$decoded_order_data['productid']];
-			}
+		foreach ($approved['data']['order'] as $order) {
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
-				':quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
-				':unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : '',
-				':number' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '',
-				':name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '',
-				':vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : '',
-				':aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? : '',
+				':quantity' => $order['quantity'] ?? '',
+				':unit' => $order['unit'] ?? '',
+				':number' => $order['ordernumber'] ?? '',
+				':name' => $order['name'] ?? '',
+				':vendor' => $order['vendor'] ?? '',
+				':aut_idem' => $order['aut_idem'] ?? '',
 				]
 			)
-			. ($erp_id ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $erp_id: '')
-			. ("\n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit'])
-			. (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->convertFromServerTime(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
-			. "\n" . ($this->_lang->GET('order.orderer') . ': ' . $orderer);
+			. ($order['productid'] ? "  \n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $order['productid']: '')
+			. "  \n" . str_replace("\n", "  \n", $order['ordertext'])
+			. "  \n" . ($this->_lang->GET('order.commission') . ': ' . $order['commission'])
+			. "  \n" . ($this->_lang->GET('order.orderer') . ': ' . $order['orderer']['name']);
 		}
 		if (!$data) $this->response([], 404);
 
 		//set up summary
-		$title = $this->_lang->GET('order.navigation.order') . ' - ' . $this->_lang->GET('consumables.product.stock_item') . ' - ' . $this->_lang->GET('order.order.' . ($this->_subMethodState ? : 'unprocessed'));
+		$title = $this->_lang->GET('order.order.' . ($approved['data']['state'] ? : 'unprocessed'));
 		$summary = [
 			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $title . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,

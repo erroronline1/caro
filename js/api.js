@@ -23,7 +23,6 @@ export const api = {
 			textareaAutocompleteIndex: null,
 			textareaAutocompleteSwipe: null,
 			orderTilesGroupBy: "commission",
-			orderUnits:null,
 			toasttimeout: {},
 		},
 	},
@@ -1723,6 +1722,7 @@ export const api = {
 						};
 						break;
 					case "export":
+						payload = _client.order.approvedFilter();
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.render !== undefined) {
@@ -1742,7 +1742,11 @@ export const api = {
 							payload = JSON.parse(request[2]);
 							delete request[2];
 						}
-					// no break intentional
+						// no break intentional
+					case "approved":
+						// avoid override for product request if payload isset
+						payload = payload || _client.order.approvedFilter();
+						// no break intentional
 					default:
 						successFn = function (data) {
 							if (data.render) {
