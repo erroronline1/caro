@@ -459,8 +459,8 @@ class ORDER extends API {
 				// determine if filtered for orderidentifier, strip if applicable
 				$orderidentifier = null;
 				if ($this->_requestedID){
-					$orderidentifier = UTILITY::identifier(' ' . $this->_requestedID, null, null, true);
-					if ($orderidentifier) $this->_requestedID =  trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
+					$orderidentifier = UTILITY::identifier($this->_requestedID, null, false, true);
+					if ($orderidentifier) $this->_requestedID = trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
 				}
 				// get all approved orders filtered by
 				// applicable units, state and search
@@ -476,8 +476,10 @@ class ORDER extends API {
 				]);
 				// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
 				// weighting is reasonable though
-				$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
-
+				if ($this->_requestedID) {
+					$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
+				}
+		
 				// request permissions once, avoiding repetitive comparisons within loop
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
@@ -805,7 +807,7 @@ class ORDER extends API {
 		// determine if filtered for orderidentifier, strip if applicable
 		$orderidentifier = null;
 		if ($this->_requestedID){
-			$orderidentifier = UTILITY::identifier(' ' . $this->_requestedID, null, null, true);
+			$orderidentifier = UTILITY::identifier($this->_requestedID, null, false, true);
 			if ($orderidentifier) $this->_requestedID =  trim(UTILITY::identifier(' ' . $this->_requestedID, null, true));
 		}
 		// sanitize search
@@ -825,7 +827,9 @@ class ORDER extends API {
 
 		// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
 		// weighting is reasonable though
-		$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
+		if ($this->_requestedID) {
+			$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
+		}
 
 		// userlist to decode orderer
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
