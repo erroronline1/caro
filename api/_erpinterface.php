@@ -956,8 +956,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			}
 		}
 
-		$dob = isset($request['Date of birth']) ? trim($request['Date of birth']) : trim($request['Geburtsdatum'] ? : '');
-		$patientnumber = isset($request['Patient number']) ? trim($request['Patient number']) : trim($request['FiBu-Nummer'] ? : '');
+		$dob = $request['Date of birth'] ?? $request['Geburtsdatum'];
+		$dob = $dob ? trim($dob) : '';
+		$patientnumber = $request['Patient number'] && $request['FiBu-Nummer'];
+		$patientnumber = $patientnumber ? trim($patientnumber) : '';
 
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
