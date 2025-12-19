@@ -91,6 +91,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
+		$markdown = new MARKDOWN();
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		
@@ -107,7 +108,6 @@ class PDF{
 				$value = implode("  \n", array_keys($value));
 			}
 
-			$markdown = new MARKDOWN();
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value), 0, 1, 0, true, '', true);
 			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
@@ -133,6 +133,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
+		$markdown = new MARKDOWN();
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
 
@@ -184,7 +185,6 @@ class PDF{
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'markdown':
-						$markdown = new MARKDOWN();
 						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value['value']), 0, 1, 0, true, '', true);
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
@@ -262,6 +262,44 @@ class PDF{
 						$this->_pdf->TextField($key, 133, $height['default'], [], ['v' => $value['value'], 'dv' => $value['value']], 65, $this->_pdf->GetY() + 4);
 						$this->_pdf->Ln(($height['default'] + max([1, $nameLines]) * 5));
 				}
+			}
+		}
+
+		return $this->return($content);
+	}
+
+	public function orderPDF($content){
+		// create a pdf for order output with pagebreaks per organizational unit for delivery notes
+		$this->init($content);
+		// set cell padding
+		$this->_pdf->setCellPaddings(5, 1, 5, 1);
+		$markdown = new MARKDOWN();
+
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$this->_pdf->SetFont('helvetica', '', 8); // font size
+		
+		$page = 0;
+		foreach ($content['content'] as $commission){
+			//$this->_pdf->startPageGroup();
+			if ($page++)$this->_pdf->AddPage();
+			foreach ($commission as $key => $value){
+				// name column
+				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
+				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+				$this->_pdf->applyCustomPageBreak($nameLines, $this->_setup['fontsize']);
+
+				// values column
+				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
+				if (gettype($value) === 'array') {
+					$value = implode("  \n", array_keys($value));
+				}
+
+				// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value), 0, 1, 0, true, '', true);
+				//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+
+				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+				$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
 			}
 		}
 

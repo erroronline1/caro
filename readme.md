@@ -36,8 +36,6 @@ Things are still in motion. Images may be outdated.
 * order
     * multiple attachments not processed properly, only last (photo) shows up - processOrderForm()
     * search for timestamp only (but not str_starts_with #)
-    * allow print export summary after order processing grouped by commission, regarding commissioned handing over to workshop
-        * pagewise by commission
 * order statistics
     * no truncate, autodelete after 10 years
     * query timespan instead

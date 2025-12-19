@@ -812,14 +812,10 @@ class ORDER extends API {
 
 		$data = [];
 
-		if($approved['data']['filter']) $data['filter'] = (isset($approved['data']['filter']['term']) && $approved['data']['filter']['term'] ? $this->_lang->GET("order.order_filter_label") . ': ' . $approved['data']['filter']['term'] . "  \n" : '')
-			. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . $approved['data']['filter']['unit'] . "  \n" : '')
-			. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . $approved['data']['filter']['etc'] . "  \n" : '')
-			. (isset($approved['data']['filter']['timespan']) && $approved['data']['filter']['timespan'] ? $this->_lang->GET("order.order_filter_datetime") . ': ' . $this->convertToServerTime($approved['data']['filter']['timespan']): '');
-
-		$item = 1;
 		foreach ($approved['data']['order'] as $order) {
-			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
+			if (!isset($index[$order['commission']])) $index[$order['commission']] = 1;
+
+			$data[$order['commission']][$index[$order['commission']]++] = $this->_lang->GET("order.prepared_order_item", [
 				':quantity' => $order['quantity'] ?? '',
 				':unit' => $order['unit'] ?? '',
 				':number' => $order['ordernumber'] ?? '',
@@ -831,9 +827,19 @@ class ORDER extends API {
 			. ($order['productid'] ? "  \n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $order['productid']: '')
 			. "  \n" . str_replace("\n", "  \n", $order['ordertext'])
 			. "  \n" . ($this->_lang->GET('order.commission') . ': ' . $order['commission'])
-			. "  \n" . ($this->_lang->GET('order.orderer') . ': ' . $order['orderer']['name']);
+			. "  \n" . ($this->_lang->GET('order.orderer') . ': ' . $order['orderer']['name'])
+			. "  \n  \n";
 		}
 		if (!$data) $this->response([], 404);
+
+		if($approved['data']['filter']) {
+			foreach ($approved['data']['order'] as $order) {
+				$data[$order['commission']]['filter'] = (isset($approved['data']['filter']['term']) && $approved['data']['filter']['term'] ? $this->_lang->GET("order.order_filter_label") . ': ' . $approved['data']['filter']['term'] . "  \n" : '')
+					. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . $approved['data']['filter']['unit'] . "  \n" : '')
+					. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . $approved['data']['filter']['etc'] . "  \n" : '')
+					. (isset($approved['data']['filter']['timespan']) && $approved['data']['filter']['timespan'] ? $this->_lang->GET("order.order_filter_datetime") . ': ' . $this->convertToServerTime($approved['data']['filter']['timespan']): '');
+			}
+		}
 
 		//set up summary
 		$title = $this->_lang->GET('order.order.' . ($approved['data']['state'] ? : 'unprocessed'));
@@ -848,7 +854,7 @@ class ORDER extends API {
 		];
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$file = $PDF->auditPDF($summary);
+		$file = $PDF->orderPDF($summary);
 		$downloadfiles[$this->_lang->GET('order.export')] = [
 			'href' => './api/api.php/file/stream/' . $file,
 			'download' => pathinfo($file)['basename']
