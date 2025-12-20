@@ -1792,11 +1792,9 @@ class ORDER extends API {
 				':orderer_name' => $orderer_name,
 				':approved' => $order['approved'],
 				':ordered' => $order['ordered'],
-				':ordertype' => $order['ordertype']
-			],
-			'replacements' => [
-				':delivered_partially' => $order['delivered_partially'] ? : ($order['issued_partially'] ? : 'NULL'),
-				':delivered_full' => $order['delivered_full'] ? : ($order['issued_full'] ? : 'NULL'),
+				':ordertype' => $order['ordertype'],
+				':delivered_partially' => $order['delivered_partially'] ? : ($order['issued_partially'] ? : null),
+				':delivered_full' => $order['delivered_full'] ? : ($order['issued_full'] ? : null),
 			]
 		]);
 	}
