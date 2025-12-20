@@ -701,11 +701,10 @@
 		},
 		"orderstatistics": {
 			"delivery_time_column": "Delivery time (days)",
+			"end": "Until",
 			"info": "The export will be an XLSX-file with all orders sorted to vendor sheets.",
 			"number": "Currently there are :number processed orders available from :from until :until for evaluation.",
-			"truncate": "Drain statistics",
-			"truncate_confirm": "Yes, irreversibly delete",
-			"truncate_success": "Order statistics have been deleted.",
+			"start": "From",
 			"undefined_vendor": "Miscellaneous"
 		},
 		"records": {
@@ -1089,7 +1088,7 @@
 			"productlist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
 			"productlist_erp_match_selected": "Match with ERP database",
 			"productlist_erp_update": "Update product lists with ERP-data",
-			"productlist_erp_update_hint": "This does not sanitize the database opposed to direct imports within the vendor manager. May take a while, get yourself a coffee...\nThe connection may appear to have stopped after about 5 minutes, but the server will work a bit longer. Every vendor takes a few seconds. For :count vendors this is approximately :minutes minutes.",
+			"productlist_erp_update_hint": "This does not sanitize the database opposed to direct imports within the vendor manager. May take a while, get yourself a coffee...\nEvery vendor takes a few seconds. For :count vendors this is approximately :minutes minutes. The connection may appear to have stopped after about 5 minutes, but the server will work a bit longer.",
 			"update_via_erp_interface": ":systemuser via ERP interface"
 		},
 		"navigation": {

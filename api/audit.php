@@ -1035,7 +1035,7 @@ class AUDIT extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 				$permitted = [
-					'orderstatistics'
+					// add respective mathods that are allowed to have a deletion
 				];
 				if (in_array($this->_requestedType, $permitted)) $this->{'delete' . $this->_requestedType}();
 				break;
@@ -2190,6 +2190,20 @@ class AUDIT extends API {
 					'name' => $this->_lang->GET('audit.orderstatistics.number', [':number' => count($orders), ':from' => $this->convertFromServerTime($from), ':until' => $this->convertFromServerTime($until)])
 				],
 				'content' => count($orders) ? $this->_lang->GET('audit.orderstatistics.info') : ''
+			], [
+				'type' => 'datetime_local',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.orderstatistics.start'),
+					'value' => $from !== '-' ? $from . 'T00:00' : '',
+					'id' => '_start'
+				],
+			], [
+				'type' => 'datetime_local',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.orderstatistics.end'),
+					'value' => $until !== '-' ? $until . 'T23:59' : '',
+					'id' => '_end'
+				],
 			]
 		];
 
@@ -2200,20 +2214,8 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.records.export_xlsx'),
-						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_start').value, document.getElementById('_end').value)",
 						'data-type' => 'download'
-					]
-				]
-			];
-			$content[] = [
-				[
-					'type' => 'deletebutton',
-					'attributes' => [
-						'value' => $this->_lang->GET('audit.orderstatistics.truncate'),
-						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.orderstatistics.truncate') ."', options:{".
-						"'".$this->_lang->GET('general.cancel_button')."': false,".
-						"'".$this->_lang->GET('audit.orderstatistics.truncate_confirm')."': {value: true, class: 'reducedCTA'},".
-						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
 					]
 				]
 			];
@@ -2228,16 +2230,25 @@ class AUDIT extends API {
 	private function exportorderstatistics(){
 		require_once('order.php');
 		$orderstatistics = new ORDER();
-		$orders = $orderstatistics->statistics_get();
+
+		$start = $this->_requestedDatetime ? $this->convertToServerTime($this->_requestedDatetime . ':00') : null;
+		$end = $this->_requestedDatetime2 ? $this->convertToServerTime($this->_requestedDatetime2 . ':00') : null;
+
+		$orders = $orderstatistics->statistics_get($start, $end);
 
 		$columns = [
 			'vendor_label' => $this->_lang->GET('order.vendor_label'),
 			'ordertype' => $this->_lang->GET('order.order_type'),
+			'organizational_unit' => $this->_lang->GET('order.organizational_unit'),
+			'orderer' => $this->_lang->GET('order.orderer'),
+			'commission' => $this->_lang->GET('order.commission'),
+			'delivery_date' => $this->_lang->GET('order.delivery_date'),
 			'quantity_label' => $this->_lang->GET('order.quantity_label'),
 			'unit_label' => $this->_lang->GET('order.unit_label'),
 			'ordernumber_label' => $this->_lang->GET('order.ordernumber_label'),
 			'productname_label' => $this->_lang->GET('order.productname_label'),
 			'additional_info' => $this->_lang->GET('order.additional_info'),
+			'approved' => $this->_lang->GET('order.order.approved'),
 			'ordered' => $this->_lang->GET('order.order.ordered'),
 			'delivered_partially' => $this->_lang->GET('order.order.delivered_partially'),
 			'delivered_full' => $this->_lang->GET('order.order.delivered_full'),
@@ -2261,11 +2272,16 @@ class AUDIT extends API {
 			$vendor_orders[$order['order_data']['vendor_label']][] = [
 				$order['order_data']['vendor_label'] ?? '',
 				$this->_lang->GET('order.ordertype.' . $order['ordertype']),
+				$order['organizational_unit'] ? ($this->_lang->_DEFAULT['units'][$order['organizational_unit']] ?? $order['organizational_unit']) : '',
+				$order['orderer_name'] ?? '',
+				$order['order_data']['commission'] ?? '',
+				$order['order_data']['delivery_date'] ?? '',
 				$order['order_data']['quantity_label'] ?? '',
 				$order['order_data']['unit_label'] ?? '',
 				$order['order_data']['ordernumber_label'] ?? '',
 				$order['order_data']['productname_label'] ?? '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
+				$this->convertFromServerTime($order['approved']),
 				$this->convertFromServerTime($order['ordered']),
 				$this->convertFromServerTime($order['delivered_partially']),
 				$this->convertFromServerTime($order['delivered_full']),
@@ -2310,21 +2326,6 @@ class AUDIT extends API {
 		);
 		$this->response([
 			'render' => $body,
-		]);
-	}
-
-	/**
-	 * truncates the respective database
-	 */
-	private function deleteorderstatistics(){
-		require_once('order.php');
-		$orderstatistics = new ORDER();
-		$orderstatistics->statistics_truncate();
-		$this->response([
-			'response' => [
-				'msg' => $this->_lang->GET('audit.orderstatistics.truncate_success'),
-				'type' => 'deleted'
-			]
 		]);
 	}
 

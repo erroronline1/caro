@@ -701,11 +701,10 @@
 		},
 		"orderstatistics": {
 			"delivery_time_column": "Lieferzeit in Tagen",
+			"end": "Bis",
 			"info": "Der Export erfolgt in einer XLSX-Datei, bei der die Bestellungen nach Lieferant in Tabellenblätter sortiert sind.",
-			"number": "Aktuell gibt es :number bearbeitete Bestellungen vom :from bis :until die evaluiert werden können.",
-			"truncate": "Statistiken löschen",
-			"truncate_confirm": "Ja, unwiderruflich löschen",
-			"truncate_success": "Bestellstatistiken wurden gelöscht.",
+			"number": "Aktuell gibt es :number bearbeitete Bestellungen vom :from bis :until die bewertet werden können.",
+			"start": "Von",
 			"undefined_vendor": "Sonstiges"
 		},
 		"records": {
@@ -1089,7 +1088,7 @@
 			"productlist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
 			"productlist_erp_match_selected": "Mit EVA abgleichen",
 			"productlist_erp_update": "Artikellisten aus EVA aktualisieren",
-			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu Imports aus der Lieferantenverwaltung heraus. Kann trotzdem dauern, hol dir einen Kaffee... \nEs kann sein, dass die Anfrage nach 5 Minuten abgebrochen zu sein scheint, der Server arbeitet aber noch weiter. Es dauert im Schnitt ein paar Sekunden pro Lieferant. Bei :count Lieferanten ungefähr :minutes Minuten.",
+			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu Imports aus der Lieferantenverwaltung heraus. Kann trotzdem dauern, hol dir einen Kaffee... \nEs dauert im Schnitt ein paar Sekunden pro Lieferant. Bei :count Lieferanten ungefähr :minutes Minuten. Es kann sein, dass die Anfrage nach 5 Minuten abgebrochen zu sein scheint, der Server arbeitet aber noch weiter. ",
 			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
 		},
 		"navigation": {
