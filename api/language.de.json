@@ -1329,7 +1329,6 @@
 		"alert_purchase": "Neue Bestellungen freuen sich auf Bearbeitung :)",
 		"alert_undelivered_order": "Die Bestellung (:ordertype) von :quantity :unit :number :name von :vendor für :commission ist seit :days Tagen noch nicht eingetroffen. Bitte setzt euch mit :vendor in Verbindung um das Lieferdatum zu erfragen. :orderer bedankt sich!",
 		"alert_unissued_order": "Die Bestellung (:ordertype) von :quantity :unit :number :name von :vendor für :commission wurde am :deliverydate geliefert aber seit :days Tagen nicht als ausgehändigt markiert. Bitte markiere als ausgehändigt um die Information auch für den Einkauf zu bereinigen oder frage den Einkauf nach dem Stand der Dinge.",
-		"all_units": "alle Bereiche",
 		"approval_image": "Unterschrift für Freigabe",
 		"approved_on": "Freigegeben am",
 		"attach_file": "Füge Dateien hinzu",
