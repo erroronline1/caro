@@ -820,27 +820,27 @@ class SQLQUERY {
 
 		// kudos https://stackoverflow.com/a/30660857/6087758
 		'order_post_order_statistics' => [
-			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) " .
-						"VALUES (:order_id, :order_data, :ordered, :delivered_partially, :delivered_full, :ordertype) " .
+			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) " .
+						"VALUES (:order_id, :order_data, :organizational_unit, :orderer_name, :approved, :ordered, :delivered_partially, :delivered_full, :ordertype) " .
 						"ON DUPLICATE KEY UPDATE order_data = :order_data, delivered_partially = :delivered_partially, delivered_full = :delivered_full, ordertype = :ordertype",
 			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :delivered_partially, 120) AS delivered_partially, CONVERT(SMALLDATETIME, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
-						"(order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) ON (target.order_id = source.order_id) " .
+						"(SELECT :order_id AS order_id, :order_data AS order_data, :organizational_unit as organizational_unit, :orderer_name as orderer_name, CONVERT(SMALLDATETIME, :approved, 120) AS approved, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :delivered_partially, 120) AS delivered_partially, CONVERT(SMALLDATETIME, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
+						"(order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) ON (target.order_id = source.order_id) " .
 						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, delivered_partially = CONVERT(SMALLDATETIME, :delivered_partially, 120), delivered_full = CONVERT(SMALLDATETIME, :delivered_full, 120), ordertype = :ordertype " .
-						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :delivered_partially, 120), CONVERT(SMALLDATETIME, :delivered_full, 120), :ordertype);"
+						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, :order_data, :organizational_unit, :approval, CONVERT(SMALLDATETIME, :approved, 120), CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :delivered_partially, 120), CONVERT(SMALLDATETIME, :delivered_full, 120), :ordertype);"
 													// ^^^^^^^^ insert id here as opposed to other merged queries because most other tables have id as auto increment, but this is primary only	
 		],
 		'order_get_order_statistics' => [
-			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
-			'sqlsrv' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id"
+			'mysql' => "SELECT * FROM caro_consumables_order_statistics WHERE ordered BETWEEN :start AND :end ORDER BY order_id",
+			'sqlsrv' => "SELECT * FROM caro_consumables_order_statistics WHERE ordered BETWEEN CONVERT(SMALLDATETIME, :start, 120) AND CONVERT(SMALLDATETIME, :end, 120) ORDER BY order_id"
 		],
 		'order_delete_order_statistics' => [
 			'mysql' => "DELETE FROM caro_consumables_order_statistics WHERE order_id = :order_id",
 			'sqlsrv' => "DELETE FROM caro_consumables_order_statistics WHERE order_id = :order_id"
 		],
 		'order_truncate_order_statistics' => [
-			'mysql' => "TRUNCATE caro_consumables_order_statistics",
-			'sqlsrv' => "TRUNCATE TABLE caro_consumables_order_statistics"
+			'mysql' => "DELETE FROM caro_consumables_order_statistics WHERE ordered < :datetime",
+			'sqlsrv' => "DELETE FROM caro_consumables_order_statistics WHERE ordered < CONVERT(SMALLDATETIME, :datetime, 120)"
 		],
 
 

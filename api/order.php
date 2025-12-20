@@ -668,7 +668,7 @@ class ORDER extends API {
 										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer']['name'], ':product' => $data['name']]) .
 										"', render:'" . $this->_lang->GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']['name']]) .
 										"', options:{'" . $this->_lang->GET('general.prevent_dataloss_cancel') . "': false, '" . $this->_lang->GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
-	 									"if (confirmation) {api.purchase('put', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
+	 									"if (confirmation) {api.purchase('patch', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
 										"else {this.checked = false; return}" .
 										"});";
 								}
@@ -1744,13 +1744,18 @@ class ORDER extends API {
 	 * 
 	 * this is a cross-module method this class may be instatiated for
 	 */
-	public function statistics_get(){
-		return SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+	public function statistics_get($start = null, $end = null){
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics', [
+			'values' => [
+				':start' => $start ?? '2025-12-20 14:00:00',
+				':end' => $end ?? '2079-06-05 23:59:59'
+			]
+		]);
 	}
 
 	/**
 	 * post or put to order statistics once an order is processed
-	 * reduces order data and updates delivery state by copying relevant date from approved order by id to statistics table
+	 * updates delivery state by copying relevant date from approved order by id to statistics table
 	 * @param int $order_id primary database key
 	 * 
 	 * this is a cross-module method this class may be instatiated for
@@ -1766,42 +1771,34 @@ class ORDER extends API {
 		]);
 		$order = $order ? $order[0] : null;
 		if (!$order) return;
-		// minimize order data
-		$order['order_data'] = json_decode($order['order_data'], true);
-		foreach ($order['order_data'] as $key => $value){
-			if (!in_array($key, [
-				'quantity_label',
-				'unit_label',
-				'ordernumber_label',
-				'productname_label',
-				'vendor_label',
-				'additional_info'])) unset($order['order_data'][$key]);
-		}
-		$order['order_data'] = UTILITY::json_encode($order['order_data']);
-		
+
+		// retrieve orderer
+		$order_data = json_decode($order['order_data'], true);
+		$orderer =  SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+			'values' => [
+				':id' => intval($order_data['orderer']),
+				':name' => ''
+			]
+		]);
+		$orderer = $orderer ? $orderer[0] : null;
+		$orderer_name = $orderer['name'] ?? $this->_lang->GET('general.deleted_user');
+
 		// update or insert order statistics
 		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
 			'values' => [
 				':order_id' => intval($order_id),
 				':order_data' => $order['order_data'],
+				':organizational_unit' => $order['organizational_unit'],
+				':orderer_name' => $orderer_name,
+				':approved' => $order['approved'],
 				':ordered' => $order['ordered'],
 				':ordertype' => $order['ordertype']
 			],
 			'replacements' => [
-				':delivered_partially' => $order['delivered_partially'] ? : ($order['delivered_partially'] ? : 'NULL'),
+				':delivered_partially' => $order['delivered_partially'] ? : ($order['issued_partially'] ? : 'NULL'),
 				':delivered_full' => $order['delivered_full'] ? : ($order['issued_full'] ? : 'NULL'),
 			]
 		]);
 	}
-
-	/**
-	 * truncate table to initiate a new observation period
-	 * 
-	 * this is a cross-module method this class may be instatiated for
-	 */
-	public function statistics_truncate(){
-		return SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
-	}
-
 }
 ?>
