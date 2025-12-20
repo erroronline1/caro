@@ -101,11 +101,11 @@ const _ = {
 		if (["GET", "DELETE"].includes(method) && payload) {
 			if (payload instanceof FormData) {
 				payload.forEach((value, key) => {
-					query += "&" + encodeURI(key) + "=" + encodeURI(value);
+					query += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(value);
 				});
 			} else {
 				for (const [key, value] of Object.entries(payload)) {
-					query += "&" + encodeURI(key) + "=" + encodeURI(value);
+					query += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(value);
 				}
 			}
 		}
