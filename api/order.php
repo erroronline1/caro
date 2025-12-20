@@ -383,20 +383,27 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
+				// set available units
+				if (PERMISSION::permissionFor('orderprocessing')) $units = array_keys($this->_lang->_USER['units']); // see all orders
+				else $units = $_SESSION['user']['units']; // display only orders for own units
+
 				// resolve filters
 				foreach($this->_payload as $key => $value){
-					// do no unset string 'null' to be able to select all units for filter even with set primaryUnit e.g. for purchase assistants if included for config orderdisplayall
 					if (!$value) unset($this->_payload->{$key});
 				}
 				$filter = [];
 				foreach(['term','timespan','unit','etc'] as $f){
 					$filter[$f] = UTILITY::propertySet($this->_payload, $f) ? : null;
-					$filter[$f] = $filter[$f] === 'null' ? null : $filter[$f];
-					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00';
+					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00'; // append seconds to datetime-local
+					if ($f === 'unit' && $filter[$f]) $filter[$f] = explode('|', $filter[$f]);
 				}
+				// this parcour maneuver is necessary to set the requested units for users with unit selector
+				// as well as these without
+				if ($filter['unit']) $units = $filter['unit']; // override units with selected filter
+				else $filter['unit'] = $units; // override filter with user units if not selected 
 
 				$response = ['data' => [
-					'filter' => $this->_payload ? (array)$this->_payload : '', // preset filters passed as query parameter
+					'filter' => $filter,
 					'state' => $this->_orderState ? : 'unprocessed', // preset the appropriate language key
 					'order' => [], 'approval' => [],
 					'allowedstateupdates'=> [],
@@ -457,13 +464,6 @@ class ORDER extends API {
 				}
 				ksort($statechange);
 
-				// set available units
-				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
-				else $units = $_SESSION['user']['units']; // display only orders for own units
-				$units[] = 'common'; // append common for for sqlquery by default
-				// override unit if explicit selected, _subMethod can be *stock* or *stock_none* as well, therefore the language key check
-				if (isset($this->_lang->_USER['units'][$filter['unit']])) $units = [$filter['unit']];
-
 				// determine if filtered for orderidentifier, strip if applicable
 				$orderidentifier = null;
 				if ($filter['term']){
@@ -502,7 +502,7 @@ class ORDER extends API {
 					'wildcards' => true,
 					'replacements' => [
 						':organizational_unit' => implode(",", $units),
-						':user' => $_SESSION['user']['id']
+						':user' => PERMISSION::permissionFor('orderdisplayall') ? 0 : $_SESSION['user']['id'] // only users that are not able to select units will be presented their own orders as well independently of unit intersection
 					]
 				]);
 				// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
@@ -515,13 +515,14 @@ class ORDER extends API {
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
 					'ordercancel' => PERMISSION::permissionFor('ordercancel') && !in_array('group', $_SESSION['user']['permissions']),
+					'orderdisplayall' => PERMISSION::permissionFor('orderdisplayall'),
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
 					'purchasemembers' => [],
 					'regularuser' => !in_array('group', $_SESSION['user']['permissions']),
 					'products' => PERMISSION::permissionFor('products'),
-					'admin' =>  array_intersect(['admin'], $_SESSION['user']['permissions'])
+					'admin' => array_intersect(['admin'], $_SESSION['user']['permissions'])
 				];
-				$response['data']['stockfilter'] = PERMISSION::permissionFor('orderdisplayall');
+				$response['data']['stockfilter'] = $permission['orderdisplayall'];
 
 				// userlist to decode orderer
 				$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -580,7 +581,7 @@ class ORDER extends API {
 					if (!$unit_intersection && array_intersect([$row['organizational_unit']], ['common']) && $orderer_id){
 						$unit_intersection = boolval(array_intersect([$row['organizational_unit']], explode(',', $users[$orderer_id]['units'])));
 					}
-					if (!$unit_intersection && !$permission['orderprocessing'] && !$permission['admin']) continue;
+					if (!$unit_intersection && !$permission['orderdisplayall'] && !$permission['admin']) continue;
 
 					$data = [
 						'id' => $row['id'],
@@ -606,6 +607,7 @@ class ORDER extends API {
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['delivered_full'] && !$row['issued_full'] && ($permission['orderaddinfo'] || $unit_intersection)) ? $statechange : [],
 						'state' => [],
+						'hidebatchupdate' => !($unit_intersection || $permission['admin']),
 						'disapprove' => (!($row['ordered'] || $row['delivered_full'] || $row['issued_full']) && in_array($row['ordertype'], ['order', 'service'])),
 						'cancel' => $permission['regularuser'] && ($row['ordered'] && !($row['delivered_full'] || $row['issued_full']) && ($permission['ordercancel'] || $unit_intersection)),
 						'return' => (($row['delivered_full'] || $row['issued_full']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || $unit_intersection)),
@@ -619,7 +621,7 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
-						'identifier' => $erp_interface_available && $permission['orderprocessing'] ? UTILITY::identifier(' ', $row['approved']) : null,
+						'identifier' => $erp_interface_available && $permission['orderdisplayall'] ? UTILITY::identifier(' ', $row['approved']) : null,
 						'calendar' => $row['delivered_full'] ? $calendar->dialog([
 							':type' => 'tasks',
 							':subject' => (UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '') . ' ' .
@@ -673,6 +675,7 @@ class ORDER extends API {
 										"else {this.checked = false; return}" .
 										"});";
 								}
+								// no break
 							case 'delivered_full':
 								if (!$permission['orderprocessing']){
 									$data['state'][$s]['disabled'] = true;
