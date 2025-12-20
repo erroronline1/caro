@@ -489,7 +489,7 @@ class ORDER extends API {
 						}
 
 						// assign rest to filered term
-						$filter['term'] = $components[1];
+						$filter['term'] = trim($components[1]);
 					}
 				}
 				// get all approved orders filtered by
@@ -847,7 +847,6 @@ class ORDER extends API {
 				':aut_idem' => $order['aut_idem'] ?? '',
 				]
 			)
-			. ($order['productid'] ? "  \n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $order['productid']: '')
 			. "  \n" . str_replace("\n", "  \n", $order['ordertext'])
 			. "  \n" . ($this->_lang->GET('order.commission') . ': ' . $order['commission'])
 			. "  \n" . ($this->_lang->GET('order.orderer') . ': ' . $order['orderer']['name'])
