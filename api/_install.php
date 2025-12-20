@@ -107,6 +107,9 @@ define('DEFAULTSQL', [
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_order_statistics` (" .
 				"	`order_id` int NOT NULL," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`orderer_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`approved` datetime NOT NULL," .
 				"	`ordered` datetime NULL DEFAULT NULL," .
 				"	`delivered_partially` datetime NULL DEFAULT NULL," .
 				"	`delivered_full` datetime NULL DEFAULT NULL," .
@@ -344,7 +347,7 @@ define('DEFAULTSQL', [
 
 		'sqlsrv' => "IF OBJECT_ID(N'caro_announcements', N'U') IS NULL " .
 				"CREATE TABLE caro_announcements (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	author_id int NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
@@ -356,7 +359,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_and_management (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	template int NULL DEFAULT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	content varchar(MAX) NOT NULL," .
@@ -368,7 +371,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_templates (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	content varchar(MAX) NOT NULL," .
 				"	objectives varchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
@@ -380,7 +383,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	type varchar(255) NOT NULL," .
 				"	span_start smalldatetime NOT NULL," .
 				"	span_end smalldatetime NOT NULL," .
@@ -396,7 +399,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_approved_orders (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	order_data varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(255) NOT NULL," .
 				"	approval varchar(MAX) NOT NULL," .
@@ -417,6 +420,9 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
 				"	order_id int NOT NULL," .
 				"	order_data varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(255) NOT NULL," .
+				"	orderer_name varchar(255) NOT NULL," .
+				"	approved smalldatetime NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
 				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
 				"	delivered_full smalldatetime NULL DEFAULT NULL," .
@@ -425,13 +431,13 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_prepared_orders (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	order_data varchar(MAX) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_products (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	vendor_id int NOT NULL," .
 				"	article_no varchar(MAX) NULL DEFAULT NULL," .
 				"	article_name varchar(MAX) NULL DEFAULT NULL," .
@@ -456,7 +462,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_vendors (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	info varchar(MAX) NULL DEFAULT NULL," .
@@ -466,7 +472,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
 				"CREATE TABLE caro_csvfilter (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
@@ -477,7 +483,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
 				"CREATE TABLE caro_file_external_documents (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	path varchar(MAX) NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	regulatory_context varchar(MAX) NOT NULL," .
@@ -487,7 +493,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_documents', N'U') IS NULL " .
 				"CREATE TABLE caro_documents (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
 				"	context varchar(255) NOT NULL," .
@@ -505,7 +511,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
 				"CREATE TABLE caro_manual (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	title varchar(255) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL" .
@@ -513,7 +519,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_measures', N'U') IS NULL " .
 				"CREATE TABLE caro_measures (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	timestamp smalldatetime NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	user_id int NULL," .
@@ -526,7 +532,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
 				"CREATE TABLE caro_messages (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
 				"	conversation_user int NOT NULL," .
 				"	sender int NOT NULL," .
@@ -538,7 +544,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
 				"CREATE TABLE caro_records (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	context varchar(255) NOT NULL," .
 				"	case_state varchar(MAX) NULL DEFAULT NULL," .
 				"	record_type varchar(255) NULL DEFAULT NULL," .
@@ -556,7 +562,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .
 				"CREATE TABLE caro_records_datalist (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	issue varchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	datalist varchar(MAX) NOT NULL" .
@@ -564,7 +570,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
 				"CREATE TABLE caro_risks (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	type varchar(255) NOT NULL," .
 				"	process varchar(MAX) NOT NULL," .
 				"	risk varchar(MAX) NOT NULL," .
@@ -594,7 +600,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
 				"CREATE TABLE caro_texttemplates (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(255) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
@@ -606,7 +612,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .
 				"CREATE TABLE caro_user (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL," .
 				"	units varchar(MAX) NOT NULL," .
@@ -619,7 +625,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_responsibility', N'U') IS NULL " .
 				"CREATE TABLE caro_user_responsibility (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
 				"	units varchar(MAX) NULL DEFAULT NULL," .
 				"	assigned_users varchar(MAX) NOT NULL," .
@@ -632,7 +638,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
 				"CREATE TABLE caro_user_training (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	date date NULL," .
@@ -645,7 +651,7 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'dbo.caro_whiteboard', N'U') IS NULL " .
 				"CREATE TABLE caro_whiteboard (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	last_touch smalldatetime NULL," .

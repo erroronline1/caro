@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_12_12'] as $update){
+		foreach (['_2025_12_20'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -327,6 +327,64 @@ class UPDATE{
 				"    ALTER TABLE caro_csvfilter" .
 				"    ADD approval varchar(MAX) NULL DEFAULT NULL" .
 				" END; ",
+			]
+		];
+	}
+
+	private function _2025_12_20(){
+		return [
+			'mysql' => [
+				"DROP TABLE caro_consumables_order_statistics; ",
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_order_statistics` (" .
+				"	`order_id` int NOT NULL," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`orderer_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`approved` datetime NOT NULL," .
+				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`delivered_partially` datetime NULL DEFAULT NULL," .
+				"	`delivered_full` datetime NULL DEFAULT NULL," .
+				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`order_id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+			],
+			'sqlsrv' => [
+				"DROP TABLE caro_consumables_order_statistics; ",
+				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_order_statistics (" .
+				"	id int NOT NULL IDENTITY PRIMARY KEY," .
+				"	order_id int NOT NULL," .
+				"	order_data varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(255) NOT NULL," .
+				"	orderer_name varchar(255) NOT NULL," .
+				"	approved smalldatetime NOT NULL," .
+				"	ordered smalldatetime NULL DEFAULT NULL," .
+				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
+				"	delivered_full smalldatetime NULL DEFAULT NULL," .
+				"	ordertype varchar(255) NOT NULL" .
+				");",
+				"ALTER TABLE caro_announcements ADD CONSTRAINT PK_caro_announcements PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_audit_and_management ADD CONSTRAINT PK_caro_audit_and_management PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_audit_templates ADD CONSTRAINT PK_caro_audit_templates PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_calendar ADD CONSTRAINT PK_caro_calendar PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_consumables_approved_orders ADD CONSTRAINT PK_caro_consumables_approved_orders PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_consumables_prepared_orders ADD CONSTRAINT PK_caro_consumables_prepared_orders PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_consumables_products ADD CONSTRAINT PK_caro_consumables_products PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_consumables_vendors ADD CONSTRAINT PK_caro_consumables_vendors PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_csvfilter ADD CONSTRAINT PK_caro_csvfilter PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_documents ADD CONSTRAINT PK_caro_documents PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_file_external_documents ADD CONSTRAINT PK_caro_file_external_documents PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_manual ADD CONSTRAINT PK_caro_manual PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_measures ADD CONSTRAINT PK_caro_measures PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_messages ADD CONSTRAINT PK_caro_messages PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_records ADD CONSTRAINT PK_caro_records PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_records_datalist ADD CONSTRAINT PK_caro_records_datalist PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_risks ADD CONSTRAINT PK_caro_risks PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_texttemplates ADD CONSTRAINT PK_caro_texttemplates PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_user ADD CONSTRAINT PK_caro_user PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_user_responsibility ADD CONSTRAINT PK_caro_user_responsibility PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_user_training ADD CONSTRAINT PK_caro_user_training PRIMARY KEY CLUSTERED (id);",
+				"ALTER TABLE caro_whiteboard ADD CONSTRAINT PK_caro_whiteboard PRIMARY KEY CLUSTERED (id);"
 			]
 		];
 	}
