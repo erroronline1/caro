@@ -102,7 +102,7 @@ class API {
 
 		// (re)authentify session user
 		if ((REQUEST[0] === 'application' && (
-			in_array(REQUEST[1], ['language', 'info', 'menu'])
+			in_array(REQUEST[1], ['menu'])
 			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
 		))){ // these requests do not need authentification or handle it on their own
 			$this->_auth = true;
@@ -297,6 +297,7 @@ class API {
 				}
 			}
 			if ($valid) {
+				$this->_lang = new LANG(); // reinstatiate for proper language return
 				return [
 					'user' => [
 						'name' => $_SESSION['user']['name'],

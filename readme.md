@@ -34,9 +34,7 @@ Things are still in motion. Images may be outdated.
 * data transfer/import from production to testserver?
 * review order flowchart
 * manual cron init beside deletion (purchase updating order states as required)
-* review start init on language change (render/race condition issue on first reload?)
 * review/validate network loss fallback especially on safari?
-* review form submission on enter for erpquery
 
 ## Content
 * [Aims](#aims)
