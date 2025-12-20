@@ -561,6 +561,13 @@ class NOTIFICATION extends API {
 							UTILITY::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
 
+							// delete order statistics
+							$prior_date = clone $this->_date['servertime'];
+							SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics', [
+								'values' => [
+									':datetime' => $prior_date->modify('-' . CONFIG['lifespan']['order']['statistics'] . ' years')->format('Y-m-d H:i:s')
+								]]);
+
 							// delete messages for users with enabled autodeletion
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							foreach($users as $user){
