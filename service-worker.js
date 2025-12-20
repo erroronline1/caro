@@ -8,7 +8,7 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-const cacheName = "20251019_0128"; // Change value to force update
+const cacheName = "20251220_1930"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -124,6 +124,8 @@ self.addEventListener("fetch", (event) => {
 						return cache.match(event.request).then(
 							// resolve
 							(response) => {
+								if (!response) return cacheResponse; // early rejection on empty response
+
 								cacheResponse = new Response(response.body, {
 									status: 203,
 									statusText: "OK",

@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
 * data transfer/import from production to testserver?
 * review order flowchart
 * manual cron init beside deletion (purchase updating order states as required)
-* review/validate network loss fallback especially on safari?
 
 ## Content
 * [Aims](#aims)
