@@ -385,7 +385,8 @@ class ORDER extends API {
 
 				// resolve filters
 				foreach($this->_payload as $key => $value){
-					if (!$value || $value === 'null') unset($this->_payload->{$key}); 
+					// do no unset string 'null' to be able to select all units for filter even with set primaryUnit e.g. for purchase assistants if included for config orderdisplayall
+					if (!$value) unset($this->_payload->{$key});
 				}
 				$filter = [];
 				foreach(['term','timespan','unit','etc'] as $f){
@@ -520,7 +521,7 @@ class ORDER extends API {
 					'products' => PERMISSION::permissionFor('products'),
 					'admin' =>  array_intersect(['admin'], $_SESSION['user']['permissions'])
 				];
-				$response['data']['stockfilter'] = $permission['orderprocessing'];
+				$response['data']['stockfilter'] = PERMISSION::permissionFor('orderdisplayall');
 
 				// userlist to decode orderer
 				$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');

@@ -675,7 +675,7 @@ export const _client = {
 					organizational_units[value] = {
 						value: key,
 					};
-					if (data.filter.unit === key || (!data.filter.unit && key === "null")) organizational_units[value].checked = true;
+					if (data.filter.unit === key || (!data.filter.unit && (key === "null" || (api._settings.user && api._settings.user.app_settings && api._settings.user.app_settings.primaryUnit && api._settings.user.app_settings.primaryUnit === key)))) organizational_units[value].checked = true;
 				}
 
 				// construct other filters

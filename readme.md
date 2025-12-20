@@ -2128,7 +2128,7 @@ measureedit = "ceo, qmo, prrc" ; edit, close and delete measures
 mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
-orderdisplayall = "purchase" ; display all orders by default, not only for own units
+orderdisplayall = "purchase, purchase_assistant" ; display all orders by default, not only for own units
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products
@@ -2727,7 +2727,7 @@ Stakeholder identification:
 | Batch update product alias | User | 2025-10-10 | Implemented; 2025-10-15 |
 | Product property: order via erp or third party ("BISI") | Purchase | 2025-10-10 | Implemented; 2025-10-15 |
 | Autodeletion for messages | User | 2025-11-06 | Implemented as optional user setting; 2025-11-07 |
-| Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 |  |
+| Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 | Implemented; 2025-12-20 |
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
 
 #### Rejected requirements
