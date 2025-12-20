@@ -33,11 +33,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * review order flowchart
-* order statistics
-    * no truncate, autodelete after 10 years
-    * query timespan instead
-    * vendor filter optional
-    * add unit column
 * manual cron init beside deletion (purchase updating order states as required)
 * review start init on language change (render/race condition issue on first reload?)
 * review/validate network loss fallback especially on safari?
@@ -1043,7 +1038,7 @@ A label can be created directly from the article number field supplemented by a 
 
 The layout of orders can be selected within the [user profile](#users) from full view, tile layout with reduced information and table view. This is intended to accomodate to different needs, e.g. purchase having all neccessary information directly available whereas other users may prefer less information load.
 
-Processed orders are also added to a second database with reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation.
+Processed orders are also added to a second database with slightly reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation. Entries in this database are not affected by order deletions and can be exported for any given time span before being sanitized after the respective [configuration setting](#environment-settings).
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders%20en-fullpage.png)
 
@@ -1838,7 +1833,7 @@ Application support legend:
 | ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
-| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br/>&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br/>&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.5.1 General Improvement | partial, structural | &bull; Registered users can file an improvement suggestion any time.<br/>&bull; Trainings are monitored regarding their expiry and reminded of evaluations and scheduling follow-up trainings.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Improvement suggestions](#improvement-suggestions), [User trainings](#user-trainings) |
 | ISO 13485 8.5.2 Corrective measures | partial, structural | &bull; Records have to be closed by authorized users. Records can be reset as comlaints at this or any earlier time. Complaints on own custom made products have to be closed by a PRRC and QMO by defaults. This way structural issues and their solutions can be addressed at the latest.<br/>&bull; An overview of ongoing complaints can be viewed by authorized users.<br/>&bull; Defined critical reasons for the return of consumables initiate a new incorporation process that has to be closed by safety and quality assurance related roles by default.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Incident"-context* | [Records](#records-1), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries), [Order](#order) |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Incident"-context* | |
@@ -2067,6 +2062,7 @@ files[sharepoint] = 48 ; HOURS, after these files will be deleted
 files[tmp] = 24 ; HOURS, after these files will be deleted
 
 order[autodelete] = 182 ; DAYS, after these orders marked as issued but not archived will be deleted
+order[statistics] = 10 ; YEARS, after these the respective order statistics entries will be deleted
 order[unissued] = 3 ; DAYS, after these unit members will be reminded to mark as issued or enquire delivery
 order[undelivered] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for regular orders
 service[undelivered] = 21 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for service or warranty cases
@@ -3264,16 +3260,16 @@ Sample response
 
 > DELETE ./api/api.php/audit/checks/{type}
 
-Deletes records. Currently implemented for order statistics only.
+Legary endpoint for possible future use. Currently without effect.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | required | "orderstatistics" |
+| {type} | path parameter | required |  |
 
-Sample response
+Supposed sample response
 ```
-{"response":{"msg":"Order statistics have been deleted.","type":"success"}}
+{"response":{"msg":"... have been deleted.","type":"success"}}
 ```
 
 > GET ./api/api.php/audit/checks/{type}/{date}/{time}

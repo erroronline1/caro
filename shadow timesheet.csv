@@ -374,3 +374,5 @@
 06.12.25,7,"code maintenance"
 12.12.25,8,"order-api, message-api, csvfilter-api"
 13.12.25,3,order-api
+19.12.25,8,order-api
+20.12.25,4,"order-api, audit-api, code maintenance"
