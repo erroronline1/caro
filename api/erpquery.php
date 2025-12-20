@@ -397,7 +397,7 @@ class ERPQUERY extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_update')
 			],
-			'content' => $this->_lang->GET('erpquery.integrations.productlist_erp_update_hint', [':count' => count($vendorlist), ':minutes' => ceil(count($vendorlist)*5/60)])
+			'content' => $this->_lang->GET('erpquery.integrations.productlist_erp_update_hint', [':count' => count($vendorlist), ':minutes' => ceil(count($vendorlist)*2/60)])
 		];
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
