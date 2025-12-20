@@ -33,8 +33,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver?
 * review order flowchart
-* order
-    * multiple attachments not processed properly, only last (photo) shows up - processOrderForm()
 * order statistics
     * no truncate, autodelete after 10 years
     * query timespan instead
