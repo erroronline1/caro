@@ -620,8 +620,12 @@ export const _client = {
 			const filter = {};
 			if (document.getElementById("filterterm")) filter.term = document.getElementById("filterterm").value;
 			if (document.getElementById("timespan")) filter.timespan = document.getElementById("timespan").value;
-			if (document.querySelector("[name='" + api._lang.GET("order.organizational_unit") + "']:checked")) filter.unit = document.querySelector("[name='" + api._lang.GET("order.organizational_unit") + "']:checked").value;
 			if (document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked")) filter.etc = document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked").value;
+			if (document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked").length){
+				filter.unit = [];
+				[...document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked")].forEach(node => {filter.unit.push(node.value);});
+				filter.unit = filter.unit.join("|");
+			} 
 			return filter;
 		},
 
@@ -668,14 +672,11 @@ export const _client = {
 				// construct unit selection
 				// limiting to units may speed up rendering for purchase members with this permission if necessary
 				const organizational_units = {};
-				for (const [key, value] of Object.entries({
-					null: api._lang.GET("order.all_units"),
-					...api._lang._USER.units,
-				})) {
+				for (const [key, value] of Object.entries(api._lang._USER.units)) {
 					organizational_units[value] = {
 						value: key,
 					};
-					if (data.filter.unit === key || (!data.filter.unit && (key === "null" || (api._settings.user && api._settings.user.app_settings && api._settings.user.app_settings.primaryUnit && api._settings.user.app_settings.primaryUnit === key)))) organizational_units[value].checked = true;
+					if (data.filter.unit && data.filter.unit.includes(key)) organizational_units[value].checked = true;
 				}
 
 				// construct other filters
@@ -693,7 +694,7 @@ export const _client = {
 
 				content[content.length - 1].push(
 					{
-						type: "radio",
+						type: "checkbox",
 						attributes: {
 							name: api._lang.GET("order.organizational_unit"),
 						},
@@ -1772,13 +1773,13 @@ export const _client = {
 					},
 				});
 
-				if (!element.incorporation && !element.samplecheck && element.id) {
+				if (!element.incorporation && !element.samplecheck && !element.hidebatchupdate && element.id) {
 					buttons = {};
-					(buttons[api._lang.GET("order.tile_view_mark")] = { value: element.id }),
-						order.push({
-							type: "checkbox",
-							content: buttons,
-						});
+					buttons[api._lang.GET("order.tile_view_mark")] = { value: element.id };
+					order.push({
+						type: "checkbox",
+						content: buttons,
+					});
 				} else {
 					tileinfo = [];
 					// add info on necessary actions if regular order, otherwise out of reach
