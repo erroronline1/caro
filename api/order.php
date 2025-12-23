@@ -851,6 +851,7 @@ class ORDER extends API {
 				':aut_idem' => $order['aut_idem'] ?? '',
 				]
 			)
+			. "  \n" . str_replace("\n", "  \n", $this->_lang->_USER['order']['ordertype'][$order['ordertype']])
 			. "  \n" . str_replace("\n", "  \n", $order['ordertext'])
 			. "  \n" . ($this->_lang->GET('order.commission') . ': ' . $order['commission'])
 			. "  \n" . ($this->_lang->GET('order.orderer') . ': ' . $order['orderer']['name'])
@@ -861,7 +862,7 @@ class ORDER extends API {
 		if($approved['data']['filter']) {
 			foreach ($approved['data']['order'] as $order) {
 				$data[$order['commission']]['filter'] = (isset($approved['data']['filter']['term']) && $approved['data']['filter']['term'] ? $this->_lang->GET("order.order_filter_label") . ': ' . $approved['data']['filter']['term'] . "  \n" : '')
-					. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . $approved['data']['filter']['unit'] . "  \n" : '')
+					. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . implode(', ' , array_map(Fn($v) => $this->_lang->_USER['units'][$v], $approved['data']['filter']['unit'])) . "  \n" : '')
 					. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . $approved['data']['filter']['etc'] . "  \n" : '')
 					. (isset($approved['data']['filter']['timespan']) && $approved['data']['filter']['timespan'] ? $this->_lang->GET("order.order_filter_datetime") . ': ' . $this->convertToServerTime($approved['data']['filter']['timespan']): '');
 			}
