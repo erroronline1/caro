@@ -31,9 +31,9 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-* data transfer/import from production to testserver?
-* review order flowchart
+* data transfer/import from production to testserver for real data testing?
 * manual cron init beside deletion (purchase updating order states as required)
+* review link opening, download, safari behaviour
 
 ## Content
 * [Aims](#aims)
