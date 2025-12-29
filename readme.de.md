@@ -1092,7 +1092,8 @@ Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Au
 * schedule_training_evaluation
 * schedule_trainings
 
-Jeder Aufgabe findet frühestens nach diesen in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt, basierend auf der letzten Ergänzung in der Log-Datei.
+Jede Aufgabe findet frühestens nach diesen in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt, basierend auf der letzten Ergänzung in der Log-Datei.  
+Die Hintergrundaktualisierung kann von authorisierten Nutzern über das Werkzeuge-Menu manuell angestoßen werden, falls es dringend ist (z.B. nach der Bearbeitung von Bestellungen).
 
 Ursprünglich sollte es ein ordnungsgemäßer CRON-Job werden (daher der Name), scheiterte aber aufgrund eines Problems beim Treiberimport unter IIS. Die Aufgaben werden nun von der Anwendung selbst erledigt und sind nicht auf Drittsoftware wie *cron* oder *schtask* angewiesen.
 
@@ -2016,6 +2017,7 @@ calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen
 calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller Nutzer, zu fremden Arbeitszeiten beitragen
 complaintclosing = "supervisor, qmo, prrc" ; obige Warnung beachten - Dokumentationen mit Reklamationen als abgeschlossen kennzeichnen
+cronoverride = "ceo, qmo, purchase, office"; automatische Hintergrundaktualisierung manuell auslösen
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
 csvrules = "ceo, qmo, prrc" ; neue CSV-Filter anlegen, ABER obige Warnung beachten - auch Freigabe von CSV-Filtern
 erpimport = "purchase, office" ; Bereitstellung von ERP Datenquellen, mehr dazu unter _erpinterface.php sofern anwendbar

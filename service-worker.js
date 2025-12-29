@@ -8,7 +8,7 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-const cacheName = "20251220_1930"; // Change value to force update
+const cacheName = "20251229_1640"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -18,10 +18,15 @@ database.database = {
 
 addEventListener("message", async (message) => {
 	client = message.source;
+	let request;
 	//do something with message.data
 	switch (message.data) {
+		case "getnotificationsoverride":
+			request = "api/api.php/notification/notifs/true"
+			// no break by intent
 		case "getnotifications":
-			let notifs = await fetch("api/api.php/notification/notifs/", {
+			request = request || "api/api.php/notification/notifs/";
+			let notifs = await fetch(request, {
 				method: "GET",
 				cache: "no-cache",
 				body: null,

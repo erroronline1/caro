@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver for real data testing?
-* manual cron init beside deletion (purchase updating order states as required)
 * review link opening, download, safari behaviour
 
 ## Content
@@ -1187,7 +1186,8 @@ The 'cron job' initiates automated message alerts and scheduled tasks (see below
 * schedule_training_evaluation
 * schedule_trainings
 
-Each task is executed earliest after passing of these [runtime-variable-defined](#runtime-variables) minutes based on the last attribution to the log-file.
+Each task is executed earliest after passing of these [runtime-variable-defined](#runtime-variables) minutes based on the last attribution to the log-file.  
+The cron job can be initiated manually for authorized users from the tools-panel in case of urgent updates (e.g. after order processing).
 
 Initially this was supposed to be a proper cron job (hence the name) but it failed due to a driver import issue on IIS from CLI. However as this is handled by the application it does not rely on third party applications like *cron* or *schtask*.
 
@@ -2112,6 +2112,7 @@ calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert 
 calendarfullaccess = "ceo" ; edit, delete or complete events and entries
 calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
 complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case documentation containing a complaint
+cronoverride = "ceo, qmo, purchase, office"; manually initiate the cron job
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
 csvrules = "ceo, qmo, prrc" ; add csv filter, BUT SEE WARNING ABOVE - also approve csv filter
 erpimport = "purchase, office" ; provide erp data sources, more details within _erpinterface regarding usecase if applicable
@@ -6383,6 +6384,7 @@ There are **no** dependency install routines for [composer](https://getcomposer.
 * [mermaid charts](https://mermaid.js.org/)
 * [recommendations on documenting software](https://github.com/openregulatory)
 * setting up one of the development environments regarding the local server with proper certificates to Joe <3
+* relentlessly reporting bugs and providing relevant feedback to Dennis and Patric
 
 [Content](#content)
 

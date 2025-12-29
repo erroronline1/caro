@@ -471,6 +471,7 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('audit.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('maintenance')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('maintenance.navigation.maintenance')] =['onclick' => "api.maintenance('get', 'task')"];
+		if (PERMISSION::permissionFor('cronoverride')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('maintenance.navigation.cronoverride')] =['onclick' => "_serviceWorker.postMessage('getnotificationsoverride')"];
 
 		$this->response(['render' => $menu]);
 	}

@@ -1163,6 +1163,7 @@
 		},
 		"navigation": {
 			"cron_log": "Cron Log",
+			"cronoverride": "Hintergrundaktualisierung manuell ausführen",
 			"maintenance": "Wartung",
 			"productsupdate": "Aktualisierung der Artikellisten",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",

@@ -20,6 +20,7 @@ class NOTIFICATION extends API {
 	 */
 
 	public $_requestedMethod = REQUEST[1];
+	public $_cronOverride = REQUEST[2] ?? false;
 
 	public function __construct(){
 		parent::__construct();
@@ -147,9 +148,12 @@ class NOTIFICATION extends API {
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
 
+		$override = false;
+		if ($this->_cronOverride && PERMISSION::permissionFor('cronoverride')) $override = true;
+
 		foreach(CONFIG['system']['cron'] as $task => $minutes){
 			try {
-				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60) {
+				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60 || $override) {
 					$execution = false;
 					switch($task){
 						case 'erp_interface_casestate':
@@ -872,7 +876,7 @@ class NOTIFICATION extends API {
 		}
 		if ($log) {
 			file_put_contents($logfile, "\n\n" . implode("\n", $log), FILE_APPEND);
-			if (array_intersect(['admin'], $_SESSION['user']['permissions'])) {
+			if (array_intersect(['admin'], $_SESSION['user']['permissions']) || $override) {
 				return implode("\n", $log);
 			}
 		}
