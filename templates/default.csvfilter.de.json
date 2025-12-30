@@ -38,6 +38,38 @@
 		}
 	},
 	{
+		"name": "Falllisten",
+		"content": {
+			"useCase": "Für die Aktualisierung der Bereichslager-Bestandslisten wird zunächst der Artikelstamm exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
+			"postProcessing": "Blattweise ausdrucken, ggf. Ausrichtung anpassen.",
+			"filesetting": {
+				"source": "genehmigt nicht geliefert/nicht genehmigt....CSV",
+				"headerrow": 1,
+				"destination": "Falllisten.xlsx",
+				"columns": ["VORGANG", "ANLAGEDATUM", "ANREDE", "NAME", "VORNAME", "GEBURTSDATUM", "KOSTENTRAEGER", "LEISTUNG", "AUFTRAGSWERT_BRUTTO", "GENEHMIGT", "GENEHMIGT_DATUM", "BETRIEB"]
+			},
+			"split": {
+				"BETRIEB": "(.*)"
+			},
+			"xslxformat": {
+				"header": {
+					"font-size": 8,
+					"widths": [7, 5, 5, 9, 7, 5, 10, 30, 12, 10, 5, 0.1],
+					"types": ["string", "string", "string", "string", "string", "string", "string", "string", "euro", "string", "string", "string"]
+				},
+				"row": {
+					"height": 40,
+					"wrap_text": true,
+					"font-size": 8,
+					"halign": "left",
+					"valign": "top",
+					"border": "top",
+					"border-style": "thin"
+				}
+			}
+		}
+	},
+	{
 		"name": "Rückzugsoption ohne ERP-Anbindung",
 		"content": {
 			"useCase": "Sort article lists from erp-system to csv-files for vendors that do not provide pricelists",
