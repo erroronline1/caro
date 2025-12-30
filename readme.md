@@ -32,8 +32,10 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver for real data testing?
-* review link opening, download, safari behaviour
 * how to embed special files like letter templates e.g. into text recommendations?
+    * add db column for linked files (install - also installTexttemplates(), databaseupdate, sqlinterface)
+    * link possible external files, checkbox2text multiple, no internal documents since text recommendations can be embedded within
+    * reconsider deletion strategy
 
 ## Content
 * [Aims](#aims)
