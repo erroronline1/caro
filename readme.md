@@ -33,6 +33,7 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * data transfer/import from production to testserver for real data testing?
 * review link opening, download, safari behaviour
+* how to embed special files like letter templates e.g. into text recommendations?
 
 ## Content
 * [Aims](#aims)
