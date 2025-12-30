@@ -26,9 +26,16 @@ export const Polyfill = {
 	a: function (a) {
 		if (!a.dataset.type) a.dataset.type = "downloadlink";
 
-		if (!a.href.includes("javascript:") && ((this.isIOS() && this.isStandalone()) || !("download" in document.createElement("a")))) {
+		let href = a.href,
+			ios = this.isIOS(),
+			standalone = this.isStandalone();
+		if ((a.href.startsWith("data") || (ios && standalone) || !("download" in document.createElement("a"))) && !a.href.includes("javascript:")) {
+			/*
+			* dataurls can not be directly opened as per specifications and are convert to blob instead
+			* https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/
+			* also safari is weird
+			*/
 			a.removeAttribute("target");
-			let href = a.href;
 			a.onclick = function () {
 				fetch(href)
 					.then((response) => response.blob())
@@ -36,8 +43,14 @@ export const Polyfill = {
 						const fileURL = URL.createObjectURL(blob),
 							pseudoa = document.createElement("a");
 						pseudoa.href = fileURL;
-						pseudoa.download = a.download;
 						pseudoa.target = "_blank";
+
+						if (ios) pseudoa.download = a.download;
+						// safari does not open otherwise,
+						// other browsers would directly download though.
+						// not settings up the download property unfortunately results in filename loss.
+						// anyway, immediate downloads clutter the download directory
+
 						document.body.appendChild(pseudoa);
 						pseudoa.click();
 						document.body.removeChild(pseudoa);
@@ -47,21 +60,22 @@ export const Polyfill = {
 			};
 			a.href = "javascript: void(0)";
 		} else if (
+			/*
+			 * download has to be specified in general to detect handling for safari special needs
+			 * howewer if download is specified with a name matching the url anyway,
+			 * this can be safely removed for some file types in context of proper browsers
+			 * because it reduces filling up the download directory
+			 */
 			a.download &&
 			a.href &&
 			["pdf", "jpg", "jpeg", "gif", "png"]
 				.map((extension) => {
-					return a.href.endsWith(extension); // || a.download.endsWith(extension);  this would have been nice for ERPinterface with data urls as well, but the tested browser has troubles processing them properly
+					return a.href.endsWith(extension);
 				})
 				.some((element) => {
 					return element === true;
 				})
 		) {
-			/*  download has to be specified in general to detect handling for safari special needs
-			 	howewer if download is specified with a name matching the url anyway,
-				this can be safely removed for some file types in context of proper browsers
-				because it reduces filling up the download directory
-			*/
 			a.target = "_blank";
 			a.removeAttribute("download");
 		}
@@ -76,6 +90,8 @@ export const Polyfill = {
 	},
 
 	downloadWarning: function () {
+		return null;
+		// recently safari does seem to not mess up anymore
 		if (!this.isIOS() || this.isStandalone()) return null;
 		const span = document.createElement("span");
 		span.append(document.createTextNode(api._lang.GET("general.safari.downloads")));
@@ -447,16 +463,16 @@ export class Dialog {
 	 * 	});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'preview', header:'display and download', render:{type: 'stl', name: 'filename', url: 'urlToFile', transfer: undefined || true});
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'stl', name: 'filename', url: 'urlToFile', transfer: undefined || true}});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'preview', header:'display and download', render:{type: 'qrcode', name: 'filename', content: 'data'});
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'qrcode', name: 'filename', content: 'data'}});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'preview', header:'display and download', render:{type: 'barcode', name: 'filename', content: {content: 'data', format: 'CODE128'}});
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'barcode', name: 'filename', content: {content: 'data', format: 'CODE128'}}});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'preview', header:'display and download', render:{type: 'image', name: 'filename', content: 'urlToFile'});
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'image', name: 'filename', content: 'urlToFile'}});
 	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
@@ -932,7 +948,7 @@ export class Dialog {
 			if (this.render.transfer) {
 				const hidden = document.createElement("input");
 				hidden.hidden = true;
-				hidden.value=this.render.name;
+				hidden.value = this.render.name;
 				return [div, hidden, ...this.confirm()];
 			} else {
 				a.href = this.render.url;
