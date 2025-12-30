@@ -4580,18 +4580,18 @@ Sample response
 
 ### Notification endpoints
 
-> GET ./api/api.php/notification/notifs
+> GET ./api/api.php/notification/notifs/{parameter}
 
 Returns notifications on number of *audit_closing*, *calendar_uncompletedevents*, *consumables_pendingincorporation*, *document_approval*, *order_unprocessed*, *order_prepared*, *managementreview*, *measure_unclosed*, *message_unnotified*, *message_unseen*, *responsibilities* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |  |
+| {parameter} | path parameter | optional | enforce cron job |
 
 Sample response
 ```
-{"calendar_uncompletedevents": 2,"consumables_pendingincorporation": 13,"document_approval": 2,"order_unprocessed": "5","message_unnotified": "0","message_unseen": "1"}
+{"cron": "2025-12-30 07:37:51 erp_interface_casestate: OK\n2025-12-30 07:37:51 erp_interface_orderdata: OK\n2025-12-30 07:37:51 alert_new_orders: OK\n2025-12-30 07:37:51 alert_open_records_and_retention_periods: OK\n2025-12-30 07:37:51 alert_unclosed_audits: OK\n2025-12-30 07:37:51 alert_undelivered_orders: OK\n2025-12-30 07:37:51 delete_files_and_calendar: OK\n2025-12-30 07:37:51 schedule_archived_orders_review: OK\n2025-12-30 07:37:51 schedule_outdated_consumables_documents_review: OK\n2025-12-30 07:37:51 schedule_responsibilities_renewal: OK\n2025-12-30 07:37:51 schedule_training_evaluation: OK", "audit_closing": 1, "consumables_pendingincorporation": 39, "csvfilter_approval": 3, "document_approval": 0, "order_unprocessed": 18, "order_prepared": 0, "managementreview": 1, "measure_unclosed": 3, "responsibilities": 0, "calendar_uncompletedtasks": 5, "calendar_uncompletedworklists": 0, "message_unnotified": 0, "message_unseen": 0}
 ```
 
 [Content](#content)
