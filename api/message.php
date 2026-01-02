@@ -64,7 +64,8 @@ class MESSAGE extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.announcement.saved_success'),
-						'type' => 'success'
+						'type' => 'success',
+						'redirect' => ['announcements']
 					]]);
 				else $this->response([
 					'response' => [
