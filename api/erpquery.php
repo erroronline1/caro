@@ -134,7 +134,8 @@ class ERPQUERY extends API {
 				if ($files && isset($files[$case])){
 					$attachments = [];
 					foreach($files[$case] as $attachment){
-						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
+//						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
+						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => "javascript:void(0)", 'onclick' => "new _client.Dialog({type: 'preview', header: '".$attachment['filename']."', render: {type: 'dataurl', name: '".$attachment['filename']."', content: '".$attachment['url']."'}})"];
 					}
 
 					$casecontent[] = [

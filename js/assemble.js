@@ -31,10 +31,9 @@ export const Polyfill = {
 			standalone = this.isStandalone();
 		if ((a.href.startsWith("data") || (ios && standalone) || !("download" in document.createElement("a"))) && !a.href.includes("javascript:")) {
 			/*
-			* dataurls can not be directly opened as per specifications and are convert to blob instead
-			* https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/
-			* also safari is weird
-			*/
+			 * dataurls can not be directly opened as per specifications and are convert to blob instead
+			 * https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/
+			 */
 			a.removeAttribute("target");
 			a.onclick = function () {
 				fetch(href)
@@ -44,12 +43,7 @@ export const Polyfill = {
 							pseudoa = document.createElement("a");
 						pseudoa.href = fileURL;
 						pseudoa.target = "_blank";
-
-						if (ios) pseudoa.download = a.download;
-						// safari does not open otherwise,
-						// other browsers would directly download though.
-						// not settings up the download property unfortunately results in filename loss.
-						// anyway, immediate downloads clutter the download directory
+						pseudoa.download = a.download;
 
 						document.body.appendChild(pseudoa);
 						pseudoa.click();
@@ -474,6 +468,9 @@ export class Dialog {
 	 * @example ```js
 	 * new Dialog({type:'preview', header:'display and download', render:{type: 'image', name: 'filename', content: 'urlToFile'}});
 	 * ```
+	 * @example ```js
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'dataurl', name: 'filename', content: 'dataurl'}});
+	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
 	 * multiple articles and sections are NOT supported due to simplified query selector
@@ -672,6 +669,7 @@ export class Dialog {
 
 				if (this.previewElements.canvas) {
 					// release ressources
+					if (this.previewElements.canvas.src) URL.revokeObjectURL(this.previewElements.canvas.src); // possible dataurl blob
 					this.previewElements.canvas.remove();
 					this.previewElements = {};
 					if (!this.render.transfer) {
@@ -959,8 +957,8 @@ export class Dialog {
 				return [div, a];
 			}
 		}
-		let result = [];
-		const canvas = document.createElement("canvas");
+		let result = [],
+			canvas = document.createElement("canvas");
 		canvas.id = getNextElementID();
 		canvas.classList.add("preview");
 		canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.render.name });
@@ -1010,6 +1008,41 @@ export class Dialog {
 			if ((warning = Polyfill.downloadWarning())) result.push(warning);
 			a = Polyfill.a(a);
 		}
+		if (this.render.type === "dataurl") {
+			/**
+			 * this works wonderful except in safari where pdfs are rendered as a single page image and are not scrollable.
+			 */
+			const filetype = this.render.content.substring(this.render.content.indexOf(":") + 1, this.render.content.indexOf(";"));
+			if (["image/png", "image/jpeg", "image/gif", "application/pdf"].includes(filetype)) {
+				canvas = document.createElement("iframe");
+				const binaryString = atob(this.render.content.substring(this.render.content.indexOf(",") + 1));
+				const byteNumbers = new Array(binaryString.length);
+
+				for (let i = 0; i < binaryString.length; i++) {
+					byteNumbers[i] = binaryString.charCodeAt(i);
+				}
+
+				const byteArray = new Uint8Array(byteNumbers);
+				const objectBlob = new Blob([byteArray], { type: filetype });
+				if (objectBlob) {
+					canvas.src = URL.createObjectURL(objectBlob);
+					canvas.type = filetype;
+					canvas.classList.add ("dataurl");
+
+					result.push(canvas);
+					this.previewElements.canvas = canvas;
+				}
+				a = Polyfill.a(a);
+				if (warning) return [canvas, warning, a];
+				return [canvas, a];
+			} else {
+				// not supported;
+			}
+			// direct download, lossless and original format
+			if ((warning = Polyfill.downloadWarning())) result.push(warning);
+			a = Polyfill.a(a);
+		}
+
 		result.push(a);
 
 		return result;
