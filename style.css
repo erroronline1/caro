@@ -644,8 +644,8 @@ canvas {
 .dataurl {
 	display: block;
 	margin-bottom: 2em;
-	height: calc(100vh - 5rem);
 	width:100%;
+	height: calc(75vh - 6em);
 	margin: 0 auto;
 	overflow: auto; /* Enable scrolling for overflow content */
 	-webkit-overflow-scrolling: touch; /* Critical for iPad Safari: enables momentum scrolling */

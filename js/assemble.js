@@ -1027,7 +1027,9 @@ export class Dialog {
 				if (objectBlob) {
 					canvas.src = URL.createObjectURL(objectBlob);
 					canvas.type = filetype;
-					canvas.classList.add ("dataurl");
+					canvas.classList.add("dataurl");
+					canvas.width = "100%";
+					canvas.height = "600"; // looks shit in safari pwa otherwise
 
 					result.push(canvas);
 					this.previewElements.canvas = canvas;
