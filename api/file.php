@@ -40,7 +40,7 @@ class FILE extends API {
 	 * returns paths to documents that are available according to database
 	 * @return array filepaths
 	 */
-	private function activeexternalfiles(){
+	public function activeexternalfiles(){
 		$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
 		if ($files) return array_column($files, 'path');
 		return [];
