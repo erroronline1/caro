@@ -763,6 +763,30 @@ class APPLICATION extends API {
 				];
 			}
 
+			// unapproved csv filters
+			$unapproved = $notifications->csvfilter();
+			if ($unapproved){
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "api.csvfilter('get', 'rule')",
+						'onkeydown' => "if (event.key==='Enter') api.csvfilter('get', 'rule')",
+						'role' => 'link',
+						'tabindex' => '0'
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.csvfilter', [':number' => $unapproved]),
+							'attributes' => [
+								'data-type' => 'filtered',
+								'name' => $this->_lang->GET('csvfilter.navigation.filter_manager')
+							]
+						]
+					]
+				];
+			}
+
 			// pending product incorporations
 			$unapproved = $notifications->consumables();
 			if ($unapproved){
