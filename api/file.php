@@ -195,7 +195,7 @@ class FILE extends API {
 							$hint = null;
 							if (isset($template_use[$file['path']])){
 								$hint = $this->_lang->GET('file.external_file.used_by', [':used_by' => 
-									$this->_lang->GET('texttemplate.navigation.texts')
+									$this->_lang->GET('texttemplate.template.template')
 									. ' '
 									. implode(', ', $template_use[$file['path']])
 								]);
