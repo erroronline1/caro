@@ -936,7 +936,7 @@ class SQLQUERY {
 						"VALUES (:id, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden, :approval, :linked_files) " .
 						"ON DUPLICATE KEY UPDATE name = :name, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, linked_files = :linked_files",
 			'sqlsrv' => "MERGE INTO caro_texttemplates WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :name AS name, :content AS content, type) AS source " .
+						"(SELECT :id AS id, :name AS name, :content AS content, :type as type) AS source " .
 						"(id, name, content, type) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = :name, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, linked_files = :linked_files " .
 						"WHEN NOT MATCHED THEN INSERT (name, unit, date, author, content, type, hidden, approval, linked_files) VALUES (name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden, :approval, :linked_files);"
