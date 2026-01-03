@@ -66,7 +66,7 @@ class FILE extends API {
 				// $_FILES is submitted always even if empty
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name']) {
 					// process provided files 
-					$files = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], UTILITY::directory('external_documents'));
+					$files = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], UTILITY::directory('external_documents'), null, null, false);
 					$insertions = [];
 					foreach ($files as $file){
 						$insertions[] = [
@@ -75,7 +75,7 @@ class FILE extends API {
 						];
 					}
 
-					// process provided linkes ressources
+					// process provided linked ressources from a wrapped link input
 					foreach ($this->_payload as $key => $value){
 						if (preg_match("/^" . $this->_lang->PROPERTY('file.external_file.link') . "/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
 							$insertions[] = [

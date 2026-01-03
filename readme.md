@@ -27,7 +27,6 @@ Things are still in motion. Images may be outdated.
 
 ## to do
 * data transfer/import from production to testserver for real data testing?
-* overwrite/renaming strategy for external documents
 
 ## Content
 * [Aims](#aims)
@@ -903,7 +902,7 @@ STL/OBJ- and image-files have a preview by default.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well. External files linked within [text templates](#text-recommendations) will be hinted regarding attention on availability.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well. External files linked within [text templates](#text-recommendations) will be hinted regarding attention on availability. Files with the same name will be enumerated. This does not affect network ressources.
 
 ![files screenshot](http://toh.erroronline.one/caro/files%20en.png)
 

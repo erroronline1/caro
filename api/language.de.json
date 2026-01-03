@@ -1117,7 +1117,7 @@
 			"available": "verfügbar",
 			"available_success": "Diese Datei ist wieder verfügbar",
 			"folder": "externe Dokumente",
-			"hint": "Bitte stelle Dateien mit nachvollziehbaren Namen zur Verfügung. Füge gegebenenfalls eine Versionsnummer an, sofern sinnvoll.",
+			"hint": "Bitte stelle Dateien mit nachvollziehbaren Namen zur Verfügung. Füge gegebenenfalls eine Versionsnummer an, sofern sinnvoll, andernfalls wird bei gleichen Dateinamen automatisch aufsteigend nummeriert.",
 			"introduced": "Eingeführt am :introduced von :user",
 			"link": "Verknüpfe eine Datei von einer Netzwerkressource",
 			"regulatory_context": "Regulatorischer Zusammenhang wurde aktualisiert",
