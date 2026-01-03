@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_12_20'] as $update){
+		foreach (['_2026_01_03'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -385,6 +385,27 @@ class UPDATE{
 				"ALTER TABLE caro_user_responsibility ADD CONSTRAINT PK_caro_user_responsibility PRIMARY KEY CLUSTERED (id);",
 				"ALTER TABLE caro_user_training ADD CONSTRAINT PK_caro_user_training PRIMARY KEY CLUSTERED (id);",
 				"ALTER TABLE caro_whiteboard ADD CONSTRAINT PK_caro_whiteboard PRIMARY KEY CLUSTERED (id);"
+			]
+		];
+	}
+
+	private function _2026_01_03(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_texttemplates ADD COLUMN IF NOT EXISTS approval text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+				"ALTER TABLE caro_texttemplates ADD COLUMN IF NOT EXISTS linked_files text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_texttemplates', 'approval') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_texttemplates" .
+				"    ADD approval varchar(MAX) NULL DEFAULT NULL" .
+				" END; ",
+				"IF COL_LENGTH('caro_texttemplates', 'linked_files') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_texttemplates" .
+				"    ADD linked_files varchar(MAX) NULL DEFAULT NULL" .
+				" END; ",
 			]
 		];
 	}

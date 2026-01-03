@@ -287,6 +287,8 @@ define('DEFAULTSQL', [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"   `hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"   `linked_files` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -607,7 +609,9 @@ define('DEFAULTSQL', [
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	type varchar(255) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL" .
+				"	hidden varchar(MAX) NULL DEFAULT NULL," .
+				"	approval varchar(MAX) NULL DEFAULT NULL" .
+				"	linked_files varchar(MAX) NULL DEFAULT NULL" .
 				");" 
 				.
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .
@@ -1246,7 +1250,9 @@ class INSTALL {
 					':author' => $entry['author'] ?? $this->_defaultUser,
 					':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
 					':type' => $entry['type'],
-					':hidden' => null
+					':hidden' => null,
+					':approval' => null,
+					':linked_files' => null
 				];
 			}
 		}
