@@ -208,6 +208,7 @@
 			"audits": ":number Audits müssen abgeschlossen werden",
 			"cases": ":number offene Vorgänge für deine zugeordneten Bereiche",
 			"complaints": ":number nicht abgeschlossene Reklamationen",
+			"csvfilter": ":number CSV-Filter benötigen eine Freigabe",
 			"messages": "Du hast :number ungelesene Nachricht(en)",
 			"orders": ":number Bestellungen zur Bearbeitung",
 			"pendingincorporations": ":number laufende Einführungsverfahren",
@@ -655,7 +656,7 @@
 			"close": "abgeschlossen",
 			"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Fortfahren?",
 			"delete_confirm_cancel": "Nein danke!",
-			"delete_confirm_header": "Managementbreicht dauerhaft löschen?",
+			"delete_confirm_header": "Managementbericht dauerhaft löschen?",
 			"delete_confirm_ok": "Ja, Bericht löschen",
 			"delete_error": "Der Managementbericht konnte nicht gelöscht werden.",
 			"delete_success": "Managementbericht gelöscht",
@@ -1414,8 +1415,8 @@
 			"unprocessed": "unbearbeitet"
 		},
 		"order_filter": "Filtern",
-		"order_filter_datetime":"Bestellungen seit",
-		"order_filter_etc":"sonstige Filter",
+		"order_filter_datetime": "Bestellungen seit",
+		"order_filter_etc": "sonstige Filter",
 		"order_filter_label": "filtere zusätzlich nach Begriff",
 		"order_last_ordered": "Zuletzt bestellt und ausgeliefert am :date",
 		"order_reference": "EVA Bestellbelegnummer",
@@ -1628,10 +1629,6 @@
 		"cause": "Ursache",
 		"damage": "Schaden",
 		"damages": ["niedrig", "mittel", "hoch", "besonders hoch"],
-		"delete_button": "Risikoeintrag löschen",
-		"delete_cancel": "Nein danke",
-		"delete_confirm": "Ja, Risikoeintrag löschen",
-		"delete_confirm_header": "Risikoeintrag unwiderruflich löschen?",
 		"edit_hidden_set": "Als ungültig gekennzeichnet am :date von :name",
 		"effect": "Wirkung",
 		"hidden": "ungültig",
@@ -1671,6 +1668,7 @@
 			"availability": "Textabschnittverfügbarkeit",
 			"availability_hint": "Verborgene Textabschnitte werden in der Auswahl oben nicht angezeigt. Verborgene Textabschnitte können Textvorlagen durcheinanderbringen, passe diese gegebenenfalls ebenfalls an.",
 			"available": "verfügbar",
+			"chunk": "Textabschnitt",
 			"content": "Inhalt",
 			"content_hint": "Typ Ersetzungen: halte dich für personalisierte Ersetzungen an die erforderliche Struktur, jede Formulierung in einer neuen Zeile: : :genus\nTyp Text: Jeder undefinierte :PLATZHALTER erzeugt automatisch ein Eingabefeld.",
 			"dependencies": "Der Textabschnitt mit diesem Namen wir von folgenden Textabschnitten oder Textvorlagen genutzt: :templates",
@@ -1686,14 +1684,17 @@
 			"saved": "Der Textabschnitt :name wurde gespeichert.",
 			"select": "Neueste Textabschnitte von :unit bearbeiten",
 			"type": "Typ",
-			"type_replacement": "Ersatz",
-			"type_text": "Text",
 			"types": {
 				"replacement": "Ersatz",
 				"text": "Text"
 			},
 			"unit": "Typischerweise verwendet von"
 		},
+		"delete": "löschen",
+		"delete_confirm": "Ja, :type :name löschen",
+		"delete_confirm_header": ":type :name unwiderruflich löschen?",
+		"delete_error": "Textvorlage konnte nicht gelöscht werden.",
+		"delete_success": ":type :name gelöscht.",
 		"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte versuche etwas anderes!",
 		"error_name_taken": "Der Name ist bereits in Verwendung oder Teil eines bestehenden Namens, bitte versuche etwas anderes!",
 		"edit_hidden_set": "Verborgen am :date von :name",
@@ -1724,7 +1725,8 @@
 			"not_saved_missing": "Die Textvorlage konnte nicht gespeichert werden, bitte gib einen Namen, die Sprache und einen Inhalt an!",
 			"save": "Textvorlage speichern",
 			"saved": "Die Textvorlage :name wurde gespeichert.",
-			"select": "Neueste Textvorlage von :unit bearbeiten"
+			"select": "Neueste Textvorlage von :unit bearbeiten",
+			"template": "Textvorlage"
 		},
 		"use": {
 			"blocks": "Genutzte Abschnitte innerhalb eines Absatzes",
@@ -1920,7 +1922,7 @@
 		"user_not_deleted": "Der Nutzer :name konnte nicht gelöscht werden",
 		"user_not_saved": "Der nutzer konnte nicht gespeichert werde",
 		"user_saved": "Der Nutzer :name wurde gespeichert",
-		"welcome_message": "Hallo :name,\nwillkommen in der :appname. Hier eine kurze Zusammenfassung:\nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo und bei der Produktsicherheit unterstützt dich :prrc. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.\nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.\nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
+		"welcome_message": "Hallo :name,\nwillkommen in der :appname. Hier eine kurze Zusammenfassung:\nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo, bei der Produktsicherheit unterstützt dich :prrc und bei Fragen zu Gefahrstoffen :hazardous_materials. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.\nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.\nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem",

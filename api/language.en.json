@@ -208,6 +208,7 @@
 			"audits": ":number audits await completion",
 			"cases": "There are :number open cases for your assigned units",
 			"complaints": ":number open complaints",
+			"csvfilter": ":number CSV-filter awaiting authorization",
 			"messages": "You have :number unread message(s)",
 			"orders": "There are :number orders awaiting processing",
 			"pendingincorporations": ":number incomplete incorporations",
@@ -1628,10 +1629,6 @@
 		"cause": "Cause",
 		"damage": "Damage",
 		"damages": ["low", "medium", "high", "particularly high"],
-		"delete_button": "Delete risk entry",
-		"delete_cancel": "No, thank you!",
-		"delete_confirm": "Yes, delete risk",
-		"delete_confirm_header": "Permanently delete risk entry?",
 		"edit_hidden_set": "Marked as invalid on :date by :name",
 		"effect": "Effect",
 		"hidden": "invalid",
@@ -1671,6 +1668,7 @@
 			"availability": "Chunk availability",
 			"availability_hint": "Hidden chunks are not displayed within the selection of latest chunks above. Hidden chunks may mess up templates, please adjust these as well.",
 			"available": "available",
+			"chunk": "Text chunk",
 			"content": "Content",
 			"content_hint": "Type replacement: for personalized chunks please adhere to syntax, each within a new line: :genus\nType text: within text chunks any undefined :PLACEHOLDER will generate an input field.",
 			"dependencies": "The current chunk by this name is used by following chunks or templates: :templates",
@@ -1686,14 +1684,17 @@
 			"saved": "The chunk named :name has been saved.",
 			"select": "Edit latest chunk for :unit",
 			"type": "Type",
-			"type_replacement": "Replacement",
-			"type_text": "Text",
 			"types": {
 				"replacement": "Replacement",
 				"text": "Text"
 			},
 			"unit": "Likely used by"
 		},
+		"delete": "delete",
+		"delete_confirm": "yes, delete :type :name",
+		"delete_confirm_header": "Permanently delete :type :name?",
+		"delete_error": "Text template could not be deleted.",
+		"delete_success": ":type :name deleted.",
 		"error_forbidden_name": "The name :name is not allowed, please use another!",
 		"error_name_taken": "The name ist already taken or part of an existing name, please use another!",
 		"edit_hidden_set": "Hidden on :date by :name",
@@ -1724,7 +1725,8 @@
 			"not_saved_missing": "Template could not been saved, please provide a name, language and content!",
 			"save": "Save template",
 			"saved": "The template named :name has been saved.",
-			"select": "Edit latest template for :unit"
+			"select": "Edit latest template for :unit",
+			"template": "Text template"
 		},
 		"use": {
 			"blocks": "Use textsection within paragraph",
@@ -1920,7 +1922,7 @@
 		"user_not_deleted": "User :name could not be deleted",
 		"user_not_saved": "User could not be saved",
 		"user_saved": "User :name has been saved",
-		"welcome_message": "Hello :name,\nwelcome to the :appname. A brief summary:\nYour contact persons for your units are :supervisor, regarding QM :qmo and in questions of product safety you'll get support by :prrc. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.\nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.\nI hope the app does make things easier at work, good luck!"
+		"welcome_message": "Hello :name,\nwelcome to the :appname. A brief summary:\nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.\nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.\nI hope the app does make things easier at work, good luck!"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 General quality management requirements",
