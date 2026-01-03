@@ -23,19 +23,11 @@ Things are still in motion. Images may be outdated.
 * recall option
 * post-market surveillance
 * post-market evaluation
-* complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
-    * devops folder with prepared sheets?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## to do
-* unittests
-* templates
-* erp_interface, additional usecases?
 * data transfer/import from production to testserver for real data testing?
-* how to embed special files like letter templates e.g. into text recommendations?
-    * add db column for linked files (install - also installTexttemplates(), databaseupdate, sqlinterface)
-    * link possible external files, checkbox2text multiple, no internal documents since text recommendations can be embedded within
-    * reconsider deletion strategy
+* overwrite/renaming strategy for external documents
 
 ## Content
 * [Aims](#aims)
@@ -201,7 +193,7 @@ Beside some architectural decisions to fit regulatory requirements the app is no
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if you're lucky you can import tidy data through the [ERP Interface](#erp-interface).
 
-Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
+Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose. Albeit orders being stored in a secondary database and accessible for a prolonged timespan, this data is unlikely to contain relevant data regarding regulatory topics in addition to accumulating ERP data.
 
 ## Extras
 * Text recommendations
@@ -386,6 +378,8 @@ The [vendor management](#vendor-and-product-management) makes use of system pres
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
+Templates can be assigned [external documents](#files), e.g. letter templates. Only accessible files will be displayed. Since text templates can be [embedded into documents](#component-editing) and used directly, these are not to be linked.
+
 Output will be copied to clipboad on clicking or tapping the output field.
 
 ![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20en-fullpage.png)
@@ -421,6 +415,8 @@ graph TD;
     chunks-...->edittemplate[edit template];
     edittemplate-.->|add template|chunks;
 ```
+
+Albeit supposed to streamline professional correspondence, text recommendations and their components are not considered critical and can be deleted by authorized users. They can be hidden as well if in doubt or wanting to come back later.
 
 [Content](#content)
 
@@ -907,7 +903,7 @@ STL/OBJ- and image-files have a preview by default.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well. External files linked within [text templates](#text-recommendations) will be hinted regarding attention on availability.
 
 ![files screenshot](http://toh.erroronline.one/caro/files%20en.png)
 
@@ -1131,11 +1127,19 @@ Sample checks are added to product. New checks trigger a system message to these
 ## Tools
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20en.png)
 
-Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations, image scaling and zip archiving.
+Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations, image scaling and zip archiving.  
+If available, [ERP interface](#erp-interface) functions may show up here too.
 
+### CSV-Filter
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
-If available, [ERP interface](#erp-interface) functions may show up here too.
+As some anticipated uses of the filter probably affect regulatory topics, filters are supposed to be approved by defined roles, and are not longer deleteable if fully approved for audit reasons. Since the construction of a filter can be a complicated task users authorized for editing are still allowed to access unapproved filters for testing purposes.
+
+Possible usecases can be:
+* filtering case lists for post market surveillance,
+* sorting [ERP-Interface data dumps](#custom-database-dumps),
+* preparing iventory lists for counting,
+* etc.
 
 ## Regulatory evaluations and summaries
 This module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
@@ -5158,12 +5162,26 @@ Sample response
 
 > POST ./api/api.php/texttemplate/chunk
 
-Stores a text chunk. If only the *hidden attribute changes, the entry will be updated. 
+Stores a text chunk. If the content remains the same, the entry will be updated. 
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | payload | form data | required |  |
+
+Sample response
+```
+{"response":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
+```
+
+> DELETE ./api/api.php/texttemplate/chunk/{id}
+
+Deletes a text chunk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id for chunk |
 
 Sample response
 ```
@@ -5179,6 +5197,12 @@ Similar to chunk.
 > POST ./api/api.php/texttemplate/template
 
 Stores a text template.
+
+Similar to chunk.
+
+> DELETE ./api/api.php/texttemplate/template/{id}
+
+Deletes a text template
 
 Similar to chunk.
 
