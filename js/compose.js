@@ -469,6 +469,7 @@ export class Composer {
 		// set dragged/dropped order of elements
 		const name = document.getElementById("TemplateName").value,
 			unit = document.getElementById("TemplateUnit").value,
+			files = document.getElementById("TemplateFiles").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
 			data = new FormData();
 
@@ -498,6 +499,7 @@ export class Composer {
 		if (name && unit && templateContent.length) {
 			data.append("name", name);
 			data.append("unit", unit);
+			data.append("files", files);
 			data.append("content", JSON.stringify(templateContent));
 			data.append("hidden", hidden);
 			return data;

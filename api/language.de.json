@@ -1716,6 +1716,7 @@
 			"hidden": "Verborgen",
 			"insert_default": "Auswahl",
 			"insert_name": "Füge einen Textabschnitt von :unit ein",
+			"linked_files": "Verknüpfte Dateien",
 			"name": "Name",
 			"new": "Neue Textvorlage",
 			"not_saved": "Die Textvorlage konnte nicht gespeichert werden.",

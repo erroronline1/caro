@@ -42,12 +42,15 @@ class TEXTTEMPLATE extends API {
 			case 'POST':
 				// set up chunk
 				$chunk = [
+					':id' => null,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.name')),
 					':unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.unit')) ? : array_key_first($this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':approval' => null,
+					':linked_files' => null
 				];
 
 				// check forbidden names
@@ -69,28 +72,17 @@ class TEXTTEMPLATE extends API {
 				foreach ($all as $entry){
 					if ($entry['type'] === 'template') continue;
 					if ($entry['name'] !== $chunk[':name'] && (str_starts_with($entry['name'], $chunk[':name']) || str_starts_with($chunk[':name'], $entry['name']))) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_name_taken'), 'type' => 'error']]);
-					if ($entry['name'] == $chunk[':name']){
+					if ($entry['name'] === $chunk[':name']){
 						$exists = $entry;
 						break;
 					}
 				}
-
-				// put hidden attribute if anything else remains the same
-				if ($exists && $exists['content'] === $chunk[':content'] && $exists['type'] === $chunk[':type']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
-						'values' => [
-							':hidden' => $chunk[':hidden'],
-							':id' => $exists['id'],
-							':unit' => $chunk[':unit']
-						]
-					])) $this->response([
-							'response' => [
-								'name' => $chunk[':name'],
-								'msg' => $this->_lang->GET('texttemplate.chunk.saved', [':name' => $chunk[':name']]),
-								'type' => 'success'
-							]]);	
+				if ($exists){
+					if ($exists['content'] === $chunk[':content'] && $exists['type'] === $chunk[':type']) {
+						$chunk[':id'] = $exists['id'];
+					}
 				}
-				// else post new chunk
+
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $chunk
 				])) $this->response([
@@ -344,16 +336,22 @@ class TEXTTEMPLATE extends API {
 	 */
 	public function template(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
+		require_once('./file.php');
+		$file = new FILE();
+
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				//set up template
 				$template = [
+					':id' => null,
 					':name' => UTILITY::propertySet($this->_payload, 'name'),
 					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first($this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
 					':type' => 'template',
 					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':approval' => null,
+					':linked_files' => UTILITY::propertySet($this->_payload, 'files')
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content'])) $this->response([], 400);
@@ -368,26 +366,25 @@ class TEXTTEMPLATE extends API {
 					if ($entry['type'] !== 'template') unset($exists[$row]);
 				}
 				$exists = $exists ? array_values($exists)[0] : null;
-				if ($exists && $exists['content'] === $template[':content']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
-						'values' => [
-							':hidden' => $template[':hidden'],
-							':id' => $exists['id'],
-							'unit' => $template[':unit']
-						]
-					])) $this->response([
-						'response' => [
-							'name' => $template[':name'],
-							'msg' => $this->_lang->GET('texttemplate.template.saved', [':name' => $template[':name']]),
-							'type' => 'success'
-						]]);	
+
+				if ($exists){
+					if ($exists['content'] === $template[':content']) {
+						$template[':id'] = $exists['id'];
+					}
 				}
+
 				//check forbidden names
 				if ($pattern = UTILITY::forbiddenName($template[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 
+				// sanitize linked files, keep only if valid 
+				$template[':linked_files'] = explode(', ', $template[':linked_files'] ? : '');
+				$template[':linked_files'] = array_intersect($template[':linked_files'], $file->activeexternalfiles());
+				$template[':linked_files'] = implode($template[':linked_files']);
+
 				// else post new template
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
-					'values' => $template])) $this->response([
+					'values' => $template
+				])) $this->response([
 					'response' => [
 						'name' => $template[':name'],
 						'msg' => $this->_lang->GET('texttemplate.template.saved', [':name' => $template[':name']]),
@@ -428,7 +425,8 @@ class TEXTTEMPLATE extends API {
 					'name' => '',
 					'unit' => '',
 					'content' => '',
-					'type' => ''
+					'type' => '',
+					'linked_files' => '',
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
@@ -507,6 +505,16 @@ class TEXTTEMPLATE extends API {
 					$units[$translation] = ['value' => $unit];
 					if ($template['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
+				
+				// sanitize linked files, keep only if valid 
+				$template['linked_files'] = explode(',', $template['linked_files'] ?: '');
+				$template['linked_files'] = array_intersect($template['linked_files'], $file->activeexternalfiles());
+
+				$linked_files = [];
+				foreach($file->activeexternalfiles() as $path){
+					$linked_files[$path] = [];
+					if (in_array($path, $template['linked_files'])) $linked_files[$path]['checked'] = true;
+				}
 
 				$response['data'] = $chunks;
 				$response['selected'] = $template['content'] ? json_decode($template['content'], true): [];
@@ -565,6 +573,14 @@ class TEXTTEMPLATE extends API {
 							]
 						],
 						...$renderinsertreplacement,
+						[
+							'type' => 'checkbox2text',
+							'attributes' => [
+								'name' => $this->_lang->GET('texttemplate.template.linked_files'),
+								'id' => 'TemplateFiles'
+							],
+							'content' => $linked_files
+						],
 						[
 							'type' => 'select',
 							'attributes' => [
@@ -824,8 +840,29 @@ class TEXTTEMPLATE extends API {
 					'hint' => $this->_lang->GET('texttemplate.use.disclaimer')
 				]
 			];
-			// append data for frontent processing
+			// append data for frontend processing
 			$response['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
+
+			require_once('./file.php');
+			$file = new FILE();
+
+			$template['linked_files'] = explode(',', $template['linked_files'] ?: '');
+			$template['linked_files'] = array_intersect($template['linked_files'], $file->activeexternalfiles());
+			if ($template['linked_files']){
+				$files = [];
+				foreach($template['linked_files'] as $path){
+					$filename = pathinfo($path)['basename'];
+					$files[$filename] = UTILITY::link(['href' => substr($path, 1), 'download' => $filename]);
+				}
+
+				$response['render']['content'][] = [
+					[
+						'type' => 'links',
+						'description' => $this->_lang->GET('texttemplate.template.linked_files'),
+						'content' => $files
+					]
+				];
+			}
 		}
 		if (!$this->_modal && PERMISSION::permissionFor('texttemplates')){
 			$response['render']['content'][] = [
