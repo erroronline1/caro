@@ -1121,7 +1121,8 @@
 			"link": "Link a file from a network resource",
 			"regulatory_context": "Regulatory context has been updated",
 			"retired": "Introduced :introduced, retired :retired by :user",
-			"retired_success": "This file is not longer accessible"
+			"retired_success": "This file is not longer accessible",
+			"used_by": "Used by :used_by"
 		},
 		"file_filter_folder": "Filter by folder",
 		"file_filter_label": "Filter by file name",

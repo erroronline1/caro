@@ -175,9 +175,32 @@ class FILE extends API {
 							]
 						]
 					];
+
+					// gather possible useage by texttemplates
+					$texttemplates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
+					$template_use = [];
+					foreach($texttemplates as $template){
+						if ($template['hidden'] || !$template['linked_files']) continue;
+
+						foreach(explode(',', $template['linked_files']) as $file){
+							if (isset($template_use[$file])) $template_use[$file][] = $template['name'];
+							else $template_use[$file] = [$template['name']];
+						}
+					}
 					$response['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
+
+							// construct hint for possible use before modifying path
+							$hint = null;
+							if (isset($template_use[$file['path']])){
+								$hint = $this->_lang->GET('file.external_file.used_by', [':used_by' => 
+									$this->_lang->GET('texttemplate.navigation.texts')
+									. ' '
+									. implode(', ', $template_use[$file['path']])
+								]);
+							}
+
 							// distinguish between uploaded files and linked ressources
 							$fileinfo = pathinfo($file['path']);
 
@@ -196,14 +219,15 @@ class FILE extends API {
 
 							$link = [];
 							$link[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
-			
+
 							// append file, link and options
 							array_push($response['render']['content'][1],
 								[
 									'type' => 'links',
 									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $this->convertFromServerTime($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
 									'content' => $link,
-									'data-filtered' => $file['path']
+									'data-filtered' => $file['path'],
+									'hint' => $hint
 								],
 								[
 									'type' => 'button',

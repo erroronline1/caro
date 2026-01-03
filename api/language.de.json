@@ -1121,7 +1121,8 @@
 			"link": "Verknüpfe eine Datei von einer Netzwerkressource",
 			"regulatory_context": "Regulatorischer Zusammenhang wurde aktualisiert",
 			"retired": "Eingeführt am :introduced, ausgemustert am :retired von :user",
-			"retired_success": "Diese Datei ist nicht mehr verfügbar"
+			"retired_success": "Diese Datei ist nicht mehr verfügbar",
+			"used_by": "Verwendet von :used_by"
 		},
 		"file_filter_folder": "Filtere Dateien nach Verzeichnis",
 		"file_filter_label": "Filtere nach Dateinamen",
