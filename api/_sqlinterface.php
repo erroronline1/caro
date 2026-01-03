@@ -957,7 +957,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_texttemplates WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_texttemplates WHERE name= :name ORDER BY id DESC"
 		],
-		'csvfilter_delete' => [
+		'texttemplate_delete' => [
 			'mysql' => "DELETE FROM caro_texttemplates WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = :id"
 		],

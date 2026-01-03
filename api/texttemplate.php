@@ -135,7 +135,7 @@ class TEXTTEMPLATE extends API {
 				foreach ($chunks as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (in_array($row['type'], ['template', 'text'])){
-						if (!in_array($row['name'], $dependedtemplates) && !in_array($row['name'], $hidden) && strpos($row['content'], $chunk['name']) !== false) {
+						if (!in_array($row['name'], $dependedtemplates) && !in_array($row['name'], $hidden) && strpos($row['content'], ':' . $chunk['name']) !== false) {
 							$dependedtemplates[] = $row['name'];
 						}
 					}
@@ -319,11 +319,52 @@ class TEXTTEMPLATE extends API {
 						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
-					array_push($response['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden, [
+						'type' => 'deletebutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('texttemplate.delete'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '" .
+							$this->_lang->GET('texttemplate.delete_confirm_header', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$chunk['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $chunk['name']])
+							 . "', options:{" .
+							"'" .
+							$this->_lang->GET("general.cancel_button") .
+							"': false," .
+							"'" .
+							$this->_lang->GET('texttemplate.delete_confirm', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$chunk['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $chunk['name']]) .
+							"': {value: true, class: 'reducedCTA'}," .
+							"}}).then(response => {if (response) api.texttemplate('delete', 'chunk', " . $chunk['id'] . ")})"
+						]
+					]);
 				}
 				$this->response($response);
 				break;
-		}					
+			case 'DELETE':
+				$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$template = $template ? $template[0] : null;
+				if ($template && 
+					SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_delete', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					])
+				) $this->response([
+						'response' => [
+							'name' => $template['name'],
+							'msg' => $this->_lang->GET('texttemplate.delete_success', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']]),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('texttemplate.delete_error'),
+						'type' => 'error'
+					]]);
+				break;
+		}	
 	}
 
 	/**
@@ -630,11 +671,52 @@ class TEXTTEMPLATE extends API {
 						$hiddenproperties = json_decode($template['hidden'], true);
 						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
-					array_push($response['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden, [
+						'type' => 'deletebutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('texttemplate.delete'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '" .
+							$this->_lang->GET('texttemplate.delete_confirm_header', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']])
+							 . "', options:{" .
+							"'" .
+							$this->_lang->GET("general.cancel_button") .
+							"': false," .
+							"'" .
+							$this->_lang->GET('texttemplate.delete_confirm', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']]) .
+							"': {value: true, class: 'reducedCTA'}," .
+							"}}).then(response => {if (response) api.texttemplate('delete', 'chunk', " . $template['id'] . ")})"
+						]
+					]);
 				}
 				if ($template['name']) $response['header'] = $template['name'];
 				$this->response($response);
 				break;
+			case 'DELETE':
+				$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$template = $template ? $template[0] : null;
+				if ($template && 
+					SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_delete', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					])
+				) $this->response([
+						'response' => [
+							'name' => $template['name'],
+							'msg' => $this->_lang->GET('texttemplate.delete_success', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']]),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('texttemplate.delete_error'),
+						'type' => 'error'
+					]]);
+				break;				
 		}
 	}
 
