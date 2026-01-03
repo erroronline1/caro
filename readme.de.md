@@ -107,7 +107,7 @@ Abgesehen von einigen architektonischen Entscheidungen zur Erfüllung regulatori
 
 Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Artikellisten (z.B. Preislisten) der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden. Auch ERP Datenexporte können genutzt werden und wenn es gut läuft auch saubere Daten durch die [ERP-Anbindung](#erp-anbindung) importiert werden.
 
-Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation.
+Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation. Obwohl Bestellungen in einer zweiten Datenbank gespeichert und für einen verlängerten Zeitraum abrufbar sind, beinhalten diese Daten wahrscheinlich keine regulatorisch relevanten Informationen die nicht ohnehin im ERP-System abgebildet werden sollten.
 
 ## Extras
 * Textempfehlungen
@@ -294,6 +294,8 @@ Die [Lieferantenverwaltung](#lieferanten--und-artikelverwaltung) nutzt systemsei
  
 Bei der Erstellung von Textvorschlägen können die Textbausteine individuell sortiert und zu Absätzen zusammengestellt werden. Dazu werden die jeweiligen Abschnitte mit der [Maus an die gewünschte Position gezogen](#verschiedenes). Bei der Nutzung von Textvorschlägen können die vorbereiteten Textbausteine und Abschnitte abgewählt werden um den Text an den Bedarf anzupassen. Eine Gruppierung nach Abschnitten erleichtert die visuelle Darstellung und Wiedererkennung des Formulars.
 
+Textvorschlägen können [externe Dokumente](#dateien), z.B. Briefvorlagen, zugeordnet werden. Es werden nur zugängliche Dateien angezeigt. Da Textvorschläge direkt [in Dokumente eingebunden](#komponentenbearbeitung) und von dort aus genutzt werden können, sind diese nicht verknüpfbar.
+
 Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
 ![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20de-fullpage.png)
@@ -331,6 +333,8 @@ graph TD;
     chunks-...->edittemplate[Vorlage bearbeiten];
     edittemplate-.->|Vorlage hinzufügen|chunks;
 ```
+
+Obgleich Textvorschläge dazu vorgesehen sind die professionelle Korrespondenz zu optimieren, werden sie nicht als kritisch betrachtet und können von berechtigten Nutzern gelöscht werden. Sie können im Zweifelsfall oder zur späteren Wiederverwendung auch verborgen werden.
 
 [Übersicht](#übersicht)
 
@@ -804,7 +808,7 @@ STL/OBJ- und Bild-Dateien haben eine automatische Vorschau.
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
-Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden.
+Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden. Externe Dokumente die in den [Textvorschlägen](#textvorschläge) verknüpft sind erhalten einen Hinweis für die Berücksichtigung hinsichtlich der Verfügbarkeit.
 
 ![files screenshot](http://toh.erroronline.one/caro/files%20de.png)
 
@@ -1034,11 +1038,19 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 ## Werkzeuge
 ![sample tools menu](http://toh.erroronline.one/caro/werkzeuge%20menu%20de.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen, Bildskalierung und ZIP-Archivierung zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen, Bildskalierung und ZIP-Archivierung zur Verfügung.  
+Falls verfügbar, werden hier auch Funktionen der [ERP-Anbindung](#erp-anbindung) angezeigt.
 
+### CSV-Filter
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
-Falls verfügbar, werden hier auch Funktionen der [ERP-Anbindung](#erp-anbindung) angezeigt.
+Da einige vorausgesehende Nutzungen regulatorische Themen betreffen können sollen die Filter von entsprechend berechtigten Nutzern freigegeben werden und sind bei vollständiger Freigabe nicht mehr löschbar. Da die Konstruktion eines Filters eine komplizierte Aufgabe sein kann, können berechtigte Nutzer auch nicht freigegebene Filter erreichen um diese testen zu können.
+
+Mögliche Nutzungen sind:
+* Fallistenfilterung für die Nachbeobachtung nach der Inverkehrbringung,
+* Sortierung von [ERP-Schnittstellen-Datenabzüge](#angepasste-datenbankauszüge),
+* Vorbereitung von Zähllisten für die Inventur,
+etc.
 
 ## Regulatorische Auswertungen und Zusammenfassungen
 Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
