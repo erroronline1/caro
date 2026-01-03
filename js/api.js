@@ -2229,6 +2229,8 @@ export const api = {
 						payload = _.getInputs("[data-usecase=texttemplate]", true);
 				}
 				break;
+			case "delete":
+				break;
 			default:
 				return;
 		}
