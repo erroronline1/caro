@@ -738,7 +738,8 @@ class USER extends API {
 							'supervisor' => [],
 							'qmo' => [],
 							'prrc' => [],
-							'admin' => [],						
+							'admin' => [],
+							'hazardous_materials' => []			
 						];
 						// construct permission- and unit-contact persons
 						foreach ($users as $registered){
@@ -766,6 +767,7 @@ class USER extends API {
 							':supervisor' => implode(', ', $roles['supervisor']),
 							':qmo' => implode(', ', $roles['qmo']),
 							':prrc' => implode(', ', $roles['prrc']),
+							':hazardous_materials' => implode(', ', $roles['hazardous_materials']),
 							':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
 							':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
 							':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
