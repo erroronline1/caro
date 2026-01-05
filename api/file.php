@@ -104,11 +104,11 @@ class FILE extends API {
 							'type' => 'success'
 						]]);
 					}
-					$this->response(['response' => [
-						'msg' => $this->_lang->GET('file.manager.error'),
-						'type' => 'error'
-					]]);
 				}
+				$this->response(['response' => [
+					'msg' => $this->_lang->GET('file.manager.error'),
+					'type' => 'error'
+				]]);
 				break;
 			case 'PUT':
 				// update availability or regulatory context
