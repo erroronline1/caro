@@ -183,7 +183,8 @@ class CSVFILTER extends API {
 				foreach ($filters as $row) {
 					$display = $row['name'];
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (PERMISSION::pending('csvrules', $row['approval'])) $display = UTILITY::hiddenOption($display);
+					//if (PERMISSION::pending('csvrules', $row['approval'])) $display = UTILITY::hiddenOption($display);
+					if (PERMISSION::pending('csvrules', $row['approval'])) $display = '[' . $this->_lang->GET('csvfilter.edit.approval_pending') . '] ' . $display;
 
 					// users authorized to author and approve filters can execute unapproved filters for drafting purposes
 					if (!isset($options[$display]) && !in_array($row['name'], $hidden) && (PERMISSION::fullyapproved('csvrules', $row['approval']) || PERMISSION::permissionFor('csvrules'))) {
@@ -424,13 +425,14 @@ class CSVFILTER extends API {
 				$hidden = [];
 				foreach ($filters as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
+					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('csvrules', $row['approval'])) {
 						$filterdatalist[] = $row['name'];
 						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					
 					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
-					if ($row['hidden'] || PERMISSION::pending('csvrules', $row['approval'])) $display = UTILITY::hiddenOption($display);
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					elseif (PERMISSION::pending('csvrules', $row['approval'])) $display = '[' . $this->_lang->GET('csvfilter.edit.approval_pending') . '] ' . $display;
 					$alloptions[$display] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 
