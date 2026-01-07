@@ -1544,7 +1544,7 @@ export const api = {
 				announcements: api._lang.GET("message.navigation.announcements"),
 				conversation: api._lang.GET("message.navigation.conversations"),
 				register: api._lang.GET("message.navigation.register"),
-				whiteboard: api._lang.GET("message.navigation.whiteboard"),
+				whiteboards: api._lang.GET("message.navigation.whiteboard"),
 			};
 
 		switch (method) {
@@ -1552,7 +1552,7 @@ export const api = {
 				switch (request[1]) {
 					case "announcement":
 					case "announcements":
-					case "whiteboard":
+					case "whiteboards":
 						successFn = async function (data) {
 							if (data.render) {
 								api.update_header(title[request[1]]);
