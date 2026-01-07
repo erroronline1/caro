@@ -1119,14 +1119,13 @@ export const _client = {
 							type: "br",
 						},
 						{
-							type: "textarea_copy",
+							type: "textarea",
 							attributes: {
 								value: element.information,
 								name: api._lang.GET("order.additional_info"),
 								readonly: true,
 							},
 							numeration: "prevent",
-							hint: api._lang.GET("order.copy_value"),
 						}
 					);
 				}
