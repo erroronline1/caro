@@ -608,7 +608,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * 
 	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
 	 */
-	public function casestate($erp_case_numbers = []){
+	public function casestate($erp_case_numbers = []){ 
 		$query = <<<'END'
 		SELECT
 			REFERENZ,
@@ -616,8 +616,16 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			CONVERT(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 			AUFTRAGSWERT_BRUTTO,
 			GENEHMIGT_TEILSUMME,
-			CONVERT(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
+			CONVERT(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
+			[sys].GENEHMIGT
 		FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+		LEFT JOIN (
+			SELECT
+				KENNZEICHEN,
+				BEZEICHNUNG AS GENEHMIGT
+			FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+			WHERE AUSWAHLART = 'AuftragsGenehmigung'
+		) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
 
 		WHERE REFERENZ IN (:ref)
 		END;
@@ -639,9 +647,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		foreach ($result as $row){
 			$response[$row['REFERENZ']] = [
 				'reimbursement' => $row['KV_DATUM'] ? : null,
-				'inquiry' => null,
-				'partiallygranted' => $row['GENEHMIGT_DATUM'] && $row['AUFTRAGSWERT_BRUTTO'] != $row['GENEHMIGT_TEILSUMME'] ? $row['GENEHMIGT_DATUM'] : null,
-				'granted' => $row['GENEHMIGT_DATUM'] && (!$row['GENEHMIGT_TEILSUMME'] || $row['AUFTRAGSWERT_BRUTTO'] == $row['GENEHMIGT_TEILSUMME']) ? $row['GENEHMIGT_DATUM'] : null,
+				'inquiry' => in_array($row['GENEHMIGT'], ['Klärung']) ? true : null,
+				'partiallygranted' => in_array($row['GENEHMIGT'], ['teilgenehmigt']) ? $row['GENEHMIGT_DATUM'] : null,
+				'granted' => in_array($row['GENEHMIGT'], ['genehmigt', 'genehmigungsfrei']) ? $row['GENEHMIGT_DATUM'] : null,
 				'production' => null,
 				'settled' => $row['FAKTURIERT_DATUM'] ? : null,
 			];
@@ -1180,13 +1188,20 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 					UNIT.BETRIEB
 				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-				INNER JOIN (
+				LEFT JOIN (
 					SELECT
 						KENNZEICHEN,
 						BEZEICHNUNG AS GENEHMIGT
 					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
 					WHERE AUSWAHLART = 'AuftragsGenehmigung'
 				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+				LEFT JOIN (
+					SELECT
+						KENNZEICHEN,
+						BEZEICHNUNG AS GELIEFERT
+					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+					WHERE AUSWAHLART = 'AuftragsLieferung'
+				) AS [sys2] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
 				INNER JOIN (
 					SELECT
 						a.NAME_1 AS NAME,
@@ -1228,9 +1243,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
 				) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
 		
-				WHERE vorgaenge.GELIEFERT = 1
-				AND [sys].GENEHMIGT IN ('Genehmigt', 'genehmigungsfrei')
+				WHERE 
+				vorgaenge.STATUS = 0
+				AND [sys2].GELIEFERT NOT IN ('geliefert')
+				AND vorgaenge.FAKTURIERT_DATUM IS NULL
+				AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
 				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+				AND vorgaenge.ANLAGEDATUM BETWEEN CONVERT(SMALLDATETIME, '2020-01-01 00:00:00', 120) AND CURRENT_TIMESTAMP
 				AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
 
 				order by vorgaenge.REFERENZ ASC
@@ -1251,7 +1270,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 					UNIT.BETRIEB
 				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-				INNER JOIN (
+				LEFT JOIN (
 					SELECT
 						KENNZEICHEN,
 						BEZEICHNUNG AS GENEHMIGT
@@ -1300,8 +1319,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
 		
 				WHERE
-				vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-				AND [sys].GENEHMIGT NOT IN ('Genehmigt', 'genehmigungsfrei', 'Storno')
+				vorgaenge.STATUS = 0
+				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+				AND vorgaenge.FAKTURIERT_DATUM IS NULL
+				AND [sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
 				AND vorgaenge.ANLAGEDATUM BETWEEN CONVERT(SMALLDATETIME, '2020-01-01 00:00:00', 120) AND CURRENT_TIMESTAMP
 				AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
 				
