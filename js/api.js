@@ -518,7 +518,7 @@ export const api = {
 							for (const opendialog of Object.values(document.querySelectorAll("dialog[open]"))) {
 								opendialog.remove();
 							}
-				
+
 							api.application("get", "start");
 						};
 						break;
@@ -794,7 +794,7 @@ export const api = {
 	 */
 	audit: (method, ...request) => {
 		request = [...request];
-		if (method === "get" && !request[0].startsWith('export')) api.history.write(["audit", ...request]);
+		if (method === "get" && !request[0].startsWith("export")) api.history.write(["audit", ...request]);
 
 		request.splice(0, 0, "audit");
 		let payload,
@@ -1087,94 +1087,6 @@ export const api = {
 	},
 
 	/**
-	 *   ___ _ _
-	 *  |  _|_| |___
-	 *  |  _| | | -_|
-	 *  |_| |_|_|___|
-	 *
-	 * displays and manages provided files, either administrative managed or open sharepoint
-	 *
-	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, search term  | requested directory name, requested filename
-	 * @returns request
-	 */
-	file: async (method, ...request) => {
-		request = [...request];
-		if (method === "get") api.history.write(["file", ...request]);
-
-		request.splice(0, 0, "file");
-		let successFn = function (data) {
-				if (data.render) {
-					api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
-			},
-			payload,
-			title = {
-				files: api._lang.GET("file.navigation.files"),
-				sharepoint: api._lang.GET("file.navigation.sharepoint"),
-				filemanager: api._lang.GET("file.navigation.file_manager"),
-				externalfilemanager: api._lang.GET("file.navigation.external_file_manager"),
-			};
-
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "filter":
-						if (request[4] === "filereference") {
-							// filereference coming from assemble.js widget
-							api.preventDataloss.monitor = false;
-							successFn = function (data) {
-								let article = document.querySelector("#_fileselectionDialog form article");
-								let sibling = article.children[2], // as per assemble after label and hidden input
-									deletesibling;
-								sibling = sibling.nextSibling;
-								if (sibling) {
-									do {
-										deletesibling = sibling;
-										sibling = sibling.nextSibling;
-										deletesibling.remove();
-									} while (sibling);
-								}
-								if (data.data) {
-									const options = _client.record.filereference(data.data);
-									const render = new Assemble(options);
-									render.initializeSection(null, article.children[2]);
-									render.processAfterInsertion();
-								}
-								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-								api.preventDataloss.monitor = true;
-							};
-						} else {
-							successFn = function (data) {
-								if (data.data) {
-									const all = document.querySelectorAll("[data-filtered]");
-									for (const file of all) {
-										file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
-									}
-								}
-								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							};
-						}
-						break;
-				}
-				break;
-			case "post":
-				successFn = function (data) {
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
-				};
-				payload = _.getInputs("[data-usecase=file]", true);
-				break;
-		}
-		api.send(method, request, successFn, null, payload);
-	},
-
-	/**
 	 *     _                           _
 	 *   _| |___ ___ _ _ _____ ___ ___| |_
 	 *  | . | . |  _| | |     | -_|   |  _|
@@ -1361,7 +1273,7 @@ export const api = {
 			successFn = async function (data) {
 				if (data.render) {
 					if (request[2]) await window.Masonry.breakpoints(false);
-					api.update_header(title[request[1]] + (request[2] && request[2] !== "null" ? " - " + api._lang.GET("erpquery.navigation." + request[2]) : ""));
+					api.update_header(title[request[1]] + (request[2] && request[2] !== "null" && api._lang._USER.erpquery.navigation[request[2]] ? " - " + api._lang.GET("erpquery.navigation." + request[2]) : ""));
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
@@ -1410,6 +1322,94 @@ export const api = {
 			case "delete":
 			default:
 				return;
+		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
+	 *   ___ _ _
+	 *  |  _|_| |___
+	 *  |  _| | | -_|
+	 *  |_| |_|_|___|
+	 *
+	 * displays and manages provided files, either administrative managed or open sharepoint
+	 *
+	 * @param {string} method get|post|delete
+	 * @param  {array} request api method, search term  | requested directory name, requested filename
+	 * @returns request
+	 */
+	file: async (method, ...request) => {
+		request = [...request];
+		if (method === "get") api.history.write(["file", ...request]);
+
+		request.splice(0, 0, "file");
+		let successFn = function (data) {
+				if (data.render) {
+					api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
+					const render = new Assemble(data.render);
+					document.getElementById("main").replaceChildren(render.initializeSection());
+					render.processAfterInsertion();
+				}
+				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+				if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
+			},
+			payload,
+			title = {
+				files: api._lang.GET("file.navigation.files"),
+				sharepoint: api._lang.GET("file.navigation.sharepoint"),
+				filemanager: api._lang.GET("file.navigation.file_manager"),
+				externalfilemanager: api._lang.GET("file.navigation.external_file_manager"),
+			};
+
+		switch (method) {
+			case "get":
+				switch (request[1]) {
+					case "filter":
+						if (request[4] === "filereference") {
+							// filereference coming from assemble.js widget
+							api.preventDataloss.monitor = false;
+							successFn = function (data) {
+								let article = document.querySelector("#_fileselectionDialog form article");
+								let sibling = article.children[2], // as per assemble after label and hidden input
+									deletesibling;
+								sibling = sibling.nextSibling;
+								if (sibling) {
+									do {
+										deletesibling = sibling;
+										sibling = sibling.nextSibling;
+										deletesibling.remove();
+									} while (sibling);
+								}
+								if (data.data) {
+									const options = _client.record.filereference(data.data);
+									const render = new Assemble(options);
+									render.initializeSection(null, article.children[2]);
+									render.processAfterInsertion();
+								}
+								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+								api.preventDataloss.monitor = true;
+							};
+						} else {
+							successFn = function (data) {
+								if (data.data) {
+									const all = document.querySelectorAll("[data-filtered]");
+									for (const file of all) {
+										file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
+									}
+								}
+								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							};
+						}
+						break;
+				}
+				break;
+			case "post":
+				successFn = function (data) {
+					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+					if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
+				};
+				payload = _.getInputs("[data-usecase=file]", true);
+				break;
 		}
 		api.send(method, request, successFn, null, payload);
 	},
@@ -1602,7 +1602,7 @@ export const api = {
 					case "announcement":
 					case "announcements":
 					case "whiteboard":
-							break;
+						break;
 					default:
 						// passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
 						payload = request[2];
@@ -1639,6 +1639,7 @@ export const api = {
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
 				if (data.response.type !== "error" && data.response.id) api.purchase("get", request[1], data.response.id);
+				if (data.response !== undefined && data.response.redirect !== undefined) api.purchase("get", ...data.response.redirect);
 				if (data.data) _serviceWorker.notif.consumables(data.data);
 			},
 			title = {
@@ -1749,11 +1750,11 @@ export const api = {
 							payload = JSON.parse(request[2]);
 							delete request[2];
 						}
-						// no break intentional
+					// no break intentional
 					case "approved":
 						// avoid override for product request if payload isset
 						payload = payload || _client.order.approvedFilter();
-						// no break intentional
+					// no break intentional
 					default:
 						successFn = function (data) {
 							if (data.render) {
@@ -1821,6 +1822,7 @@ export const api = {
 				successFn = function (data) {
 					new Toast(data.response.msg, data.response.type);
 					if (data.data) _serviceWorker.notif.consumables(data.data);
+					if (data.response !== undefined && data.response.redirect !== undefined) api.purchase("get", ...data.response.redirect);
 				};
 				break;
 			case "delete":
@@ -2152,7 +2154,7 @@ export const api = {
 				break;
 			case "post":
 			case "patch":
-						payload = _.getInputs("[data-usecase=risk]", true);
+				payload = _.getInputs("[data-usecase=risk]", true);
 				break;
 		}
 		api.send(method, request, successFn, null, payload);
