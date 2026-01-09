@@ -271,7 +271,7 @@ class ERPQUERY extends API {
 								':amount' => $order['amount'],
 								':delivered_full' => $order['delivered_full'] ? $this->convertFromServerTime($order['delivered_full']) : '?'
 							]
-						)] = ['href' => "javascript: api.purchase('get', 'order'); api.purchase('get', 'productsearch', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order')"];
+						)] = ['href' => "javascript: api.purchase('get', 'order'); setTimeout(api.purchase('get', 'search', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order'), 500)"];
 					}
 					$content[] = [
 						'type' => 'links',
@@ -468,7 +468,7 @@ class ERPQUERY extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$result = ERPINTERFACE->customcsvdump($this->_requestedType);
+				$result = ERPINTERFACE->customcsvdump($this->_requestedType, (array) $this->_payload);
 				if ($result === null ||  !$result) $this->response([
 					'response' => [
 						'name' => false,
@@ -491,6 +491,7 @@ class ERPQUERY extends API {
 				$options = ['...' . $this->_lang->GET('erpquery.csvdump.select') => ['value' => '0']];
 				foreach(ERPINTERFACE->customcsvdump() as $key){
 					$options[$key] = ['value' => $key];
+					if ($this->_requestedType === $key) $options[$key]['selected'] = true;
 				}
 
 				// append filter selection
@@ -501,7 +502,7 @@ class ERPQUERY extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('erpquery.csvdump.select'),
-									'onchange' => "api.erpquery('post', 'csvdump', this.value)"
+									'onchange' => "api.erpquery('get', 'csvdump', this.value)"
 								],
 								'content' => $options,
 								'hint' => $this->_lang->GET('erpquery.csvdump.select_hint')
@@ -509,6 +510,26 @@ class ERPQUERY extends API {
 						]
 					]
 				];
+				// append params if given
+				if ($this->_requestedType){
+					$response['render']['form'] = [
+						'data-usecase' => 'erpquery',
+						'action' => "javascript:api.erpquery('post', 'csvdump', '" . $this->_requestedType . "')"
+					];
+					if ($params = ERPINTERFACE->customcsvdump($this->_requestedType)){
+						$param_inputs = [];
+						foreach($params as $name => $param){
+							$param_inputs[] = [
+								'type' => $param['type'],
+								'attributes' => [
+									'name' => $name,
+									'value' => $param['value']
+								]
+							];
+						}
+						if ($param_inputs) $response['render']['content'][] = $param_inputs;
+					}
+				}
 		}
 		$this->response($response);
 	}
@@ -581,6 +602,5 @@ class ERPQUERY extends API {
 		}
 		$this->response($response);
 	}
-
 }
 ?>

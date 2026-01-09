@@ -2746,7 +2746,7 @@ A solution could be established due to an erp database connection thus implement
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission |
 | Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 | Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
 
@@ -4087,18 +4087,18 @@ Sample response
 {"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}]]}}
 ```
 
-> GET ./api/api.php/erpquery/csvdump/
+> GET ./api/api.php/erpquery/csvdump/{id}
 
-Returns the input form for requesting a query.
+Returns the input form for requesting a query. Without id filter selection only, with id optional query parameters specified within erpinterface.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none | | | |
+| {id} | path parameter | optional | query to apply |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.erpquery('post', 'csvdump', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.erpquery('get', 'csvdump', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
 ```
 
 > POST ./api/api.php/erpquery/csvdump/{id}
@@ -4108,7 +4108,8 @@ Returns a CSV file for successful ERP interface requests.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | filter to apply |
+| {id} | path parameter | required | query to apply |
+| payload | form data | optional | query options |
 
 Sample response
 ```

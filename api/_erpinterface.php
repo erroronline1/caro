@@ -20,6 +20,8 @@ namespace CARO\API;
 // the base class contains examples of all implemented methods during delevopment.
 // if you can only serve partially drop the methods or return null from your custom class
 
+// you are responsible for a decent user input sanitation to avoid malicious injections
+
 class _ERPINTERFACE {
 	/**
 	 * set to true if class has been successfully constructed
@@ -150,6 +152,7 @@ class _ERPINTERFACE {
 		 * ]
 		 * 
 		 * array keys according to record document field names, drop or append reasonable options, e.g. multilanguage if applicable
+		 * return formats are supposed to match the respective input format, e.g. Y-m-d for date
 		 * return [
 		 * 		[
 		 * 			'Family name' => string,
@@ -177,20 +180,58 @@ class _ERPINTERFACE {
 	 * if database connection is available you can formulate queries to retrieve a custom data dump
 	 * without parameter available query keys are returned to be shown within the CARO App
 	 * @param string|null $key
-	 * @return array|string array of available query keys or path to csv dump
+	 * @param array|null $params
+	 * @return array|string array of available query keys, params or path to csv dump
 	*/
-	public function customcsvdump($key = null){
+	public function customcsvdump($key = null, $params = null){
 		return null;
 
 		/*
 		$queries = [
-			'random query' => 'SELECT * FROM database'
+			'Vorgangsexport' => [
+				'query' => <<<'END'
+					SELECT * FROM database_table WHERE column = :userinput
+					END,
+				'params' => [
+					':userinput' => [
+						'name' => 'Column value',
+						'type' => 'text', // currently default simple html input types (text, date, time, number)
+						'default' => '',
+						'function' => function($v){
+							return $this->_pdo->quote($v); // process input somehow, date conversion or reasonable input sanitation to avoid malicious injections
+						}
+					],
+				]
+			]
 		];
 
 		if (!$key) return array_keys($queries);
 		if (!isset($queries[$key])) return null;
+		$paramfields = [];
+		// if not called with params return optional parameter settings for input
+		if ($params === null) {
+			if (!empty($queries[$key]['params'])) {
+				foreach($queries[$key]['params'] as $property){
+					$paramfields[$property['name']] = [
+						'type' => $property['type'],
+						'value' => is_callable($property['default']) ? $property['default']() : $property['default']
+					];
+				}
+			}
+			return $paramfields;
+		}
+		// iterate over query params and overwrite defaults with passed params, then apply function
+		if (isset($queries[$key]['params'])){
+			foreach($queries[$key]['params'] as $param => $property){
+				$default = is_callable($property['default']) ? $property['default']() : $property['default'];
+				$paramfields[$param] = $default;
+				if (!empty($params[$property['name']])) $paramfields[$param] = $params[$property['name']];
+				$paramfields[$key] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+			}
+		}
+
 		try{
-			$statement = $this->_pdo->prepare($queries[$key]);
+			$statement = $this->_pdo->prepare(strtr($queries[$key]['query'], $paramfields));
 			$statement->execute();
 		}
 		catch(\EXCEPTION $e){
@@ -482,9 +523,10 @@ class TEST extends _ERPINTERFACE {
 	 * if database connection is available you can formulate queries to retrieve a custom data dump
 	 * without parameter available query keys are returned to be shown within the CARO App
 	 * @param string|null $key
-	 * @return array|string array of available query keys or path to csv dump
+	 * @param array|null $params
+	 * @return array|string array of available query keys, params or path to csv dump
 	*/
-	public function customcsvdump($key = null){
+	public function customcsvdump($key = null, $params = null){
 		$queries = [
 			'random query' => 'fictional_file.csv',
 			'random query 2' => 'another_fictional_file.csv',
@@ -492,6 +534,8 @@ class TEST extends _ERPINTERFACE {
 
 		if (!$key) return array_keys($queries);
 		if (!isset($queries[$key])) return null;
+		if ($params === null) return [];
+
 		return substr(UTILITY::directory('tmp'), 1) . '/' . $queries[$key];
 		return [];
 	}
@@ -1028,318 +1072,444 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * if database connection is available you can formulate queries to retrieve a custom data dump
 	 * without parameter available query keys are returned to be shown within the CARO App
 	 * @param string|null $key
-	 * @return array|string array of available query keys or path to csv dump
+	 * @param array|null $params
+	 * @return array|string array of available query keys, params or path to csv dump
 	*/
-	public function customcsvdump($key = null){
+	public function customcsvdump($key = null, $params = null){
 		$queries = [
-			'Vorgangsexport' => <<<'END'
-				SELECT
-					vorgaenge.REFERENZ AS VORGANG,
-					CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-					pat.ANREDE,
-					pat.[PERSOENLICHE ANREDE],
-					pat.REFERENZ AS KUNDENNUMMER,
-					pat.NAME,
-					pat.VORNAME,
-					pat.STRASSE,
-					pat.LKZ,
-					pat.PLZ,
-					pat.ORT,
-					CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
-					EMAIL.EMAIL,
-					pat.STERBEDATUM,
-					vorgaenge.LEISTUNG,
-					vorgaenge.AUFTRAGSWERT_BRUTTO,
-					'geliefert' AS GELIEFERT,
-					CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
-					[sys].GENEHMIGT,
-					'nein' AS OHNE_SERIENBRIEF	
-				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-				INNER JOIN (
-					SELECT
-						KENNZEICHEN,
-						BEZEICHNUNG AS GENEHMIGT
-					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-					WHERE AUSWAHLART = 'AuftragsGenehmigung'
-				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-				INNER JOIN (
-					SELECT
-						a.NAME_1 AS NAME,
-						concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
-						a.GEBURTSDATUM,
-						a.STRASSE_1 AS STRASSE,
-						a.PLZ_1 AS PLZ,
-						a.ORT_1 AS ORT,
-						a.LKZ_1 AS LKZ,
-						a.REFERENZ,
-						more.STERBEDATUM,
-						t.ADRESS_ANREDE AS ANREDE,
-						t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE]
-					FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
-
-					WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
-					AND more.STERBEDATUM IS NULL
-					AND more.OHNE_SERIENBRIEF = 0
-				) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-				LEFT JOIN (
-					SELECT
-						mail.NUMMER AS EMAIL,
-						mail.ADRESSEN_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] AS im ON mail.KONTAKTART = im.REFERENZ
-
-					WHERE im.BEZEICHNUNG = 'E-Mail'
-				) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
-		
-				WHERE vorgaenge.GELIEFERT_DATUM IS NOT NULL
-				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 10
-				AND [sys].GENEHMIGT NOT IN ('Storno')
-
-				AND vorgaenge.ANLAGEDATUM > ':date'
-				order by vorgaenge.REFERENZ ASC
-				END,
-			'EVA-Artikelstamm Lagerware' => <<<'END'
-				SELECT
-					article.ARTIKEL_REFERENZ,
-					vendor.NAME_1 as LIEFERANTEN_NAME,
-					article.BESTELL_NUMMER,
-					article.BESTELL_TEXT,
-					unit.BEZEICHNUNG AS BESTELLEINHEIT,
-					storage.LAGERORT,
-					storage.LAGER_REFERENZ,
-					CONVERT(varchar(255), article.WARENEINGANGSDATUM, 104) AS WARENEINGANGSDATUM
-				FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
-				INNER JOIN (
-					SELECT
-						BEZEICHNUNG,
-						REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[inf_einheit]
-				) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
-				INNER JOIN (
-					SELECT
-						REFERENZ,
-						ZUSATZINFORMATION
-					FROM [eva3_02_viva_souh].[dbo].[wws_artikelstamm]
-				) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
-				INNER JOIN (
-					SELECT
-						ARTIKEL_REFERENZ,
-						LAGERORT,
-						strg_n.BEZEICHNUNG as LAGER_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[wws_lagerbestand] AS strg
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
-					WHERE 
-					(
-						(
-							strg_n.BEZEICHNUNG LIKE 'Zentrallager' OR
-							strg_n.BEZEICHNUNG LIKE 'Gießraum' OR
-							strg_n.BEZEICHNUNG LIKE 'Bandagisten' OR
-							strg_n.BEZEICHNUNG LIKE 'Prothetik' OR
-							strg_n.BEZEICHNUNG LIKE 'Orthetik' OR
-							strg_n.BEZEICHNUNG LIKE 'Armorthetik und -prothetik' OR
-							strg_n.BEZEICHNUNG LIKE 'Dysmelie' OR
-							strg_n.BEZEICHNUNG LIKE 'Kunststoffabteilung' OR
-							strg_n.BEZEICHNUNG LIKE 'Silikonabteilung'
-						)
-						AND (
-							(
-								strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null' AND strg.LAGER_REFERENZ IS NOT NULL
-							) OR (
-								strg.LAGER_MINDESTBESTAND > 0
-							) 
-						)
-					) OR
-					(
-						strg_n.BEZEICHNUNG LIKE 'Ambulan%' OR
-						strg_n.BEZEICHNUNG LIKE 'Kopfklinik%' OR
-						strg_n.BEZEICHNUNG LIKE 'B1%' OR
-						strg_n.BEZEICHNUNG LIKE 'OP%'
-					)
-				) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
-				INNER JOIN (
-					SELECT 
-						v.NAME_1,
-						v.REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
-					WHERE ia.BEZEICHNUNG = 'Lieferanten'
-				) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
-				
-				WHERE article.STATUS = 0 AND article.PRIMAER_LIEFERANT = 1
-
-				ORDER BY LAGER_REFERENZ, LAGERORT, LIEFERANTEN_NAME, BESTELL_NUMMER, BESTELL_TEXT
-				END,
-			'genehmigt nicht geliefert' => <<<'END'
-				SELECT
-					vorgaenge.REFERENZ AS VORGANG,
-					CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-					pat.ANREDE,
-					pat.REFERENZ AS KUNDENNUMMER,
-					pat.NAME,
-					pat.VORNAME,
-					CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
-					KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
-					vorgaenge.LEISTUNG,
-					vorgaenge.AUFTRAGSWERT_BRUTTO,
-					[sys].GENEHMIGT,
-					CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
-					UNIT.BETRIEB
-				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-				LEFT JOIN (
-					SELECT
-						KENNZEICHEN,
-						BEZEICHNUNG AS GENEHMIGT
-					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-					WHERE AUSWAHLART = 'AuftragsGenehmigung'
-				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-				LEFT JOIN (
-					SELECT
-						KENNZEICHEN,
-						BEZEICHNUNG AS GELIEFERT
-					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-					WHERE AUSWAHLART = 'AuftragsLieferung'
-				) AS [sys2] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-				INNER JOIN (
-					SELECT
-						a.NAME_1 AS NAME,
-						concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
-						a.GEBURTSDATUM,
-						a.STRASSE_1 AS STRASSE,
-						a.PLZ_1 AS PLZ,
-						a.ORT_1 AS ORT,
-						a.LKZ_1 AS LKZ,
-						a.REFERENZ,
-						more.STERBEDATUM,
-						t.ADRESS_ANREDE AS ANREDE,
-						t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE],
-						more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
-
-					WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
-					AND more.STERBEDATUM IS NULL
-				) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-				LEFT JOIN
-				(
-					SELECT
-						ka.NAME_1,
-						ka.REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-					WHERE kia.BEZEICHNUNG = 'Kostenträger'
-				) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-				LEFT JOIN
-				(
-					SELECT
-						names.NAME_3 AS BETRIEB,
-						unit.ADRESSEN_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
-					WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
-				) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
-		
-				WHERE 
-				vorgaenge.STATUS = 0
-				AND [sys2].GELIEFERT NOT IN ('geliefert')
-				AND vorgaenge.FAKTURIERT_DATUM IS NULL
-				AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
-				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-				AND vorgaenge.ANLAGEDATUM BETWEEN CONVERT(SMALLDATETIME, '2020-01-01 00:00:00', 120) AND CURRENT_TIMESTAMP
-				AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
-
-				order by vorgaenge.REFERENZ ASC
-				END,
-			'nicht genehmigt' => <<<'END'
-				SELECT
-					vorgaenge.REFERENZ AS VORGANG,
-					CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-					pat.ANREDE,
-					pat.REFERENZ AS KUNDENNUMMER,
-					pat.NAME,
-					pat.VORNAME,
-					CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
-					KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
-					vorgaenge.LEISTUNG,
-					vorgaenge.AUFTRAGSWERT_BRUTTO,
-					[sys].GENEHMIGT,
-					CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
-					UNIT.BETRIEB
-				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-				LEFT JOIN (
-					SELECT
-						KENNZEICHEN,
-						BEZEICHNUNG AS GENEHMIGT
-					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-					WHERE AUSWAHLART = 'AuftragsGenehmigung'
-				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-				INNER JOIN (
-					SELECT
-						a.NAME_1 AS NAME,
-						concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
-						a.GEBURTSDATUM,
-						a.STRASSE_1 AS STRASSE,
-						a.PLZ_1 AS PLZ,
-						a.ORT_1 AS ORT,
-						a.LKZ_1 AS LKZ,
-						a.REFERENZ,
-						more.STERBEDATUM,
-						t.ADRESS_ANREDE AS ANREDE,
-						t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE],
-						more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
-
-					WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
-					AND more.STERBEDATUM IS NULL
-				) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-				LEFT JOIN
-				(
-					SELECT
-						ka.NAME_1,
-						ka.REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-					WHERE kia.BEZEICHNUNG = 'Kostenträger'
-				) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-				LEFT JOIN
-				(
-					SELECT
-						names.NAME_3 AS BETRIEB,
-						unit.ADRESSEN_REFERENZ
-					FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
-					INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
-					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
-					WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
-				) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
-		
-				WHERE
-				vorgaenge.STATUS = 0
-				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-				AND vorgaenge.FAKTURIERT_DATUM IS NULL
-				AND [sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
-				AND vorgaenge.ANLAGEDATUM BETWEEN CONVERT(SMALLDATETIME, '2020-01-01 00:00:00', 120) AND CURRENT_TIMESTAMP
-				AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
-				
-				order by vorgaenge.REFERENZ ASC
-				END,
-			];
-		$variables = [
 			'Vorgangsexport' => [
-				':date' => date('Y-m-d 0:00:00.000', time()-3600*24*(365+2))
+				'query' => <<<'END'
+					SELECT
+						vorgaenge.REFERENZ AS VORGANG,
+						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+						pat.ANREDE,
+						pat.[PERSOENLICHE ANREDE],
+						pat.REFERENZ AS KUNDENNUMMER,
+						pat.NAME,
+						pat.VORNAME,
+						pat.STRASSE,
+						pat.LKZ,
+						pat.PLZ,
+						pat.ORT,
+						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+						EMAIL.EMAIL,
+						pat.STERBEDATUM,
+						vorgaenge.LEISTUNG,
+						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						'geliefert' AS GELIEFERT,
+						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+						[sys].GENEHMIGT,
+						'nein' AS OHNE_SERIENBRIEF	
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							a.NAME_1 AS NAME,
+							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+							a.GEBURTSDATUM,
+							a.STRASSE_1 AS STRASSE,
+							a.PLZ_1 AS PLZ,
+							a.ORT_1 AS ORT,
+							a.LKZ_1 AS LKZ,
+							a.REFERENZ,
+							more.STERBEDATUM,
+							t.ADRESS_ANREDE AS ANREDE,
+							t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE]
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
+
+						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+						AND more.STERBEDATUM IS NULL
+						AND more.OHNE_SERIENBRIEF = 0
+					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+					LEFT JOIN (
+						SELECT
+							mail.NUMMER AS EMAIL,
+							mail.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] AS im ON mail.KONTAKTART = im.REFERENZ
+
+						WHERE im.BEZEICHNUNG = 'E-Mail'
+					) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
+			
+					WHERE vorgaenge.GELIEFERT_DATUM IS NOT NULL
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 10
+					AND [sys].GENEHMIGT NOT IN ('Storno')
+
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					order by vorgaenge.REFERENZ ASC
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date', // currently default simple html input types (text, date, time, number)
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-5 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000'); // process input somehow, date conversion or reasonable input sanitation to avoid malicious injections
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'EVA-Artikelstamm Lagerware' => [
+				'query' => <<<'END'
+					SELECT
+						article.ARTIKEL_REFERENZ,
+						vendor.NAME_1 as LIEFERANTEN_NAME,
+						article.BESTELL_NUMMER,
+						article.BESTELL_TEXT,
+						unit.BEZEICHNUNG AS BESTELLEINHEIT,
+						storage.LAGERORT,
+						storage.LAGER_REFERENZ,
+						CONVERT(varchar(255), article.WARENEINGANGSDATUM, 104) AS WARENEINGANGSDATUM
+					FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
+					INNER JOIN (
+						SELECT
+							BEZEICHNUNG,
+							REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[inf_einheit]
+					) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
+					INNER JOIN (
+						SELECT
+							REFERENZ,
+							ZUSATZINFORMATION
+						FROM [eva3_02_viva_souh].[dbo].[wws_artikelstamm]
+					) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
+					INNER JOIN (
+						SELECT
+							ARTIKEL_REFERENZ,
+							LAGERORT,
+							strg_n.BEZEICHNUNG as LAGER_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[wws_lagerbestand] AS strg
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_lager] AS strg_n ON strg.LAGER_REFERENZ = strg_n.REFERENZ
+						WHERE 
+						(
+							(
+								strg_n.BEZEICHNUNG LIKE 'Zentrallager' OR
+								strg_n.BEZEICHNUNG LIKE 'Gießraum' OR
+								strg_n.BEZEICHNUNG LIKE 'Bandagisten' OR
+								strg_n.BEZEICHNUNG LIKE 'Prothetik' OR
+								strg_n.BEZEICHNUNG LIKE 'Orthetik' OR
+								strg_n.BEZEICHNUNG LIKE 'Armorthetik und -prothetik' OR
+								strg_n.BEZEICHNUNG LIKE 'Dysmelie' OR
+								strg_n.BEZEICHNUNG LIKE 'Kunststoffabteilung' OR
+								strg_n.BEZEICHNUNG LIKE 'Silikonabteilung'
+							)
+							AND (
+								(
+									strg.LAGERORT IS NOT NULL AND strg.LAGERORT != 'null' AND strg.LAGER_REFERENZ IS NOT NULL
+								) OR (
+									strg.LAGER_MINDESTBESTAND > 0
+								) 
+							)
+						) OR
+						(
+							strg_n.BEZEICHNUNG LIKE 'Ambulan%' OR
+							strg_n.BEZEICHNUNG LIKE 'Kopfklinik%' OR
+							strg_n.BEZEICHNUNG LIKE 'B1%' OR
+							strg_n.BEZEICHNUNG LIKE 'OP%'
+						)
+					) AS storage ON storage.ARTIKEL_REFERENZ = article.ARTIKEL_REFERENZ
+					INNER JOIN (
+						SELECT 
+							v.NAME_1,
+							v.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
+						WHERE ia.BEZEICHNUNG = 'Lieferanten'
+					) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
+					
+					WHERE article.STATUS = 0 AND article.PRIMAER_LIEFERANT = 1
+
+					ORDER BY LAGER_REFERENZ, LAGERORT, LIEFERANTEN_NAME, BESTELL_NUMMER, BESTELL_TEXT
+					END,
+				'params' => []
+			],
+			'genehmigt nicht geliefert' => [
+				'query' => <<<'END'
+					SELECT
+						vorgaenge.REFERENZ AS VORGANG,
+						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+						pat.ANREDE,
+						pat.REFERENZ AS KUNDENNUMMER,
+						pat.NAME,
+						pat.VORNAME,
+						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
+						vorgaenge.LEISTUNG,
+						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						[sys].GENEHMIGT,
+						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+						UNIT.BETRIEB
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					LEFT JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					LEFT JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GELIEFERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsLieferung'
+					) AS [sys2] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							a.NAME_1 AS NAME,
+							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+							a.GEBURTSDATUM,
+							a.STRASSE_1 AS STRASSE,
+							a.PLZ_1 AS PLZ,
+							a.ORT_1 AS ORT,
+							a.LKZ_1 AS LKZ,
+							a.REFERENZ,
+							more.STERBEDATUM,
+							t.ADRESS_ANREDE AS ANREDE,
+							t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE],
+							more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
+
+						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+						AND more.STERBEDATUM IS NULL
+					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							ka.NAME_1,
+							ka.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+						WHERE kia.BEZEICHNUNG = 'Kostenträger'
+					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+			
+					WHERE 
+					vorgaenge.STATUS = 0
+					AND [sys2].GELIEFERT NOT IN ('geliefert')
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
+					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+
+					order by vorgaenge.REFERENZ ASC
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'nicht genehmigt' => [
+				'query' => <<<'END'
+					SELECT
+						vorgaenge.REFERENZ AS VORGANG,
+						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+						pat.ANREDE,
+						pat.REFERENZ AS KUNDENNUMMER,
+						pat.NAME,
+						pat.VORNAME,
+						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
+						vorgaenge.LEISTUNG,
+						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						[sys].GENEHMIGT,
+						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+						UNIT.BETRIEB
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					LEFT JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							a.NAME_1 AS NAME,
+							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+							a.GEBURTSDATUM,
+							a.STRASSE_1 AS STRASSE,
+							a.PLZ_1 AS PLZ,
+							a.ORT_1 AS ORT,
+							a.LKZ_1 AS LKZ,
+							a.REFERENZ,
+							more.STERBEDATUM,
+							t.ADRESS_ANREDE AS ANREDE,
+							t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE],
+							more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
+
+						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+						AND more.STERBEDATUM IS NULL
+					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							ka.NAME_1,
+							ka.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+						WHERE kia.BEZEICHNUNG = 'Kostenträger'
+					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+			
+					WHERE
+					vorgaenge.STATUS = 0
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
+					AND [sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+					
+					order by vorgaenge.REFERENZ ASC
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
 			]
 		];
 
 		if (!$key) return array_keys($queries);
 		if (!isset($queries[$key])) return null;
+		$paramfields = [];
+		// if not called with params return optional parameter settings for input
+		if ($params === null) {
+			if (!empty($queries[$key]['params'])) {
+				foreach($queries[$key]['params'] as $property){
+					$paramfields[$property['name']] = [
+						'type' => $property['type'],
+						'value' => is_callable($property['default']) ? $property['default']() : $property['default']
+					];
+				}
+			}
+			return $paramfields;
+		}
+		// iterate over query params and overwrite defaults with passed params, then apply function
+		if (isset($queries[$key]['params'])){
+			foreach($queries[$key]['params'] as $param => $property){
+				$default = is_callable($property['default']) ? $property['default']() : $property['default'];
+				$paramfields[$param] = $default;
+				if (!empty($params[$property['name']])) $paramfields[$param] = $params[$property['name']];
+				$paramfields[$key] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+			}
+		}
+
 		try{
-			if (isset($variables[$key])) $statement = $this->_pdo->prepare(strtr($queries[$key], $variables[$key]));
-			else $statement = $this->_pdo->prepare($queries[$key]);
+			$statement = $this->_pdo->prepare(strtr($queries[$key]['query'], $paramfields));
 			$statement->execute();
 		}
 		catch(\EXCEPTION $e){
