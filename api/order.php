@@ -631,6 +631,7 @@ class ORDER extends API {
 							':alert' => 1
 						]) : null,
 						'thirdparty_order' => $product ? $product['thirdparty_order'] : null,
+						'purchasemembers' => $permission['purchasemembers'],
 					];
 
 					// add identified group user
@@ -928,7 +929,8 @@ class ORDER extends API {
 						'response' => [
 							'id' => $this->_requestedID ? : $this->_pdo->lastInsertId(),
 							'msg' => $this->_lang->GET('order.saved_to_prepared'),
-							'type' => 'info'
+							'type' => 'info',
+							'redirect' => ['order']
 						],
 						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
 					];
@@ -945,7 +947,8 @@ class ORDER extends API {
 							':id' => intval($this->_requestedID)
 						]
 					]);
-				$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['response']['redirect'] = ['order'];
 				}
 
 				break;
@@ -1392,7 +1395,7 @@ class ORDER extends API {
 					]);
 					$result = $result ? $result[0] : null;
 					if ($result){
-						$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
+						$approval = $this->_lang->GET('order.orderauth_verified', [':user' => $result['name']]);
 					}
 				}
 				elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
@@ -1403,7 +1406,7 @@ class ORDER extends API {
 					]);
 					$result = $result ? $result[0] : null;
 					if ($result && $result['orderauth']){
-						$approval = $result['name'] . $this->_lang->GET('order.token_verified');
+						$approval = $this->_lang->GET('order.token_verified', [':user' => $result['name']]);
 					}
 				}
 				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
@@ -1650,7 +1653,7 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result){
-				$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
+				$approval = $this->_lang->GET('order.orderauth_verified', [':user' => $result['name']]);
 			}
 		}
 		elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
@@ -1661,7 +1664,7 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result && $result['orderauth']){
-				$approval = $result['name'] . $this->_lang->GET('order.token_verified');
+				$approval = $this->_lang->GET('order.token_verified', [':user' => $result['name']]);
 			}
 		}
 		unset ($this->_payload->{$this->_lang->PROPERTY('user.order_authorization')});
