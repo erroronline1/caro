@@ -621,11 +621,13 @@ export const _client = {
 			if (document.getElementById("filterterm")) filter.term = document.getElementById("filterterm").value;
 			if (document.getElementById("timespan")) filter.timespan = document.getElementById("timespan").value;
 			if (document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked")) filter.etc = document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked").value;
-			if (document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked").length){
+			if (document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked").length) {
 				filter.unit = [];
-				[...document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked")].forEach(node => {filter.unit.push(node.value);});
+				[...document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked")].forEach((node) => {
+					filter.unit.push(node.value);
+				});
 				filter.unit = filter.unit.join("|");
-			} 
+			}
 			return filter;
 		},
 
@@ -867,6 +869,59 @@ export const _client = {
 							class: "orange",
 						},
 					});
+
+				// append orderer and message option
+				if (element.orderer) {
+					buttons = {};
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+					links = {};
+					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer.name })] = {
+						href: "javascript:void(0)",
+						"data-type": "input",
+						class: "messageto",
+						style: "--icon: url('" + (element.orderer.image || "") + "')",
+						onclick: function () {
+							_client.message.newMessage(
+								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
+								"element.orderer",
+								api._lang
+									.GET("order.message", {
+										":quantity": "element.quantity",
+										":unit": "element.unit",
+										":number": "element.ordernumber",
+										":name": "element.name",
+										":vendor": "element.vendor",
+										":info": "element.information" || "",
+										":commission": "element.commission",
+										":aut_idem": "element.aut_idem",
+									})
+									.replace("\\n", "\n"),
+								buttons
+							);
+						}
+							.toString()
+							._replaceArray(
+								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
+								[
+									element.orderer.name,
+									element.quantity,
+									element.unit ? element.unit.replaceAll('"', '\\"') : "",
+									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
+									element.name ? element.name.replaceAll('"', '\\"') : "",
+									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
+									element.information ? element.information.replaceAll('"', '\\"') : "",
+									element.commission ? element.commission.replaceAll('"', '\\"') : "",
+									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
+									JSON.stringify(buttons),
+								]
+							),
+					};
+					collapsible.push({
+						type: "links",
+						content: links,
+					});
+				}
 
 				// append commission
 				if (element.commission) {
@@ -1164,59 +1219,6 @@ export const _client = {
 								.toString()
 								._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 						},
-					});
-				}
-
-				// append orderer and message option
-				if (element.orderer) {
-					buttons = {};
-					buttons[api._lang.GET("order.add_information_cancel")] = false;
-					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
-					links = {};
-					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer.name })] = {
-						href: "javascript:void(0)",
-						"data-type": "input",
-						class: "messageto",
-						style: "--icon: url('" + (element.orderer.image || "") + "')",
-						onclick: function () {
-							_client.message.newMessage(
-								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
-								"element.orderer",
-								api._lang
-									.GET("order.message", {
-										":quantity": "element.quantity",
-										":unit": "element.unit",
-										":number": "element.ordernumber",
-										":name": "element.name",
-										":vendor": "element.vendor",
-										":info": "element.information" || "",
-										":commission": "element.commission",
-										":aut_idem": "element.aut_idem",
-									})
-									.replace("\\n", "\n"),
-								buttons
-							);
-						}
-							.toString()
-							._replaceArray(
-								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
-								[
-									element.orderer.name,
-									element.quantity,
-									element.unit ? element.unit.replaceAll('"', '\\"') : "",
-									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
-									element.name ? element.name.replaceAll('"', '\\"') : "",
-									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
-									element.information ? element.information.replaceAll('"', '\\"') : "",
-									element.commission ? element.commission.replaceAll('"', '\\"') : "",
-									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
-									JSON.stringify(buttons),
-								]
-							),
-					};
-					collapsible.push({
-						type: "links",
-						content: links,
 						hint: element.lastorder ? element.lastorder : null,
 					});
 				}
@@ -1236,6 +1238,75 @@ export const _client = {
 					collapsible.push({
 						type: "links",
 						content: element.attachments,
+					});
+				}
+
+				// append orderer and message option
+				if (element.purchasemembers) {
+					buttons = {};
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+					links = {};
+					links[api._lang.GET("order.message_orderer", { ":orderer": api._lang.GET("permissions.purchase") })] = {
+						href: "javascript:void(0)",
+						"data-type": "input",
+						class: "messageto",
+						onclick: function () {
+							_client.message.newMessage(
+								api._lang.GET("order.message_orderer", { ":orderer": api._lang.GET("permissions.purchase") }),
+								"element.purchasemembers",
+								api._lang
+									.GET("order.message", {
+										":quantity": "element.quantity",
+										":unit": "element.unit",
+										":number": "element.ordernumber",
+										":name": "element.name",
+										":vendor": "element.vendor",
+										":info": "element.information" || "",
+										":commission": "element.commission",
+										":aut_idem": "element.aut_idem",
+									})
+									.replace("\\n", "\n") +
+									"element.ordertext".replace("\\n", "\n") +
+									"element.identifier".replace("\\n", "\n"),
+								buttons
+							);
+						}
+							.toString()
+							._replaceArray(
+								[
+									"element.purchasemembers",
+									"element.quantity",
+									"element.unit",
+									"element.ordernumber",
+									"element.name",
+									"element.vendor",
+									"element.information",
+									"element.commission",
+									"element.aut_idem",
+									"element.ordertext",
+									"element.identifier",
+									"buttons",
+								],
+								[
+									element.purchasemembers.join(","),
+									element.quantity,
+									element.unit ? element.unit.replaceAll('"', '\\"') : "",
+									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
+									element.name ? element.name.replaceAll('"', '\\"') : "",
+									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
+									element.information ? element.information.replaceAll('"', '\\"') : "",
+									element.commission ? element.commission.replaceAll('"', '\\"') : "",
+									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
+									element.ordertext ? "\\n" + element.ordertext.replaceAll('"', '\\"') : "",
+									element.identifier ? "\\n" + element.identifier.replaceAll('"', '\\"') : "",
+									JSON.stringify(buttons),
+								]
+							),
+					};
+					collapsible.push({
+						type: "links",
+						content: links,
 					});
 				}
 
@@ -1694,7 +1765,14 @@ export const _client = {
 				groups[element[groupby]].push(order);
 			}
 
-			for (const [key, group] of Object.entries(groups)) {
+			let ordered_groups = Object.keys(groups)
+				.sort() // Sort the keys alphabetically
+				.reduce((obj, key) => {
+					obj[key] = groups[key]; // Rebuild the object with sorted keys
+					return obj;
+				}, {});
+
+			for (const [key, group] of Object.entries(ordered_groups)) {
 				group.unshift([{ c: api._lang.GET("order.table_order") }, { c: api._lang.GET("order.commission") }, { c: api._lang.GET("order.table_info") }]);
 				groupname = api._lang._USER.units[key] || key;
 				content.push([
@@ -1835,7 +1913,14 @@ export const _client = {
 				];
 			}
 
-			for (const group of Object.entries(groups)) {
+			let ordered_groups = Object.keys(groups)
+				.sort() // Sort the keys alphabetically
+				.reduce((obj, key) => {
+					obj[key] = groups[key]; // Rebuild the object with sorted keys
+					return obj;
+				}, {});
+
+			for (const group of Object.entries(ordered_groups)) {
 				content.push(group);
 				if (bulk) content.push(bulk);
 			}
