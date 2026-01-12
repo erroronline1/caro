@@ -1172,7 +1172,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						'function' => function($v){
 							try {
 								$date = new \DateTime($v);
-								return $date->format('Y-m-d 0:00:00.000');
+								return $date->format('Y-m-d 23:59:59.000');
 							}
 							catch(\EXCEPTION $e){
 								return null;
@@ -1255,7 +1255,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					END,
 				'params' => []
 			],
-			'genehmigt nicht geliefert' => [
+			'genehmigt nicht geliefert - Vorgänge' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1272,20 +1272,20 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 						UNIT.BETRIEB
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-					LEFT JOIN (
+					INNER JOIN (
 						SELECT
 							KENNZEICHEN,
 							BEZEICHNUNG AS GENEHMIGT
 						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
 						WHERE AUSWAHLART = 'AuftragsGenehmigung'
 					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-					LEFT JOIN (
+					INNER JOIN (
 						SELECT
 							KENNZEICHEN,
 							BEZEICHNUNG AS GELIEFERT
 						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
 						WHERE AUSWAHLART = 'AuftragsLieferung'
-					) AS [sys2] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
 					INNER JOIN (
 						SELECT
 							a.NAME_1 AS NAME,
@@ -1308,15 +1308,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 						AND more.STERBEDATUM IS NULL
 					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-					LEFT JOIN
-					(
-						SELECT
-							ka.NAME_1,
-							ka.REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-						WHERE kia.BEZEICHNUNG = 'Kostenträger'
-					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-					LEFT JOIN
+					INNER JOIN
 					(
 						SELECT
 							names.NAME_3 AS BETRIEB,
@@ -1326,13 +1318,21 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
 						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
 					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							ka.NAME_1,
+							ka.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+						WHERE kia.BEZEICHNUNG = 'Kostenträger'
+					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
 			
 					WHERE 
 					vorgaenge.STATUS = 0
 					AND [sys2].GELIEFERT NOT IN ('geliefert')
-					AND vorgaenge.FAKTURIERT_DATUM IS NULL
-					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
 					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
 					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
 
@@ -1363,7 +1363,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						'function' => function($v){
 							try {
 								$date = new \DateTime($v);
-								return $date->format('Y-m-d 0:00:00.000');
+								return $date->format('Y-m-d 23:59:59.000');
 							}
 							catch(\EXCEPTION $e){
 								return null;
@@ -1372,7 +1372,84 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				]
 			],
-			'nicht genehmigt' => [
+			'genehmigt nicht geliefert - Zusammenfassung' => [
+				'query' => <<<'END'
+					SELECT
+						UNIT.BETRIEB,
+						COUNT(vorgaenge.id) as AUFTRAEGE,
+						CAST(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO) AS int) as AUFTRAGSWERT
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GELIEFERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsLieferung'
+					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
+					INNER JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+			
+					WHERE 
+					vorgaenge.STATUS = 0
+					AND [sys2].GELIEFERT NOT IN ('geliefert')
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+
+					GROUP BY UNIT.BETRIEB
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'nicht genehmigt - Vorgänge' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1389,7 +1466,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 						UNIT.BETRIEB
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-					LEFT JOIN (
+					INNER JOIN (
 						SELECT
 							KENNZEICHEN,
 							BEZEICHNUNG AS GENEHMIGT
@@ -1418,15 +1495,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 						AND more.STERBEDATUM IS NULL
 					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-					LEFT JOIN
-					(
-						SELECT
-							ka.NAME_1,
-							ka.REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-						WHERE kia.BEZEICHNUNG = 'Kostenträger'
-					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-					LEFT JOIN
+					INNER JOIN
 					(
 						SELECT
 							names.NAME_3 AS BETRIEB,
@@ -1436,6 +1505,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
 						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
 					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							ka.NAME_1,
+							ka.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+						WHERE kia.BEZEICHNUNG = 'Kostenträger'
+					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
 			
 					WHERE
 					vorgaenge.STATUS = 0
@@ -1472,7 +1549,84 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						'function' => function($v){
 							try {
 								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'nicht genehmigt - Zusammenfassung' => [
+				'query' => <<<'END'
+					SELECT
+						UNIT.BETRIEB,
+						COUNT(vorgaenge.id) as AUFTRAEGE,
+						CAST(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO) AS int) as AUFTRAGSWERT
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GELIEFERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsLieferung'
+					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
+					INNER JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+			
+					WHERE 
+					vorgaenge.STATUS = 0
+					AND [sys2].GELIEFERT NOT IN ('geliefert')
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+
+					GROUP BY UNIT.BETRIEB
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
 								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
 							}
 							catch(\EXCEPTION $e){
 								return null;
