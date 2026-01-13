@@ -1095,7 +1095,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						EMAIL.EMAIL,
 						pat.STERBEDATUM,
 						vorgaenge.LEISTUNG,
-						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
 						'geliefert' AS GELIEFERT,
 						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
 						[sys].GENEHMIGT,
@@ -1255,7 +1255,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					END,
 				'params' => []
 			],
-			'genehmigt nicht geliefert - Vorgänge' => [
+			'genehmigt nicht geliefert - Falllisten' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1267,7 +1267,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
 						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
 						vorgaenge.LEISTUNG,
-						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
 						[sys].GENEHMIGT,
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 						UNIT.BETRIEB
@@ -1377,7 +1377,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					SELECT
 						UNIT.BETRIEB,
 						COUNT(vorgaenge.id) as AUFTRAEGE,
-						CAST(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO) AS int) as AUFTRAGSWERT
+						FORMAT(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO), 'C2', 'de-de') as AUFTRAGSWERT
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 					INNER JOIN (
 						SELECT
@@ -1449,7 +1449,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				]
 			],
-			'nicht genehmigt - Vorgänge' => [
+			'nicht genehmigt - Falllisten' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1461,7 +1461,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
 						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
 						vorgaenge.LEISTUNG,
-						vorgaenge.AUFTRAGSWERT_BRUTTO,
+						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
 						[sys].GENEHMIGT,
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 						UNIT.BETRIEB
@@ -1563,7 +1563,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					SELECT
 						UNIT.BETRIEB,
 						COUNT(vorgaenge.id) as AUFTRAEGE,
-						CAST(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO) AS int) as AUFTRAGSWERT
+						FORMAT(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO), 'C2', 'de-de') as AUFTRAGSWERT
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 					INNER JOIN (
 						SELECT
