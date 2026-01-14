@@ -1638,8 +1638,14 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
-				if (data.response.type !== "error" && data.response.id) api.purchase("get", request[1], data.response.id);
-				if (data.response !== undefined && data.response.redirect !== undefined) api.purchase("get", ...data.response.redirect);
+				if (data.response !== undefined && data.response.redirect !== undefined) {
+					api.purchase("get", ...data.response.redirect);
+					return;
+				}
+				if (data.response.type !== "error" && data.response.id) {
+					api.purchase("get", request[1], data.response.id);
+					return;
+				}
 				if (data.data) _serviceWorker.notif.consumables(data.data);
 			},
 			title = {
