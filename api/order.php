@@ -1242,17 +1242,20 @@ class ORDER extends API {
 					array_splice($response['render']['content'], 1, 0, $items);
 				}
 
-				// append delete button
-				if ($this->_requestedID) array_push($response['render']['content'], [
-					['type' => 'deletebutton',
-					'attributes' => [
-						'value' => $this->_lang->GET('order.delete_prepared_order'),
-						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
-							"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
-							"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
-					]]
-				]);
+				if ($this->_requestedID) {
+					// append delete button
+					array_push($response['render']['content'], [
+						['type' => 'deletebutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('order.delete_prepared_order'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
+								"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
+								"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
+						]]
+					]);
+					$response['header'] = $this->_lang->GET('order.edit_prepared_order');
+				}
 
 				break;
 			case 'DELETE':
