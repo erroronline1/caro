@@ -46,16 +46,18 @@
 				"source": "genehmigt nicht geliefert/nicht genehmigt....CSV",
 				"headerrow": 1,
 				"destination": "Falllisten.xlsx",
-				"columns": ["VORGANG", "ANLAGEDATUM", "ANREDE", "NAME", "VORNAME", "GEBURTSDATUM", "KOSTENTRAEGER", "LEISTUNG", "AUFTRAGSWERT_BRUTTO", "GENEHMIGT", "GENEHMIGT_DATUM", "BETRIEB"]
+				"columns": ["VORGANG", "ANLAGEDATUM", "NAME", "KOSTENTRAEGER", "LEISTUNG", "AUFTRAGSWERT_BRUTTO", "GENEHMIGT", "GENEHMIGT_DATUM", "BETRIEB", "GENEHMIGT_FLAG"]
 			},
 			"split": {
-				"BETRIEB": "(.*)"
+				"BETRIEB": "(.*)",
+				"GENEHMIGT_FLAG": "(.*)"
+
 			},
 			"xslxformat": {
 				"header": {
 					"font-size": 8,
-					"widths": [7, 5, 5, 9, 7, 5, 10, 30, 12, 10, 5, 0.1],
-					"types": ["string", "string", "string", "string", "string", "string", "string", "string", "euro", "string", "string", "string"]
+					"widths": [7, 5, 9, 10, 25, 12, 7, 5, 0.1, 0.1],
+					"types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", "string"]
 				},
 				"row": {
 					"height": 40,
