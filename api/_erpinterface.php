@@ -1255,22 +1255,20 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					END,
 				'params' => []
 			],
-			'genehmigt nicht geliefert - Falllisten' => [
+			'Falllisten laufende Fälle' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
 						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-						pat.ANREDE,
+						CONCAT(pat.ANREDE, ' ', pat.NAME, ' ' , pat.VORNAME, ' ', CONVERT(varchar(255), pat.GEBURTSDATUM, 104)) AS NAME,
 						pat.REFERENZ AS KUNDENNUMMER,
-						pat.NAME,
-						pat.VORNAME,
-						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
 						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
 						vorgaenge.LEISTUNG,
 						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
 						[sys].GENEHMIGT,
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
-						UNIT.BETRIEB
+						UNIT.BETRIEB,
+						CASE WHEN [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei') THEN 'genehmigt' ELSE 'nicht genehmigt' END AS GENEHMIGT_FLAG
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 					INNER JOIN (
 						SELECT
@@ -1329,9 +1327,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			
 					WHERE 
 					vorgaenge.STATUS = 0
+					AND [sys].GENEHMIGT NOT IN ('abgelehnt', 'Storno', 'verstorben')
 					AND [sys2].GELIEFERT NOT IN ('geliefert')
 					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
 					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
 					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
@@ -1372,12 +1370,24 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				]
 			],
-			'genehmigt nicht geliefert - Zusammenfassung' => [
+			'Falllisten laufende Fälle - Zusammenfassung' => [
 				'query' => <<<'END'
 					SELECT
 						UNIT.BETRIEB,
-						COUNT(vorgaenge.id) as AUFTRAEGE,
-						FORMAT(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO), 'C2', 'de-de') as AUFTRAGSWERT
+						SUM(CASE WHEN
+							[sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+							THEN 1 ELSE 0 END) as AUFTRAEGE_GENEHMIGT,
+						FORMAT(SUM(CASE WHEN
+							[sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
+							THEN vorgaenge.AUFTRAGSWERT_BRUTTO ELSE 0 END
+						), 'C2', 'de-de') as AUFTRAGSWERT_GENEHMIGT,
+						SUM(CASE WHEN
+							[sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
+							THEN 1 ELSE 0 END) as AUFTRAEGE_NICHT_GENEHMIGT,
+						FORMAT(SUM(CASE WHEN
+							[sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
+							THEN vorgaenge.AUFTRAGSWERT_BRUTTO ELSE 0 END
+						), 'C2', 'de-de') as AUFTRAGSWERT_NICHT_GENEHMIGT
 					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 					INNER JOIN (
 						SELECT
@@ -1406,196 +1416,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			
 					WHERE 
 					vorgaenge.STATUS = 0
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND [sys2].GELIEFERT NOT IN ('geliefert')
-					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
-					AND vorgaenge.FAKTURIERT_DATUM IS NULL
-					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
-					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
-
-					GROUP BY UNIT.BETRIEB
-					END,
-				'params' => [
-					':anlagedatumvon' => [
-						'name' => 'Anlagedatum von',
-						'type' => 'date',
-						'default' => function(){
-							$date = new \DateTime('now');
-							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
-						},
-						'function' => function($v){
-							try {
-								$date = new \DateTime($v);
-								return $date->format('Y-m-d 0:00:00.000');
-							}
-							catch(\EXCEPTION $e){
-								return null;
-							}
-						}
-					],
-					':anlagedatumbis' => [
-						'name' => 'Anlagedatum bis',
-						'type' => 'date',
-						'default' => date('Y-m-d'),
-						'function' => function($v){
-							try {
-								$date = new \DateTime($v);
-								return $date->format('Y-m-d 23:59:59.000');
-							}
-							catch(\EXCEPTION $e){
-								return null;
-							}
-						}
-					]
-				]
-			],
-			'nicht genehmigt - Falllisten' => [
-				'query' => <<<'END'
-					SELECT
-						vorgaenge.REFERENZ AS VORGANG,
-						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-						pat.ANREDE,
-						pat.REFERENZ AS KUNDENNUMMER,
-						pat.NAME,
-						pat.VORNAME,
-						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
-						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
-						vorgaenge.LEISTUNG,
-						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
-						[sys].GENEHMIGT,
-						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
-						UNIT.BETRIEB
-					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-					INNER JOIN (
-						SELECT
-							KENNZEICHEN,
-							BEZEICHNUNG AS GENEHMIGT
-						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-						WHERE AUSWAHLART = 'AuftragsGenehmigung'
-					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-					INNER JOIN (
-						SELECT
-							a.NAME_1 AS NAME,
-							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
-							a.GEBURTSDATUM,
-							a.STRASSE_1 AS STRASSE,
-							a.PLZ_1 AS PLZ,
-							a.ORT_1 AS ORT,
-							a.LKZ_1 AS LKZ,
-							a.REFERENZ,
-							more.STERBEDATUM,
-							t.ADRESS_ANREDE AS ANREDE,
-							t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE],
-							more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
-						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
-						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
-
-						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
-						AND more.STERBEDATUM IS NULL
-					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-					INNER JOIN
-					(
-						SELECT
-							names.NAME_3 AS BETRIEB,
-							unit.ADRESSEN_REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
-						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
-						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
-						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
-					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
-					LEFT JOIN
-					(
-						SELECT
-							ka.NAME_1,
-							ka.REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-						WHERE kia.BEZEICHNUNG = 'Kostenträger'
-					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-			
-					WHERE
-					vorgaenge.STATUS = 0
-					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-					AND vorgaenge.FAKTURIERT_DATUM IS NULL
-					AND [sys].GENEHMIGT NOT IN ('genehmigt', 'genehmigungsfrei', 'Storno', 'teilgenehmigt', 'abgelehnt', 'verstorben')
-					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
-					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
-					
-					order by vorgaenge.REFERENZ ASC
-					END,
-				'params' => [
-					':anlagedatumvon' => [
-						'name' => 'Anlagedatum von',
-						'type' => 'date',
-						'default' => function(){
-							$date = new \DateTime('now');
-							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
-						},
-						'function' => function($v){
-							try {
-								$date = new \DateTime($v);
-								return $date->format('Y-m-d 0:00:00.000');
-							}
-							catch(\EXCEPTION $e){
-								return null;
-							}
-						}
-					],
-					':anlagedatumbis' => [
-						'name' => 'Anlagedatum bis',
-						'type' => 'date',
-						'default' => date('Y-m-d'),
-						'function' => function($v){
-							try {
-								$date = new \DateTime($v);
-								return $date->format('Y-m-d 23:59:59.000');
-							}
-							catch(\EXCEPTION $e){
-								return null;
-							}
-						}
-					]
-				]
-			],
-			'nicht genehmigt - Zusammenfassung' => [
-				'query' => <<<'END'
-					SELECT
-						UNIT.BETRIEB,
-						COUNT(vorgaenge.id) as AUFTRAEGE,
-						FORMAT(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO), 'C2', 'de-de') as AUFTRAGSWERT
-					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
-					INNER JOIN (
-						SELECT
-							KENNZEICHEN,
-							BEZEICHNUNG AS GENEHMIGT
-						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-						WHERE AUSWAHLART = 'AuftragsGenehmigung'
-					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-					INNER JOIN (
-						SELECT
-							KENNZEICHEN,
-							BEZEICHNUNG AS GELIEFERT
-						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
-						WHERE AUSWAHLART = 'AuftragsLieferung'
-					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
-					INNER JOIN
-					(
-						SELECT
-							names.NAME_3 AS BETRIEB,
-							unit.ADRESSEN_REFERENZ
-						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
-						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
-						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
-						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
-					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
-			
-					WHERE 
-					vorgaenge.STATUS = 0
-					AND [sys2].GELIEFERT NOT IN ('geliefert')
-					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
-					AND [sys].GENEHMIGT IN ('genehmigt', 'genehmigungsfrei')
-					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
 					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
 
