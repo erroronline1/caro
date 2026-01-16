@@ -1093,6 +1093,7 @@ Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
 Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) (siehe unten). Ferner bereinigt er abgelaufene Dateien und [Aufzeichnungen](#löschung-von-aufzeichnungen). Er wird durch Benachrichtigungs-Requests ausgelöst. Die Konfiguration CONFIG[system][cron] beinhaltet Intervall-Einstellungen für
 * [erp_interface_casestate](#erp-anbindung)
 * [erp_interface_orderdata](#erp-anbindung)
+* [erp_interface_birthday_message](#erp-interface)
 * alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
@@ -1640,6 +1641,9 @@ Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateie
 
 ### Bereitstellung von Datenquellen
 Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen werden muss, stellt die Elternklasse der ERP-Anbindung ein Beispiel bereit um Dateien, Anwendungsfälle und vorgesehende Dateinamen zu definieren, welche anschließend in den angepassten Methoden verwendet werden können. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf. Dateien werden jeweils überschrieben.
+
+### Geburtstagsnachricht
+Sofern verfügbar, beantwortet diese Methode mit einer Liste von Mitarbeitern die innerhalb des übermittelten Zeitraumes Geburtstag haben/hatten, welche durch den [CRON-Jobs](#cron) als Systemnachricht mit Geburstagsgruß verarbeitet wird.
 
 ### Empfehlungen für die Anpassung
 * es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind

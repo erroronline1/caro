@@ -1091,7 +1091,11 @@
 			"productlist_erp_match_selected": "Mit EVA abgleichen",
 			"productlist_erp_update": "Artikellisten aus EVA aktualisieren",
 			"productlist_erp_update_hint": "Dies bereinigt nicht die Datenbank im Gegensatz zu Imports aus der Lieferantenverwaltung heraus. Kann trotzdem dauern, hol dir einen Kaffee... \nEs dauert im Schnitt ein paar Sekunden pro Lieferant. Bei :count Lieferanten ungefähr :minutes Minuten. Es kann sein, dass die Anfrage nach 5 Minuten abgebrochen zu sein scheint, der Server arbeitet aber noch weiter. ",
-			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
+			"update_via_erp_interface": ":systemuser über die ERP-Anbindung",
+			"user_birthday": {
+				"past": "Hey :user, herzlichen Glückwunsch nachträglich zum Geburtstag!",
+				"today": "Hey :user, herzlichen Glückwunsch zum Geburtstag!"
+			}
 		},
 		"navigation": {
 			"casedata": "Vorgangsdaten nach Vorgangsnummer",

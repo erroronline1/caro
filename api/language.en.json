@@ -1091,7 +1091,11 @@
 			"productlist_erp_match_selected": "Match with ERP database",
 			"productlist_erp_update": "Update product lists with ERP-data",
 			"productlist_erp_update_hint": "This does not sanitize the database opposed to direct imports within the vendor manager. May take a while, get yourself a coffee...\nEvery vendor takes a few seconds. For :count vendors this is approximately :minutes minutes. The connection may appear to have stopped after about 5 minutes, but the server will work a bit longer.",
-			"update_via_erp_interface": ":systemuser via ERP interface"
+			"update_via_erp_interface": ":systemuser via ERP interface",
+			"user_birthday": {
+				"past": "Hey :user, happy belated birthday!",
+				"today": "Hey :user, happy birthday!"
+			}
 		},
 		"navigation": {
 			"casedata": "Case data by case number",

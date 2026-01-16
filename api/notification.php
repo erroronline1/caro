@@ -156,6 +156,26 @@ class NOTIFICATION extends API {
 				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60 || $override) {
 					$execution = false;
 					switch($task){
+						case 'erp_interface_birthday_message':
+							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'birthdaymessage') && ERPINTERFACE->birthdaymessage()){
+								// exit if no starting point is provided or override is set to avoid duplicates
+								if (!file_exists($logfile) || $override) break;
+
+								$from = date('Y-m-d', filemtime($logfile));
+								if (!($erpdata = ERPINTERFACE->birthdaymessage($from))) break;
+								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+								foreach ($erpdata as $workmate){
+									if (!array_search($workmate['name'], array_column($users, 'name'))) continue;
+									$this->alertUserGroup(
+										['user' => [$workmate['name']]],
+										$this->_lang->GET('erpquery.integrations.user_birthday.' . ($workmate['past'] ? 'past' : 'today'), [
+											':user' => $workmate['name']
+										], true)
+									);
+								}
+							}
+
+							break;
 						case 'erp_interface_casestate':
 							// update records case state if set within erp system
 							// does only update database null values

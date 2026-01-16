@@ -1188,6 +1188,7 @@ The application has some options to be maintained by authorized users:
 The 'cron job' initiates automated message alerts and scheduled tasks (see below). It further clears expired files and [records](#record-deletion). It is triggered during notification requests. The configuration CONFIG[system][cron] contains interval settings for
 * [erp_interface_casestate](#erp-interface)
 * [erp_interface_orderdata](#erp-interface)
+* [erp_interface_birthday_message](#erp-interface)
 * alert_new_orders
 * alert_open_records_and_retention_periods
 * alert_unclosed_audits
@@ -1736,6 +1737,9 @@ Your custom ERP-interface class can contain a method to provide a CSV-file with 
 
 ### Data source provision
 In case you have to rely on data dumps instead of direct database access, the interface parent class provides an example to define files, usecases and the intended name for processing within your custom methods. If this is provided a menu item will show up within the [Tools](#tools). Files are overwritten.
+
+### Birthday message
+If provided, the query returns employees having birthday in a passed timespan, that will be processed as a birthday message within the [cron-job](#cron).
 
 ### Customization recommendations
 * it is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp]. Data for the responses must match the expected structure described within the parent class
