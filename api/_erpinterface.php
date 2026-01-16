@@ -47,6 +47,28 @@ class _ERPINTERFACE {
 	}
 
 	/**
+	 * retrieve users that have a birthday 
+	 * @param string $from Y-m-d without time
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
+	 */
+	public function birthdaymessage($from = null){
+		/**
+		 * return [
+		 * 		[
+		 * 			'name'=> string,
+		 *			'past' => bool
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+		return null;
+	}
+
+	/**
 	 * retrieve current case states based on passed case numbers
 	 * @param array $erp_case_numbers
 	 * @return null|array
@@ -641,6 +663,62 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			var_dump($e);
 			return null;
 		}
+	}
+
+	/**
+	 * retrieve users that have a birthday 
+	 * @param string $from Y-m-d without time
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
+	 */
+	public function birthdaymessage($from = null){
+		if (!$from) return [[]];
+		
+		$query = <<<'END'
+			SELECT
+				a.NAME_1 as NACHNAME,
+				a.NAME_2,
+				a.NAME_3,
+				a.NAME_4,
+				SUBSTRING(CONVERT(varchar(255), a.GEBURTSDATUM, 23), 6, 5) AS DATE
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Mitarbeiter'
+			AND SUBSTRING(CONVERT(varchar(255), a.GEBURTSDATUM, 23), 6, 5) IN (:span)
+			END;
+
+		try {
+			$date = new \DateTime($from);
+		}
+		catch(\EXCEPTION $e){
+			return [[]];
+		}
+		$today = new \DateTime(date('Y-m-d')); // not 'now' for hours reasons. datetime should be at 0:00 o'clock
+		$span = [
+			$this->_pdo->quote($date->format('m-d'))
+		];
+		while($date < $today){
+			$span[] = $this->_pdo->quote($date->modify('+1 day')->format('m-d'));
+		}
+
+		$statement = $this->_pdo->prepare(strtr($query, [
+			':span' => implode(',', $span)
+		]));
+		$statement->execute();
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			$response[] = [
+				'name' => implode(' ', array_filter([$row['NAME_2'], $row['NAME_3'], $row['NAME_4']], Fn($v) => $v)) . ' ' . $row['NACHNAME'],
+				'past' => boolval($row['DATE'] !== $today->format('m-d'))
+			];
+		}
+		return $response;
 	}
 
 	/**
