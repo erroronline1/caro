@@ -1260,7 +1260,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
 						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-						CONCAT(pat.ANREDE, ' ', pat.NAME, ' ' , pat.VORNAME, ' ', CONVERT(varchar(255), pat.GEBURTSDATUM, 104)) AS NAME,
+						CONCAT(pat.ANREDE, ' ', pat.NAME, ', ' , pat.VORNAME, ' *', CONVERT(varchar(255), pat.GEBURTSDATUM, 104)) AS NAME,
 						pat.REFERENZ AS KUNDENNUMMER,
 						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
 						vorgaenge.LEISTUNG,
@@ -1302,7 +1302,6 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
 						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
 						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
-
 						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 						AND more.STERBEDATUM IS NULL
 					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
@@ -1423,6 +1422,192 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
 
 					GROUP BY UNIT.BETRIEB
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'Fälle pro Verordner' => [
+				'query' => <<<'END'
+					SELECT
+						vorgaenge.REFERENZ AS VORGANG,
+						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+						CONCAT(pat.ANREDE, ' ', pat.NAME, ', ' , pat.VORNAME, ' *', CONVERT(varchar(255), pat.GEBURTSDATUM, 104)) AS NAME,
+						vorgaenge.LEISTUNG,
+						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
+						VERORDNER.NAME AS VERORDNER,
+						MITARBEITER.NAME AS MITARBEITER,
+						UNIT.BETRIEB
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							t.ADRESS_ANREDE AS ANREDE,
+							a.NAME_1 AS NAME,
+							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+							a.GEBURTSDATUM,
+							a.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
+						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+						AND more.STERBEDATUM IS NULL
+					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+					INNER JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+					INNER JOIN
+					(
+						SELECT
+							concat(names.NAME_1, ' ', names.NAME_2, ' ', names.NAME_3, ' ', names.NAME_4, ' - ', unit.ADRESSEN_REFERENZ) AS NAME,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_aerzte] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Ärzte'
+					) AS VERORDNER ON vorgaenge.VERORDNER = VERORDNER.ADRESSEN_REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							concat(a.NAME_1, ' ', a.NAME_2) AS NAME,
+							a.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						WHERE ia.BEZEICHNUNG = 'Mitarbeiter'
+					) AS MITARBEITER ON vorgaenge.MITARBEITER = MITARBEITER.REFERENZ
+			
+					WHERE 
+					vorgaenge.STATUS = 0
+					AND [sys].GENEHMIGT NOT IN ('abgelehnt', 'Storno', 'verstorben')
+
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO NOT BETWEEN -10.1 AND 10.1
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+
+					order by VERORDNER.NAME ASC, vorgaenge.AUFTRAGSWERT_BRUTTO DESC
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date',
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-3 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
+			'Fälle pro Verordner - Zusammenfassung' => [
+				'query' => <<<'END'
+					SELECT
+						VERORDNER.NAME,
+						SUM(CASE WHEN
+							vorgaenge.AUFTRAGSWERT_BRUTTO > 0
+							THEN 1 ELSE 0 END) as AUFTRAEGE,
+						FORMAT(SUM(vorgaenge.AUFTRAGSWERT_BRUTTO), 'C2', 'de-de') as AUFTRAGSWERT
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GELIEFERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsLieferung'
+					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
+					INNER JOIN
+					(
+						SELECT
+							concat(names.NAME_1, ' ', names.NAME_2, ' ', names.NAME_3, ' ', names.NAME_4, ' - ', unit.ADRESSEN_REFERENZ) AS NAME,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_aerzte] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Ärzte'
+					) AS VERORDNER ON vorgaenge.VERORDNER = VERORDNER.ADRESSEN_REFERENZ
+								
+					WHERE 
+					vorgaenge.STATUS = 0
+					AND [sys].GENEHMIGT NOT IN ('abgelehnt', 'Storno', 'verstorben')
+					AND vorgaenge.AUFTRAGSWERT_BRUTTO NOT BETWEEN -10.1 AND 10.1
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					AND vorgaenge.BETRIEB IN (12, 14, 15, 16, 17, 18)
+
+					GROUP BY VERORDNER.NAME
+					ORDER BY SUM(vorgaenge.AUFTRAGSWERT_BRUTTO) DESC, VERORDNER.NAME ASC
 					END,
 				'params' => [
 					':anlagedatumvon' => [
