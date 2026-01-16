@@ -24,9 +24,16 @@ Things are still in motion. Images may be outdated.
 * post-market surveillance
 * post-market evaluation
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
+* data transfer/import from production to testserver for real data testing?
+    * https://stackoverflow.com/questions/1280705/set-start-value-for-column-with-autoincrement, https://medium.com/@mk.muhammadkhoirudin/how-to-retrieve-auto-increment-values-in-sql-server-a-guide-to-common-methods-comparing-4-f054f9ff8a6b#a3a6, https://databaseblogs.com/turn-off-identity-column-in-sql-server/
+    * https://databasefaqs.com/mariadb-set-auto-increment-value/, https://stackoverflow.com/questions/15821532/get-current-auto-increment-value-for-any-table
 
 ## to do
-* data transfer/import from production to testserver for real data testing?
+* contain filtered filenames into csvfilter export (filename, print header), if available
+    * chain destination and source or only if destination does contain ____ or whatever
+* disable erpinterface for a set timespan with message for third party server updates
+* product search (consumables): vendor filter as text with dataset as per request (selection gets too long)
+* dispay last editing user within documentation?
 
 ## Content
 * [Aims](#aims)
@@ -2746,7 +2753,7 @@ A solution could be established due to an erp database connection thus implement
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission<br/>&bull; Vendor filter as text with dataset on product searches |
 | Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 | Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
 
