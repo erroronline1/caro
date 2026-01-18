@@ -34,6 +34,7 @@ Things are still in motion. Images may be outdated.
 * disable erpinterface for a set timespan with message for third party server updates
 * product search (consumables): vendor filter as text with dataset as per request (selection gets too long)
 * dispay last editing user within documentation?
+* erpinterfacae test example of processing an uploaded csv for birthdays
 
 ## Content
 * [Aims](#aims)
@@ -6384,7 +6385,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
     * creates barcodes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
-    * v3.12.1
+    * v3.12.3
     * \> 5k stars
     * \> 1k forks
     * [MIT license](https://github.com/lindell/JsBarcode/?tab=MIT-1-ov-file)
