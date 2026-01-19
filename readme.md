@@ -33,7 +33,6 @@ Things are still in motion. Images may be outdated.
     * chain destination and source or only if destination does contain ____ or whatever
 * disable erpinterface for a set timespan with message for third party server updates
 * product search (consumables): vendor filter as text with dataset as per request (selection gets too long)
-* dispay last editing user within documentation?
 * erpinterfacae test example of processing an uploaded csv for birthdays
 
 ## Content

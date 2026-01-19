@@ -1644,6 +1644,11 @@ class RECORD extends API {
 		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
 		$data = $this->recordsearch(['search' => $this->_requestedID]);
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$last_user = [];
+		foreach($users as $user){
+			$last_user[$user['id']] = $user['name'];
+		}
 
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $contexts = $available_units = [];
@@ -1678,7 +1683,8 @@ class RECORD extends API {
 							'type' => 'textsection',
 							'content' => $this->_lang->GET('record.list_touched', [
 								':date' => $this->convertFromServerTime($record['last_touch']),
-								':document' => $record['last_document']
+								':document' => $record['last_document'],
+								':user' => $last_user[$record['last_user']] ?? $this->_lang->GET('general.deleted_user')
 							]),
 							'attributes' => [
 								'data-type' => 'record',
@@ -1827,7 +1833,8 @@ class RECORD extends API {
 				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
-				'units' => $row['units']
+				'units' => $row['units'],
+				'last_user' => $row['last_user']
 			];
 		}
 		return $contexts;

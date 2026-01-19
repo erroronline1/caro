@@ -1543,7 +1543,7 @@
 				"30": "30 Years, e.g. trade association"
 			}
 		},
-		"list_touched": "last edit on :date with :document",
+		"list_touched": "last edit on :date with :document by :user",
 		"mark_as_closed": "Mark as closed in your role as",
 		"mark_as_closed_info": "The record will not show up in the overview, however it will still be found using the filter.",
 		"match_bundles": "Match against any bundle",
