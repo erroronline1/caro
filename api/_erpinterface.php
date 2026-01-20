@@ -1155,7 +1155,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	*/
 	public function customcsvdump($key = null, $params = null){
 		$queries = [
-			'Vorgangsexport' => [
+			'Vorgangsexport für Terminerinnerung' => [
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1259,7 +1259,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				]
 			],
-			'EVA-Artikelstamm Lagerware' => [
+			'EVA-Artikelstamm Lagerware z.B. für Inventur' => [
 				'query' => <<<'END'
 					SELECT
 						article.ARTIKEL_REFERENZ,
@@ -1720,7 +1720,23 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						}
 					]
 				]
-			]
+			],
+			/*'Mitarbeiterliste' => [
+				'query' => <<<'END'
+					SELECT
+						a.NAME_1 AS Nachname,
+						a.NAME_2 As Vorname
+					FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+					LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+					WHERE ia.BEZEICHNUNG = 'Mitarbeiter'
+					AND a.AKTIV_KENNZEICHEN = 1
+					AND a.STATUS = 0
+					AND a.NAME_2 IS NOT NULL
+					AND a.NAME_2 NOT IN ('- NICHT LÖSCHEN -')
+					ORDER BY NAME_1, NAME_2
+					END,
+				'params' => []
+			]*/
 		];
 
 		if (!$key) return array_keys($queries);
