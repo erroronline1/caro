@@ -253,7 +253,7 @@ class NOTIFICATION extends API {
 								$oldest = SQLQUERY::EXECUTE($this->_pdo, 'order_get_appoved_oldest_approval');
 								$oldest = $oldest ? $oldest[0]['approved'] : null;
 
-								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : $oldest))) break;
+								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata($oldest))) break; 
 
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 									'values' => [
@@ -283,7 +283,7 @@ class NOTIFICATION extends API {
 										$order['order_data'] = json_decode($order['order_data'], true);
 
 										$articles = array_filter($identifiers, fn($o) => 
-											$o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
+											isset($order['order_data']['vendor_label']) && $o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
 											(
 												(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
 												(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
