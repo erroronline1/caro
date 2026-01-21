@@ -788,8 +788,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
 		],
 		'order_get_appoved_oldest_approval' =>[
-			'mysql' => "SELECT approved FROM caro_consumables_approved_orders ORDER BY approved ASC LIMIT 1",
-			'sqlsrv' => "SELECT TOP(1) approved FROM caro_consumables_approved_orders ORDER BY approved ASC"
+			'mysql' => "SELECT approved FROM caro_consumables_approved_orders WHERE ordered IS NULL OR delivered_full IS NULL ORDER BY approved ASC LIMIT 1",
+			'sqlsrv' => "SELECT TOP(1) approved FROM caro_consumables_approved_orders WHERE ordered IS NULL OR delivered_full IS NULL ORDER BY approved ASC"
 		],
 		'order_get_approved_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE '%orderer\":\":user\"%') AND (order_data LIKE :SEARCH)",
