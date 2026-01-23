@@ -23,6 +23,7 @@ Die CARO-App kann dabei:
 * [den Bestellstatus von Artikeln abgleichen](#den-bestellstatus-von-artikeln-abgleichen)
 * [Kommissionsbestellungen anzeigen](#kommissionsbestellungen-anzeigen)
 * [Datenexporte generieren](#datenexporte-generieren)
+* [Geburstagsgrüße an Mitarbeiter versenden](#geburtstagsgrüße-an-mitarbeiter-versenden)
 
 # Patientendaten direkt aus dem System abfragen
 Mit der Suche nach dem Namen, Geburtsdatum oder FIBU-Nummer können die Patientendaten angezeigt oder in Dokumente importiert werden.  
@@ -68,7 +69,7 @@ Diese Funktion ist Bestandteil der automatischen Hintergrundaktualisierung.
 
 # Kommissionsbestellungen anzeigen
 Die CARO-App speichert Bestellungen im Regelfall nur für einen vergleichsweise kurzen Zeitraum, der es erlaubt zeitnah mit wenig Aufwand Rücksendungen zu erstellen.  
-Eine langfristige Archivierung von Bestellungen ist über die ERP-Software vorgesehen, der Zugriff auf diese Daten erlaubt dabei rasch vergangene Ausführungen von Artikelbestellungen nachzuvollziehen ohne dazu andere Mitarbeitende zwingend einbeziehen zu müssen. Das Bestell- und Lieferdatum, sowie die Liefermenge sind Teil der bereitgestellten Informationen.  
+Eine langfristige und vollständige Archivierung von Bestellungen ist über die ERP-Software vorgesehen, der Zugriff auf diese Daten erlaubt dabei rasch vergangene Ausführungen von Artikelbestellungen nachzuvollziehen ohne dazu andere Mitarbeitende zwingend einbeziehen zu müssen. Das Bestell- und Lieferdatum, sowie die Liefermenge sind Teil der bereitgestellten Informationen.  
 Grundlage der Suche sind die Parameter zur Suche von Patientendaten, zusätzlich kann der Zeitraum eingegrenzt werden.
 
 Diese Funktion steht als gesondertes Modul zur Verfügung.
@@ -77,3 +78,8 @@ Diese Funktion steht als gesondertes Modul zur Verfügung.
 Voreingestellte Datenbankabfragen können direkt als CSV-Datei exportiert werden. Dadurch ist eine weitestgehend unkomplizierte Anpassung an den jeweiligen Bedarf möglich, es besteht keine Abhängigkeit von CSV-Exportfunktionen oder Export-Beschränkungen.
 
 Diese Funktion steht als gesondertes Modul zur Verfügung.
+
+# Geburtstagsgrüße an Mitarbeiter versenden
+Es kann ein Abgleich zwischen Nutzernamen in CARO und angelegten und gepflegten Mitarbeitern in EVA erfolgen, auf dessen Basis innerhalb CAROs eine Systemnachirt mit einem Geburtstagsgruß versandt wird. Diese Information wird nur für die Systemnachricht verwendet und nicht weiter veröffentlicht.
+
+Diese Funktion ist Bestandteil der automatischen Hintergrundaktualisierung.
