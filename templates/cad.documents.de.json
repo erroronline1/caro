@@ -329,6 +329,6 @@
 		"regulatory_context": "iso13485_5_5_3,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "Identifikator,Digitale Fertigung"
+		"content": "operativer Identifikator,Digitale Fertigung"
 	}
 ]
