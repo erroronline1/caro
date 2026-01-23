@@ -1259,6 +1259,129 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				]
 			],
+			'Vorgangsexport - alle' => [
+				'query' => <<<'END'
+					SELECT
+						vorgaenge.REFERENZ AS VORGANG,
+						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+						pat.ANREDE,
+						pat.REFERENZ AS KUNDENNUMMER,
+						pat.NAME,
+						pat.VORNAME,
+						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
+						vorgaenge.LEISTUNG,
+						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
+						[sys].GENEHMIGT,
+						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+						[sys2].GELIEFERT,
+						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+						[sys3].FAKTURIERT,
+						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS FAKTURIERT_DATUM,
+						UNIT.BETRIEB,
+						UNIT.ADRESSEN_REFERENZ AS BETRIEB_REFERENZ
+					FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GENEHMIGT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsGenehmigung'
+					) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS GELIEFERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsLieferung'
+					) AS [sys2] ON [sys2].KENNZEICHEN = vorgaenge.GELIEFERT
+					INNER JOIN (
+						SELECT
+							KENNZEICHEN,
+							BEZEICHNUNG AS FAKTURIERT
+						FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+						WHERE AUSWAHLART = 'AuftragsFakturierung'
+					) AS [sys3] ON [sys3].KENNZEICHEN = vorgaenge.FAKTURIERT
+					INNER JOIN (
+						SELECT
+							a.NAME_1 AS NAME,
+							concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+							a.GEBURTSDATUM,
+							a.STRASSE_1 AS STRASSE,
+							a.PLZ_1 AS PLZ,
+							a.ORT_1 AS ORT,
+							a.LKZ_1 AS LKZ,
+							a.REFERENZ,
+							more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ,
+							more.STERBEDATUM,
+							t.ADRESS_ANREDE AS ANREDE
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
+
+						WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+						AND more.STERBEDATUM IS NULL
+					) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+					INNER JOIN
+					(
+						SELECT
+							names.NAME_3 AS BETRIEB,
+							unit.ADRESSEN_REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+						INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+						INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+						WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+					) AS UNIT ON vorgaenge.BETRIEB = UNIT.ADRESSEN_REFERENZ
+					LEFT JOIN
+					(
+						SELECT
+							ka.NAME_1,
+							ka.REFERENZ
+						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+						WHERE kia.BEZEICHNUNG = 'Kostenträger'
+					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+			
+					WHERE
+					UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
+					AND [sys].GENEHMIGT NOT IN ('Storno')
+					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
+					ORDER BY vorgaenge.REFERENZ ASC
+					END,
+				'params' => [
+					':anlagedatumvon' => [
+						'name' => 'Anlagedatum von',
+						'type' => 'date', // currently default simple html input types (text, date, time, number)
+						'default' => function(){
+							$date = new \DateTime('now');
+							return $date->modify('-5 years')->modify('first day of this month')->format('Y-m-d');
+						},
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 0:00:00.000'); // process input somehow, date conversion or reasonable input sanitation to avoid malicious injections
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					],
+					':anlagedatumbis' => [
+						'name' => 'Anlagedatum bis',
+						'type' => 'date',
+						'default' => date('Y-m-d'),
+						'function' => function($v){
+							try {
+								$date = new \DateTime($v);
+								return $date->format('Y-m-d 23:59:59.000');
+							}
+							catch(\EXCEPTION $e){
+								return null;
+							}
+						}
+					]
+				]
+			],
 			'EVA-Artikelstamm Lagerware z.B. für Inventur' => [
 				'query' => <<<'END'
 					SELECT
@@ -1794,7 +1917,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			]*/
 		];
 
-		if (!$key) return array_keys($queries);
+		if (!$key) {
+			$keys = array_keys($queries);
+			sort($keys, SORT_STRING);
+			return $keys;
+		}
 		if (!isset($queries[$key])) return null;
 		$paramfields = [];
 		// if not called with params return optional parameter settings for input
