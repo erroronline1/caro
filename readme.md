@@ -34,6 +34,16 @@ Things are still in motion. Images may be outdated.
 * disable erpinterface for a set timespan with message for third party server updates
 * product search (consumables): vendor filter as text with dataset as per request (selection gets too long)
 * erpinterfacae test example of processing an uploaded csv for birthdays
+* allow different export formats for erpinterface csv dumps?
+    * defined in query settings, selecteable by required radio input if applicable
+    * also pdf?
+    * add explanatory description for usecase, displayed after selection, like params
+* allow pdf format for csv-filter?
+* bundle notification alert_undelivered_orders by vendor to reduce message amount, unissued by commission
+* make order identifier key within erpinterface orderdata to speed up comparison?
+    * consider {identifier}=>[[order], [order2], ...]
+* add record restricted_access
+    * like document, with permission and unit (e.g. supervisor intersection)
 
 ## Content
 * [Aims](#aims)
