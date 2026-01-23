@@ -25,6 +25,30 @@
 		}
 	},
 	{
+		"name": "operativer Identifikator",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content":[
+				[
+					{
+						"attributes": {
+							"name": "Thema",
+							"required": true
+						},
+						"type": "identify",
+						"hint": "nur für operative Zwecke, keine Patientenversorgungen"
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Basisdaten",
 		"alias": "",
 		"context": "component",
@@ -1084,6 +1108,17 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Identifikator,Vorgangsprotokoll"
+	},
+	{
+		"name": "Besprechungsprotokoll",
+		"alias": "",
+		"context": "generalrecords",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "operativer Identifikator,Vorgangsprotokoll"
 	},
 	{
 		"name": "Schulungsbewertung",
