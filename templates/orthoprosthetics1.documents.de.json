@@ -1,0 +1,1824 @@
+[
+	{
+		"comment": "following are prosthetics i components #################################################################################################"
+	},
+	{
+		"name": "Maßblatt Unterschenkel-Orthoprothese Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "reale Patientenmaße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Supracondyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Condyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Knie AP in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Ferse in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Malleolen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fersen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Vorfuß ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verkürzung in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Effektive Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Schuhgröße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fußgröße in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht in kg"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße in cm"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Startmaß Referenz"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß oder Höhe",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Maßdokumentation"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos",
+							"multiple": true
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Oberschenkel-Orthoprothese Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "reale Patientenmaße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Tuber-Ferse in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Malleolen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fersen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Vorfuß ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Tuber-Boden contralateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Boden contralateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verkürzung in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Effektive Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Schuhgröße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fußgröße in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht in kg"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße in cm"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Startmaß Referenz"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß oder Höhe",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Maßdokumentation"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos",
+							"multiple": true
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Borggreve-Umkehrplastik Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "reale Patientenmaße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Tuber-Ferse in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Malleolen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fersen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Vorfuß ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Tuber-Boden contralateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Boden contralateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verkürzung in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Effektive Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Schuhgröße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fußgröße in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht in kg"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße in cm"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Startmaß Referenz"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß oder Höhe",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Maßdokumentation"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos",
+							"multiple": true
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Tibiapseudarthrose Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "reale Patientenmaße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Supracondyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Condyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Knie AP in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Ferse in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Malleolen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fersen ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Vorfuß ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verkürzung in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Boden contralateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Effektive Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Schuhgröße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fußgröße in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht in kg"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße in cm"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Startmaß Referenz"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß oder Höhe",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Maßdokumentation"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos",
+							"multiple": true
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung US longitudinal Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hilfsmittel"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Neuanfertigung einer Unterschenkel-Orthoprothese longitudinal 50.50 KA": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "erster Testschaft"
+						},
+						"content": {
+							"erster Testschaft 50.06 KA": [],
+							"ohne Testschaft 50.08 KA": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bauteile"
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftansatz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Eingussanker",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schraubadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohradapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Doppeldapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Pyramidenadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Laminationsadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Knöchelholz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Knöchelholz bei geringer Bauhöhe"
+						},
+						"content": {
+							"50.10 KA": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Verschraubung",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fuß",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Anbringen eines Prothesenfußes"
+						},
+						"content": {
+							"50.09 KA": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußkosmetik",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Stumpfstrümpfe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Bauteile sonstiges"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zu Bauteilen"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Abzüge"
+						},
+						"content": {
+							"Gipsabdruck vorhanden 50.01 KA": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"zusätzl. 3. Anprobe 50.04 KA": [],
+							"zusätzl. 4. Anprobe 50.05 KA": [],
+							"zusätzlicher Testschaft 50.13 KA": [],
+							"Deckelverschluss 50.11 KA": [],
+							"Antirutschsohle 50.33 KA": [],
+							"Kosmetischer Ausgleich Fesselbereich 50.17 KA": [],
+							"Abschlusslage über Fesselausgleich 50.18 KA": [],
+							"Kosmetischer Ausgleich Unterschenkel 50.21 KA": [],
+							"Abschlusslage über Unterschenkelausgleich 50.22 KA": [],
+							"Lackieren Unterschenkelausgleich 50.24 KA": [],
+							"elastischer Überzug Unterschenkelausgleich 50.25 KA": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verschlüsse 50.15 KA"
+						}
+					}
+				],
+				[
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Sonstige Artikel",
+							"multiple": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Aufwendungen"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung US transversal Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hilfsmittel"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Neuanfertigung einer Unterschenkel-Orthoprothese transversal modular inkl. Soft-Socket 50.51 KA": [],
+							"Neuanfertigung einer Unterschenkel-Orthoprothese transversal Schalenbauweise inkl. Soft-Socket 50.52 KA": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Testschaft"
+						},
+						"content": {
+							"erster Testschaft 50.06 KA": [],
+							"ohne Testschaft": [],
+							"ohne Soft-Socket 50.14 KA": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bauteile"
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftansatz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Eingussanker",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohradapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Doppeldapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Knöchelholz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Knöchelholz bei geringer Bauhöhe"
+						},
+						"content": {
+							"50.10 KA": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Verschraubung",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fuß",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußkosmetik",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Stumpfstrümpfe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Kniekappe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Stumpfendkissen",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Liner",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Locksystem",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Mehraufwand Linerversorgung"
+						},
+						"content": {
+							"zusätzliche Arbeitszeit 50.02 KA": [],
+							"Mehraufwand individuelle Liner 50.29 KA": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Bauteile sonstiges"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zu Bauteilen"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Abzüge"
+						},
+						"content": {
+							"Gipsabdruck vorhanden 50.01 KA": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"Traktionsvorrichtung": [],
+							"zusätzl. 3. Anprobe 50.04 KA": [],
+							"zusätzl. 4. Anprobe 50.05 KA": [],
+							"zusätzlicher Testschaft 50.13 KA": [],
+							"Antirutschsohle 50.33 KA": [],
+							"Kosmetischer Ausgleich Fesselbereich 50.17 KA": [],
+							"Abschlusslage über Fesselausgleich 50.18 KA": [],
+							"Kosmetischer Ausgleich Unterschenkel 50.21 KA": [],
+							"Abschlusslage über Unterschenkelausgleich 50.22 KA": [],
+							"Lackieren Unterschenkelausgleich 50.24 KA": [],
+							"elastischer Überzug Unterschenkelausgleich 50.25 KA": []
+						}
+					}
+				],
+				[
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Sonstige Artikel",
+							"multiple": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Aufwendungen"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung OS Orthoprothese Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hilfsmittel"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese mit Tuberunterstützung modular 50.53 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese mit Tuberunterstützung und Schienengelenken modular 50.53 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese mit Tuberunterstützung in Schalenbauweise / wasserfest 50.56 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese ohne Tuberunterstützung Schalenbauweise/ wasserfest 50.58 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese ohne Tuberunterstützung modular 50.57 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese ohne Tuberunterstützung mit Schienengelenken und Prothesenfuß": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Testschaft"
+						},
+						"content": {
+							"erster Testschaft 50.06 KA": [],
+							"ohne Testschaft 50.08 KA": [],
+							"erster Testschaft mit Schienengelenken": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bauteile"
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftansatz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Eingussanker",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Kniegelenk",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Systemschienen",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohradapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohrklemmadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Doppeldapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Knöchelholz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Knöchelholz bei geringer Bauhöhe"
+						},
+						"content": {
+							"50.10 KA": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Verschraubung",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fuß",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußkosmetik",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaumstoffformteil",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Stumpfstrümpfe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Liner",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Locksystem",
+							"multiple": true
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Mehraufwand Linerversorgung"
+						},
+						"content": {
+							"zusätzliche Arbeitszeit 50.02 KA": [],
+							"Mehraufwand individuelle Liner 50.29 KA": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Bauteile sonstiges"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zu Bauteilen"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Abzüge"
+						},
+						"content": {
+							"Gipsabdruck vorhanden 50.01 KA": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"zusätzl. 3. Anprobe 50.04 KA": [],
+							"zusätzl. 4. Anprobe 50.05 KA": [],
+							"zusätzlicher Testschaft 50.13 KA": [],
+							"Deckelverschluss 50.11 KA": [],
+							"Schienenaufnahme 50.15 KA": [],
+							"Hosenschutzpolster 50.31 KA": [],
+							"Gelenkschoner 50.31 KA": [],
+							"Antirutschsohle 50.33 KA": [],
+							"Beckenteil aus PE 50.34 KA": [],
+							"Einteilige Kosmetik ganzes Bein 50.16 KA": [],
+							"Kosmetischer Ausgleich Fesselbereich 50.17 KA": [],
+							"Abschlusslage über Fesselausgleich 50.18 KA": [],
+							"Kosmetischer Ausgleich Unter- oder Oberschenkel 50.21 KA": [],
+							"Abschlusslage über Unter- oder Oberschenkelausgleich 50.22 KA": [],
+							"Lackieren Unter- oder Oberschenkelausgleich 50.24 KA": [],
+							"elastischer Überzug Unter- oder Oberschenkelausgleich 50.25 KA": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Zusätze sonstiges"
+						},
+						"hint": "ggf Anzahl der o.g."
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verschlüsse 50.15 KA"
+						}
+					}
+				],
+				[
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Sonstige Artikel",
+							"multiple": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Aufwendungen"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung Borggreve Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hilfsmittel"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese nach Borggreve modularbauweise 50.59 KA": [],
+							"Neuanfertigung einer Oberschenkel-Orthoprothese nach Borggreve schalenbauweise / wasserfest 50.60 KA": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "erster Testschaft"
+						},
+						"content": {
+							"erster Testschaft 50.06 KA": [],
+							"ohne Testschaft 50.08 KA": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bauteile"
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftansatz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaftadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Eingussanker",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohradapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Rohrklemmadapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Doppeldapter",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Kniegelenk",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Schaumstoffformteil",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Knöchelholz",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Verschraubung",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fuß",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Fußkosmetik",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Stumpfstrümpfe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Kosmetikstrümpfe",
+							"multiple": true
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Bauteile sonstiges"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zu Bauteilen"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Abzüge"
+						},
+						"content": {
+							"Gipsabdruck vorhanden 50.01 KA": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"zusätzl. 3. Anprobe 50.04 KA": [],
+							"zusätzl. 4. Anprobe 50.05 KA": [],
+							"zusätzlicher Testschaft 50.13 KA": [],
+							"Hosenschutzpolster 50.31 KA": [],
+							"Gelenkschoner 50.31 KA": [],
+							"Antirutschsohle 50.33 KA": [],
+							"Beckenteil aus PE 50.34 KA": [],
+							"Kosmetischer Ausgleich Unter- oder Oberschenkel 50.21 KA": [],
+							"Abschlusslage über Unter- oder Oberschenkelausgleich 50.22 KA": [],
+							"Lackieren Unter- oder Oberschenkelausgleich 50.24 KA": [],
+							"elastischer Überzug Unter- oder Oberschenkelausgleich 50.25 KA": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Verschlüsse 50.15 KA"
+						}
+					}
+				],
+				[
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "Sonstige Artikel",
+							"multiple": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Aufwendungen"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Warnungen Einsatzbereich Ortho-Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hinweise und Warnungen für die beinprothetische Versorgung"
+						},
+						"content": "• Achten Sie auf die korrekte Wahl des Funktionsmodus für die jeweilige Nutzungssituation. Ein falscher Funktionsmodus erhöht das Sturzrisiko.\n• Achten Sie regelmäßig, insbesondere im Wachstum, auf eine Beinlängendifferenz und setzen Sie sich bei Auffälligkeiten mit uns in Verbindung, um Unsicherheiten und ein erhöhtes Sturzrisiko zu vermeiden.\n• Achten Sie regelmäßig, insbesondere im Wachstum, auf Ihr Körpergewicht und Aktivitätslevel. Bei Änderungen setzen Sie sich bitte umgehend mit uns in Verbindung um die Konfiguration Ihrer Orthoprothesenkomponenten zu prüfen und ein Überlastungsrisiko ausschließen zu können.\n• Beachten Sie, dass die Orthoprothesenelemente bei unachtsamer Handhabung zu Verletzungen oder zu Beschädigungen Ihrer Kleidung führen können.\n• Bei elektronischen Komponenten ist auf eine ausreichende Ladung der Energieversorgung ausschließlich mit geeigneten und zugelassenen Ladegeräten zu achten um die Funktion sicherzustellen. Systemausfälle vergrößern das Sturzrisiko. Verwenden Sie nur Original-Akkus und -Ladegeräte. Bei längerer Nichtbenutzung der Orthoprothese sollte diese dennoch einmal wöchentlich aufgeladen werden um die Akkuleistung nicht zu verringern. Die Leistungsdauer hängt von Ihrem individuellen Einsatz der Orthoprothese ab. Eine häufige Benutzung reduziert die Nutzungsdauer. Die Microcontroller der Orthoprothese benötigen auch ohne aktive Nutzung Strom. Schalten Sie daher die Orthoprothese bei Nichtbenutzung aus. Die Ladegeräte dürfen nicht zum Aufladen anderer Akkus verwendet werden. Unsachgemäße Handhabung führt zu Defekten an Akkumulatoren und Ladegerät. Das Ladegerät ist gegen Sturz, Schlag oder Bedienungsfehler zu sichern, da es dadurch zu Defekten kommen kann. Werfen Sie den Akku nicht ins Feuer. Setzen Sie ihn niemals Hitze aus. Vermeiden Sie direkte Sonneneinstrahlung. Es besteht Explosionsgefahr!\n• Bei Gewichts- und Stumpfschwankungen besteht Sturzgefahr durch Haftungsverlust und Verletzungsgefahr durch Einklemmen oder unkorrekten Sitz der Orthoprothese. Sollten Sie Änderungen in der Passform bemerken sprechen Sie uns umgehend an.\n• Das Hinknien mit der Orthoprothese kann zu Beschädigungen der Kosmetik führen. Eine defekte oder zu lose sitzende Kosmetik kann zu einem erhöhten Risiko von unbeabsichtigten Quetschungen führen.\n• Das Silikon- oder Gelmaterial ist bei sorgfältiger Handhabung robust und dauerhaft. Allerdings sind Materialverletzungen möglich durch Einwirkungen von scharfkantigen Gegenständen. Vermeiden Sie deshalb den Kontakt des Silikon- oder Gel-Liners mit langen Fingernägeln, Schmuck, evtl. mitgelieferten Verbindungsstiften, Werkzeugen etc.\n• Defekte oder undichte Ventile vergrößern das Sturzrisiko durch Haftungsverlust. Kontrollieren Sie vor jeder Nutzung die Funktion und den Zustand des Ventils.\n• Der Luftabschluss der Hautoberfläche im Schaft kann zu einer erhöhten Schweißneigung führen und erfordert bisweilen etwas Zeit zur Gewöhnung. Sprechen Sie uns an ob für Sie ggf. eine andere Lösung in Frage kommt.\n• Der Verbindungsstift eines Liners muss fest verschraubt sein. Ein Lösen des Stiftes während des Gehens führt zum Verlust der Orthoprothese. \n• Der Verschlussmechanismus in der Orthoprothese ist von Fremdkörpern oder Strumpfeinziehungen freizuhalten, da diese die Funktion des Mechanismus beeinträchtigen können. \n• Die Anwendung fettender Substanzen zur Hautpflege darf nicht unmittelbar vor der Orthoprothesenbenutzung erfolgen, weil sie die Haftungseigenschaften der Orthoprothese herabsetzen können, wenn sie in den Schaft oder Liner gelangen.\n• Die Fersenkappe des Schuhs muss bauartbedingt hoch genug ausgeführt sein, um ein Herausrutschen der Ferse zu verhindern, d.h. die Ferse der Orthoprothese muss fest gefasst sein. Testen Sie die Fersenfassung immer mit Orthoprothese, damit die Sohlenstärke der Orthoprothese berücksichtigt ist.\n• Die Orthoprothese ist auf eine bestimmte effektive Absatzhöhe bzw. auf einen bestimmten Schuh aufgebaut. Mit effektivem Absatz wird die Höhendifferenz zwischen der Sohlenstärke im Absatzbereich und der Sohlenstärke im Vorfußbereich bezeichnet. Ist der effektive Absatz des Schuhs zu hoch, so führt dies zu einem Kippen der Orthoprothese im Schuh, was wiederum das Herausrutschen der Ferse aus dem Schuh und eine Unsicherheit beim Laufen nach sich zieht. Ist der effektive Absatz zu niedrig, so werden Sie mit der Orthoprothese nach hinten gedrückt.\n• Die Orthoprothesen sollten nicht ohne Schuhe getragen werden da sie sonst brechen oder es zum Sturz durch Wegrutschen kommen kann und sich die Statik ändert, was zu Beeinflussung der Sicherheit führen kann.\n• Ein Liner sollte nicht im umgewendeten Zustand dauerhaft gelagert werden, um Materialverwerfungen und Risse zu vermeiden. Zu starke Zugkräfte (z.B. beim An- oder Ablegen) schädigen das Material, es droht Funktionsverlust.\n• Ein Orthoprothesenträger muss auf ein konstantes Körpergewicht achten, da sich jede diesbezügliche Änderung direkt auf die Passform seiner Orthoprothese auswirkt. Volumenschwankungen können aber auch durch die Einnahme von Medikamenten beeinflusst werden. Sprechen Sie mit Ihrem Arzt darüber, um die Ursachen dieser Schwankungen zu erkennen und entsprechende Maßnahmen zu ergreifen.\n• Eine Änderung der Achsfriktion eines prothetischen Kniegelenks führt zu unvorhersehbaren Änderungen im Gangablauf und erhöht das Sturzrisiko. Bitte achten Sie auf die Einhaltung der Wartungsintervalle.\n• Eine fehlerhafte Benutzung der Anziehhilfe birgt das Risiko von Verletzungen, Funktionsverlust der Anziehhilfe und Haftungsverlust der Orthoprothese durch ungenaues Anlegen. Sollte Ihre Unterweisung nicht ausreichend erfolgt sein sprechen Sie uns bitte umgehen an uns.\n• Eine Sturzgefahr ist nie ganz auszuschließen. Deshalb beachten Sie bitte: Ein Hängenbleiben der Fußspitze am Boden ist gerade bei unebenem Gelände möglich. Bei Auftritt mit der Ferse kann das Kniegelenk unbeabsichtigt einbeugen und das Bein/die Orthoprothese einknicken.\n• Es besteht im Bereich von Gelenken grundsätzlich Quetschgefahr. Achten Sie darauf, dass keine Hautfalten oder -wülste im Gelenkbereich Kontakt finden und halten Sie die Finger fern.\n• Fällt eine pneumatische oder hydraulische Schwungphasensteuerung aus, so wird sich dies nur durch eine größere Leichtgängigkeit bemerkbar machen, die es Ihnen dann nur erlaubt, in einer Geschwindigkeit zu gehen. Achtung! Sie können mit einer defekten Pneumatik oder Hydraulik nicht mehr schnell gehen – Sturzgefahr! Lassen Sie deshalb rechtzeitig Ihre Orthoprothese überprüfen. Regelmäßige Wartung vermindert die Gefahr des plötzlichen Versagens.\n• Bei hoher Beanspruchung (z.B. Bergwanderungen, Laufsport) können sich Prothesenkomponenten mit hydraulischen Steuerungen erhitzen. Bitte vermeiden Sie die Berührung dieser Bauteile. Es besteht Verbrennungsgefahr.\n• Gleitmittel auf der Innenseite der Orthoprothese mindern die Hafteigenschaften des Polyurethan-Gels oder Silikons.\n• Immer, wenn Sie Ihre Orthoprothese nicht angezogen haben und z.B. die Orthoprothesenstrümpfe oder den Schuh wechseln, kann das Knie und Hüftgelenk unbeabsichtigt einknicken und Ihnen die Hand einklemmen. Durch das Einbeugen der Gelenke wird diese Gefahr vermieden.\n• Lufteinschlüsse zwischen Haut und Polyurethan-Gel oder Silikon können zu Hautirritationen führen.\n• Ob sie mit Ihrer Orthoprothese ein Kraftfahrzeug führen und am Straßenverkehr teilnehmen dürfen, lassen Sie bitte von der zuständigen Behörde abklären.\n• Prüfen Sie vor jeder Nutzung den einwandfreien Zustand und die Funktion einer eventuell vorhandenen Sperre/Verriegelung um das Sturzrisiko zu reduzieren.\n• Veränderungen Ihrer körperlichen Leistungsfähigkeit wirken sich auch auf die Gehsicherheit aus. Lassen sie regelmäßig das Versorgungskonzept überprüfen.\n• Versichern Sie sich nach jedem Anlegen der Orthoprothese durch Ziehen an der Orthoprothese, dass diese fest am Stumpf sitzt. Es besteht Sturzgefahr sollte sie sich während des Gehens oder Laufens vom Stumpf lösen.\n• Zu fest angezogene Strümpfe bergen das Risiko eingewachsener Fußnägel und Infektionen."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bestimmungsgemäßer Gebrauch"
+						},
+						"content": "Prothese zur äußerlichen Anwendung als kosmetischer oder funktioneller (Sitzen, stehen, Fortbewegen) Ersatz Bei Dysmelien im Bereich der unteren Extremität, ggf. mit manuell betätigten, mechanischen oder elektromechanischen Funktionseinheiten."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kontakt mit Feuchtigkeit zulässig",
+							"required": true
+						},
+						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen, Sonderanwendung"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Zulässige maximale Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Zulässiges maximales Körpergewicht in kg"
+						}
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Nehmen Sie bei Überschreiten des maximal zulässigen Körpergewichts bitte unbedingt Kontakt auf"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Komponenten (ggf. gelten zusätzlich die Gebrauchsanweisungen der Hersteller)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Testorthoprothese", "required": true },
+						"content": {
+							"nicht zutreffend": [],
+							"Ihr Hilfsmittel befindet sich gegenwärtig in einem Testzustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin die Prothese gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung der Prothese unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Aufgrund der verwendeten Materialien ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht sicherzustellen. Die verwendeten Materialien können sich durch starken Lichteinfall, Wärme und erhöhte mechanische Belastungen verformen, verspröden oder brechen, wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Prothesenteilen entstehen könnten. Wir weisen daher ausdrücklich darauf hin die Prothese vor starkem Lichteinfall (z.B. direkte Sonneneinstrahlung), starker Wärme (z.B. Heizkörper) und erhöhten Belastungen (Trage- und Hebearbeiten von mehr als 5kg) zu schützen.": []
+						}
+					},
+					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Beschreibung Komponenten Ortho-Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung der Komponenten, Handhabe und Funktionsweise"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Prothesentyp"
+						},
+						"content": {
+							"Vorfuß-Orthoprothese(Mobilisator): Bei dieser Orthoprothese bleibt das Knöchelgelenk frei. Das aktive Anheben und Senken der Fußspitze ist möglich. Der Schaft ist aus einem flexiblen Material gestaltet, das in seiner Form exakt auf die Gegebenheiten Ihres Beines abgestimmt ist. Die Orthoprothese haftet am Bein durch zwei deutliche Verdickungen im Schaft oberhalb der Ferse auf beiden Seiten der Achillessehne. Durch diese beiden Druckpolster verklammert sich die Orthoprothese an Ihrem Körper. Bitte verwenden Sie immer zum Schutz Ihrer Haut einen Strumpf (z.B. DAW-Schutzhülle) zwischen Bein und Weichwandinnenschaft. Material in Hautkontakt: PE oder EVA.\nAn- und Ablegen:\n1. Ziehen Sie einen Strumpf (z.B. DAW-Hülle) über Ihr Bein. Achten Sie auf faltenfreien Sitz des Strumpfes.\n2. Führen Sie zunächst nur mit leichtem Druck Ihr Bein in die Einstiegsöffnung.\n3. Weiten Sie mit Ihrer Anziehhilfe (z.B. Schuhlöffel) die Einstiegsöffnung im Fersenbereich.\n4. Rutschen Sie mit der Ferse langsam über die Anziehhilfe in den Schaft.\n5. Entfernen Sie die Anziehhilfe.\n6. Vergewissern Sie sich über den korrekten Sitz von Strumpf und Orthoprothese.\n7. Ziehen Sie in gewohnter Weise einen Strumpf und einen Schuh über die Orthoprothese.\nDas Ablegen der FußOrthoprothese erfolgt in umgekehrter Reihenfolge.": [],
+							"Vorfuß-Orthoprothese aus Silikon: Bei dieser Orthoprothese bleibt das Knöchelgelenk frei. Das aktive Anheben und Senken der Fußspitze ist möglich. Der Schaft und Vorfußersatz Ihrer Orthoprothese sind aus flexiblem Silikon gestaltet, das in seiner Form exakt auf die Gegebenheiten Ihres Beines abgestimmt ist. Die Orthoprothese hält allein über die Hafteigenschaften des Silikonmaterials am Bein, Verschlüsse und/oder Verklammerungen der Orthoprothese sind nicht nötig. Material in Hautkontakt: Silikon.\nAn- und Ablegen:\n1. Wenden sie die Fersenkappe von Ihrer SilikonfußOrthoprothese um.\n2. Verteilen Sie etwas wasserlösliche Lotion auf der Beinoberfläche. (Wasserlösliche Substanzen erlauben kurzfristig ein Gleiten zwischen Bein und Schaft, bis die Lotion eingezogen ist. Fettige Substanzen sind nicht geeignet, weil sie eine dauerhafte Gleitbewegung zwischen Bein und Schaft hervorrufen.)\n3. Gleiten Sie mit Ihrem Bein in den Schaft. Achten Sie darauf, dass keine Lufteinschlüsse zwischen Bein und Schaft verbleiben. \n4. Ziehen Sie die Fersenkappe Ihrer Orthoprothese faltenfrei und ohne Lufteinschlüsse um Ihre Ferse.\n5. Ziehen Sie in gewohnter Weise einen Strumpf und einen Schuh über die Orthoprothese. \nBitte beachten Sie:\n- Die SilikonvorfußOrthoprothese sollte nicht dauerhaft mit umgeschlagener Fersenkappe gelagert werden um Materialverwerfungen zu vermeiden. \nZum Ausziehen der SilikonOrthoprothese schlagen Sie die Fersenkappe wieder um, fahren mit dem Finger zwischen Haut und Schaft damit Luft eindringen kann und schlüpfen aus der Orthoprothese. Nach jeder Benutzung sind Bein und Silikonschaft sorgfältig zu waschen und abzutrocknen.": [],
+							"Orthoprothese in Rahmenbauweise: Zusätzlich zur Fuß- oder Beinbettung verfügt sie über eine Fassung in Rahmenkonstruktion, um den Halt und die Führung der Orthoprothese zu verbessern. Schaft und Fassung einer solchen Orthoprothese sind in der Regel aus einer festen Gießharzkonstruktion mit einer Polsterschicht aus Polyethylenschaumstoff gefertigt, die in der Form exakt auf die Gegebenheiten Ihres Beines abgestimmt sind. Die Orthoprothese haftet am Bein durch einen Verschluss aus Klettverschluss, Pelottenkopf/Riemen oder Riemen und Schnallen. Bitte verwenden Sie immer zum Schutz Ihrer Haut einen Strumpf (z.B. DAW-Schutzhülle) zwischen Bein und Orthoprothesenschaft. Material in Hautkontakt: PE, EVA, Acryl oder Silikon.\nAn- und Ablegen:\n1. Ziehen Sie einen Strumpf (z.B. DAW-Hülle) über Ihr Bein. Achten Sie auf faltenfreien Sitz des Strumpfes.\n2. Öffnen Sie an der Orthoprothese den Verschluss/die Klappe.\n3. Führen Sie Ihr Bein in die Orthoprothese ein. Achten Sie darauf, dass Ihr Bein im Schaft korrekt platziert wird. \n4. Schließen Sie den Verschluss/die Klappe, überprüfen Sie den festen Sitz der Orthoprothese. \n5. Ziehen Sie in gewohnter Weise einen Strumpf und einen Schuh über die Orthoprothese.\nDas Ablegen der FußOrthoprothese erfolgt in umgekehrter Reihenfolge.": [],
+							"Orthoprothese mit Einstiegsklappe: Zusätzlich zur Bettung verfügt sie über eine Fassung mit Einstiegsklappe, um den Halt und die Führung der Orthoprothese zu verbessern. Schaft und Fassung einer solchen Orthoprothese sind aus einer festen Gießharzkonstruktion mit einer Polsterschicht aus Polyethylenschaumstoff gefertigt, die in der Form exakt auf die Gegebenheiten Ihres Beines abgestimmt sind. Die Orthoprothese haftet am Bein durch das Schließen der Einstiegshilfe mittels Klettverschluss, Pelottenknopf/Riemen oder Riemen und Schnallen. Bitte verwenden Sie immer zum Schutz Ihrer Haut einen Strumpf (z.B. DAW-Schutzhülle) zwischen Bein und Orthoprothesenschaft. Material in Hautkontakt: PE, EVA, Acryl oder Silikon.\nAn- und Ablegen:\n1. Ziehen Sie einen Strumpf (z.B. DAW-Hülle) über Ihr Bein. Achten Sie auf faltenfreien Sitz des Strumpfes.\n2. Öffnen Sie an der Orthoprothese den Verschluss/die Klappe.\n3. Führen Sie Ihr Bein in die Orthoprothese ein. Achten Sie darauf, dass Ihr Bein im Schaft korrekt platziert wird. \n4. Schließen Sie den Verschluss/die Klappe, überprüfen Sie den festen Sitz der Orthoprothese. \n5. Ziehen Sie in gewohnter Weise einen Strumpf und einen Schuh über die Orthoprothese.\nDas Ablegen der FußOrthoprothese erfolgt in umgekehrter Reihenfolge.": [],
+							"Orthoprothese mit Steckschaft: Ihre Orthoprothese besteht aus einem Schaft mit inliegendem Weichwandinnenschaft und einem Orthoprothesen-Kniegelenk und / oder Orthoprothesenfuß. Der Schaft ist aus einer festen Gießharzkonstruktion gefertigt. Die Verbindung zwischen Ihrem Bein und dem Orthoprothesenschaft erfolgt durch einen Weichwandinnenschaft, der aus Polyethylenschaumstoff hergestellt ist. Dieser Weichwandinnenschaft bewirkt eine Polsterung für Ihr Bein und gewährt der gesamten Orthoprothese die notwendige Haftung dadurch, dass er sich mit einer deutlichen Verstärkung oberhalb des verdickten Beinendes an Ihrem Körper verklammert (zur Erleichterung des Einsteigens ist der Weichwandinnenschaft geschlitzt). Die Formen von Weichwandinnenschaft und Orthoprothesenschaft sind exakt auf die Gegebenheiten Ihres Beines abgestimmt. Bitte verwenden Sie immer zum Schutz Ihrer Beinhaut einen Beinstrumpf (z.B. DAW-Schutzhülle) zwischen Bein und Weichwandinnenschaft. Zwischen Weichwandinnenschaft und Orthoprothesenschaft benötigen Sie zusätzlich einen dünnen Strumpf als zusätzliche Gleitschicht. Material in Hautkontakt: PE, EVA, Acryl oder Silikon.\nAn- und Ablegen:\n1. Ziehen Sie einen Strumpf (z.B. DAW-Hülle) über Ihr Bein. Achten Sie auf faltenfreien Sitz des Strumpfes.\n2. Ziehen Sie den Weichwandinnenschaft auf das Bein. Dabei wird sich der Schlitz im Weichwandinnenschaft zunächst öffnen und anschließend wieder schließen. \n3. Ziehen Sie einen abgenähten Perlontrikot auf den Weichwandinnenschaft. \n4. Führen Sie Bein und Weichwandinnenschaft langsam in den festen Schaft ein, bis Sie am Schaftboden Kontakt bekommen. \n5. Ziehen Sie in gewohnter Weise einen Strumpf und einen Schuh über die Orthoprothese.\nDas Ablegen der FußOrthoprothese erfolgt in umgekehrter Reihenfolge. Vermeiden Sie ein verdrehtes Anziehen von Weichwandinnenschaft und Orthoprothesenschaft.": [],
+							"Orthoprothese mit Linerschaft, mit distalem Verschluss oder als Cushion-System: Die Verbindung zwischen Ihrem Bein und dem Orthoprothesenschaft erfolgt durch einen Linerschaft. Hierbei handelt es sich um einen dünnen hochelastischen Mantel aus Polyurethan oder Silikon. Das auf das Bein aufgerollte Silikonmaterial bietet eine absolut sichere Haftung auf der Hautoberfläche. Voraussetzung für die Hafteigenschaft ist, dass sich keine trennende Schicht (z.B. Fett, Öl, Puder, Trikotstrumpf etc.) zwischen Haut und Liner befinden darf. Darüber hinaus hält der Liner Reibung von der Haut fern. Der Verbindungsmechanismus zwischen Bein, Liner und Orthoprothese ist sehr unterschiedlich bei den einzelnen Produkten. Ihr Orthopädie-Techniker hat das für Sie am besten geeignete Modell aus einer breiten Palette von Zuliefererprodukten ausgewählt.\nDie Befestigung mit dem festen Orthoprothesenschaft wird bei einem Cushion-System über eine Kniekappe oder Orthoprothesenfixbandage, oder bei distalem Verschluss durch den Verbindungsstift erreicht. Dieser greift in ein entsprechendes Gegenstück im Boden des Schaftes ein und arretiert sich dort selbsttätig. Zum Lösen der Verbindung und Aussteigen aus dem Schaft finden Sie eine Drucktaste in der kosmetischen Verkleidung Ihrer Orthoprothese. Durch Betätigen dieser Taste wird der Verbindungsstift freigegeben, und der Liner kann aus der Orthoprothese herausgezogen werden. Zwischen Liner und Orthoprothesenschaft benötigen Sie evtl. einen dünnen Strumpf (mit Loch für den Verbindungsstift) als Gleitschicht. Material in Hautkontakt: Polyurethan, Silikon oder einer Mischung.\nAn- und Ablegen:\n1. Der Liner wird vollständig umgewendet ggf. unter Zuhilfenahme eines nur auf die Außenseite aufzutragenden Gleitmittels.\n2. Der Liner wird am Beinende mittig am Stumpfende (in Verlängerung der Beinlängsachse) positioniert aufgesetzt und faltenfrei sowie ohne Lufteinschlüsse nach oben aufgerollt. Hierbei sind Beschädigungen durch scharfe Gegenstände (z.B. Verbindungsstift oder Fingernägel) zu vermeiden.\n4. Bei Pinanschluss: Die korrekte Positionierung des Verbindungsstiftes mittig am Ende ist zu überprüfen - wenn der Stift fehlpositioniert ist, kann keine Arretierung im Orthoprothesenschaft erfolgen.\n5. Bei Pinnanschluss: Ein Verschiebestrumpf mit Durchlass für den Verbindungsstift ist überzuziehen. WICHTIG: der Pin muss komplett freiliegen, da ansonsten der Strumpf sich mit im Loch verklemmen kann. Es besteht die Gefahr, dass die Orthoprothese nicht mehr ausgezogen werden kann!\n6. Führen Sie Ihr Bein in den Orthoprothesenschaft ein, bis der Verbindungsstift im Verschlussstück der Orthoprothese Aufnahme gefunden hat.\nBei Cushionsystem: rollen Sie die Kniekappe oder Fixbandage nach oben, damit die Kniekappe einen luftdichten Abschluss am Oberschenkel erzeugt.\n7. Abschließend überprüfen Sie bitte die Arretierung der Verbindung / dichtheit des Schaftsystems. \nDas Ablegen der Orthoprothese erfolgt in umgekehrter Reihenfolge. \n- Betätigen Sie im Sitzen die Auslösetaste an Ihrem Orthoprothesenschaft, wodurch der Verbindungsstift freigegeben wird / rollen Sie die Kniekappe nach unten bis über den Schaftrand heraus ab. \n- Ziehen Sie Ihren Stumpf aus dem Orthoprothesenschaft, und nehmen Sie den Verschiebestrumpf/Stumpfstrump ab. \n- Rollen Sie den Liner von Bein herunter, wobei wiederum darauf zu achten ist, dass keine Beschädigungen mit scharfkantigen Gegenständen erfolgen. \n- Nach jeder Benutzung sind Bein und Liner sorgfältig zu waschen und abzutrocknen.": [],
+							"Orthoprothese mit Oberhülse: Zur besseren Führung und Entlastung des Kniegelenkes ist Ihre Orthoprothese neben dem Unterschenkelschaft zusätzlich noch mit einer Oberschenkelhülse ausgestattet. Hierbei handelt es sich um eine großflächige Ledermanschette, die den Oberschenkel umschließt und über jeweils eine Gelenkschiene an der Innen- und Außenseite mit dem Orthoprothesenschaft verbunden ist. Die Oberschenkelhülse ist mit einer Schnürung, Klettverschlüssen oder Riemen und Schnallen zu verschließen. Bitte schließen Sie die Hülse nur so eng, dass sie dem Oberschenkel seitlich Halt gibt. Bei engerem Verschluss drückt sich die Manschette in den Oberschenkel ein und mindert den Tragekomfort. Ihr Bein wird in der Orthoprothese in einen Weichwandinnenschaft gebettet. Dieser bewirkt eine Polsterung für Ihr Bein und verbessert somit den Tragekomfort. Die seitlichen Gelenkschienen sind zum Schutz vor Hauteinklemmungen mit Gelenkschützern versehen. Die Gelenkschützer dürfen nicht entfernt werden, beschädigte Gelenkschützer lassen Sie bitte bei uns erneuern. Die Scharniere an den Gelenkschienen sind ausreichend gefettet, und die Verbindungsbolzen sind gegen Lockerungen gesichert. Sollte Ihre Orthoprothese mit einem Anschlaggurt in der Kniekehle ausgestattet sein, so dient dieser einem geräuschlosen Streckanschlag der Orthoprothese. Das Gurtband kann sich im Laufe der Tragezeit verlängern. Lassen Sie es bei uns neu einstellen. Material in Hautkontakt: PE, EVA, Polyurethan, Silikon oder einer Mischung, Leder oder Metall.\nAn- und Ablegen:\nZiehen Sie zunächst die erforderliche Anzahl von Strümpfen über das Bein, und steigen Sie anschließend in Ihre Orthoprothese hinein und verschließen Sie die Riemenverschlüsse der Oberhülse. Achten Sie darauf, dass die Verschlüsse der Oberhülse nicht zu stramm anzuziehen sind. Bei Verschluss mit Riemen und Schnallen verwenden Sie bitte die mitgelieferten Schnallenschützer, um Beschädigungen der Kleidung zu verhindern. Das Ablegen der Orthoprothese erfolgt in umgekehrter Reihenfolge.": [],
+							"Orthoprothese mit volumenänderbarem Schaft: Durch die Anbringung verschiedener Klappentechniken zwischen dem harten Außen- und dem weichen Innenschaft werden Volumensschwankungen ausgeglichen. Die konturübergreifenden Bereiche können stärker zur Fixierung des Beines im Schaft durch Reduzierung der Weite herangezogen werden. Es sind Klappen oberhalb der Konturen mit Gurtverschluss oder einem Einzugsystem verbunden. Durch festeres Schließen ist es allerdings nur möglich, solche Volumensschwankungen, wie sie im Laufe des Tages auftreten können, auszugleichen. Material in Hautkontakt: PE, EVA, Acryl oder Silikon.\nAn- und Ablegen:\nAm einfachsten ist es, sämtliche Vorbereitungen wie das Anziehen der Hose und des Schuhs im Sitzen durchzuführen. Zum Vorbereiten des Anziehens Ihrer Orthoprothese sollten sie sich auf einen normal hohen Stuhl setzen, der nicht nach hinten weggleiten kann.\nMit textiler Anziehhilfe:\n1. Die Anziehhilfe können Sie im Sitzen auf Ihr Bein bis in den Schritt faltenfrei ziehen oder die Anziehhilfe je nach Technik im Orthoprothesenschaft platzieren.\n2. Danach stehen Sie auf und führen Ihr Bein in den Schaft ein. Zur besseren Standsicherheit können Sie sich mit dem erhaltenen Bein am Stuhl o.ä. anlehnen. Bei einigen Kniekonstruktionen müssen Sie das Kniegelenk gegen Einknicken sichern (nicht bei polyzentrischen Gelenken).\n3. Je nach Technik ziehen Sie die Anziehhilfe durch das Ventilloch des Orthoprothesenschaftes heraus. Ziehen Sie unter Belastung des Orthoprothesenschaftes die Anziehhilfe vollständig durch das Ventilloch heraus.\n4. Richten Sie sich auf, und prüfen Sie gefühlsmäßig, ob Ihr Bein korrekt im Schaft eingebettet ist. \n5. Setzen Sie vorsichtig das Ventil ein. Auch wenn Sie sehr lange Körperhaare an der Haut haben, dürfen Sie diese nur im Bereich des Ventils kurzschneiden, um ein Einklemmen der Haare im Ventil zu verhindern. Das Bein darf nicht rasiert werden, weil dies zu Haarbalgentzündungen führen könnte.\nZum Ablegen der Orthoprothese müssen Sie zunächst das Ventil entfernen. In stehender Position drücken Sie die Orthoprothese zum Boden und hebeln Sie Ihr Bein mit leicht kreisenden Bewegungen langsam aus dem Schaft.\nMit Wet-Fitting:\nReiben Sie Ihr Bein mit einer wasserhaltigen Körperlotion ein, bei der die fettende Wirkung möglichst gering ist, denn die Haut soll nicht aufgeweicht werden. Wichtig dabei ist, dass die Lotion möglichst schnell von der Haut aufgenommen wird, nachdem Sie mit Ihrem Bein in den Schaft geglitten sind und das Ventil eingesetzt haben. Zum Ablegen öffnen Sie das Ventil und ziehen Sie das Bein behutsam aus dem Schaft heraus. Es kann notwendig sein die Weichteile am Rand mit leichten massierenden Bewegungen heraus zu ziehen.\nDas Verschließen der Klappen soll erst erfolgen, wenn die Passform aufgrund von Volumensverlust eingeschränkt ist. Ihr Orthopädietechniker hat Ihnen die Technik dieses Systems erklärt. Grundsätzlich sollten Sie mit allzu starkem Verschließen der Klammern am Ende (am Schaftboden) zurückhaltend sein, da Sie sich allzu leicht aus dem Schaft heraushebeln können und so die Haftung reduziert werden kann.": [],
+							"Orthoprothese mit flexiblem Schaft: Der Schaft Ihrer Orthoprothese besteht aus einem flexiblen Innenschaft und einem harten, lastaufnehmenden Außenschaft, so dass große Bereiche des Beines nicht so stark eingeengt sind, da sich das flexible Material der veränderten Form der Muskulatur anpasst. Das Ventil, welches wie ein Zapfen aus dem Schaft herausragt, führt durch den Kosmetikschaum nach außen, so dass Sie zum Anziehen der Orthoprothese, zum Öffnen und Schließen des Ventils den Kosmetikschaum nicht entfernen müssen. Material in Hautkontakt: PE, EVA, Silikon oder Acryl.\nAn- und Ablegen:\nAm einfachsten ist es, sämtliche Vorbereitungen wie das Anziehen der Hose und des Schuhs im Sitzen durchzuführen. Zum Vorbereiten des Anziehens Ihrer Orthoprothese sollten sie sich auf einen normal hohen Stuhl setzen, der nicht nach hinten weggleiten kann.\nMit textiler Anziehhilfe:\n1. Die Anziehhilfe können Sie im Sitzen auf Ihr Bein bis in den Schritt faltenfrei ziehen oder die Anziehhilfe je nach Technik im Orthoprothesenschaft platzieren.\n2. Danach stehen Sie auf und führen Ihr Bein in den Schaft ein. Zur besseren Standsicherheit können Sie sich mit dem erhaltenen Bein am Stuhl o.ä. anlehnen. Bei einigen Kniekonstruktionen müssen Sie das Kniegelenk gegen Einknicken sichern (nicht bei polyzentrischen Gelenken).\n3. Je nach Technik ziehen Sie die Anziehhilfe durch das Ventilloch des Orthoprothesenschaftes heraus. Ziehen Sie unter Belastung des Orthoprothesenschaftes die Anziehhilfe vollständig durch das Ventilloch heraus.\n4. Richten Sie sich auf, und prüfen Sie gefühlsmäßig, ob Ihr Bein korrekt im Schaft eingebettet ist. \n5. Setzen Sie vorsichtig das Ventil ein. Auch wenn Sie sehr lange Körperhaare an der Haut haben, dürfen Sie diese nur im Bereich des Ventils kurzschneiden, um ein Einklemmen der Haare im Ventil zu verhindern. Das Bein darf nicht rasiert werden, weil dies zu Haarbalgentzündungen führen könnte.\nZum Ablegen der Orthoprothese müssen Sie zunächst das Ventil entfernen. In stehender Position drücken Sie die Orthoprothese zum Boden und hebeln Sie Ihr Bein mit leicht kreisenden Bewegungen langsam aus dem Schaft.\nMit Wet-Fitting:\nReiben Sie Ihr Bein mit einer wasserhaltigen Körperlotion ein, bei der die fettende Wirkung möglichst gering ist, denn die Haut soll nicht aufgeweicht werden. Wichtig dabei ist, dass die Lotion möglichst schnell von der Haut aufgenommen wird, nachdem Sie mit Ihrem Bein in den Schaft geglitten sind und das Ventil eingesetzt haben. Zum Ablegen öffnen Sie das Ventil und ziehen Sie den Stumpf behutsam aus dem Schaft heraus. Es kann notwendig sein die Weichteile am Rand mit leichten massierenden Bewegungen heraus zu ziehen.\nDas Verschließen der Klappen soll erst erfolgen, wenn die Passform aufgrund von Volumensverlust eingeschränkt ist. Ihr Orthopädietechniker hat Ihnen die Technik dieses Systems erklärt. Grundsätzlich sollten Sie mit allzu starkem Verschließen der Klammern am Ende (am Schaftboden) zurückhaltend sein, da Sie sich allzu leicht aus dem Schaft heraushebeln können und so die Haftung reduziert werden kann.": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Komponenten"
+						},
+						"content": {
+							"Strümpfe: Beim Tragen einer Orthoprothese ohne Liner muss das Bein mit einem speziellen Strumpf bedeckt werden. Dieser Strumpf schützt die Haut gegen übermäßige Reibung und nimmt die Hautfeuchtigkeit auf. Zusätzlich lassen sich durch unterschiedlich dicke Materialien leichte Volumenschwankungen des Beines ausgleichen. Es sind folgende Strümpfe erhältlich:\n1. Nylon-Hüllen (z.B. DAW) - sehr dünn\n2. Baumwoll-Stumpfstrümpfe - mittlere Dicke\n3. Frottier-Stumpfstrümpfe - tragen am stärksten auf\nBitte beachten Sie die mitgelieferte Waschanleitung für Ihre Strümpfe!": [],
+							"Ventile: Ihre Orthoprothese muss nach dem Anziehen durch ein Ventil verschlossen werden. Durch die muskulären Bewegungen im Schaft in der Bewegung, insbesondere aber beim Sitzen, kann Luft in den Schaft ziehen. Die Haftung wäre dadurch verringert, oder die Luft sucht sich geräuschvoll einen Weg nach draußen. Deshalb werden Ventile verwendet, die zwar verhindern, dass Luft in den Schaft strömt, aber eingedrungene Luft durch Knopfdruck aus dem Schaft entweichen lassen oder es kommen Ventile mit automatischem Luftausstoß zur Anwendung. Nach dem Anziehen des Schaftes schließen Sie das Ventil. Sollte es nicht dicht sein, was Sie sofort spüren oder sogar hören können, untersuchen Sie das Ventil auf Verunreinigungen oder eingeklemmte Haare. Ist das Ventil danach noch immer undicht, so suchen Sie uns auf. Bei Holz- und anderen dickwandigen Schäften kann ein Ventilrohr Verwendung finden. Das Gummiflachventil mit Kontaktzapfen verhindert, dass sich Weichteile des Beines in die Öffnung des Ventilrohres drücken und es zu Hautschädigungen kommen kann. Achten Sie darauf, dass Sie Ihr Ventil mit Kontaktzapfen immer in der gleichen Richtung einsetzen - beachten Sie die Markierung auf dem Ventil.": [],
+							"Orthoprothesenfuß: Der Orthoprothesenfuß Ihrer Orthoprothese ist nicht nur auf Ihre Schuhgröße, sondern auch auf die Absatzhöhe Ihres Schuhs abgestimmt worden. Deshalb sollten Sie beim Kauf eines neuen Schuhs darauf achten, dass Sie die baulich berücksichtigte Absatzhöhe einhalten. Diese können Sie den Angaben dieser Gebrauchsanweisung oder deren Anhang dieser Gebrauchsanweisung (z.B. Herstellerhinweise und Gebrauchsanweisung Ihres Orthoprothesenfußes) entnehmen. Bei Veränderung der Absatzhöhe sollten Sie auf jeden Fall uns aufsuchen. Um Geräusche und vermehrten Abrieb zu vermeiden, sollte der Orthoprothesenfuß immer mit einem Strumpf im Schuh getragen werden.": [],
+							"frei bewegliches Orthoprothesenknie: Ihr Orthopädie-Techniker hat entsprechend Ihrer medizinischen Notwendigkeit ein geeignetes frei bewegliches Orthoprothesenkniegelenk eingesetzt. Bitte entnehmen Sie ggf. die zusätzlichen Informationen dem Anhang dieser Gebrauchsanweisung (z.B. Herstellerhinweise und Gebrauchsanweisung Ihres Orthoprothesenknies).": [],
+							"gesperrtes Orthoprothesenknie: Ihre Orthoprothese ist mit einem sperrbaren Kniegelenk ausgestattet worden. Die Sperre rastet sofort hörbar ein, wenn Sie aufstehen und das Orthoprothesenknie vollständig strecken. Ein unbeabsichtigtes Einknicken ist so ausgeschlossen. Allerdings bleibt die Orthoprothese auch beim Gehen steif. Zum Hinsetzen muss der Entriegelungshebel an der oberen Außenseite betätigt werden. Prüfen Sie, bevor Sie Ihre Orthoprothese anziehen, ob die Sperre im Kniegelenk eingerastet ist und ob es sich entriegeln lässt, und ziehen Sie erst dann Ihre Orthoprothese an. Bitte entnehmen Sie ggf. die zusätzlichen Informationen dem Anhang dieser Gebrauchsanweisung (z.B. Herstellerhinweise und Gebrauchsanweisung Ihres Orthoprothesenkniegelenks).": [],
+							"gesperrte Orthoprothesenhüfte: Ihre Hüft-Orthoprothese hat ein sperrbares Hüftgelenk, das sofort einrastet, wenn Sie aufstehen. Beckenschaft und Orthoprothesenpassteile bilden eine feste Einheit. Zum Hinsetzen muss der Entriegelungshebel an der oberen Außenseite unter der Schaumkosmetik betätigt werden. Prüfen Sie, bevor Sie Ihre Orthoprothese anziehen, ob die Sperre im Hüftgelenk eingerastet ist. . Bitte entnehmen Sie ggf. die zusätzlichen Informationen dem Anhang dieser Gebrauchsanweisung (z.B. Herstellerhinweise und Gebrauchsanweisung Ihres Orthoprothesenhüftgelenks).": []
+						}
+					},
+
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": "Versichern Sie sich nach jedem Anlegen der Orthoprothese durch Ziehen an der Orthoprothese, dass diese fest am Bein sitzt. Ansonsten könnte sie sich während des Gehens oder Laufens vom Bein lösen. Heben Sie nach dem Anlegen die Orthoprothese mit dem Bein an, so als wollten Sie einen Schritt machen. Hierbei sollten Sie überprüfen, ob der Orthoprothesenschaft auch wirklich am Bein haftet. Er darf nicht abrutschen oder Luft einziehen, die geräuschvoll beim Gehen entweichen würde und die die Haftung der Orthoprothese am Bein vermindert. Betrachten Sie die Stellung der Orthoprothese: Steht der Fuß korrekt? Sollte dies nicht der Fall sein oder Sie sich unsicher fühlen, sollten Sie sich noch einmal setzen und die Orthoprothese erneut anziehen um das Risiko eines Sturzes oder von Hautschädigungen zu vermeiden.\n\nBei der Verwendung von Strümpfen gilt: für eine Feinabstimmung im Schaftvolumen ist evtl. die Verwendung zusätzlicher Strümpfe angezeigt.\nDas Ablegen von Orthoprothesen mit Steckschaft kann vereinfacht werden, wenn Sie im Sitzen die Orthoprothese am Boden fixieren, indem Sie mit Ihrem anderen Fuß auf den Fußrücken der Orthoprothese treten."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Medizinische Aspekte Ortho-Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Medizinisch-therapeutische Aspekte"
+						},
+						"content": "Entsprechend der ärztlichen Diagnose kommen verschiedene Orthoprothesentypen zum Einsatz, die verschiedene Funktionen übernehmen. Die Kombination verschiedener Funktionen in einer Orthoprothese ist möglich. Die Sonderanfertigungsprodukte der Orthoprothesen sind Medizinprodukte, die als Körperersatz einem körperlichen und funktionellen unmittelbaren Ausgleich einer Behinderung nach einer Fehlbildung Bereich der unteren Extremitäten dienen. Die Orthoprothesen werden von außen an den Körper angelegt, wobei sich die Anwendung nach der Defekthöhe richtet. Die Orthoprothesen sind häufig Kombinationen aus individuell gefertigten Sonderanfertigungskomponenten und industriell hergestellten Prothesen- und/oder Orthesenkomponenten. Damit Orthoprothesen ihre Funktion erfüllen können, müssen Kräfte von der Orthoprothese auf den Körper übertragen werden. Diese Kraftübertragung erfolgt möglichst großflächig. Durch das permanente Tragen der Orthoprothese kann sich ihr Zustand verändern, sodass eine Änderung des Hilfsmittels nötig wird. Bitte wenden sich in diesen Fällen an ihre Orthopädie Techniker. \n \nIndikationen \nÜbergeordnet betrachtete Indikationen für den Einsatz von Orthoprothesen für die untere Extremität sind angeborene Fehlbildungen im Bereich der unteren Extremität, wobei ein Segment oder mehrere anatomische Segmente und/oder Strukturen fehlen können und ein Ausgleich der fehlenden Segmente und Funktionen erforderlich ist. \n• Fehlbildung im Bereich der unteren Extremität \n \nKontraindikationen \nAllgemein geltende Kontraindikationen, welche die Anwendung einer Orthoprothese ausschließen, sind: \n• Fehlende Compliance des Patienten \n• Unverträglichkeiten gegenüber den verwendeten Materialien (Allergien) oder Eigenschweißreaktionen \n• Kognitive Einschränkungen, die eine sichere Handhabung der Orthoprothese verhindern \n• Ausgeprägte Komorbitäten, die eine erfolgreiche Versorgung und Handhabung von Orthoprothesen verhindern \nZudem können Kontraindikationen vorliegen, die eine Versorgung in speziellen Bereichen verhindern: \n• Nicht belastbare Knochen- oder Weichteilstrukturen \n• Verminderte Belastbarkeit der Haut \n• Unzureichende Durchblutung \n• Neurome \n• Weichteilinfektionen"
+					}
+				]
+			]
+		}
+	},
+	{
+		"comment": "following are prosthetics i documents #################################################################################################"
+	},
+	{
+		"name": "Maßblatt Unterschenkel-Orthoprothese Prothetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Unterschenkel-Orthoprothese Prothetik I"
+	},
+	{
+		"name": "Maßblatt Oberschenkel-Orthoprothese Prothetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Oberschenkel-Orthoprothese Prothetik I"
+	},
+	{
+		"name": "Maßblatt Borggreve-Umkehrplastik Prothetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Borggreve-Umkehrplastik Prothetik I"
+	},
+	{
+		"name": "Maßblatt Tibiapseudarthrose Prothetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Tibiapseudarthrose Prothetik I"
+	},
+	{
+		"name": "Versorgungsplanung US longitudinal Prothetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung US longitudinal Prothetik I"
+	},
+	{
+		"name": "Versorgungsplanung US transversal Prothetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung US transversal Prothetik I"
+	},
+	{
+		"name": "Versorgungsplanung OS Orthoprothese Prothetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung OS Orthoprothese Prothetik I"
+	},
+	{
+		"name": "Versorgungsplanung Borggreve Prothetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung Borggreve Prothetik I"
+	},
+	{
+		"name": "Gebrauchsanweisung Orthoprothesen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
+		"permitted_export": true,
+		"restricted_access": null,
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Ortho-Prothetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Ortho-Prothetik I,Gebrauchsanweisung Medizinische Aspekte Ortho-Prothetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+	},
+	{
+		"comment": "following are prosthetics i bundles #################################################################################################"
+	},
+	{
+		"name": "Versorgungsdokumentation Ortho-Prothetik I",
+		"alias": "",
+		"context": "bundle",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik I,Maßblatt Unterschenkel-Orthoprothese Prothetik I,Maßblatt Oberschenkel-Orthoprothese Prothetik I,Maßblatt Borggreve-Umkehrplastik Prothetik I,Maßblatt Tibiapseudarthrose Prothetik I,Versorgungsplanung US longitudinal Prothetik I,Versorgungsplanung US transversal Prothetik I,Versorgungsplanung OS Orthoprothese Prothetik I,Versorgungsplanung Borggreve Prothetik I,Kunststofffertigungsauftrag Prothetik I,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik I,Abgabeprotokoll Prothetik I,Gebrauchsanweisung Orthoprothesen,Empfangsbestätigung"
+	}
+]
