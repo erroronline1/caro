@@ -516,9 +516,20 @@ class ERPQUERY extends API {
 						'data-usecase' => 'erpquery',
 						'action' => "javascript:api.erpquery('post', 'csvdump', '" . $this->_requestedType . "')"
 					];
-					if ($params = ERPINTERFACE->customcsvdump($this->_requestedType)){
+					$options = ERPINTERFACE->customcsvdump($this->_requestedType);
+
+					if (!empty($options['description'])){
+						$response['render']['content'][] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $options['description']
+							] 
+						];
+					}
+
+					if (!empty($options['params'])){
 						$param_inputs = [];
-						foreach($params as $name => $param){
+						foreach($options['params'] as $name => $param){
 							$param_inputs[] = [
 								'type' => $param['type'],
 								'attributes' => [
@@ -529,6 +540,23 @@ class ERPQUERY extends API {
 						}
 						if ($param_inputs) $response['render']['content'][] = $param_inputs;
 					}
+
+					$export_inputs = [
+						'CSV' => ['checked' => true]
+					];
+					if (!empty($options['export'])){
+						foreach ($options['export'] as $name){
+							if (strtolower($name) === 'csv') continue;
+							$export_inputs[strtoupper($name)] = [];
+						}
+					}
+					$response['render']['content'][] = [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => $this->_lang->GET('erpquery.csvdump.export_type')
+						],
+						'content' => $export_inputs
+					];
 				}
 		}
 		$this->response($response);

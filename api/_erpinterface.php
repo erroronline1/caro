@@ -211,6 +211,7 @@ class _ERPINTERFACE {
 		/*
 		$queries = [
 			'Vorgangsexport' => [
+				'description' => 'This export is suitable for this an that',
 				'query' => <<<'END'
 					SELECT * FROM database_table WHERE column = :userinput
 					END,
@@ -223,6 +224,9 @@ class _ERPINTERFACE {
 							return $this->_pdo->quote($v); // process input somehow, date conversion or reasonable input sanitation to avoid malicious injections
 						}
 					],
+				],
+				'export' => [
+					'pdf' => []
 				]
 			]
 		];
@@ -240,15 +244,26 @@ class _ERPINTERFACE {
 					];
 				}
 			}
-			return $paramfields;
+			return ['params' => $paramfields, 'export' => !empty($queries[$key]['export']) ? array_keys($queries[$key]['export']): null];
 		}
 		// iterate over query params and overwrite defaults with passed params, then apply function
 		if (isset($queries[$key]['params'])){
 			foreach($queries[$key]['params'] as $param => $property){
 				$default = is_callable($property['default']) ? $property['default']() : $property['default'];
 				$paramfields[$param] = $default;
-				if (!empty($params[$property['name']])) $paramfields[$param] = $params[$property['name']];
-				$paramfields[$key] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+				if (isset($params[$property['name']])) {
+					$paramfields[$param] = $params[$property['name']];
+					unset($params[$property['name']]);
+				}
+				$paramfields[$param] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+			}
+		}
+		// determine export format
+		$export = 'csv';
+		foreach($params as $void => $value){
+			$value = strtolower($value);
+			if (isset($queries[$key]['export']) && isset($queries[$key]['export'][$value])) {
+				$export = $value;
 			}
 		}
 
@@ -263,21 +278,43 @@ class _ERPINTERFACE {
 		$statement = null;
 
 		if ($result) {
-			$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
-			$file = fopen($tempFile, 'w');
-			fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-			fputcsv($file, array_keys($result),
-				CONFIG['csv']['dialect']['separator'],
-				CONFIG['csv']['dialect']['enclosure'],
-				CONFIG['csv']['dialect']['escape']);
-			foreach ($result as $line) {
-				fputcsv($file, $line,
-				CONFIG['csv']['dialect']['separator'],
-				CONFIG['csv']['dialect']['enclosure'],
-				CONFIG['csv']['dialect']['escape']);
+			switch($export){
+				case 'pdf':
+					require_once('./_pdf.php');
+					$PDF = new PDF(CONFIG['pdf']['table']);		
+					$content = [
+						'title' => "test",
+						'date' => "",
+						'content' => $result,
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $key)
+					];
+					return $PDF->tablePDF($content);
+					break;
+				default:
+					$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+					$file = fopen($tempFile, 'w');
+					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+					fputcsv($file, array_keys($result),
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape']);
+					foreach ($result as $line) {
+						fputcsv($file, $line,
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape']);
+					}
+					fclose($file);
+					return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+
+					// OR USE INBUILT FUNCTION
+
+					if ($files = UTILITY::csv($result, array_keys($result[0]),
+						$key . date(' Y-m-d H-i-s') . '.csv')){
+						return substr($files[0], 1);
+				}
 			}
-			fclose($file);
-			return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+
 		}
 		return [];
 		*/
@@ -1192,6 +1229,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	public function customcsvdump($key = null, $params = null){
 		$queries = [
 			'Vorgangsexport für Terminerinnerung' => [
+				'description' => 'Alle gelieferten Fälle. Die Liste kann anschließend mit dem CSV-Filter für den Serienbriefversand vorbereitet werden.',
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1296,6 +1334,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				]
 			],
 			'Vorgangsexport - alle' => [
+				'description' => 'Liste aller Vorgänge, wie sie auch für die Inventurerfassung der Buchhaltung genutzt wird.',
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1419,6 +1458,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				]
 			],
 			'EVA-Artikelstamm Lagerware z.B. für Inventur' => [
+				'description' => 'Als Lagerware markierte Artikel. Die Liste kann anschließend mit dem CSV-Filter bereichsweise sortiert werden.',
 				'query' => <<<'END'
 					SELECT
 						article.ARTIKEL_REFERENZ,
@@ -1487,6 +1527,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'params' => []
 			],
 			'EVA-Artikelstamm komplett' => [
+				'description' => 'Der komplette Artikelstamm, wie er auch für die Inventurerfassung der Buchhaltung genutzt wird.',
 				'query' => <<<'END'
 					SELECT
 						article.ARTIKEL_REFERENZ,
@@ -1548,6 +1589,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'params' => []
 			],
 			'Falllisten laufende Fälle' => [
+				'description' => 'Alle laufenden Fälle. Die Liste kann anschließend mit dem CSV-Filter bereichsweise sortiert werden.',
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1662,6 +1704,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				]
 			],
 			'Falllisten laufende Fälle - Zusammenfassung' => [
+				'description' => 'Bereichsweise Zusammenfassung aller laufenden Fälle',
 				'query' => <<<'END'
 					SELECT
 						UNIT.BETRIEB,
@@ -1747,9 +1790,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 							}
 						}
 					]
+				],
+				'export' => [
+					'pdf' => [
+					]
 				]
 			],
 			'Fälle pro Verordner' => [
+				'description' => 'Eine Liste aller Fälle sortiert nach Verordner und Erlös',
 				'query' => <<<'END'
 					SELECT
 						vorgaenge.REFERENZ AS VORGANG,
@@ -1858,6 +1906,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				]
 			],
 			'Fälle pro Verordner - Zusammenfassung' => [
+				'description' => 'Eine Liste mit der Anzahl und den Erlösen pro Verordner',
 				'query' => <<<'END'
 					SELECT
 						VERORDNER.NAME,
@@ -1933,6 +1982,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 							}
 						}
 					]
+				],
+				'export' => [
+					'pdf' => [
+					]
 				]
 			],
 			/*'Mitarbeiterliste' => [
@@ -1970,15 +2023,26 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					];
 				}
 			}
-			return $paramfields;
+			return ['params' => $paramfields, 'export' => !empty($queries[$key]['export']) ? array_keys($queries[$key]['export']): null, 'description' => $queries[$key]['description'] ?? ''];
 		}
 		// iterate over query params and overwrite defaults with passed params, then apply function
 		if (isset($queries[$key]['params'])){
 			foreach($queries[$key]['params'] as $param => $property){
 				$default = is_callable($property['default']) ? $property['default']() : $property['default'];
 				$paramfields[$param] = $default;
-				if (!empty($params[$property['name']])) $paramfields[$param] = $params[$property['name']];
-				$paramfields[$key] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+				if (isset($params[$property['name']])) {
+					$paramfields[$param] = $params[$property['name']];
+					unset($params[$property['name']]);
+				}
+				$paramfields[$param] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+			}
+		}
+		// determine export format
+		$export = 'csv';
+		foreach($params as $value){
+			$value = strtolower($value);
+			if (isset($queries[$key]['export']) && isset($queries[$key]['export'][$value])) {
+				$export = $value;
 			}
 		}
 
@@ -1993,10 +2057,23 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$statement = null;
 
 		if ($result) {
-			if ($files = UTILITY::csv($result, array_keys($result[0]),
-				$key . date(' Y-m-d H-i-s') . '.csv')){
-
-				return substr($files[0], 1);
+			switch($export){
+				case 'pdf':
+					require_once('./_pdf.php');
+					$PDF = new PDF(CONFIG['pdf']['table']);		
+					$content = [
+						'title' => $key,
+						'date' => date('Y-m-d'),
+						'content' => $result,
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $key)
+					];
+					return $PDF->tablePDF($content);
+					break;
+				default:
+					if ($files = UTILITY::csv($result, array_keys($result[0]),
+						$key . date(' Y-m-d H-i-s') . '.csv')){
+						return substr($files[0], 1);
+				}
 			}
 		}
 		return [];
