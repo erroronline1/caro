@@ -18,7 +18,6 @@ class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
-	private $_search = '';
 	private $_usecase = '';
 	private $filefiltersample = <<<'END'
 	{
@@ -134,9 +133,7 @@ class CONSUMABLES extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = REQUEST[2] ?? null;
-		$this->_search = REQUEST[3] ?? null;
-		$this->_usecase = REQUEST[4] ?? null;
+		$this->_requestedID = $this->_usecase = REQUEST[2] ?? null;
 	}
 
 	/**
@@ -1245,7 +1242,7 @@ class CONSUMABLES extends API {
 				}
 
 				// render search and selection
-				$response = ['render' => ['content' => $this->productsearch($this->_usecase ? : 'product')]];
+				$response = ['render' => ['content' => $this->productsearch($this->_usecase ? : 'product')]]; 
 		
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) {
@@ -1734,7 +1731,7 @@ class CONSUMABLES extends API {
 	 *  |_|
 	 * returns sliders with search form (where applicable) and product tiles based on search
 	 * @param string $usecase
-	 * @param array $parameter named array, currently with search string and _-separated vendor ids
+	 * @param array $parameter named array, currently with search string and vendor name
 	 * 
 	 * @return array render content
 	 * 
@@ -1745,13 +1742,9 @@ class CONSUMABLES extends API {
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
-		if (!isset($parameter['vendors']) || $parameter['vendors'] === 'null'){
-			$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
-		}
-
 		$search = [];
-
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+		$parameter['vendor'] = isset($parameter['vendor']) ? trim($parameter['vendor']) : null;
 
 		if ($parameter['search']) {
 			// get matches
@@ -1762,7 +1755,7 @@ class CONSUMABLES extends API {
 				],
 				'wildcards' => 'all',
 				'replacements' => [
-					':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
+					':vendor' =>$parameter['vendor'] ? ('%' . $parameter['vendor'] . '%') : '%',
 				]
 			]);
 			// order matches by relevance; shift to top if all of optional terms have been found, apply column condition if applicable
@@ -1777,35 +1770,24 @@ class CONSUMABLES extends API {
 			case 'manualorder': // manual orders try to find a database match in advance
 				break;
 			case 'product': // consumables.php can make good use of this method!
-				// prepare existing vendor lists
-				$vendorselection = [];
-
-				$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
-
-				foreach ($vendors as $key => $row) {
-					$datalist[] = $row['name'];
-					$display = $row['name'];
-					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
-					$vendorselection[$display] = ['value' => $row['id']];
-					if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$display]['selected'] = true;
-				}
-				ksort($vendorselection);
 				$slides[] = [
 					[
 						'type' => 'scanner',
 						'destination' => 'productsearch'
 					], [
-						'type' => 'select',
-						'content' => $vendorselection,
+						'type' => 'text', // the previous implementation of a selection does not make sense for above 20 something entries
 						'attributes' => [
 							'id' => 'productsearchvendor',
-							'name' => $this->_lang->GET('consumables.product.filter_vendors')
-							]
+							'data-type' => 'filtered',
+							'name' => $this->_lang->GET('consumables.product.filter_vendors'),
+							'value' => $parameter['vendor'] ?? ''
+						],
+						'datalist' => array_column($vendors, 'name')
 					], [
 						'type' => 'search',
 						'attributes' => [
 							'name' => $this->_lang->GET('consumables.product.search'),
-							'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'search', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), '" . $usecase . "'); return false;}",
+							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', '" . $usecase . "', data); return false;}",
 							'id' => 'productsearch',
 							'value' => $parameter['search'] ? : ''
 						]
@@ -1824,18 +1806,12 @@ class CONSUMABLES extends API {
 				}
 				break;
 			default: // order.php can make good use of this method!
-				$datalist = [];
 				$datalist_unit = [];
 
 				// prepare existing vendor lists
-				$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
 				foreach ($vendors as $key => $row) {
-					if ($row['hidden']) continue;
-					$datalist[] = $row['name'];
-					$vendorselection[$row['name']] = ['value' => $row['id']];
-					if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$row['name']]['selected'] = true;
+					if ($row['hidden']) unset($vendors[$key]);
 				}
-				ksort($vendorselection);
 
 				// prepare existing sales unit lists
 				$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
@@ -1848,17 +1824,19 @@ class CONSUMABLES extends API {
 						'type' => 'scanner',
 						'destination' => 'productsearch'
 					], [
-						'type' => 'select',
-						'content' => $vendorselection,
+						'type' => 'text', // the previous implementation of a selection does not make sense for above 20 something entries
 						'attributes' => [
 							'id' => 'productsearchvendor',
-							'name' => $this->_lang->GET('consumables.product.vendor_select')
-						]
+							'data-type' => 'filtered',
+							'name' => $this->_lang->GET('consumables.product.filter_vendors'),
+							'value' => $parameter['vendor'] ?? ''
+						],
+						'datalist' => array_column($vendors, 'name')
 					], [
 						'type' => 'search',
 						'attributes' => [
 							'name' => $this->_lang->GET('consumables.product.search'),
-							'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'search', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), 'order'); return false;}",
+							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', '" . $usecase . "', data); return false;}",
 							'id' => 'productsearch',
 							'value' => $parameter['search'] ? : ''
 						]
@@ -1890,7 +1868,7 @@ class CONSUMABLES extends API {
 										'attributes' => [
 											'name' => $this->_lang->GET('order.vendor_label'),
 										],
-										'datalist' => array_values(array_unique($datalist))
+										'datalist' => array_column($vendors, 'name')
 									], [
 										'type' => 'textsection',
 										'attributes' => [
@@ -1905,7 +1883,7 @@ class CONSUMABLES extends API {
 								"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false},".
 								"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true, class: 'reducedCTA'},".
 							"}}, 'FormData').then(response => {if (response) {".
-								"api.purchase('post', 'search', 'null', response, 'manualorder');".
+								"api.purchase('post', 'search', 'manualorder', response);".
 								"api.preventDataloss.monitor = true;}".
 								"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
 						]
@@ -2006,6 +1984,7 @@ class CONSUMABLES extends API {
 	 * 
 	 */
 	public function search(){
+
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// try if any product is known to switch from manual order to a decent tracked product
@@ -2017,17 +1996,10 @@ class CONSUMABLES extends API {
 					'article_ean' => ''
 				];
 
-				// determine vendor
-				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_search', [
-						'values' => [
-							':SEARCH' => $manual['vendor_name'] ? '"' . $manual['vendor_name'] .'"' : '%'
-						],
-						'wildcards' => 'contained'
-					]);
-				$this->_requestedID = implode('_', array_values(array_column($vendors, 'id')));
-				$this->_search = $manual['article_no'] . ($manual['article_name'] ? ' +' . implode(' +', explode(' ', $manual['article_name'])) : '');
-
-				$result = $this->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID]);
+				$result = $this->productsearch($this->_usecase ? : 'product', [
+					'search' => UTILITY::propertySet($this->_payload, 'search') ? : null,
+					'vendor' => UTILITY::propertySet($this->_payload, 'vendor') ? : null
+				]);
 				
 				// also see productsearch
 				$tile = [
@@ -2068,13 +2040,16 @@ class CONSUMABLES extends API {
 
 				break;
 			default:
-				if ($result = $this->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID])){
+				if ($result = $this->productsearch($this->_usecase ? : 'product', [
+					'search' => UTILITY::propertySet($this->_payload, 'search') ? : null,
+					'vendor' => UTILITY::propertySet($this->_payload, 'vendor') ? : null
+				])){
 					$this->response(['render' => ['content' => $result]]);
 				}
 		}
 		$this->response([
 			'response' => [
-			'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_search]),
+			'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => UTILITY::propertySet($this->_payload, 'search')]),
 			'type' => 'error'
 		]]);
 	}

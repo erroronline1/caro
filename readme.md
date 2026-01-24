@@ -31,9 +31,6 @@ Things are still in motion. Images may be outdated.
 ## to do
 * contain filtered filenames into csvfilter export (filename, print header), if available
     * chain destination and source or only if destination does contain ____ or whatever
-* disable erpinterface for a set timespan with message for third party server updates
-* product search (consumables): vendor filter as text with dataset as per request (selection gets too long)
-* erpinterfacae test example of processing an uploaded csv for birthdays
 * allow different export formats for erpinterface csv dumps?
     * defined in query settings, selecteable by required radio input if applicable
     * also pdf?
@@ -3767,15 +3764,13 @@ Sample response
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> POST ./api/api.php/consumables/search/{vendor_id}/{search}/{usecase}
+> POST ./api/api.php/consumables/search/{usecase}
 
 Returns a product search result based on usecase and payload. Current implementation is used for matching manual orders with the products database.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {vendor_id} | path parameter | required | null |
-| {search} | path parameter | required | null |
 | {usecase} | path parameter | optional | manualorder |
 | payload | form data | required | containing the manual order details |
 
@@ -3783,20 +3778,19 @@ Sample response
 ```
 {"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check, as well as automated matching with order state."},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","role":"link","tabindex":"0","title":"add deusith 3,5 by Fritz Minke GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Fritz Minke GmbH  deusith 3,5 "}]},{"type":"textsection","attributes":{"name":"Add article from 3 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('Platte', '3166.35 - 000', 'DEUSITH - Zuschnitte 60 x 45 cm, 70° Shore 3,5 mm, weiß, haut ', 'ab 5 Platten', 'Fritz Minke GmbH'); return false;","onkeydown":....
 ```
-> GET ./api/api.php/consumables/search/{vendor_id}/{search}/{usecase}
+> GET ./api/api.php/consumables/search/{usecase}?{search}
 
 Returns a search form based on usecase and products matching {search}. If {_usecase} is set to *product* the returned elements events lead to consumables editing or product information depending on permissions. *productselection* returns only results for the respective widget. *order* results lead to adding the selected product to a new order.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {vendor_id} | path parameter | required | vendor id in database or null |
-| {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
 | {usecase} | path parameter | optional | altered events for product management |
+| {search} | query string | optional | *search* term for article_no, article_name, article_alias, article_ean; *vendor* name |
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"button","attributes":{"value":"Add new product","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"null"},....},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"search","attributes":{"name":"Search product by article number or name","onkeydown":"if (event.key === 'Enter') {api.purchase('get', 'search', document.getElementById('productsearchvendor').value, this.value, 'product'); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 1752)"},"content":[{"type":"textsection","content":"Otto Bock HealthCare Deutschland GmbH 99B25 Schlauch-Strumpf PAK"}]}]]]]}}
+{"render":{"content":[[[{"type":"button","attributes":{"value":"Neuen Artikel hinzufügen","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"text","attributes":{"id":"productsearchvendor","data-type":"filtered","name":"Lieferanten eingrenzen","value":""},"datalist":[...,"Werkmeister GmbH & Co. KG","Werkzeug-Jäger GmbH","Wilhelm Julius Teufel GmbH"]},{"type":"search","attributes":{"name":"Suche Produkt nach Name oder Artikelnummer","onkeydown":"if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', 'product', data); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Füge einen Artikel aus 1 Treffern hinzu"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 4084)","onkeydown":"if (event.key==='Enter') api.purchase('get', 'product', 4084)","role":"link","tabindex":"0","title":"Schlauch-Strumpf von Otto Bock Healthcare GmbH anzeigen"},"content":[{"type":"textsection","content":"Otto Bock Healthcare GmbH 99B25 Schlauch-Strumpf Packung"}]}]]]]}}
 ```
 
 > GET ./api/api.php/consumables/vendor/{name|id}

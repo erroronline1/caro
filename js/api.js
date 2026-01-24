@@ -1661,7 +1661,7 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "search":
-						switch (request[4]) {
+						switch (request[2]) {
 							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
 									let article = document.querySelector("#_productselectionDialog form article");
@@ -1696,6 +1696,8 @@ export const api = {
 									api.preventDataloss.monitor = request[4] === "editconsumables";
 								};
 						}
+						payload = request[3]; // form data object with search and vendor key
+						delete request[3];
 						break;
 					case "incorporation":
 						successFn = function (data) {
