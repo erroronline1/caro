@@ -1079,6 +1079,7 @@
 			"erpimport_option": "Import and update products"
 		},
 		"csvdump": {
+			"export_type": "Export format",
 			"null": "This query does not exists",
 			"select": "Select query to export as CSV",
 			"select_hint": "No fitting query found? Contact a programmer to set one up."

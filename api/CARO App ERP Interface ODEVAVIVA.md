@@ -75,7 +75,7 @@ Grundlage der Suche sind die Parameter zur Suche von Patientendaten, zusätzlich
 Diese Funktion steht als gesondertes Modul zur Verfügung.
 
 # Datenexporte generieren
-Voreingestellte Datenbankabfragen können direkt als CSV-Datei exportiert werden. Dadurch ist eine weitestgehend unkomplizierte Anpassung an den jeweiligen Bedarf möglich, es besteht keine Abhängigkeit von CSV-Exportfunktionen oder Export-Beschränkungen.
+Voreingestellte Datenbankabfragen können direkt als CSV-Datei oder PDF exportiert werden. Dadurch ist eine weitestgehend unkomplizierte Anpassung an den jeweiligen Bedarf möglich, es besteht keine Abhängigkeit von CSV-Exportfunktionen oder Export-Beschränkungen.
 
 Diese Funktion steht als gesondertes Modul zur Verfügung.
 
