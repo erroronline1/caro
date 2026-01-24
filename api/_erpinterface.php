@@ -470,6 +470,35 @@ class TEST extends _ERPINTERFACE {
 	}
 
 	/**
+	 * retrieve users that have a birthday 
+	 * @param string $from Y-m-d without time
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
+	 */
+	public function birthdaymessage($from = null){
+		if (!$from) return [[]];
+		
+		$csvfile = fopen('../unittests/sample-csv-files-sample-6.csv', 'r');
+		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
+		$i=0;
+		$today = new \DateTime(date('Y-m-d')); // not 'now' for hours reasons. datetime should be at 0:00 o'clock
+		while(($row = fgetcsv($csvfile, null, CONFIG['csv']['dialect']['separator'], CONFIG['csv']['dialect']['enclosure'], CONFIG['csv']['dialect']['escape'])) !== false) {
+			if ($i++ < 2) continue;
+			$row_date = new \DateTime($row[2]);
+			$response[] = [
+				'name' => implode(' ', [$row[0], $row[1]]),
+				'past' => boolval($row_date->format('m-d') !== $today->format('m-d'))
+			];
+		}
+		fclose($csvfile);
+		
+		return $response;
+	}
+
+	/**
 	 * retrieve current case states based on passed case numbers
 	 * @param array $erp_case_numbers
 	 * @return null|array
