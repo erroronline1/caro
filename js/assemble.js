@@ -2568,7 +2568,7 @@ export class Assemble {
 
 		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 
-		label.dataset.type = this.currentElement.type;
+		label.dataset.type = this.currentElement.attributes['data-type'] || this.currentElement.type;
 		label.append(span, input);
 
 		if (["search", "filter"].includes(type)) {
