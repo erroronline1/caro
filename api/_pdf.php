@@ -425,6 +425,38 @@ class PDF{
 		return $this->return($content);
 	}
 
+	public function tablePDF($content){
+		// create a pdf for a table output
+		$this->init($content);
+		// set cell padding
+		$this->_pdf->setCellPaddings(5, 1, 5, 1);
+
+		$this->_pdf->SetFont('helvetica', '', 8); // font size
+		
+		$this->_pdf->startPageGroup();
+		$html = <<<END
+			<style>
+				tr.odd {background-color:#ddd}
+			</style>
+		END;
+		
+		$html .= '<table>';
+		$html .= '<tr><th>' . implode('</th><th>', array_keys($content['content'][0])) . '</th></tr>';
+		foreach ($content['content'] as $index => $row){
+			$odd = $index % 2 ? ' class="odd"' : '';
+			$html .= '<tr' . $odd . '>';
+			foreach($row as $column) {
+				$html .= '<td>' . $column . '</td>';
+			}
+			$html .= '</tr>';
+		}
+		$html .= '</table>';
+		// writeHTML($html, $ln=true, $fill=false, $reseth=false, $cell=false, $align='')			
+		$this->_pdf->writeHTML($html);
+
+		return $this->return($content);
+	}
+
 	public function timesheetPDF($content){
 		// create a pdf for a timesheet output
 		$this->init($content);
