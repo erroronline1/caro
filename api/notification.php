@@ -277,47 +277,45 @@ class NOTIFICATION extends API {
 
 								foreach ($orders as $order){
 									if ($order['ordered'] && $order['delivered_full']) continue;
-									
-									if ($identifiers = array_filter($erpdata, fn($o) => isset($o['identifier']) ? $o['identifier'] === UTILITY::identifier(' ', $order['approved']) : false)){ // identifier matched unless $erpdata ist an empty [[]]-array
+									if (!isset($erpdata[trim(UTILITY::identifier(' ', $order['approved']))])) continue;
 
-										$order['order_data'] = json_decode($order['order_data'], true);
+									$order['order_data'] = json_decode($order['order_data'], true);
 
-										$articles = array_filter($identifiers, fn($o) => 
-											isset($order['order_data']['vendor_label']) && $o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
-											(
-												(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
-												(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
-											)
-										);
+									$articles = array_filter($erpdata[trim(UTILITY::identifier(' ', $order['approved']))], fn($o) => 
+										isset($order['order_data']['vendor_label']) && $o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
+										(
+											(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
+											(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
+										)
+									);
 
-										if ($articles && count($articles) === 1){
-											$article = $articles[array_key_first($articles)];
-											foreach ($states as $state){
-												if ($order[$state] === null && $article[$state]){
-													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
-														[
-															':id' => $order['id'],
-															':field' => $state,
-															':date' => $this->_pdo->quote($article[$state])
-														]) . '; ');
-												}
+									if ($articles && count($articles) === 1){
+										$article = $articles[array_key_first($articles)];
+										foreach ($states as $state){
+											if ($order[$state] === null && $article[$state]){
+												$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
+													[
+														':id' => $order['id'],
+														':field' => $state,
+														':date' => $this->_pdo->quote($article[$state])
+													]) . '; ');
 											}
-											if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
-												$order['order_data']['order_reference'] = $article['order_reference'];
-													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_addinformation'),
-														[
-															':id' => $order['id'],
-															':order_data' => $this->_pdo->quote(UTILITY::json_encode($order['order_data']))
-														]) . '; ');
-											}
+										}
+										if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
+											$order['order_data']['order_reference'] = $article['order_reference'];
+												$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_addinformation'),
+													[
+														':id' => $order['id'],
+														':order_data' => $this->_pdo->quote(UTILITY::json_encode($order['order_data']))
+													]) . '; ');
+										}
 
-											//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
-											if ($updates) {
-												foreach ($updates as $update){
-													SQLQUERY::EXECUTE($this->_pdo, $update);
-												}
-												$orderstatistics->statistics_update($order['id']);
+										//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
+										if ($updates) {
+											foreach ($updates as $update){
+												SQLQUERY::EXECUTE($this->_pdo, $update);
 											}
+											$orderstatistics->statistics_update($order['id']);
 										}
 									}
 								}
