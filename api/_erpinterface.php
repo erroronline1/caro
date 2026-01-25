@@ -1985,6 +1985,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				],
 				'export' => [
 					'pdf' => [
+						'40%', '10%', '50%'
 					]
 				]
 			],
@@ -2026,6 +2027,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			return ['params' => $paramfields, 'export' => !empty($queries[$key]['export']) ? array_keys($queries[$key]['export']): null, 'description' => $queries[$key]['description'] ?? ''];
 		}
 		// iterate over query params and overwrite defaults with passed params, then apply function
+		$pdfparam = [];
 		if (isset($queries[$key]['params'])){
 			foreach($queries[$key]['params'] as $param => $property){
 				$default = is_callable($property['default']) ? $property['default']() : $property['default'];
@@ -2035,6 +2037,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					unset($params[$property['name']]);
 				}
 				$paramfields[$param] = $property['function']($paramfields[$param]) ?? $property['function']($default);
+				$pdfparam[$property['name']] = $paramfields[$param];
 			}
 		}
 		// determine export format
@@ -2063,9 +2066,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					$PDF = new PDF(CONFIG['pdf']['table']);		
 					$content = [
 						'title' => $key,
-						'date' => date('Y-m-d'),
+						'date' => date('Y-m-d') . ' - ' . json_encode($pdfparam),
 						'content' => $result,
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $key)
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $key),
+						'columns' => $queries[$key]['export']['pdf'] 
 					];
 					return $PDF->tablePDF($content);
 					break;
