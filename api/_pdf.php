@@ -441,15 +441,22 @@ class PDF{
 		END;
 		
 		$html .= '<table>';
-		$html .= '<tr><th>' . implode('</th><th>', array_keys($content['content'][0])) . '</th></tr>';
+		$html .= '<thead><tr>';
+		foreach(array_keys($content['content'][0]) as $column => $column_content){
+			$html .= '<th' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</th>';
+		}
+		$html .= '</tr></thead>';
+
+		$html .=  '<tbody>';
 		foreach ($content['content'] as $index => $row){
 			$odd = $index % 2 ? ' class="odd"' : '';
 			$html .= '<tr' . $odd . '>';
-			foreach($row as $column) {
-				$html .= '<td>' . $column . '</td>';
+			foreach(array_values($row) as $column => $column_content) {
+				$html .= '<td' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</td>';
 			}
 			$html .= '</tr>';
 		}
+		$html .= '</tbody>';
 		$html .= '</table>';
 		// writeHTML($html, $ln=true, $fill=false, $reseth=false, $cell=false, $align='')			
 		$this->_pdf->writeHTML($html);
