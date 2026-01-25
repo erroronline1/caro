@@ -1637,7 +1637,7 @@ Die CARO App speichert Bestellungen standardmäßig für einen relativ kurzen Ze
 Falls verfügbar und aufgeräumt kann die CARO App Artikeldatenbank auch aus dem ERP-System befüllt werden. Dies bietet Vorteile z.B. beim Abgleich mit Bestelldaten und reduziert zweifellos die Menge an Daten, was das System erheblich beschleunigt.
 
 ### Angepasste Datenbankauszüge
-Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beliebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
+Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien oder PDF mit beliebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 
 ### Bereitstellung von Datenquellen
 Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen werden muss, stellt die Elternklasse der ERP-Anbindung ein Beispiel bereit um Dateien, Anwendungsfälle und vorgesehende Dateinamen zu definieren, welche anschließend in den angepassten Methoden verwendet werden können. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf. Dateien werden jeweils überschrieben.
@@ -1654,7 +1654,7 @@ Sofern verfügbar, beantwortet diese Methode mit einer Liste von Mitarbeitern di
 * falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
 * für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
 * bereitgestellte Datendateien finden sich unter `UTILITY::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
-* angepasste Datenbankauszüge sollten bevorzugt mit `UTILITY::csv()` erstellt werden
+* angepasste Datenbankauszüge sollten bevorzugt mit `UTILITY::csv()` und `PDF(CONFIG['pdf']['table'])` erstellt werden
 
 `UTILITY`-Methoden finden sich in api/_utility.php.
 
@@ -2097,6 +2097,11 @@ record[format] = 'A4'
 record[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
 record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
 record[exportimage_maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
+
+table[format] = 'A4'
+table[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
+table[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+table[orientation] = "landscape" ; portrait or landscape
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape

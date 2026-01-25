@@ -31,14 +31,7 @@ Things are still in motion. Images may be outdated.
 ## to do
 * contain filtered filenames into csvfilter export (filename, print header), if available
     * chain destination and source or only if destination does contain ____ or whatever
-* allow different export formats for erpinterface csv dumps?
-    * defined in query settings, selecteable by required radio input if applicable
-    * also pdf?
-    * add explanatory description for usecase, displayed after selection, like params
 * allow pdf format for csv-filter?
-* bundle notification alert_undelivered_orders by vendor to reduce message amount, unissued by commission
-* make order identifier key within erpinterface orderdata to speed up comparison?
-    * consider {identifier}=>[[order], [order2], ...]
 * add record restricted_access
     * like document, with permission and unit (e.g. supervisor intersection)
 
@@ -1740,7 +1733,7 @@ The CARO App stores orders for a relatively short time by default unless orders 
 If available and tidy, the product database of the CARO App can be populated directly from the ERP data. This has the advantage of improved matching of products between the CARO App products and order data updates as well as most likely reducing the database size and speeding up any request.
 
 ### Custom database dumps
-Your custom ERP-interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
+Your custom ERP-interface class can contain a method to provide a CSV- or PDF-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
 ### Data source provision
 In case you have to rely on data dumps instead of direct database access, the interface parent class provides an example to define files, usecases and the intended name for processing within your custom methods. If this is provided a menu item will show up within the [Tools](#tools). Files are overwritten.
@@ -1757,7 +1750,7 @@ If provided, the query returns employees having birthday in a passed timespan, t
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
 * provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
-* custom csv dumps are recommended to be created with `UTILITY::csv()`
+* custom csv dumps are recommended to be created with `UTILITY::csv()` and `PDF(CONFIG['pdf']['table'])`
 
 `UTILITY`-methods can be found in api/_utility.php.
 
@@ -2200,6 +2193,11 @@ record[format] = 'A4'
 record[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
 record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
 record[exportimage_maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+
+table[format] = 'A4'
+table[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
+table[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
+table[orientation] = "landscape" ; portrait or landscape
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
