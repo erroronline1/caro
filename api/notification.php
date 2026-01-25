@@ -495,6 +495,9 @@ class NOTIFICATION extends API {
 							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
 							// userlist to decode orderer
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$undelived_notif = [];
+							$unissued_notif = [];
+
 							foreach ($unissued as $order){
 								$update = false;
 								$decoded_order_data = null;
@@ -514,9 +517,10 @@ class NOTIFICATION extends API {
 								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
 								if ($order['ordered'] && !$order['issued_full'] && $order['delivered_notified'] < $receive_interval){
 									$decoded_order_data = json_decode($order['order_data'], true);
-									$this->alertUserGroup(
-										['permission' => ['purchase']],
-										$this->_lang->GET('order.alert_undelivered_order', [
+
+									// construct vendor request messages grouped by vendor
+									if (!isset($undelived_notif[$decoded_order_data['vendor_label'] ?? ''])) $undelived_notif[$decoded_order_data['vendor_label'] ?? ''] = [];
+									$undelived_notif[$decoded_order_data['vendor_label'] ?? ''][] = $this->_lang->GET('order.alert_undelivered_order', [
 											':days' => $ordered->diff($this->_date['servertime'])->days,
 											':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 											':quantity' => $decoded_order_data['quantity_label'],
@@ -525,9 +529,8 @@ class NOTIFICATION extends API {
 											':name' => $decoded_order_data['productname_label'] ?? '',
 											':vendor' => $decoded_order_data['vendor_label'] ?? '',
 											':commission' => $decoded_order_data['commission'],
-											':orderer' => $decoded_order_data['orderer']
-										], true)
-									);
+											':orderer' => $users[array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))]['name']
+										], true);
 									$update = true;
 								} else $receive_interval = $order['delivered_notified'];
 
@@ -568,6 +571,15 @@ class NOTIFICATION extends API {
 										':issued_notified' => $delivery_interval ? : 'NULL',
 										':id' => $order['id']
 									]) . '; ');
+
+							}
+
+							// deliver vendor request message grouped by vendor to decrease amount of messages
+							foreach($undelived_notif as $message){
+								$this->alertUserGroup(
+									['permission' => ['purchase']],
+									implode("\n\n", $message)
+								);
 
 							}
 							// set alert flags
