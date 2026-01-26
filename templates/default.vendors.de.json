@@ -6025,6 +6025,29 @@
 		}
 	},
 	{
+		"name": "schubert und braun prothesenwerk GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Bautzner Str. 145, 01099 Dresden",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "sealprene",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
