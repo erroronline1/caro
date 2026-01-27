@@ -600,7 +600,8 @@ class APPLICATION extends API {
 					[
 						'type' => 'announcementsection',
 						'attributes' => [
-							'name' => $announcement['subject']
+							'name' => $announcement['subject'],
+							'class' => $announcement['highlight'] ? : null
 						],
 						'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
 					]

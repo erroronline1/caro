@@ -1253,6 +1253,13 @@
 			"deleted_success": "Announcement deleted.",
 			"edit": "Edit announcement",
 			"end": "Valid until",
+			"highlight": "hightlight",
+			"highlights": {
+				"null": "no highlighting",
+				"green": "green",
+				"orange": "orange",
+				"red": "red"
+			},
 			"last_edit": "Last edit by :author on :date",
 			"new": "New announcement",
 			"saved_error": "Announcement could not be saved. Please try again.",

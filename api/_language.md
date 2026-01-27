@@ -26,7 +26,7 @@ Organizational units.
 
 First item (common) is hardcoded and used as default for texttemplates assignments and possibly other select options, admin and office are hardcoded as well.
 Once defined keys remain in the database, so it should be appended at best! `units` order is passed to application. On appending, the sourcecode should be reviewed, e.g.
-* notification.php for excluding messaging all users of `common, admin and office` on open records and `common and admin` on expiring trainings
+* notification.php for excluding messaging all users of `common`, `admin` and `office` on open records and `common` and `admin` on expiring trainings
 * unit intersections should exclude admin to reduce amount of case documentations and scheduled trainings
 
 ### skills
@@ -91,6 +91,8 @@ All keys are hardcoded.
 
 ### message
 All keys are hardcoded.
+
+`message.announcement.highlights` order is passed to application, keys refer to available reasonable class names; null is reserved. yellow is not suitable.
 
 ### order
 Most keys are hardcoded, orderstate can be cropped or extended. `order.ordertype`, `order.orderstate` orders are passed to application.

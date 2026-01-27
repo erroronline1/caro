@@ -1253,6 +1253,13 @@
 			"deleted_success": "Ankündigung gelöscht.",
 			"edit": "Ankündigung bearbeiten",
 			"end": "Gültig bis",
+			"highlight": "hervorheben",
+			"highlights": {
+				"null": "keine Hervorhebung",
+				"green": "grün",
+				"orange": "orange",
+				"red": "rot"
+			},
 			"last_edit": "letzte Bearbeitung von :author am :date",
 			"new": "neue Ankündigung",
 			"saved_error": "Ankündigung konnte nicht gespeichert werden. Bitte versuche es erneut.",
