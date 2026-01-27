@@ -40,6 +40,7 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT';
+				$highlight = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.highlight'));
 				$announcement = [
 					':id' => $this->_announcement,
 					':date' => time(),
@@ -49,6 +50,8 @@ class MESSAGE extends API {
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.end'))) ? : null,
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.subject')) ? : null,
 					':text' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.text')) ? : null,
+					':highlight' => $highlight !== 'null' ? $highlight : null,
+
 				];
 				// chain checked units
 				$units = [];
@@ -151,7 +154,8 @@ class MESSAGE extends API {
 				[
 					'type' => 'announcementsection',
 					'attributes' => [
-						'name' => $announcement['subject']
+						'name' => $announcement['subject'],
+						'class' => $announcement['highlight'] ? : null
 					],
 					'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
 				]
@@ -166,10 +170,11 @@ class MESSAGE extends API {
 								[
 									...$this->announcementform([
 										'subject' => $announcement['subject'] ? : '',
-										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/'],['', "\\n"], $announcement['text']): '',
+										'text' => $announcement['text'] ? preg_replace(['/\r/', '/\n/', '/\'/'],['', "\\n", "&apos;"], $announcement['text']): '',
 										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
 										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
-										'units' => $announcementunits
+										'units' => $announcementunits,
+										'highlight' => $announcement['highlight']
 									])
 								]
 							)
@@ -203,6 +208,11 @@ class MESSAGE extends API {
 	 * reusable form generator
 	 */
 	private function announcementform($preset){
+		$highlights = [];
+		foreach($this->_lang->_USER['message']['announcement']['highlights'] as $key => $translation){
+			$highlights[$translation] = ['value' => $key, 'class' => $key === 'null' ? '' : $key];
+			if ($preset['highlight'] ?? 'null' === $key) $highlights[$translation]['checked'] = true;
+		}
 		return [
 			[
 				[
@@ -240,6 +250,12 @@ class MESSAGE extends API {
 						'name' => $this->_lang->GET('message.announcement.end'),
 						'value' => $preset['span_end'] ?? ''
 					]
+				], [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.highlight'),
+					],
+					'content' => $highlights
 				], [
 					'type' => 'checkbox',
 					'attributes' => [
