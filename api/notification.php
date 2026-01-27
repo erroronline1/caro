@@ -232,6 +232,7 @@ class NOTIFICATION extends API {
 												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : 'NULL',
 												':erp_case_number' => $this->_pdo->quote($case['erp_case_number']),
 												':note' => $this->_pdo->quote($case['note'] ? : ''),
+												':restricted_access' => $this->_pdo->quote($case['restricted_access'] ? : 'NULL'),
 												':id' => $case['id'] // must come after :identifier, otherwise replacements fail
 											]) . '; ');
 									}

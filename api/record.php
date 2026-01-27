@@ -83,7 +83,8 @@ class RECORD extends API {
 						':content' => json_decode($case['content'], true),
 						':lifespan' => $case['lifespan'],
 						':erp_case_number' => $case['erp_case_number'],
-						':note' => $case['note']
+						':note' => $case['note'],
+						':restricted_access' => $case['restricted_access'],
 					];
 
 					if ($this->_caseState === 'lifespan'){
@@ -1028,7 +1029,8 @@ class RECORD extends API {
 							':content' => json_decode($case['content'], true),
 							':lifespan' => $case['lifespan'],
 							':erp_case_number' => $case['erp_case_number'],
-							':note' => $case['note']
+							':note' => $case['note'],
+							':restricted_access' => $case['restricted_access']
 						];
 					}
 					else {
@@ -1043,7 +1045,8 @@ class RECORD extends API {
 							':content' => [],
 							':lifespan' => null,
 							':erp_case_number' => null,
-							':note' => null
+							':note' => null,
+							':restricted_access' => null
 						];
 					}
 					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
@@ -1954,6 +1957,7 @@ class RECORD extends API {
 					':lifespan' => $merge['lifespan'],
 					':erp_case_number' => $merge['erp_case_number'],
 					':note' => $merge['note'],
+					':restricted_access' => $merge['restricted_access'],
 					':id' => $merge['id'],
 			]])) $this->response([
 				'response' => [
@@ -1984,6 +1988,7 @@ class RECORD extends API {
 					':lifespan' => max($original['lifespan'], $merge['lifespan']),
 					':erp_case_number' => $original['erp_case_number'],
 					':note' => $original['note'],
+					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
@@ -2046,6 +2051,7 @@ class RECORD extends API {
 					':lifespan' => $original['lifespan'],
 					':erp_case_number' => $original['erp_case_number'],
 					':note' => $original['note'],
+					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
 			]])) $this->response([
 				'response' => [
