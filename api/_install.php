@@ -43,6 +43,7 @@ define('DEFAULTSQL', [
 				"	`span_end` datetime NULL DEFAULT NULL," .
 				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`text` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`highlight` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -245,6 +246,7 @@ define('DEFAULTSQL', [
 				"	`lifespan` int NULL DEFAULT NULL," .
 				"	`erp_case_number` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`note` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`restricted_access` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -356,7 +358,8 @@ define('DEFAULTSQL', [
 				"	span_start smalldatetime NULL DEFAULT NULL," .
 				"	span_end smalldatetime NULL DEFAULT NULL," .
 				"	subject varchar(MAX) NOT NULL," .
-				"	text varchar(MAX) NULL DEFAULT NULL" .
+				"	text varchar(MAX) NULL DEFAULT NULL," .
+				"	highlight varchar(255) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
@@ -559,7 +562,8 @@ define('DEFAULTSQL', [
 				"	notified int NULL DEFAULT NULL," .
 				"	lifespan int NULL DEFAULT NULL," .
 				"	erp_case_number varchar(255) NULL DEFAULT NULL," .
-				"	note varchar(MAX) NULL DEFAULT NULL" .
+				"	note varchar(MAX) NULL DEFAULT NULL," .
+				"	restricted_access varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .

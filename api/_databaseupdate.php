@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_01_03'] as $update){
+		foreach (['_2026_01_26'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -405,6 +405,27 @@ class UPDATE{
 				" BEGIN" .
 				"    ALTER TABLE caro_texttemplates" .
 				"    ADD linked_files varchar(MAX) NULL DEFAULT NULL" .
+				" END; ",
+			]
+		];
+	}
+
+	private function _2026_01_26(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_announcements ADD COLUMN IF NOT EXISTS highlight tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS restricted_access text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_announcements', 'highlight') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_announcements" .
+				"    ADD highlight varchar(255) NULL DEFAULT NULL" .
+				" END; ",
+				"IF COL_LENGTH('caro_records', 'restricted_access') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD restricted_access varchar(MAX) NULL DEFAULT NULL" .
 				" END; ",
 			]
 		];
