@@ -1690,7 +1690,7 @@ class DOCUMENT extends API {
 							'hint' => $this->_lang->GET('assemble.compose.document.context_hint')
 						],
 						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.author', [':author' => $document['author'], ':date' => $this->convertFromServerTime(substr($document['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.name_hint')) .
-						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
+						($pending_approvals ? ' ' . $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependedbundles ? $this->_lang->GET('assemble.compose.document.bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? $this->_lang->GET('assemble.compose.document.component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
