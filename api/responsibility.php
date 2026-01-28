@@ -140,7 +140,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
@@ -152,7 +152,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $proxy[$user['name']]['disabled'] = true;
 						}
