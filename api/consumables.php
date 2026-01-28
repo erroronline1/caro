@@ -1885,7 +1885,7 @@ class CONSUMABLES extends API {
 							"}}, 'FormData').then(response => {if (response) {".
 								"api.purchase('post', 'search', 'manualorder', response);".
 								"api.preventDataloss.monitor = true;}".
-								"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
+								"if (document.getElementById('modal')) document.getElementById('modal').replaceChildren();})", // clear modal to avoid messing up input names
 						]
 					]
 				];
@@ -2022,7 +2022,7 @@ class CONSUMABLES extends API {
 							]
 						]
 					];
-				if ($result){
+				if ($result && $result[0]){
 					array_unshift($result[0][0], $tile);
 					array_unshift($result, [
 						'type' => 'textsection',

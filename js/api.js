@@ -1791,7 +1791,7 @@ export const api = {
 				switch (request[1]) {
 					case "search":
 						payload = request[3]; // form data object passed by utility.js
-						request[3] = "null";
+						delete request[3];
 						successFn = function (data) {
 							new Dialog({
 								type: "input",
