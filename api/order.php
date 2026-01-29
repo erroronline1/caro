@@ -385,14 +385,15 @@ class ORDER extends API {
 
 				// set available units
 				if (PERMISSION::permissionFor('orderprocessing')) $units = array_keys($this->_lang->_USER['units']); // see all orders
-				else $units = $_SESSION['user']['units']; // display only orders for own units
+				else $units = ['common', ...$_SESSION['user']['units']]; // display only orders for own units and common, which are filtered later for intersection units of orderer with requesting user
+				// e.g. prothetics1 users can see common orders of own members as well
 
 				// resolve filters
 				foreach($this->_payload as $key => $value){
 					if (!$value) unset($this->_payload->{$key});
 				}
 				$filter = [];
-				foreach(['term','timespan','unit','etc'] as $f){
+				foreach(['term', 'timespan', 'unit', 'etc'] as $f){
 					$filter[$f] = UTILITY::propertySet($this->_payload, $f) ? : null;
 					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00'; // append seconds to datetime-local
 					if ($f === 'unit' && $filter[$f]) $filter[$f] = explode('|', $filter[$f]);
@@ -563,6 +564,7 @@ class ORDER extends API {
 						($filter['etc'] === 'stock' && !isset($product['stock_item']))
 						|| ($filter['etc'] === 'stock_none' && isset($product['stock_item']))
 						|| ($filter['etc'] === 'returns' && $row['ordertype'] !== 'return')
+						|| ($filter['etc'] === 'returns_none' && $row['ordertype'] === 'return')
 						|| ($filter['timespan'] && $row[$this->_orderState ? : 'approved'] < $filter['timespan'])
 						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
 					) continue;
@@ -575,12 +577,15 @@ class ORDER extends API {
 					if (isset($users[$orderer_id])) $orderer = $users[$orderer_id];
 					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
 
-					// if unit intersects, orderer is viewing user...
-					$unit_intersection = boolval(array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) || $orderer['name'] === $_SESSION['user']['name'];
-					// ... or common orders are done by own unit members
-					if (!$unit_intersection && array_intersect([$row['organizational_unit']], ['common']) && $orderer_id){
-						$unit_intersection = boolval(array_intersect([$row['organizational_unit']], explode(',', $users[$orderer_id]['units'])));
-					}
+					// if unit intersects, or orderer is viewing user...
+					$unit_intersection = 
+						// orderer is viewing user...
+						$orderer['name'] === $_SESSION['user']['name']
+						// unit intersects
+						|| boolval(array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))
+						// common orders are done by own unit members
+						|| (array_intersect([$row['organizational_unit']], ['common']) && $orderer_id && boolval(array_intersect($_SESSION['user']['units'], explode(',', $users[$orderer_id]['units']))))
+						;
 					if (!$unit_intersection && !$permission['orderdisplayall'] && !$permission['admin']) continue;
 
 					$data = [
@@ -696,8 +701,8 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'issued_full':
-								if ($row['delivered_full']){
-									$delete = new \DateTime($row['delivered_full']);
+								if ($row['issued_full']){
+									$delete = new \DateTime($row['issued_full']);
 									$delete->modify('+ ' . CONFIG['lifespan']['order']['autodelete'] . 'days');
 									$data['autodelete'] = $this->_lang->GET('order.autodelete', [':date' => $this->convertFromServerTime($delete->format('Y-m-d')), ':unit' => $this->_lang->_USER['units'][$data['organizationalunit']]]);
 								}
@@ -1714,7 +1719,7 @@ class ORDER extends API {
 		}
 		// set data itemwise
 		foreach ($this->_payload as $key => $value){
-			$key = array_search($key, $language);
+			if (!($key = array_search($key, $language))) continue; // language key is not set, ignore additional inputs, e.g. vendor filter
 			if (is_array($value)){
 				foreach ($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
