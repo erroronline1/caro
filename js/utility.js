@@ -687,6 +687,7 @@ export const _client = {
 					stock: api._lang.GET("order.stock_filter"),
 					stock_none: api._lang.GET("order.stock_filter_none"),
 					returns: api._lang.GET("order.return_filter"),
+					returns_none: api._lang.GET("order.return_filter_none"),
 				})) {
 					etc[value] = {
 						value: key,

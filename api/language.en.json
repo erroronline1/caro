@@ -1462,6 +1462,7 @@
 		"refresh": "Refresh view",
 		"return": "Return product",
 		"return_filter": "Display returns only",
+		"return_filter_none": "Display no returns",
 		"return_message": "Add addition information for purchase, like serial number, etc.",
 		"return_message_cancel": "No, thank you",
 		"return_message_ok": "Yes, return",

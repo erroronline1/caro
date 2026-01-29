@@ -1462,6 +1462,7 @@
 		"refresh": "Ansicht aktualisieren",
 		"return": "Rücksendung",
 		"return_filter": "nur Rücksendungen anzeigen",
+		"return_filter_none": "keine Rücksendungen anzeigen",
 		"return_message": "Füge Informationen für den Einkauf an, z.B. Seriennummer, etc.",
 		"return_message_cancel": "Nein danke",
 		"return_message_ok": "Ja, zurücksenden",
