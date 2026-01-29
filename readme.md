@@ -32,8 +32,11 @@ Things are still in motion. Images may be outdated.
 * contain filtered filenames into csvfilter export (filename, print header), if available
     * chain destination and source or only if destination does contain ____ or whatever
 * allow pdf format for csv-filter?
-* add record restricted_access
-    * like document, with permission and unit (e.g. supervisor intersection)
+* record restricted_access for generalrecords-context 
+    * {unit:[...], permission:[...], user:[...]} with unit/permission intersection, ceo/admin full access
+    * exclude self only
+    * also see record.inquiry selection $notification_recipients
+* orders: manual returns should request and process $return_reason
 
 ## Content
 * [Aims](#aims)
