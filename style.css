@@ -1155,6 +1155,12 @@ input:checked + .checkbox.red::before {
 	color: var(--article);
 	border-color: var(--article);
 }
+input:checked + .checkbox.orange,
+input:checked + .checkbox.orange::before {
+	background-color: var(--orange);
+	color: var(--article);
+	border-color: var(--article);
+}
 
 input:checked + .radio {
 	background-color: var(--green);
@@ -1167,6 +1173,12 @@ input:checked + .radio.red {
 	color: var(--article);
 	border-color: var(--article);
 }
+input:checked + .radio.orange {
+	background-color: var(--orange);
+	color: var(--article);
+	border-color: var(--article);
+}
+
 
 input[type="checkbox"]:disabled + label,
 input[type="radio"]:disabled + label {
