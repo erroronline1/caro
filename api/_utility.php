@@ -383,16 +383,19 @@ class UTILITY {
 	 * handles the identifier format globally
 	 * if the passed identifier does not have a valid trailing base 36 unix timestamp the default date will be appended accordingly
 	 * @param string passed $identifier
-	 * @param string $default_date
-	 * @param bool $strip_date returns first part of submitted identifier without timestamp appended
+	 * @param string $default_date_to_add
+	 * @param bool $return_string_before_timestamp returns first part of submitted identifier without timestamp appended
 	 * @param bool $translate_timestamp returns Y-m-d H:i:s translation of timestamp
-	 * @param bool $verified_timestamp returns the trailing timestamp if valid
+	 * @param bool $return_verified_timestamp returns the trailing timestamp if valid
 	 * @return string|null
 	 */
-	public static function identifier($identifier = '', $default_date = '', $strip_date = false, $translate_timestamp = false, $verified_timestamp = false){
+	public static function identifier($identifier = '', $default_date_to_add = '', $return_string_before_timestamp = false, $translate_timestamp = false, $return_verified_timestamp = false){
 		if (!$identifier) return $identifier;
 
-		preg_match('/(.+?)(?:\s*#([a-z0-9]+))*$/', $identifier, $components);
+		// find `lorem ipsum #t8r3to` or `lorem ipsum #t8r3to dolor`
+		// does *not* match `#t8r3to lorem ipsum` or `mambo #5`
+		// current timestamp has a min length of 6 characters, 7 max within expected anthropocene
+		preg_match('/(.+?)(?:\s*#([a-z0-9]{6,7}))*($|[^a-z0-9])/', $identifier, $components);
 		if ($components && isset($components[2]) && $components[2]){
 			try {
 				// try to convert to unixtime int
@@ -403,9 +406,9 @@ class UTILITY {
 					$datetime->setTimestamp($unixtime);
 					// if no error has risen the identifier is likely valid
 
-					if ($verified_timestamp) return '#' . $components[2]; // proper trailing timestamp with separator
+					if ($return_verified_timestamp) return '#' . $components[2]; // proper trailing timestamp with separator
 					if ($translate_timestamp) return $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
-					if ($strip_date){
+					if ($return_string_before_timestamp){
 						if (isset($components[1]) && $components[1]) return $components[1];
 					}
 					return $identifier;
@@ -415,10 +418,10 @@ class UTILITY {
 			// do nothing, return null by default if checks are supposed to be applied. valid responses have been returned in advance
 			}
 		}
-		if ($verified_timestamp) return null;
+		if ($return_verified_timestamp) return null;
 		if ($translate_timestamp) return null;
-		if ($default_date) {
-			$unixtime = strtotime($default_date);
+		if ($default_date_to_add) {
+			$unixtime = strtotime($default_date_to_add);
 			$identifier .= ' #' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
 		}
 		return $identifier;
