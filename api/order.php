@@ -292,45 +292,8 @@ class ORDER extends API {
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 
-								// determine criticality of return reason
-								$return_reason = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.return_reason'));
-								$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['critical']);
-								if ($criticality !== false){
-									$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.critical.' . $criticality, [], true) . "\n" .$decoded_order_data['additional_info'];
-
-									// append incorporation review if applicable and alert eligible users
-									if (isset($decoded_order_data['productid'])){
-										$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-											'values' => [
-												':ids' => intval($decoded_order_data['productid'])
-											]
-										]);
-										$product = $product ? $product[0] : null;
-										if ($product){
-											$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-											$product['incorporated'][] = [
-												'_check' => $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true),
-												'user' => [
-													'name' => CONFIG['system']['caroapp'],
-													'date' => $this->_date['servertime']->format('Y-m-d H:i')
-												]
-											];
-											SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-												'replacements' => [
-													':id' => $product['id'],
-													':incorporated' => UTILITY::json_encode($product['incorporated'])
-												]
-											]);
-											$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
-											'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
-											. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true));
-										}
-									}
-								}
-								else {
-									$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['easy']);
-									$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.easy.' . $criticality, [], true) . "\n" .$decoded_order_data['additional_info'];
-								}
+								// determine criticality, append to info or review incorporation
+								$decoded_order_data = $this->return_criticality($decoded_order_data);
 
 								// create a new order as return
 								if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -1048,6 +1011,23 @@ class ORDER extends API {
 				// render search and selection
 				require_once('consumables.php');
 				$search = new CONSUMABLES();
+				$return_reasons = ['...' => []];
+				if ($this->_lang->_USER['orderreturns']['critical']) {
+					foreach ($this->_lang->_USER['orderreturns']['critical'] as $key => $value) {
+						$return_reasons[$value] = ['value' => $key];
+						if (isset($order['return_reason']) && $order['return_reason'] == $key) $return_reasons[$value]['selected'] = true;
+					}
+				}
+				if ($this->_lang->_USER['orderreturns']['easy']) {
+					foreach ($this->_lang->_USER['orderreturns']['easy'] as $key => $value){
+						$return_reasons[$value] = ['value' => $key];
+						if (isset($order['return_reason']) && $order['return_reason'] == $key) $return_reasons[$value]['selected'] = true;
+					}
+				}
+				ksort($return_reasons);
+
+				function order_return($order) { return $order['order_type'] === 'return' ? [] : ['disabled' => true];}
+
 				$response['render'] = ['form' => [
 					'data-usecase' => 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
@@ -1087,13 +1067,22 @@ class ORDER extends API {
 							'type' => 'select',
 							'content' => $order_type,
 							'attributes' => [
-								'name' => $this->_lang->GET('order.order_type')
+								'name' => $this->_lang->GET('order.order_type'),
+								'onchange' => "document.getElementById('_return_reason').disabled = this.value !== 'return'; if (this.value !== 'return') document.getElementById('_return_reason').value = '...'"
+							]
+						], [
+							'type' => 'select',
+							'content' => $return_reasons,
+							'attributes' => [
+								'id' => '_return_reason',
+								'name' => $this->_lang->GET('order.return_reason'),
+								...order_return($order)
 							]
 						], [
 							'type' => 'date',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.delivery_date'),
-								'value' =>$order['delivery_date'] ?? ''
+								'value' => $order['delivery_date'] ?? ''
 							]
 						], [
 							'type' => 'textarea',
@@ -1346,6 +1335,11 @@ class ORDER extends API {
 				if ($product) $order_data2['productid'] = $product['id'];
 			}
 
+			if ($order_data2['order_type'] === 'return'){
+				if (!isset($order_data2['return_reason']) || !$order_data2['return_reason']) $this->response(['MISSING RETURN REASON'], 417);
+				$order_data2 = $this->return_criticality($order_data2);
+			}
+
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('order_post_approved_order'),
 			[
 				':order_data' => $this->_pdo->quote(UTILITY::json_encode($order_data2)),
@@ -1545,6 +1539,10 @@ class ORDER extends API {
 									];
 									$value = $this->_lang->GET('order.ordertype.' . $value);
 								}
+								if ($key === 'return_reason') {
+									if (!empty($this->_lang->_USER['orderreturns']['critical'][$value])) $value = $this->_lang->_USER['orderreturns']['critical'][$value]; 
+									elseif (!empty($this->_lang->_USER['orderreturns']['easy'][$value])) $value = $this->_lang->_USER['orderreturns']['easy'][$value]; 
+								}
 
 								$info .= $this->_lang->GET('order.' . $key) . ': ' . $value . "\n";
 							}
@@ -1719,7 +1717,7 @@ class ORDER extends API {
 		}
 		// set data itemwise
 		foreach ($this->_payload as $key => $value){
-			if (!($key = array_search($key, $language))) continue; // language key is not set, ignore additional inputs, e.g. vendor filter
+			if (!($key = array_search($key, $language)) || in_array($value, [null, false, '...'])) continue; // language key is not set, ignore additional inputs, e.g. vendor filter or null/default values
 			if (is_array($value)){
 				foreach ($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
@@ -1732,9 +1730,62 @@ class ORDER extends API {
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['id'];
+
 		if (!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
 	}
+
+	/**
+	 *           _                             _ _   _         _ _ _       
+	 *   ___ ___| |_ _ _ ___ ___       ___ ___|_| |_|_|___ ___| |_| |_ _ _ 
+	 *  |  _| -_|  _| | |  _|   |     |  _|  _| |  _| |  _| .'| | |  _| | |
+	 *  |_| |___|_| |___|_| |_|_|_____|___|_| |_|_| |_|___|__,|_|_|_| |_  |
+	 *                          |_____|                               |___|
+	 * determine criticality of return reason
+	 * review incorporation if reasonable
+	 * used for patching approved orders as well as approved manual returns from the order form
+	 */
+	private function return_criticality($decoded_order_data){
+		if ($return_reason = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.return_reason'))) $criticality = array_key_exists($return_reason, $this->_lang->_USER['orderreturns']['critical']) ? $return_reason : false;
+		elseif ($return_reason = ($decoded_order_data['return_reason'] ?? '')) $criticality = array_key_exists($return_reason, $this->_lang->_USER['orderreturns']['critical']) ? $return_reason : false;
+		if ($criticality !== false){
+			$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.critical.' . $criticality, [], true) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+			// append incorporation review if applicable and alert eligible users
+			if (isset($decoded_order_data['productid'])){
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($decoded_order_data['productid'])
+					]
+				]);
+				$product = $product ? $product[0] : null;
+				if ($product){
+					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+					$product['incorporated'][] = [
+						'_check' => $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true),
+						'user' => [
+							'name' => CONFIG['system']['caroapp'],
+							'date' => $this->_date['servertime']->format('Y-m-d H:i')
+						]
+					];
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+						'replacements' => [
+							':id' => $product['id'],
+							':incorporated' => UTILITY::json_encode($product['incorporated'])
+						]
+					]);
+					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
+					'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
+					. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true));
+				}
+			}
+		}
+		else {
+			$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['easy']);
+			$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.easy.' . $criticality, [], true) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+		}
+		return $decoded_order_data;
+	}
+
 
 	/**
 	 *       _       _   _     _   _               
