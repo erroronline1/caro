@@ -937,7 +937,8 @@ class CONSUMABLES extends API {
 								}
 							}
 						}
-						$product['incorporated'] = UTILITY::json_encode([...$product['incorporated'], $latestincorporation]);
+						if ($latestincorporation) $product['incorporated'] = [...$product['incorporated'], $latestincorporation];
+						$product['incorporated'] = UTILITY::json_encode($product['incorporated']);
 					}
 					elseif ($product['incorporated']) $product['incorporated'] = UTILITY::json_encode($product['incorporated']);
 					else $product['incorporated'] = null;
@@ -1068,9 +1069,9 @@ class CONSUMABLES extends API {
 									}
 								}
 							}
-							$similarproduct['incorporated'] = UTILITY::json_encode([...$similarproduct['incorporated'], $latestincorporation]);
+							if ($latestincorporation) $similarproduct['incorporated'] = [...$similarproduct['incorporated'], $latestincorporation];
+							$similarproduct['incorporated'] = UTILITY::json_encode($similarproduct['incorporated']);
 						}
-						// huh? elseif ($similarproduct['incorporated']) $product['incorporated'] = UTILITY::json_encode($similarproduct['incorporated']);
 						else $similarproduct['incorporated'] = null;
 
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
@@ -1242,7 +1243,7 @@ class CONSUMABLES extends API {
 				}
 
 				// render search and selection
-				$response = ['render' => ['content' => $this->productsearch($this->_usecase ? : 'product')]]; 
+				$response = ['render' => ['content' => $this->productsearch('product')]]; 
 		
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) {
