@@ -1436,8 +1436,8 @@ export const _client = {
 
 					let reasons = {};
 
-					if (api._lang._USER.orderreturns.critical) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.critical)) reasons[value] = [];
-					if (api._lang._USER.orderreturns.easy) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.easy)) reasons[value] = [];
+					if (api._lang._USER.orderreturns.critical) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.critical)) reasons[value] = {value: key};
+					if (api._lang._USER.orderreturns.easy) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.easy)) reasons[value] = {value: key};
 					reasons = Object.keys(reasons)
 						.sort()
 						.reduce((obj, key) => {
