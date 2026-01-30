@@ -1043,15 +1043,17 @@ class PERMISSION {
 	 * returns a boolean if user is authorized for requested app-function, array of permissions if $returnvalues argument is true
 	 * @param string $function as defined within config.ini
 	 * @param bool $returnvalues
+	 * @param bool|array $default
 	 * @return bool|array
 	 */
-	public static function permissionFor($function = '', $returnvalues = false){
+	public static function permissionFor($function = '', $returnvalues = false, $default = ['admin']){
 		if (!isset($_SESSION['user']) || !isset($_SESSION['user']['permissions'])) return [];
 		if (isset(CONFIG['permissions'][$function])){
 			if (!$returnvalues) {
+				if (!$default) $default = [];
 				// limited functions don't include admin by default
 				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));
-				return boolval(array_intersect(['admin', ...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));
+				return boolval(array_intersect([...$default, ...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));
 			}
 			return preg_split('/\W+/', CONFIG['permissions'][$function]);
 		}
