@@ -395,7 +395,7 @@ class UTILITY {
 		// find `lorem ipsum #t8r3to` or `lorem ipsum #t8r3to dolor`
 		// does *not* match `#t8r3to lorem ipsum` or `mambo #5`
 		// current timestamp has a min length of 6 characters, 7 max within expected anthropocene
-		preg_match('/(.+?)(?:\s*#([a-z0-9]{6,7}))*($|[^a-z0-9])/', $identifier, $components);
+		preg_match('/(.+?)(?:\s*#([a-z0-9]{6,7}))($|[^a-z0-9])/', $identifier, $components);
 		if ($components && isset($components[2]) && $components[2]){
 			try {
 				// try to convert to unixtime int
