@@ -384,7 +384,7 @@ class ORDER extends API {
 				}
 
 				// set available units
-				if (PERMISSION::permissionFor('orderprocessing')) $units = array_keys($this->_lang->_USER['units']); // see all orders
+				if (PERMISSION::permissionFor('orderprocessing', false, false)) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = ['common', ...$_SESSION['user']['units']]; // display only orders for own units and common, which are filtered later for intersection units of orderer with requesting user
 				// e.g. prothetics1 users can see common orders of own members as well
 

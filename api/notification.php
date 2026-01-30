@@ -1048,7 +1048,7 @@ class NOTIFICATION extends API {
 	 */
 	public function order(){
 		$unprocessed = 0;
-		if (PERMISSION::permissionFor('orderprocessing')){
+		if (PERMISSION::permissionFor('orderprocessing', false, false)){
 			$unprocessed = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed');
 			$unprocessed = $unprocessed ? intval($unprocessed[0]['num']) : 0;
 		}
