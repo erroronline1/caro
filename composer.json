@@ -1,0 +1,6 @@
+{
+    "require": {
+        "openspout/openspout": "^5.2",
+        "tecnickcom/tc-lib-pdf": "^8.4"
+    }
+}
