@@ -7,3 +7,5 @@ fileserver
 *.pdf
 assets
 *.env
+*composer*
+autoload.php

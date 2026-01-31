@@ -9,7 +9,7 @@
  */
 
 const cacheName = "20251229_1640"; // Change value to force update
-importScripts("./libraries/erroronline1.js");
+importScripts("./vendor/erroronline1.js");
 var database = _.idb;
 database.database = {
 	name: "caro",

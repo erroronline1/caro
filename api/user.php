@@ -1182,8 +1182,8 @@ class USER extends API {
 	private function token($CODE, $STRING){
 		if (!PERMISSION::permissionFor('users')) return null;
 
-		require_once('../libraries/TCPDF/tcpdf_barcodes_2d.php');
-		require_once('../libraries/TCPDF/include/barcodes/qrcode.php');
+		require_once('../vendor/TCPDF/tcpdf_barcodes_2d.php');
+		require_once('../vendor/TCPDF/include/barcodes/qrcode.php');
 		$qrcode = new \TCPDF2DBarcode($CODE, 'QRCODE,' . CONFIG['limits']['qr_errorlevel']);
 		$pngcode = imagecreatefromstring($qrcode->getBarcodePngData());
 

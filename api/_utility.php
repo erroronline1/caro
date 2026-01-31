@@ -1905,8 +1905,8 @@ class BLOCKCHAIN {
 	}
 }
 
-require_once("../libraries/XLSXWriter.php");
-require_once("../libraries/XLSXWriter_BuffererWriter.php");
+require_once("../vendor/XLSXWriter.php");
+require_once("../vendor/XLSXWriter_BuffererWriter.php");
 class XLSXWrapper extends \XLSXWriter{
 	public function __construct(){
 		parent::__construct();

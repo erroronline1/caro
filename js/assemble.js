@@ -11,7 +11,7 @@
 /*
 this module helps to assemble content according to the passed simplified object notation.
 */
-import QrCreator from "../libraries/qr-creator.js";
+import QrCreator from "../vendor/qr-creator.js";
 import Icons from "./icons.json" with { type: "json" };
 
 export function getNextElementID() {
