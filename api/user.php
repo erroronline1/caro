@@ -1182,10 +1182,12 @@ class USER extends API {
 	private function token($CODE, $STRING){
 		if (!PERMISSION::permissionFor('users')) return null;
 
-		require_once('../vendor/TCPDF/tcpdf_barcodes_2d.php');
-		require_once('../vendor/TCPDF/include/barcodes/qrcode.php');
-		$qrcode = new \TCPDF2DBarcode($CODE, 'QRCODE,' . CONFIG['limits']['qr_errorlevel']);
-		$pngcode = imagecreatefromstring($qrcode->getBarcodePngData());
+		require(__DIR__ . '/../vendor/autoload.php');
+		$qrcode = new \Com\Tecnick\Barcode\Barcode();
+
+		$pngcode = $qrcode->getBarcodeObj('QRCODE', $CODE, -3, -3, 'black', [0, 0, 0, 0]);
+		$code_data = $pngcode->getArray();
+		$pngcode->setBackgroundColor('transparent');
 
 		$card = [85.6, 53.9];
 		$dimensions = [1024, ceil(1024 / $card[0] * $card[1])];
@@ -1199,7 +1201,8 @@ class USER extends API {
 		$background_color = imagecolorallocate($image, 255, 255, 255);
 		imagefill($image, 0, 0, $background_color);
 		imagecolortransparent($image, $background_color);
-		imagecopyresampled($image, $pngcode, $margin['qr']['x'], $margin['qr']['y'], 0, 0, $dimensions[1] - $margin['qr']['x'] * 4, $dimensions[1] - $margin['qr']['y'] * 2, $qrcode->getBarcodeArray()['num_cols'] * 3, $qrcode->getBarcodeArray()['num_rows'] * 3);
+
+		imagecopyresampled($image, $pngcode->getGD(), $margin['qr']['x'], $margin['qr']['y'], 0, 0, $dimensions[1] - $margin['qr']['x'] * 4, $dimensions[1] - $margin['qr']['y'] * 2, intval($code_data['full_width']), intval($code_data['full_width']));
 
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
 		$font_size = 36;
