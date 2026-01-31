@@ -10,9 +10,11 @@
  */
 
 namespace CARO\API;
-error_reporting(0);
-require_once('../vendor/TCPDF/tcpdf.php');
 
+require(__DIR__ . '/../vendor/autoload.php');
+
+//require_once('../vendor/TCPDF/tcpdf.php');
+error_reporting(E_ALL);
 class PDF{
 	private $_setup = [];
 	private $_pdf = null;
@@ -498,15 +500,16 @@ class PDF{
 	}
 }
 
-class RECORDTCPDF extends \TCPDF {
+class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	// custom pdf header and footer
 	public $qrcodesize = null;
 	public $qrcodecontent = null;
 	public $header = null;
 	public $_setup = null;
 
-	public function __construct($setup, $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent='', $header=['title' => '', 'date' => '']){
-		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
+	public function __construct($setup, $unicode = true, $encoding = 'UTF-8', $diskcache = false, $pdfa = false, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
+//		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
+		parent::__construct($setup['unit']);
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
 		$this->header = $header;
@@ -533,14 +536,17 @@ class RECORDTCPDF extends \TCPDF {
 			if ($width && $height){ // avoid division by zero error for faulty input
 				$right_margin = $width * 20 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageWidth() - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$header_image = $this->image->add('../' . $image);
+				$header_image_out = $this->image->getSetImage($header_image, 0, 10, $width / $height * 20, 20, 200);
+				$this->page->addContent($header_image_out);
+
 				$right_margin += 5;
 			}
 		}
 		if ($this->_setup['header']){
-			$this->SetFont('helvetica', 'B', 20); // font size
+			$this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
 			if ($this->header['title']) $this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
-			$this->SetFont('helvetica', '', 10); // font size
+			$this->font->insert($this->pon, 'helvetica', '', 10); // font size
 			if ($this->header['date']) $this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
 		}
 		if ($this->qrcodecontent){
