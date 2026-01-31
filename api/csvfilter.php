@@ -141,6 +141,22 @@ class CSVFILTER extends API {
 							}
 						}
 						break;
+					case 'pdf':
+						require_once('./_pdf.php');
+						$PDF = new PDF(CONFIG['pdf']['table']);
+						$pdfcontent = [
+							'title' => $filter['name'],
+							'date' => date('Y-m-d'),
+							'content' => $datalist->_list,
+							'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', pathinfo($content['filesetting']['destination'])['filename']),
+							'columns' => $content['pdfformat'] ?? []
+						];
+						$file = $PDF->tablePDF($pdfcontent);
+						if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
+							'href' => './api/api.php/file/stream/' . substr($file, 1),
+							'download' => pathinfo($file)['basename']
+						];
+						break;
 				}
 				
 				$this->response([

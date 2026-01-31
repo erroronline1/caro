@@ -430,36 +430,43 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 1, 5, 1);
-
-		$this->_pdf->SetFont('helvetica', '', 8); // font size
 		
-		$this->_pdf->startPageGroup();
-		$html = <<<END
-			<style>
-				tr.odd {background-color:#ddd}
-			</style>
-		END;
-		
-		$html .= '<table>';
-		$html .= '<thead><tr>';
-		foreach(array_keys($content['content'][0]) as $column => $column_content){
-			$html .= '<th' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</th>';
-		}
-		$html .= '</tr></thead>';
+		if (array_is_list($content['content'])) $content['content'] = [$content['content']];
 
-		$html .=  '<tbody>';
-		foreach ($content['content'] as $index => $row){
-			$odd = $index % 2 ? ' class="odd"' : '';
-			$html .= '<tr' . $odd . '>';
-			foreach(array_values($row) as $column => $column_content) {
-				$html .= '<td' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</td>';
+		$page = 0;
+		foreach($content['content'] as $header => $table){
+			if ($page++) $this->_pdf->AddPage();
+			$this->_pdf->SetFont('helvetica', '', 16); // font size
+			if (!array_is_list($content['content'])) $this->_pdf->MultiCell(0, 4, $header, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$this->_pdf->SetFont('helvetica', '', 8); // font size
+			$html = <<<END
+				<style>
+					tr.odd {background-color:#ddd}
+				</style>
+			END;
+			
+			$html .= '<table>';
+			$html .= '<thead><tr>';
+			$headers = array_keys($table[array_key_first($table)]);
+			foreach($headers as $column => $column_content){
+				$html .= '<th' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</th>';
 			}
-			$html .= '</tr>';
+			$html .= '</tr></thead>';
+	
+			$html .=  '<tbody>';
+			foreach ($table as $index => $row){
+				$odd = $index % 2 ? ' class="odd"' : '';
+				$html .= '<tr' . $odd . '>';
+				foreach(array_values($row) as $column => $column_content) {
+					$html .= '<td' . (isset($content['columns'][$column]) && $content['columns'][$column] ? ' style="width:' . $content['columns'][$column] . '"': '') . '>' . $column_content . '</td>';
+				}
+				$html .= '</tr>';
+			}
+			$html .= '</tbody>';
+			$html .= '</table>';
+			// writeHTML($html, $ln=true, $fill=false, $reseth=false, $cell=false, $align='')			
+			$this->_pdf->writeHTML($html);
 		}
-		$html .= '</tbody>';
-		$html .= '</table>';
-		// writeHTML($html, $ln=true, $fill=false, $reseth=false, $cell=false, $align='')			
-		$this->_pdf->writeHTML($html);
 
 		return $this->return($content);
 	}
@@ -476,7 +483,7 @@ class PDF{
 		$page = 0;
 		foreach ($content['content'] as $user){
 			//$this->_pdf->startPageGroup();
-			if ($page++)$this->_pdf->AddPage();
+			if ($page++) $this->_pdf->AddPage();
 			foreach ($user as $row){
 				$key = isset($row[0]) ? $row[0][0] : '';
 				$value = $row[1] ?? '';
