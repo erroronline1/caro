@@ -1908,7 +1908,7 @@ Latest tested server environments:
 
 Latest tested operating systems, browsers and devices:
 * Win 11 Edge
-* Linux Mint 22.2 Firefox
+* Linux Mint 22 Firefox
 * Android 12 Firefox
 * iOS 26 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
@@ -6353,6 +6353,22 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 # Ressources
 
 ## External libraries
+* [https://github.com/composer/composer](https://github.com/composer/composer)
+    * dependency management for PHP
+    * [MIT license](https://github.com/composer/composer?tab=License-1-ov-file)
+* [https://github.com/tecnickcom/tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf)
+    * creates PDF-files on the server side, successor of [TCPDF](https://github.com/tecnickcom/tcpdf)
+    * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
+    * v8.4.7
+    * \> 1.8k stars
+    * \> 200 forks
+    * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
+* [https://github.com/maksimovic/PHP_XLSXWriter](https://github.com/maksimovic/PHP_XLSXWriter)
+    * creates XLSX-files on the server side
+    * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
+    * v1.0.4
+    * maintained fork of [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) with \> 1k stars, \> 650 forks
+    * [MIT license](https://github.com/maksimovic/PHP_XLSXWriter?tab=License-1-ov-file)
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
     * Justification: this library enables the application to handle 2D-codes for transfer of physical to digital data. This is used for the login process and a safe way of consistent tracing of records and products.
@@ -6361,19 +6377,6 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 1k forks
     * [ASL 2.0 license](https://github.com/mebjas/html5-qrcode?tab=Apache-2.0-1-ov-file)
     * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
-* [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
-    * creates PDF-files on the server side
-    * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v6.10.1
-    * \> 4k stars
-    * \> 1k forks
-    * [LGPL license](https://github.com/tecnickcom/TCPDF?tab=License-1-ov-file)
-* [https://github.com/maksimovic/PHP_XLSXWriter](https://github.com/maksimovic/PHP_XLSXWriter)
-    * creates XLSX-files on the server side
-    * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
-    * v1.0.4
-    * maintained fork of [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) with \> 1k stars, \> 650 forks
-    * [MIT license](https://github.com/maksimovic/PHP_XLSXWriter?tab=License-1-ov-file)
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).
