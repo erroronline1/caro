@@ -1889,7 +1889,7 @@ Application support legend:
 
 # Prerequisites
 * Server with
-    * PHP >= 8.2
+    * PHP >= 8.5
     * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted/extended)
     * SSL (camera access for qr-scanner, Service-Worker and sha256 encryption don't work otherwise)
     * Storage requirements are hardly determinable and depend on your company size. A medium sized company with about 6000 yearly cases may need about 10 GB per year. Database size should be able to grow dynamically
@@ -1902,21 +1902,15 @@ Application support legend:
 * Vendor product lists (e.g. pricelists) as CSV-files ([see details](#importing-vendor-product-lists)), ERP stock list exports or a customized [ERP interface](#erp-interface)
 * Occasionally FTP-access to the server for updates of [runtime variables](#runtime-variables) and [language files](#customisation)
 
-Tested server environments:
-* Apache [Uniform Server Zero XV](https://uniformserver.com/) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
-* Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
-* Apache (native) with PHP 8.3, MariaDB 15.1 (from 2024-05-30)
-* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 2022)
+Latest tested server environments:
+* Apache (native) with PHP 8.5, MariaDB 15.1 (from 2026-01-31)
+* Microsoft IIS with PHP 8.5, SQL Express (SQL Server 2022) (from 2026-01-31)
 
-Tested operating systems, browsers and devices:
-* Win 10 Edge 123 (until 2025-11-17)
-* Win 11 Edge 142 (from 2025-11-18)
-* Win 11 Firefox (until 2024-05-30)
-* Linux Mint 21.3 Firefox 133 (from 2024-05-30)
-* Linux Mint 22.2 Firefox 145 (from 2025-11-16)
-* Android 12 Firefox 133
-* macOS 13 Ventura [Safari 18](#safaris-special-needs), Edge 131, Firefox 133
-* iOS 18.7.1 [Safari](#safaris-special-needs)
+Latest tested operating systems, browsers and devices:
+* Win 11 Edge
+* Linux Mint 22.2 Firefox
+* Android 12 Firefox
+* iOS 26 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
 
 External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
@@ -1943,7 +1937,7 @@ It is strongly recommended to create an additional development environment to te
     * pricelist import does take a lot longer on [updating products](#importing-vendor-product-lists) than deleting and reinserting
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][session][idle]](#runtime-variables)
-* php.ini enable extensions:
+* php.ini enable extensions (most probably not required for Apache):
     * curl
     * fileinfo
     * gd
@@ -1952,11 +1946,14 @@ It is strongly recommended to create an additional development environment to te
     * exif
     * pdo_odbc
     * zip
-    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv if applicable)
+    * pdo_sqlsrv (sqlsrv if applicable, [source](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows))
+* php.ini extension_dir = "ext" for IIS
+* apt install php8.5-mysql for Apache if not already satisfied
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Allow double escaping in web.config for IIS 
 * ignore client certificates in IIS SSL settings for the site
+* allow full access to `fileserver` directory and its descendants for IIS-IUSRS
 
 ### Application setup
 The default provides [template files](#https://github.com/erroronline1/caro/tree/master/templates) in the respective template folder for a swift availability of contents upon launch. Filenames follow a pattern of `{choosable name part}.{type}.{default language}.{extension}` where

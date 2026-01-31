@@ -1792,7 +1792,7 @@ Anwendungsunterstützung Legende:
 
 # Voraussetzungen
 * Server mit
-    * PHP >= 8.2
+    * PHP >= 8.5
     * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst/ergänzt werden)
     * SSL (Kamerazugriff für den Scanner, Service-Worker und SHA256-Verschlüsselung können sonst technisch nicht genutzt werden)
     * Der erforderliche Speicherpatz ist kaum ermittelbar und abhängig von der Unternehmensgröße. Ein mittelständiges Unternehmen mit jährlich etwa 6000 Fällen benötigt etwa 10 GB pro Jahr. Die Datenbankgröße sollte sich dynamisch anpassen. 
@@ -1805,21 +1805,15 @@ Anwendungsunterstützung Legende:
 * Lieferantenartikellisten (z.B. Preislisten) als CSV-Dateien ([siehe Details](#importierung-von-lieferantenartikellisten)), ERP Datenexporte oder eine angepasste [ERP Anbindung](#erp-anbindung)
 * Gelegentlich FTP-Zugang zum Server für Anpassungen der [Laufzeitvariablen](#laufzeitvariablen) und [Sprachdateien](#anpassung)
 
-Getestete Serverumgebungen:
-* Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
-* Apache (nativ) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
-* Apache (nativ) mit PHP 8.3, MariaDB 15.1 (seit 2025-11-16)
-* Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 2022)
+Zuletzt getestete Serverumgebungen:
+* Apache (nativ) mit PHP 8.3, MariaDB 15.1 (seit 2026-01-31)
+* Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 2022) (seit 2026-01-31)
 
 Getestete Betriebssysteme, Browser und Geräte:
-* Win 10 Edge 123 (bis 2025-11-17)
-* Win 11 Edge 142 (seit 2025-11-18)
-* Win 11 Firefox (bis 2024-05-30)
-* Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
-* Linux Mint 22.2 Firefox 145 (seit 2025-11-16)
-* Android 12 Firefox 133
-* macOS 13 Ventura [Safari 18](#safaris-besondere-bedürfnisse), Edge 131, Firefox 133
-* iOS 18.7.1 [Safari](#safaris-special-needs)
+* Win 11 Edge
+* Linux Mint 22 Firefox
+* Android 12 Firefox
+* iOS 26 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit fehlerhafter Auflösung von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten können.
@@ -1846,7 +1840,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * der Preislistenimport benötigt mehr Zeit für die [Aktualisierung von Artikeln](#importierung-von-lieferantenartikellisten) als für das Löschen und Wiedereinfügen
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[lifespan][session][idle]](#laufzeitvariablen)
-* php.ini Aktivierung folgender Erweiterungen:
+* php.ini Aktivierung folgender Erweiterungen (unter Apache wahrscheinlich nicht benötigt):
     * curl
     * fileinfo
     * gd
@@ -1855,11 +1849,14 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * exif
     * pdo_odbc
     * zip
-    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv sofern zutreffend)
+    * pdo_sqlsrv (sqlsrv sofern zutreffend, [Quelle](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows))
+* php.ini extension_dir = "ext" für IIS Server
+* apt install php8.5-mysql unter Apache sofern noch nicht geschehen
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 * doppelte Escapezeichen zulassen (web.config für IIS Server)
 * IIS: Client-Zertifikate in den SSL-Einstellungen der Website ignorieren
+* Vollzugriff auf das `fileserver` Verzeichnis und dessen Inhalt für IIS-IUSRS erlauben
 
 ### Anwendungseinrichtung
 Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronline1/caro/tree/master/templates) im entsprechenden *template*-Ordner bereit um eine schnelle Verfügbarkeit von Inhalten bei der Inbetriebnahme der Anwendung zu unterstützen. Dateinamen folgen dem Muster `{frei wählbar}.{Typ}.{Standardsprache}.{Dateinamenerweiterung} wobei
