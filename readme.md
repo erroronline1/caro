@@ -31,12 +31,10 @@ Things are still in motion. Images may be outdated.
 ## to do
 * contain filtered filenames into csvfilter export (filename, print header), if available
     * chain destination and source or only if destination does contain ____ or whatever
-* allow pdf format for csv-filter?
 * record restricted_access for generalrecords-context 
     * {unit:[...], permission:[...], user:[...]} with unit/permission intersection, ceo/admin full access
     * exclude self only
     * also see record.inquiry selection $notification_recipients
-* orders: manual returns should request and process $return_reason
 
 ## Content
 * [Aims](#aims)
@@ -1665,6 +1663,12 @@ In case the output of a processed filter (e.g. for the CSV-filter) is supposed t
 }
 ```
 Please consult the documentation for the [XLSXWriter-library](https://github.com/maksimovic/PHP_XLSXWriter) for available options. Formulas have to follow the english notation.
+
+Also, PDF is possible, column widths can be defined:
+
+```javascript
+"pdfformat": ["7%", "12%", "20%", "33%", "10%", "10%", null, "5%", "8%", "5%"]
+```
 
 [Content](#content)
 

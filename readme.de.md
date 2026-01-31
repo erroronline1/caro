@@ -1567,6 +1567,12 @@ Sofern die Ausgabe eines verarbeiteten Filters (z.B. for einen CSV-Filter) in ei
 ```
 Für weitere Optionen wird auf die Dokumentation der [XLSXWriter-Bibliothek](https://github.com/maksimovic/PHP_XLSXWriter) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
 
+Auch die Ausgabe als PDF ist möglich, hier kann die Spaltenbreite bestimmt werden.
+
+```javascript
+"pdfformat": ["7%", "12%", "20%", "33%", "10%", "10%", null, "5%", "8%", "5%"]
+```
+
 [Übersicht](#übersicht)
 
 ## ERP Anbindung
