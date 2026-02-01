@@ -789,7 +789,7 @@ class INSTALL {
 		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
 		imagefill($image, 0, 0, $background_color);
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
-		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		imagefttext($image, $font_size, 0, $x, $y, $text_color,  __DIR__ . '/../media/UbuntuMono-R.ttf', $initials);
 		ob_start();
 		imagepng($image);
 		$image = ob_get_contents();

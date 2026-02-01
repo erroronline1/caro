@@ -73,9 +73,9 @@ class UTILITY {
 				$input = imagecreatetruecolor($new['w'], $height);
 				imagecolortransparent($input, imagecolorallocate($input, 0, 0, 0));
 				$textcolor = imagecolorallocate($input, 1, 1, 1);
-				imagefttext($input, $height / 2, 0, ceil($height / 5), $height - ceil($height / 7), $textcolor, '../media/UbuntuMono-R.ttf', $label);
+				imagefttext($input, $height / 2, 0, ceil($height / 5), $height - ceil($height / 7), $textcolor,  __DIR__ . '/../media/UbuntuMono-R.ttf', $label);
 				$textcolor = imagecolorallocate($input, 255, 255, 255);
-				imagefttext($input, $height / 2, 0, ceil($height / 6), $height - ceil($height / 6), $textcolor, '../media/UbuntuMono-R.ttf', $label);
+				imagefttext($input, $height / 2, 0, ceil($height / 6), $height - ceil($height / 6), $textcolor,  __DIR__ . '/../media/UbuntuMono-R.ttf', $label);
 				imagecopymerge($output, $input, 0, $new['h'] - $height, 0, 0, $new['w'], $new['h'], 99);
 			}
 

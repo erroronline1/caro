@@ -57,7 +57,7 @@ class USER extends API {
 		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
 		imagefill($image, 0, 0, $background_color);
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
-		imagettftext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		imagettftext($image, $font_size, 0, $x, $y, $text_color,  __DIR__ . '/../media/UbuntuMono-R.ttf', $initials);
 		ob_start();
 		imagepng($image);
 		$image = ob_get_contents();
@@ -1208,7 +1208,7 @@ class USER extends API {
 		$font_size = 36;
 		$l = 0;
 		foreach (preg_split('/\s+/m', $STRING) as $line){
-			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, '../media/UbuntuMono-R.ttf', $line);
+			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, __DIR__ . '/../media/UbuntuMono-R.ttf', $line);
 		}
 		ob_start();
 		imagepng($image);
