@@ -35,6 +35,10 @@ Things are still in motion. Images may be outdated.
     * {unit:[...], permission:[...], user:[...]} with unit/permission intersection, ceo/admin full access
     * exclude self only
     * also see record.inquiry selection $notification_recipients
+* further implementation of tc-lib-pdf
+    * refactor _pdf.php
+    * implement selected fonts
+* [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
 
 ## Content
 * [Aims](#aims)
