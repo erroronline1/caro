@@ -39,7 +39,7 @@ class MESSAGE extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-			case 'PUT';
+			case 'PUT':
 				$highlight = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.highlight'));
 				$announcement = [
 					':id' => $this->_announcement,
