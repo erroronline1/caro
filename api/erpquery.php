@@ -183,14 +183,16 @@ class ERPQUERY extends API {
 	public function caselist(){
 		if (!PERMISSION::permissionFor('erpcasedata')) $this->response([], 401);
 		$content = $fields = [];
-		foreach(ERPINTERFACE->customerdata() as $field){
-			$fields[] = [
+		foreach(ERPINTERFACE->customercases() as $field){
+			$current_field = [
 				'type' => $field['type'],
 				'attributes' => [
 					'name' => $field['name'],
 					'value' => UTILITY::propertySet($this->_payload, $field['name']) ? : ''
 				]
 			];
+			if ($field['datalist'] ?? false) $current_field['datalist'] = $field['datalist'];
+			$fields[] = $current_field;
 		}
 		$content[] = $fields;
 
@@ -202,8 +204,7 @@ class ERPQUERY extends API {
 					$links = [];
 					foreach($cases as $case){
 						$description = $case['caseid'] . ' - ' . $case['text'];
-						if ($case['reimbursement']) $description .= ' - ' . $this->_lang->GET('casestate.casedocumentation.reimbursement') . ' ' . $case['reimbursement'];
-						if ($case['settled']) $description .= ' - ' . $this->_lang->GET('casestate.casedocumentation.settled') . ' ' . $case['settled'];
+						if ($case['info']) $description .= ' - ' . $case['info'];
 						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "const formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', 'erpcasepositions', null, formdata);"];
 					}
 					$content[] = [
@@ -238,13 +239,15 @@ class ERPQUERY extends API {
 	public function pastorders(){
 		$content = $fields = [];
 		foreach(ERPINTERFACE->pastorders() as $field){
-			$fields[] = [
+			$current_field = [
 				'type' => $field['type'],
 				'attributes' => [
 					'name' => $field['name'],
 					'value' => UTILITY::propertySet($this->_payload, $field['name']) ? : ''
 				]
 			];
+			if ($field['datalist'] ?? false) $current_field['datalist'] = $field['datalist'];
+			$fields[] = $current_field;
 		}
 		$content[] = [
 			'type' => 'collapsible',
@@ -312,13 +315,15 @@ class ERPQUERY extends API {
 	public function patientlookup($rendertype = 'textsection'){
 		$content = $fields = [];
 		foreach(ERPINTERFACE->customerdata() as $field){
-			$fields[] = [
+			$current_field = [
 				'type' => $field['type'],
 				'attributes' => [
 					'name' => $field['name'],
 					'value' => UTILITY::propertySet($this->_payload, $field['name']) ? : ''
 				]
 			];
+			if ($field['datalist'] ?? false) $current_field['datalist'] = $field['datalist'];
+			$fields[] = $current_field;
 		}
 		$content[] = $fields;
 
