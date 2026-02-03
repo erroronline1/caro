@@ -133,12 +133,22 @@ class _ERPINTERFACE {
 		/**
 		 * try to preserve the order passed from customerdata() to keep the refined weighted order
 		 * 
+		 * on !$request
+		 * return [
+		 * 		...$this->customerdata(),
+		 * 		[
+		 * 			'name' => string,
+		 * 			'type' => string, // text, date, number
+		 * 			'datalist' => array // for recommendations if applicable
+		 * 		],
+		 * 		...
+		 * ]
+		 * 
 		 * return [
 		 * 		'{patient}' => [ // e.g. a concatenation of patient name and date of birth
 		 * 			'caseid' => string,
 		 * 			'text' => string,
-		 * 			'reimbursement' => string Y-m-d,
-		 * 			'settled' => string Y-m-d
+		 * 			'info' => string
 		 * 		],
 		 * 		...
 		 * ]
@@ -169,6 +179,7 @@ class _ERPINTERFACE {
 		 * 		[
 		 * 			'name' => string,
 		 * 			'type' => string, // text, date, number
+		 * 			'datalist' => array // for recommendations if applicable
 		 * 		],
 		 * 		...
 		 * ]
@@ -447,6 +458,7 @@ class _ERPINTERFACE {
 		 * 		[
 		 * 			'name' => string,
 		 * 			'type' => string, // text, date, number
+		 * 			'datalist' => array // for recommendations if applicable
 		 * 		],
 		 * 		...
 		 * ]
@@ -951,15 +963,42 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameters according to the usecase e.g. dbo driver
 	 */
-	public function customercases($request = null){
+	public function customercases($request = null){ 
 		$query = <<<'END'
 		SELECT
 			vorgang.REFERENZ,
 			vorgang.LEISTUNG,
 			CONVERT(varchar(255), vorgang.KV_DATUM, 104) AS KV_DATUM,
+			sys1.GENEHMIGT,
+			CONVERT(varchar(255), vorgang.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+			sys2.GELIEFERT,
+			CONVERT(varchar(255), vorgang.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+			sys3.FAKTURIERT,
 			CONVERT(varchar(255), vorgang.FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
-			pat.REFERENZ as Patientennummer
+			pat.REFERENZ as Patientennummer,
+			UNIT.BETRIEB
 		FROM [eva3_02_viva_souh].[dbo].[vorgaenge] as vorgang
+		INNER JOIN (
+			SELECT
+				KENNZEICHEN,
+				BEZEICHNUNG AS GENEHMIGT
+			FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+			WHERE AUSWAHLART = 'AuftragsGenehmigung'
+		) AS [sys1] ON [sys1].KENNZEICHEN = vorgang.GENEHMIGT
+		INNER JOIN (
+			SELECT
+				KENNZEICHEN,
+				BEZEICHNUNG AS GELIEFERT
+			FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+			WHERE AUSWAHLART = 'AuftragsLieferung'
+		) AS [sys2] ON [sys2].KENNZEICHEN = vorgang.GELIEFERT
+		INNER JOIN (
+			SELECT
+				KENNZEICHEN,
+				BEZEICHNUNG AS FAKTURIERT
+			FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
+			WHERE AUSWAHLART = 'AuftragsFakturierung'
+		) AS [sys3] ON [sys3].KENNZEICHEN = vorgang.FAKTURIERT
 		INNER JOIN (
 			SELECT
 				a.NAME_1 as NACHNAME,
@@ -973,6 +1012,17 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 		) AS pat ON pat.REFERENZ = vorgang.ADRESSEN_REFERENZ
+		INNER JOIN
+		(
+			SELECT
+				names.NAME_3 AS BETRIEB,
+				unit.ADRESSEN_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+			INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+			INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+			WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+			AND names.NAME_3 LIKE :unit
+		) AS UNIT ON vorgang.BETRIEB = UNIT.ADRESSEN_REFERENZ
 
 		WHERE pat.REFERENZ IN (:ref)
 		AND vorgang.LEISTUNG IS NOT NULL
@@ -980,11 +1030,63 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		ORDER BY vorgang.ID DESC
 		END;
 
-		if (!$request) return [[]];
+		if (!$request) {
+			$inputs = $this->customerdata();
+
+			$unitquery = <<<END
+				SELECT
+					names.NAME_3 AS BETRIEB,
+					unit.ADRESSEN_REFERENZ
+				FROM [eva3_02_viva_souh].[dbo].[adr_betrieb] AS unit
+				INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS names ON unit.ADRESSEN_REFERENZ = names.REFERENZ
+				INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS unita ON unita.REFERENZ = names.ADRESSART
+				WHERE unita.BEZEICHNUNG = 'Betrieb / Filiale'
+				AND names.NAME_3 IS NOT NULL
+			END;
+
+			try{
+				$statement = $this->_pdo->prepare($unitquery);
+				$statement->execute();	
+			}
+			catch(\EXCEPTION $e){
+				UTILITY::debug($e, $statement->debugDumpParams());
+			}
+			$result = $statement->fetchAll();
+			$statement = null;
+			if ($datalist = array_column($result, 'BETRIEB')){
+				// this may extend inputs and handle available languages as well!
+				$language = $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'];
+				switch($language){
+					case 'en':
+						array_push($inputs, 
+							[
+								'name' => 'Unit',
+								'type' => 'text',
+								'datalist' => $datalist
+							]
+						);
+					case 'de':
+						array_push($inputs, 
+							[
+								'name' => 'Fachbereich',
+								'type' => 'text',
+								'datalist' => $datalist
+							]
+						);
+				}
+			}
+
+			return $inputs;
+		}
+
+		$requested_unit = $request['Unit'] ?? $request['Fachbereich'];
+		$requested_unit = $requested_unit ? trim($requested_unit) : '%';
+
 		if (!($customers = $this->customerdata($request))) return [[]];
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref['ERPNR']), $customers))
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref['ERPNR']), $customers)),
+				':unit' => $this->_pdo->quote($requested_unit)
 			]));
 			$statement->execute();	
 		}
@@ -1008,8 +1110,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			$pre_response[$row['Patientennummer']]['cases'][] = [
 				'caseid' => $row['REFERENZ'],
 				'text' => $row['LEISTUNG'],
-				'reimbursement' => $row['KV_DATUM'],
-				'settled' => $row['FAKTURIERT_DATUM']
+				'info' => implode(', ', array_filter([
+					$row['BETRIEB'],
+					($row['KV_DATUM'] ? 'KV (' . $row['KV_DATUM'] . ')' : null ),
+					$row['GENEHMIGT'] . ( ($row['GENEHMIGT_DATUM'] ? ' (' . $row['GENEHMIGT_DATUM'] . ')' : '' ) ),
+					$row['GELIEFERT'] . ( ($row['GELIEFERT_DATUM'] ? ' (' . $row['GELIEFERT_DATUM'] . ')' : '' ) ),
+					$row['FAKTURIERT'] . ( ($row['FAKTURIERT_DATUM'] ? ' (' . $row['FAKTURIERT_DATUM'] . ')' : '' ) )
+				], fn($v) => $v)),
 			];
 		}
 		// skip empty, make patient name key for response
@@ -2063,7 +2170,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			switch($export){
 				case 'pdf':
 					require_once('./_pdf.php');
-					$PDF = new PDF(CONFIG['pdf']['table']);		
+					$PDF = new PDF(CONFIG['pdf']['table']);
 					$content = [
 						'title' => $key,
 						'date' => date('Y-m-d') . ' - ' . json_encode($pdfparam),
