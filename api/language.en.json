@@ -1169,9 +1169,17 @@
 			"not_found": "Logfile not found and has most probably just been deleted",
 			"delete": "Delete cron.log with :count entries"
 		},
+		"erp_connection": {
+			"confirmation": "The ERP-interface is now :state",
+			"enabled": "enabled",
+			"explanation":"You can change the availability of the ERP-interface in case of maintenance work. Please consider an :announcement if changing states.",
+			"disabled": "disabled",
+			"select": "State of the ERP-interface"
+		},
 		"navigation": {
 			"cron_log": "Cron Log",
 			"cronoverride": "Initiate background update manually",
+			"erp_connection": "ERP-connection",
 			"maintenance": "Maintenance",
 			"productsupdate": "Product lists update",
 			"records_datalist": "Record datalist",

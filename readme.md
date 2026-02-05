@@ -1184,6 +1184,7 @@ The application has some options to be maintained by authorized users:
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 * Risk data can be imported/updated through dedicated CSV-files.
 * In case of an available product list import via the [ERP interface](#erp-interface) there is an option to update the whole product database in one go. 
+* During ERP-software maintenance the interface can be temporarily disabled.
 
 [Content](#content)
 
@@ -1767,6 +1768,9 @@ If provided, the query returns employees having birthday in a passed timespan, t
 
 ### ERP queries module
 The default module contains available options for data retrieval from the [teams](#the-team) ERP-software, many workmates have been asking for. This may have to be adjusted to your available solutions as well, but here it may get necessary to get accomodated to this applications code syntax and data structures such as language models and backend widget construction. Sorry for that in advance.
+
+### Connection setting
+The connection can be disabled/enabled during runtime from within the [maintenance-module](#maintenance) to take maintenance work into account, where the ERP maintenance may conflict with database queries.
 
 [Content](#content)
 
@@ -4342,12 +4346,12 @@ Parameters
 
 > DELETE ./api/api.php/maintenance/task/{task}
 
-Currently only deleting cron.log
+Currently deleting cron.log and disabling ERP-interface
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {task} | path parameter | required | cron_log |
+| {task} | path parameter | required | cron_log, erp_connection |
 
 Sample response
 HTTP status code 410 or 404.
@@ -4372,13 +4376,13 @@ Sample response
 
 > PUT ./api/api.php/maintenance/task/{task}
 
-Currently only Updates vendor information.
+Currently updates on vendor information and reenabling ERP-interface
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {task} | path parameter | required | vendorupdate |
-| payload | form data | required | selected updates |
+| {task} | path parameter | required | vendorupdate, erp_connection |
+| payload | form data | optional  | selected updates |
 
 Sample response
 ```

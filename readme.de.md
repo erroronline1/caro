@@ -1084,6 +1084,7 @@ Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
 * Risiko-Daten können durch entsprechende CSV-Dateien importiert oder aktualisiert werden.
 * Im Falle eines verfügbaren Artikellistenimports durch die [ERP-Anbindung](#erp-anbindung) besteht die Option die gesamte Artikel-Datenbank in einem Rutsch zu aktualisieren.
+* Während Wartungsarbeiten an der ERP-Software kann die Verbindung zwischenzeitlich deaktiviert werden.
 
 [Übersicht](#übersicht)
 
@@ -1666,6 +1667,9 @@ Sofern verfügbar, beantwortet diese Methode mit einer Liste von Mitarbeitern di
 
 ### ERP-Abfragemodul
 Das Standardmodul beinhaltet verfügbare Optionen zur Dateneinsicht in die ERP-Software des [Teams](#das-team), wonach viele Kollegen gefragt haben. Das Modul muss gegebenenfalls an die jeweilig verfügbare Lösung angepasst werden, aber an dieser Stelle wird es erforderlich sich mit der Syntax und den Datenstrukturen des Quelltextes vertraut zu machen, wie Sprachmodell und die Konstruktion der Widgets durch das Backend. Entschuldigung vorab dafür.
+
+### Verbindungseinstellungen
+Die Verbindung zur ERP-Schnittstelle kann wärend der Laufzeit im [Wartungs-Modul](#wartung) aktiviert und deaktiviert werden um Wartungsarbeiten an der ERP-Software und ewaige Konflikte mit Datenbankabfragen zu berücksichtigen.
 
 [Übersicht](#übersicht)
 

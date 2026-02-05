@@ -12,6 +12,58 @@
 namespace CARO\API;
 
 // application maintainance tools
+
+/*
+https://github.com/mauris/ini-writer
+*/
+class Dumper {
+    public function dump($input)
+    {
+        $output = '';
+        foreach ($input as $section => $array) {
+            $output .= self::writeSection($section, $array);
+        }
+
+        return $output;
+    }
+
+    protected static function writeSection($section, $array)
+    {
+        $subsections = array();
+        $output = "[$section]\n";
+        foreach ($array as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                $key = $section . '.' . $key;
+                $subsections[$key] = (array) $value;
+            } else {
+                $output .= self::normalizeKey($key) . '=';
+                if (is_string($value)) {
+                    $output .= '"' . addslashes($value) .'"';
+                } elseif (is_bool($value)) {
+                    $output .= $value ? 'true' : 'false';
+                } else {
+                    $output .= $value;
+                }
+                $output .= "\n";
+            }
+        }
+
+        if ($subsections) {
+            $output .= "\n";
+            foreach ($subsections as $section => $array) {
+                $output .= self::writeSection($section, $array);
+            }
+        }
+
+        return $output;
+    }
+
+    protected static function normalizeKey($key)
+    {
+        return str_replace('=', '_', $key);
+    }
+}
+
 class MAINTENANCE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
@@ -67,6 +119,100 @@ class MAINTENANCE extends API {
 	}
 	
 	/**
+	 *                                             _   _
+	 *   ___ ___ ___       ___ ___ ___ ___ ___ ___| |_|_|___ ___
+	 *  | -_|  _| . |     |  _| . |   |   | -_|  _|  _| | . |   |
+	 *  |___|_| |  _|_____|___|___|_|_|_|_|___|___|_| |_|___|_|_|
+	 *          |_| |_____|
+	 * temporarily disable erp-connection by overloading CONFIG['system']['erp']
+	 */
+	private function erp_connection(){
+		$response = ['render' => ['content' => []]];
+		$config_copy = constant('CONFIG');
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				// reactivate erp_connection by restoring initial config
+				$unlinkfile = null;
+				if (is_file('_config.env')) {
+					// overwrite env file with copy and delete it
+					copy('_config.env', 'config.env');
+					$unlinkfile = '_config.env';
+				}
+				else {
+					// delete env file als fallback to ini file
+					// CAUTION: the api does not know if the env-file is intended. two consecutive calls could mess up the setting.
+					// this should somewhat be handled from the frontend. bit messy, i know
+					$unlinkfile = 'config.env';
+				}
+				if ($unlinkfile && unlink($unlinkfile)){
+					$response['render']['content'][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.erp_connection.confirmation', [':state' => $this->_lang->GET('maintenance.erp_connection.enabled')]),
+								'class' => 'orange'
+							]
+						]
+					];
+				}
+				break;
+			case 'DELETE':
+				// deactivate erp_connection by overriding config, saving current state as a copy or creating an env file
+				if (is_file('config.env')) {
+					// create env file copy
+					copy('config.env', '_config.env');
+				}
+				// create or overwrite env file
+				$config_copy['system']['erp'] = false;
+
+				$dump = new Dumper();
+				if (file_put_contents('config.env', $dump->dump($config_copy))){
+					$response['render']['content'][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.erp_connection.confirmation', [':state' => $this->_lang->GET('maintenance.erp_connection.disabled')]),
+								'class' => 'orange'
+							]
+						]
+					];
+				}
+				break;
+		}
+
+		$selection = [
+			$this->_lang->GET('maintenance.erp_connection.enabled') => [
+				'onchange' => "api.maintenance('put', 'task', 'erp_connection')",
+				'class' => 'green'
+			],
+			$this->_lang->GET('maintenance.erp_connection.disabled') => [
+				'onchange' => "api.maintenance('delete', 'task', 'erp_connection')",
+				'class' => 'red'
+			]
+		];
+		if ((ERPINTERFACE && ERPINTERFACE->_instatiated && $config_copy['system']['erp']) || $_SERVER['REQUEST_METHOD'] === 'PUT')
+			$selection[$this->_lang->GET('maintenance.erp_connection.enabled')]['checked'] = true;
+		else
+			$selection[$this->_lang->GET('maintenance.erp_connection.disabled')]['checked'] = true;
+
+		$response['render']['content'][] = [
+			[
+				'type' => 'textsection',
+				'htmlcontent' => $this->_lang->GET('maintenance.erp_connection.explanation', [':announcement' => '<a href="javascript: api.message(\'get\', \'announcements\')" class="inline">' . $this->_lang->GET('message.announcement.new') . '</a>'])
+			],
+			[
+				'type' => 'radio',
+				'attributes' => [
+					'name' => $this->_lang->GET('maintenance.erp_connection.select')
+				],
+				'content' => $selection
+			]
+		];
+		return $response;
+	}
+
+
+	/**
 	 *   _           _   
 	 *  | |_ ___ ___| |_ 
 	 *  |  _| .'|_ -| '_|
@@ -80,6 +226,7 @@ class MAINTENANCE extends API {
 		
 		$methods = [
 			'cron_log',
+			'erp_connection',
 			'records_datalist',
 			'riskupdate',
 			'vendorupdate',

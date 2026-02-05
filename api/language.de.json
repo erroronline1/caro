@@ -1169,9 +1169,17 @@
 			"not_found": "Logfile wurde nicht gefunden und wurde vermutlich gerade eben gelöscht",
 			"delete": "cron.log mit :count Einträgen löschen"
 		},
+		"erp_connection": {
+			"confirmation": "Die ERP-Anbindung ist jetzt :state",
+			"enabled": "aktiviert",
+			"explanation":"Du kannst die Anbindung des ERPs im Falle von Wartungsarbeiten ändern. Bitte ziehe eine :announcement in Erwägung, falls du den Status änderst.",
+			"disabled": "deaktiviert",
+			"select": "Status der ERP-Anbindung"
+		},
 		"navigation": {
 			"cron_log": "Cron Log",
 			"cronoverride": "Hintergrundaktualisierung manuell ausführen",
+			"erp_connection": "ERP-Anbindung",
 			"maintenance": "Wartung",
 			"productsupdate": "Aktualisierung der Artikellisten",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
