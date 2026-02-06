@@ -382,8 +382,9 @@ class PDF{
 						}
 						preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value with contributor for full export
 						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
-						$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
-						if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
+
+						if (isset($content['attachments'][$document]) && in_array($link[1], $content['attachments'][$document])){
+							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
 							$file = pathinfo($path);
 							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 								// inline image embedding
