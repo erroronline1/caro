@@ -13,7 +13,6 @@ namespace CARO\API;
 
 require(__DIR__ . '/../vendor/autoload.php');
 
-//require_once('../vendor/TCPDF/tcpdf.php');
 error_reporting(E_ALL);
 class PDF{
 	private $_setup = [];
@@ -22,8 +21,8 @@ class PDF{
 	public function __construct($setup){
 		$this->_setup = [
 			'format' => $setup['format'] ?? 'A4',
-			'unit' => $setup['unit'] ?? PDF_UNIT,
-			'orientation' => $setup['orientation'] ?? PDF_PAGE_ORIENTATION,
+			'unit' => $setup['unit'] ?? 'mm',
+			'orientation' => $setup['orientation'] ?? NULL,
 			'margintop' => isset($setup['margintop']) ? intval($setup['margintop']) : 30,
 			'marginright' => isset($setup['marginright']) ? intval($setup['marginright']) : 15,
 			'marginbottom' => isset($setup['marginbottom']) ? intval($setup['marginbottom']) : 20,
@@ -57,7 +56,7 @@ class PDF{
 		$this->_pdf->SetTitle($content['title']);
 
 		// set margins
-		if ($this->_setup['header']){
+/*		if ($this->_setup['header']){
 			$this->_pdf->SetMargins($this->_setup['marginleft'], PDF_MARGIN_HEADER + $this->_setup['margintop'], $this->_setup['marginright'], true);
 			$this->_pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		} else {
@@ -76,7 +75,7 @@ class PDF{
 		$this->_pdf->setCellMargins(0, 0, 0, 0);
 		// set color for background
 		$this->_pdf->SetFillColor(255, 255, 255);
-	}
+*/	}
 
 	private function return($content){
 		// export pdf to temp and return link
@@ -498,37 +497,66 @@ class PDF{
 
 		return $this->return($content);
 	}
+
+	public function test(){
+		// create a pdf for a timesheet output
+		$this->init(['title'=>'lorem']);
+		$this->_pdf->AddPage();
+		//$rawpdf = $this->_pdf->getOutPDFString();
+		//$this->_pdf->renderPDF($rawpdf);
+
+		}
 }
 
 class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	// custom pdf header and footer
-	public $qrcodesize = null;
+/*	public $qrcodesize = null;
 	public $qrcodecontent = null;
 	public $header = null;
 	public $_setup = null;
-
+*/
 	public function __construct($setup, $unicode = true, $encoding = 'UTF-8', $diskcache = false, $pdfa = false, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
 //		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
 		parent::__construct($setup['unit']);
-		$this->qrcodesize = $qrcodesize;
+/*		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
 		$this->header = $header;
 		$this->_setup = $setup;
+*/
+		$this->enableDefaultPageContent();
+
 	}
 
 	// forces pagebreak if content exceeds name or page height
 	public function applyCustomPageBreak($lines, $lineheight) {
-		if ($this->GetY() > $this->getPageHeight() - $this->_setup['marginbottom'] - $lines * $lineheight) {
+	/*	if ($this->GetY() > $this->getPageHeight() - $this->_setup['marginbottom'] - $lines * $lineheight) {
 			if ($this->getNumPages() < $this->getPage() + 1) $this->AddPage();
 			$this->SetY($this->_setup['margintop']);
 		}
 		if ($this->getNumPages() > $this->getPage()) $this->setPage($this->getPage() + 1);
+	*/
 	}
 
-	//Page header
-	public function Header() {
-		// Title
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+    /**
+     * Sets the page common content like Header and Footer.
+     * Override this method to add custom content to all pages.
+     *
+     * @param int $pid Page index. Omit or set it to -1 for the current page ID.
+     *
+     * @return string PDF output code.
+     */
+/*    public function defaultPageContent(int $pid = -1): string
+    {
+		$_lang = new LANG();
+        if ($pid < 0) {
+            $pid = $this->page->getPageId();
+        }
+        $page = $this->page->getPage($pid);
+        $out = $this->graph->getStartTransform();
+        $out .= $this->defaultfont['out'];
+        $out .= $this->color->getPdfColor('black');
+
+		//header
 		$right_margin = 0;
 		if ($image = $this->_setup['header_image']){
 			// given the image will always be 20mm high
@@ -537,56 +565,160 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				$right_margin = $width * 20 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 				$header_image = $this->image->add('../' . $image);
-				$header_image_out = $this->image->getSetImage($header_image, 0, 10, $width / $height * 20, 20, 200);
-				$this->page->addContent($header_image_out);
-
+				$header_image_out = $this->image->getSetImage(
+					$header_image,
+					$page['width'] - $this->toUnit($width),
+					0,
+					$this->toUnit($width / $height * 20),
+					$this->toUnit(20),
+					$page['height']);
+				$out .= $this->page->addContent($header_image_out);
 				$right_margin += 5;
 			}
 		}
-		if ($this->_setup['header']){
+		if ($this->header['title']) {
 			$this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
-			if ($this->header['title']) $this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+			$txtbox = $this->getTextCell(
+				$this->header['title'], // string $txt,
+				$this->toUnit(110 - $right_margin), // float $posx = 0,
+				0, // float $posy = 0,
+				$this->toUnit(90), // float $width = 0,
+				0, // float $height = 0,
+				15, // float $offset = 0,
+				1, // float $linespace = 0,
+				'R', // string $valign = 'C',
+				'J', // string $halign = 'C',
+				null, // ?array $cell = null,
+				[], // array $styles = [],
+				0, // float $strokewidth = 0,
+				0, // float $wordspacing = 0,
+				0, // float $leading = 0,
+				0, // float $rise = 0,
+				true, // bool $jlast = true,
+				true, // bool $fill = true,
+				false, // bool $stroke = false,
+				false, //bool $underline = false,
+				false, //bool $linethrough = false,
+				false, //bool $overline = false,
+				false, // bool $clip = false,
+				false, // bool $drawcell = true,
+				'', // string $forcedir = '',
+				null // ?array $shadow = null,
+			);
+			$out .= $this->page->addContent($txtbox);
+		}
+		if ($this->header['date']){
 			$this->font->insert($this->pon, 'helvetica', '', 10); // font size
-			if ($this->header['date']) $this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+			$txtbox = $this->getTextCell(
+				$this->header['date'], // string $txt,
+				$this->toUnit(110 - $right_margin), // float $posx = 0,
+				0, // float $posy = 0,
+				$this->toUnit(90), // float $width = 0,
+				0, // float $height = 0,
+				15, // float $offset = 0,
+				1, // float $linespace = 0,
+				'R', // string $valign = 'C',
+				'J' // string $halign = 'C',
+			);
+			$out .= $this->page->addContent($txtbox);
 		}
 		if ($this->qrcodecontent){
-			$style = array(
-				'border' => 0,
-				'vpadding' => 'auto',
-				'hpadding' => 'auto',
-				'fgcolor' => array(0,0,0),
-				'bgcolor' => false, //array(255,255,255)
-				'module_width' => 1, // width of a single module in points
-				'module_height' => 1 // height of a single module in points
+			$barcode_style = [
+				'lineWidth' => 0,
+				'lineCap' => 'butt',
+				'lineJoin' => 'miter',
+				'dashArray' => [],
+				'dashPhase' => 0,
+				'lineColor' => 'black',
+				'fillColor' => 'black',
+			];
+
+			$barcode1 = $this->getBarcode(
+				'QRCODE,' . CONFIG['limits']['qr_errorlevel'],
+				$this->qrcodecontent,
+				10,
+				10,
+				-1,
+				-1,
+				[0, 0, 0, 0],
+				$barcode_style
 			);
-			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
-			$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
+			$this->page->addContent($barcode1);
+
+			$txtbox = $this->getTextCell(
+				$this->qrcodecontent, // string $txt,
+				50, // float $posx = 0,
+				$this->qrcodesize, // float $posy = 0,
+				0, // float $width = 0,
+				0, // float $height = 0,
+				15, // float $offset = 0,
+				1, // float $linespace = 0,
+				'L', // string $valign = 'C',
+				'J' // string $halign = 'C',
+
+			);
+			$out .= $this->page->addContent($txtbox);
 		}
-	}
 
-	// Page footer
-	public function Footer() {
-		$_lang = new LANG();
+		//footer
+        if ($this->defaultfont === null) {
+            $this->defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10);
+        }
 
-		// Position at 15 mm from bottom
-		$this->SetY(-15);
 		$imageMargin = 0;
 		if ($image = $this->_setup['footer_image']){
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
 				$imageMargin = $width * 10 / $height;
-				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageWidth() - 10 - $imageMargin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$footer_image = $this->image->add('../' . $image);
+				$footer_image_out = $this->image->getSetImage(
+					$footer_image,
+					$page['height'] - $this->toUnit($height),
+					$page['width'] - $this->toUnit($width),
+					$this->toUnit($width / $height * 20),
+					$this->toUnit(20),
+					$page['height']);
+				$out .= $this->page->addContent($footer_image_out);
+								
 				$imageMargin += 5;
 			}
 		}
-		// Set font
-		$this->SetFont('helvetica', 'I', 8);
-		// company contacts and page number
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$this->MultiCell($this->getPageWidth() - $this->_setup['marginleft'] - 10 - $imageMargin, 10, $_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, $this->_setup['marginleft'], $this->GetY(), true, 0, false, true, $this->_setup['marginbottom'], 'T', true);
-	}
+		$this->font->insert($this->pon, 'helvetica', '', 8); // font size
+		$txtbox = $this->getTextCell(
+			$_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'] . ' | ' . (string) ($pid + 1), // string $txt,
+            $this->toUnit($this->defaultfont['dw']),
+            $page['height'] - (2 * $this->toUnit($this->defaultfont['height'])),
+            $page['width'] - (4 * $this->toUnit($this->defaultfont['dw'])),
+			0, // float $height = 0,
+			15, // float $offset = 0,
+			1, // float $linespace = 0,
+			'C', // string $valign = 'C',
+			'J' // string $halign = 'C',
+		);
+		$this->page->addContent($txtbox);
+
+
+        // print page number in the footer
+        $prevcell = $this->defcell;
+        $this->defcell = $this::ZEROCELL; // @phpstan-ignore assign.propertyType
+
+        $out .= $this->getTextCell(
+            (string) ($pid + 1),
+            $this->toUnit($this->defaultfont['dw']),
+            $page['height'] - (2 * $this->toUnit($this->defaultfont['height'])),
+            $page['width'] - (4 * $this->toUnit($this->defaultfont['dw'])),
+            0,
+            0,
+            0,
+            'T',
+            ($this->rtl ? 'L' : 'R'),
+        );
+        $out .= $this->graph->getStopTransform();
+        $this->defcell = $prevcell;
+        return $out;
+    }
+*/
 }
 
 ?>

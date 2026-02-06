@@ -36,8 +36,7 @@ Things are still in motion. Images may be outdated.
     * exclude self only
     * also see record.inquiry selection $notification_recipients
 * further implementation of tc-lib-pdf
-    * refactor _pdf.php, also consider possible image arrays values
-    * implement selected fonts
+    * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
 
 ## Content
