@@ -380,29 +380,32 @@ class PDF{
 							$valueLines += $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
 							continue;
 						}
-						preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value with contributor for full export
+						preg_match("/(.+?) (\(.+?\))$/", $value, $link); // attachment value with contributor for full export
 						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
 
-						if (isset($content['attachments'][$document]) && in_array($link[1], $content['attachments'][$document])){
-							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
-							$file = pathinfo($path);
-							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-								// inline image embedding
-								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-								list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $path);
-								$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
-								$outputsize = [
-									'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
-									'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
-								];
-								$this->_pdf->Image('.' . $path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
-								$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
-							}
-							else {
-								// file attachment
-								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-								// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-								$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $path));
+						$possibleFiles = explode(', ', $link[1]);
+						if (isset($content['attachments'][$document]) && array_intersect($possibleFiles, $content['attachments'][$document])){
+							foreach($possibleFiles as $filename){
+								$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $filename;
+								$file = pathinfo($path);
+								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+									// inline image embedding
+									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+									list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $path);
+									$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+									$outputsize = [
+										'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
+										'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
+									];
+									$this->_pdf->Image('.' . $path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+									$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
+								}
+								else {
+									// file attachment
+									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+									// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
+									$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $path));
+								}	
 							}
 						}
 						// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
