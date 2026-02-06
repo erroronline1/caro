@@ -1880,6 +1880,8 @@ Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronlin
 
 Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unübersichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Artikellistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 
+[Installation der Schriftarten für die PDF Bibliothek tc-lib-pdf-font](https://github.com/tecnickcom/tc-lib-pdf-font?tab=readme-ov-file#running-all-tests). Sieht kompliziert aus, ist aber keine Raktenwissenschaft wenn man im Stande ist die Anwendung an sich zu installieren.
+
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und Manual-Vorlagen)

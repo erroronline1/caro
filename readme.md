@@ -39,8 +39,6 @@ Things are still in motion. Images may be outdated.
     * refactor _pdf.php, also consider possible image arrays values
     * implement selected fonts
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
-* order filter recognize "commission #timestamp" like the exported labels!
-* multiple orders have been submitted, maybe lock submit button after press?
 
 ## Content
 * [Aims](#aims)
@@ -1982,6 +1980,8 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
 > the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
 
 If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and product list imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
+
+[Install the fonts for the PDF library tc-lib-pdf-font](https://github.com/tecnickcom/tc-lib-pdf-font?tab=readme-ov-file#running-all-tests). Appears somewhat advanced, but is no rocket science if you're able to install the application per se.
 
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
