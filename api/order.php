@@ -1335,6 +1335,7 @@ class ORDER extends API {
 				if ($product) $order_data2['productid'] = $product['id'];
 			}
 
+			// verify return_reason 
 			if ($order_data2['order_type'] === 'return'){
 				if (!isset($order_data2['return_reason']) || !$order_data2['return_reason']) $this->response(['MISSING RETURN REASON'], 417);
 				$order_data2 = $this->return_criticality($order_data2);
@@ -1730,6 +1731,10 @@ class ORDER extends API {
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['id'];
+		// verify return_reason 
+		if ($order_data['order_type'] === 'return'){
+			if (!isset($order_data['return_reason']) || !$order_data['return_reason']) $this->response(['MISSING RETURN REASON'], 417);
+		}
 
 		if (!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
@@ -1774,14 +1779,14 @@ class ORDER extends API {
 						]
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
-					'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
-					. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true));
+						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
+						. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true)
+					);
 				}
 			}
 		}
 		else {
-			$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['easy']);
-			$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.easy.' . $criticality, [], true) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+			$decoded_order_data['additional_info'] = ($this->_lang->_DEFAULT['order_returns']['easy'][$return_reason] ?? $return_reason) . "\n" . ($decoded_order_data['additional_info'] ?? '');
 		}
 		return $decoded_order_data;
 	}
