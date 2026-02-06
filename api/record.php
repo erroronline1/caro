@@ -591,7 +591,7 @@ class RECORD extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.create_identifier'))) {
-					$content = UTILITY::identifier($content, $this->_appendDate ? $this->_date['usertime']->format('Y-m-d H:i:s') : null);
+					$content = UTILITY::identifier($content, $this->_appendDate && !in_array($this->_appendDate, ['null', 'false']) ? $this->_date['usertime']->format('Y-m-d H:i:s') : null);
 				}
 				if ($content){
 					$downloadfiles = [];
