@@ -39,7 +39,6 @@ Things are still in motion. Images may be outdated.
     * refactor _pdf.php, also consider possible image arrays values
     * implement selected fonts
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
-* order filter selection (stock/return) as checkbox, not radio
 * order filter recognize "commission #timestamp" like the exported labels!
 * multiple orders have been submitted, maybe lock submit button after press?
 

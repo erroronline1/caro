@@ -620,7 +620,13 @@ export const _client = {
 			const filter = {};
 			if (document.getElementById("filterterm")) filter.term = document.getElementById("filterterm").value;
 			if (document.getElementById("timespan")) filter.timespan = document.getElementById("timespan").value;
-			if (document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked")) filter.etc = document.querySelector("[name='" + api._lang.GET("order.order_filter_etc") + "']:checked").value;
+			if (document.querySelectorAll("[data-grouped='" + api._lang.GET("order.order_filter_etc") + "']:checked").length) {
+				filter.etc = [];
+				[...document.querySelectorAll("[data-grouped='" + api._lang.GET("order.order_filter_etc") + "']:checked")].forEach((node) => {
+					filter.etc.push(node.value);
+				});
+				filter.etc = filter.etc.join("|");
+			}
 			if (document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked").length) {
 				filter.unit = [];
 				[...document.querySelectorAll("[data-grouped='" + api._lang.GET("order.organizational_unit") + "']:checked")].forEach((node) => {
@@ -692,7 +698,7 @@ export const _client = {
 					etc[value] = {
 						value: key,
 					};
-					if (data.filter.etc === key || (!data.filter.etc && key === "null")) etc[value].checked = true;
+					if (data.filter.etc && data.filter.etc.includes(key)) etc[value].checked = true;
 				}
 
 				content[content.length - 1].push(
@@ -704,7 +710,7 @@ export const _client = {
 						content: organizational_units,
 					},
 					{
-						type: "radio",
+						type: "checkbox",
 						attributes: {
 							name: api._lang.GET("order.order_filter_etc"),
 						},

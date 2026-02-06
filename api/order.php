@@ -359,7 +359,7 @@ class ORDER extends API {
 				foreach(['term', 'timespan', 'unit', 'etc'] as $f){
 					$filter[$f] = UTILITY::propertySet($this->_payload, $f) ? : null;
 					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00'; // append seconds to datetime-local
-					if ($f === 'unit' && $filter[$f]) $filter[$f] = explode('|', $filter[$f]);
+					if (in_array($f, ['unit', 'etc']) && $filter[$f]) $filter[$f] = explode('|', $filter[$f]);
 				}
 				// this parcour maneuver is necessary to set the requested units for users with unit selector
 				// as well as these without
@@ -524,10 +524,10 @@ class ORDER extends API {
 
 					// filter
 					if (
-						($filter['etc'] === 'stock' && !isset($product['stock_item']))
-						|| ($filter['etc'] === 'stock_none' && isset($product['stock_item']))
-						|| ($filter['etc'] === 'returns' && $row['ordertype'] !== 'return')
-						|| ($filter['etc'] === 'returns_none' && $row['ordertype'] === 'return')
+						(in_array('stock', $filter['etc'] ?? []) && !isset($product['stock_item']))
+						|| (in_array('stock_none', $filter['etc'] ?? []) && isset($product['stock_item']))
+						|| (in_array('returns', $filter['etc'] ?? []) && $row['ordertype'] !== 'return')
+						|| (in_array('returns_none', $filter['etc'] ?? []) && $row['ordertype'] === 'return')
 						|| ($filter['timespan'] && $row[$this->_orderState ? : 'approved'] < $filter['timespan'])
 						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
 					) continue;
