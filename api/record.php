@@ -1316,12 +1316,6 @@ class RECORD extends API {
 								continue;
 							}
 							$display .= $value . "<br />";
-							preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value
-							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
-							if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
-								$file = pathinfo($path);
-								$files[$file['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $path]);
-							}
 						}
 						array_push($body[count($body) -1][0]['content'],
 							[
@@ -1331,9 +1325,15 @@ class RECORD extends API {
 								],
 								'htmlcontent' => trim($display)
 							]);
-						if ($files) array_push($body[count($body) -1][0]['content'], [
+					}
+					if (isset($content['attachments'][$document])){
+						foreach($content['attachments'][$document] as $path){
+							$file = pathinfo($path);
+							$files[$file['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . substr(UTILITY::directory('record_attachments'), 1) . '/'. $path]);
+						}
+						array_push($body[count($body) -1][0]['content'], [
 							'type' => 'links',
-							'description' => $this->_lang->GET('file.file_list', [':folder' => $key]),
+							'description' => $this->_lang->GET('record.file_attachments'),
 							'content' => $files
 						]);
 					}
@@ -2182,10 +2182,14 @@ class RECORD extends API {
 						// populate file image and attachments based on values containing respective paths and extensions
 						// guess file url; special regex delimiter
 						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
-							$file = pathinfo($entry['value']);
-							if (!isset($summary['attachments'][$document])) $summary['attachments'][$document] = [];
-							$summary['attachments'][$document][] = $entry['value'];
-							$displayvalue = $file['basename'];
+							$displayvalue = '';
+							$files = [];
+							foreach (explode(', ', $entry['value']) as $file){
+								$file = pathinfo($file);
+								if (!isset($summary['attachments'][$document])) $summary['attachments'][$document] = [];
+								$summary['attachments'][$document][] = $files[] = $file['basename'];
+							}
+							$displayvalue = implode(', ', $files);
 						}
 						// modify displayed value based on requested type
 						switch ($type){
