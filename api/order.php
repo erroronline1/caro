@@ -431,31 +431,13 @@ class ORDER extends API {
 				// determine if filtered for orderidentifier, strip if applicable
 				$orderidentifier = null;
 				if ($filter['term']){
-
 					// also see UTILITY::identifier
-					// unfortunately this has to be handled slightly extra to enable timestamp only being searcheable
 
-					preg_match('/(.*?)(?:\s*#([a-z0-9]+))$/', $filter['term'], $components);
-					if ($components && isset($components[2]) && $components[2]){
-						try {
-							// try to convert to unixtime int
-							@$unixtime = intval(base_convert($components[2], 36, 10));
-							// narrow down to recent time
-							if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) { // 2025-08-15 - 2079-06-06
-								$datetime = new \DateTime();
-								$datetime->setTimestamp($unixtime);
-								// if no error has risen the identifier is likely valid
+					$orderidentifier = UTILITY::identifier('  ' . $filter['term'], null, false, true);
+					$filter['term'] = trim(UTILITY::identifier($filter['term'], null, true) ?? '');
 
-								$orderidentifier =  $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
-							}
-						}
-						catch (\Exception $e){
-						// do nothing, return null by default if checks are supposed to be applied. valid responses have been returned in advance
-						}
-
-						// assign rest to filered term
-						$filter['term'] = trim($components[1]);
-					}
+					// if only searched for an identifier, most likely a order identifier. set term to null
+					if ($filter['term'] === UTILITY::identifier('  ' . $filter['term'], null, false, false, true)) $filter['term'] = null;
 				}
 				// get all approved orders filtered by
 				// applicable units, state and search
