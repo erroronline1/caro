@@ -429,6 +429,204 @@
 		}
 	},
 	{
+		"name": "Maßblatt Knieexprothese Prothetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "reale Patientenmaße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Diagonales ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Weichteil ML 6cm unterhalb Tuber"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Flexion"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "AP lateral in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "AP medial in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Laterale Adduktion"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Supracondyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Condyläres ML in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Condyläres AP in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Tuber-Boden in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kniespalt-Boden in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Effektive Absatzhöhe in mm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Fußgröße in cm"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht in kg"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße in cm"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Schaftsystem"
+						},
+						"content": {
+							"Silikonhaftkontaktschaft": [],
+							"Liner": [],
+							"Ventil außen": [],
+							"Ventil innen": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Linerausführung"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Linergröße"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ventiltyp"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Lock, Lanyard, Dichtlippe"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß 0 3cm unter Tuber"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Umfangsmaß oder Höhe",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "number",
+						"attributes": {
+							"name": "geplante maximale Reduzierung in Prozent"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Maßdokumentation"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos",
+							"multiple": true
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Maßblatt Oberschenkelprothese Prothetik I",
 		"alias": "",
 		"context": "component",
@@ -491,7 +689,7 @@
 					{
 						"type": "number",
 						"attributes": {
-							"name": "Lateralte Adduktion"
+							"name": "Laterale Adduktion"
 						}
 					},
 					{
@@ -565,8 +763,7 @@
 							"Silikonhaftkontaktschaft": [],
 							"Liner": [],
 							"Ventil außen": [],
-							"Ventil innen": [],
-							"Knöchelhoch": []
+							"Ventil innen": []
 						}
 					},
 					{
@@ -1930,6 +2127,17 @@
 		"content": "Identifikator,Maßblatt Unterschenkelprothese Prothetik I"
 	},
 	{
+		"name": "Maßblatt Knieexprothese Prothetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Knieexprothese Prothetik I"
+	},
+	{
 		"name": "Maßblatt Oberschenkelprothese Prothetik I",
 		"alias": "",
 		"context": "casedocumentation",
@@ -2018,6 +2226,6 @@
 		"regulatory_context": "",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik I,Maßblatt Vorfußprothese Prothetik I,Maßblatt Unterschenkelprothese Prothetik I,Maßblatt Oberschenkelprothese Prothetik I,Maßblatt Hüftex- und Hemipelvektomieprothese Prothetik I,Versorgungsplanung Prothetik I,Kunststofffertigungsauftrag Prothetik I,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik I,Abgabeprotokoll Prothetik I,Gebrauchsanweisung Beinprothesen,Empfangsbestätigung"
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik I,Maßblatt Vorfußprothese Prothetik I,Maßblatt Unterschenkelprothese Prothetik I,Maßblatt Knieexprothese Prothetik I,Maßblatt Oberschenkelprothese Prothetik I,Maßblatt Hüftex- und Hemipelvektomieprothese Prothetik I,Versorgungsplanung Prothetik I,Kunststofffertigungsauftrag Prothetik I,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik I,Abgabeprotokoll Prothetik I,Gebrauchsanweisung Beinprothesen,Empfangsbestätigung"
 	}
 ]
