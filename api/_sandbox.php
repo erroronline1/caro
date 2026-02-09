@@ -68,18 +68,19 @@ $pageSettings = [
 		'CT' => $pdf->_contentCoordinates['top'],
 		'CB' => $page['height'] - $pdf->_contentCoordinates['top'] - $pdf->_contentCoordinates['bottom']
 	],
-/*
+	[
 		'RX' => $pdf->_setup['marginleft'],
 		'RY' => $pdf->_contentCoordinates['top'],
 		'RW' => $page['width'] - $pdf->_setup['marginright'],
 		'RH' => $page['height'] - $pdf->_contentCoordinates['top'] - $pdf->_contentCoordinates['bottom']
 	],
-*/	'orientation' => $pdf->_setup['orientation']
+	'orientation' => $pdf->_setup['orientation']
 ];
 
 // add the actual page
 $page = $pdf->addPage($pageSettings);
-/*
+
+
 $pdf->graph->setPageWidth($page['width']);
 $pdf->graph->setPageHeight($page['height']);
 
@@ -110,16 +111,16 @@ for($i = 0; $i < count(array_keys($contents)); $i++){
 		'L', // string $halign = 'C',
 		null,
 		[
-    'all' => [
-        'lineWidth' => 1,
-        'lineCap' => 'round',
-        'lineJoin' => 'round',
-        'miterLimit' => 1,
-        'dashArray' => [],
-        'dashPhase' => 0,
-        'lineColor' => 'green',
-        'fillColor' => 'yellow',
-    ],
+			'all' => [
+				'lineWidth' => 1,
+				'lineCap' => 'round',
+				'lineJoin' => 'round',
+				'miterLimit' => 1,
+				'dashArray' => [],
+				'dashPhase' => 0,
+				'lineColor' => 'green',
+				'fillColor' => 'yellow',
+			],
 		],
 		true
 	);
@@ -145,16 +146,18 @@ for($i = 0; $i < count(array_keys($contents)); $i++){
 		'J', // string $halign = 'C',
 		null,
 		[
-    'all' => [
-        'lineWidth' => 1,
-        'lineCap' => 'round',
-        'lineJoin' => 'round',
-        'miterLimit' => 1,
-        'dashArray' => [],
-        'dashPhase' => 0,
-        'lineColor' => 'red',
-        'fillColor' => 'blue',
-    ]],
+			'all' => [
+				'lineWidth' => 1,
+				'lineCap' => 'round',
+				'lineJoin' => 'round',
+				'miterLimit' => 1,
+				'dashArray' => [],
+				'dashPhase' => 0,
+				'lineColor' => 'red',
+				'fillColor' => 'blue',
+			]
+		],
+		true
 	);
 	// set current y coordinate and check if a pagebreak is applicable
 	$previousBox = $pdf->getLastBBox();
@@ -176,7 +179,7 @@ for($i = 0; $i < count(array_keys($contents)); $i++){
 
 }
 
-*/
+
 $pdf->pageNumeration();
 
 

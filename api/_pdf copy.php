@@ -523,7 +523,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		$this->enableDefaultPageContent();
 		$this->enableZeroWidthBreakPoints(true);
 
-		$this->setDefaultCellMargin(0,0,0,0);
+		$this->setDefaultCellMargin(0, 0, 0, 0);
 		$this->font->insert($this->pon, 'helvetica', '', 10); // add default font
 
 	}
@@ -551,7 +551,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		if ($this->defaultfont === null) {
 			$this->defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10);
 		}
-		$this->setDefaultCellPadding(3,3,3,3);
+		$this->setDefaultCellPadding(3, 3, 3, 3);
 		$out = $this->graph->getStartTransform();
 		$out .= $this->color->getPdfColor('black');
 
@@ -572,7 +572,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					$width / $height * 10,
 					10,
 					$page['height']);
-				$this->page->addContent($footer_image_out, $pid);
+				$out .= $footer_image_out;
 				$imageMargin = $width * 10 / $height + $this->_setup['marginright'] + 3;
 			}
 		}
@@ -590,8 +590,23 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			0, // float $linespace = 0,
 			'C', // string $valign = 'C',
 			'R' // string $halign = 'C',
+			,
+			null,
+			[
+				'all' => [
+					'lineWidth' => 1,
+					'lineCap' => 'round',
+					'lineJoin' => 'round',
+					'miterLimit' => 1,
+					'dashArray' => [],
+					'dashPhase' => 0,
+					'lineColor' => 'green',
+					'fillColor' => 'yellow',
+				],
+			],
+			true
 		);
-		$this->page->addContent($txtbox, $pid);
+		$out .= $txtbox;
 		
 		//header
 		$imageMargin = $identifierMargin = 0;
@@ -609,7 +624,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					$width / $height * 20,
 					20,
 					$page['height']);
-				$this->page->addContent($header_image_out, $pid);
+				$out .= $header_image_out;
 				$headerHeights[] = 0 + 20;
 				$imageMargin = $width * 20 / $height + 5;
 			}
@@ -642,7 +657,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				[3, 0, 3, 0],
 				$barcode_style
 			);
-			$this->page->addContent($identifier, $pid);
+			$out .= $identifier;
 
 			$txtbox = $this->getTextCell(
 				$this->qrcodecontent, // string $txt,
@@ -653,23 +668,24 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				0, // float $offset = 0,
 				1, // float $linespace = 0,
 				'T', // string $valign = 'C',
-				'J' , // string $halign = 'C',
-		null,
-		[
-    'all' => [
-        'lineWidth' => 1,
-        'lineCap' => 'round',
-        'lineJoin' => 'round',
-        'miterLimit' => 1,
-        'dashArray' => [],
-        'dashPhase' => 0,
-        'lineColor' => 'green',
-        'fillColor' => 'yellow',
-    ],
-		],
-		true
+				'J' // string $halign = 'C',
+				,
+				null,
+				[
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				],
+				true
 			);
-			$this->page->addContent($txtbox, $pid);
+			$out .= $txtbox;
 			$identifierMargin = $this->qrcodesize + 50 + $this->_setup['marginleft'];
 			$headerHeights[] = $this->qrcodesize + 6 + $this->_setup['margintop'];
 			$identifierBox = $this->getLastBBox();
@@ -680,7 +696,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		$titleBox = null;
 		if ($this->header['title']) {
 			$titlefont = $this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
-			$this->page->addContent($titlefont['out'], $pid);
+			$out .= $titlefont['out'];
 			$txtbox = $this->getTextCell(
 				$this->header['title'], // string $txt,
 				$identifierMargin, // float $posx = 0,
@@ -690,23 +706,27 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				0, // float $offset = 0,
 				0, // float $linespace = 0,
 				'T', // string $valign = 'C',
-				'R', // string $halign = 'C',
-		null,
-		[
-    'all' => [
-        'lineWidth' => 1,
-        'lineCap' => 'round',
-        'lineJoin' => 'round',
-        'miterLimit' => 1,
-        'dashArray' => [],
-        'dashPhase' => 0,
-        'lineColor' => 'green',
-        'fillColor' => 'yellow',
-    ],
-		],
-		true			);
-			$this->page->addContent($txtbox, $pid);
-			$this->page->addContent($this->defaultfont['out'], $pid);
+				'R' // string $halign = 'C',
+				,
+				null,
+				[
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				],
+				true
+			);
+//			$this->page->addContent($txtbox);
+			$out .= $txtbox;
+//			$this->page->addContent($this->defaultfont['out']);
+			$out .= $this->defaultfont['out'];
 			$titleBox = $this->getLastBBox();
 			$headerHeights[] = $titleBox['y'] + $titleBox['h'];
 
@@ -714,10 +734,9 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// subtitle, typically a date goes right below the title 
 		if ($this->header['date']){
 			$posy = 0;
-			$width = $page['width'] - $imageMargin - $identifierMargin;
+			$width = max(40, $page['width'] - $imageMargin - $identifierMargin);
 			if ($titleBox) {
 				$posy = $titleBox['y'] + $titleBox['h'];
-				$width = $titleBox['w'];
 			}
 			$txtbox = $this->getTextCell(
 				$this->header['date'].'sdf adf adsfsfd  ad', // string $txt,
@@ -727,33 +746,34 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				0, // float $height = 0,
 				0, // float $offset = 0,
 				- ($this->defaultfont['height'] * .3), // float $linespace = 0,
-				'C', // string $valign = 'C',
+				'T', // string $valign = 'C',
 				////////////////////////////////////////////
 				'R' // string $halign = 'C', WHY YOU NO ALIGNING RIGHT!?!?!?
 				////////////////////////////////////////////
-, // string $halign = 'C',
-		null,
-		[
-    'all' => [
-        'lineWidth' => 1,
-        'lineCap' => 'round',
-        'lineJoin' => 'round',
-        'miterLimit' => 1,
-        'dashArray' => [],
-        'dashPhase' => 0,
-        'lineColor' => 'green',
-        'fillColor' => 'yellow',
-    ],
-		],
-		true
-				);
-			$this->page->addContent($txtbox, $pid);
+				, // string $halign = 'C',
+				null,
+				[
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				],
+				true
+			);
+			//$this->page->addContent($txtbox);
+			$out .= $txtbox;
 			$dateBox = $this->getLastBBox();
 			$headerHeights[] = $dateBox['y'] + $dateBox['h'];
 		}
 
 		$out .= $this->graph->getStopTransform();
-		$this->setDefaultCellPadding(5,3,3,3);
+		$this->setDefaultCellPadding(5, 3, 3, 3);
 
 		// determine the max top and bottom y-coordinates for further use
 		$this->_contentCoordinates = [
