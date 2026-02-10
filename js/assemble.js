@@ -2474,16 +2474,21 @@ export class Assemble {
 		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
 			label.dataset.multiple = "multiple";
+			if ("onkeydown" in this.currentElement.attributes) this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') {event.preventDefault(); this.blur(); }" + this.currentElement.attributes.onkeydown;
+			else this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') {event.preventDefault(); this.blur(); }";
 			input.onchange = () => {
 				// arrow function for reference of this.names
 				if (input.value) {
 					inputClone.attributes.name = inputClone.attributes.name.replace(/\(\d+\)$/gm, "");
 					delete inputClone.attributes.value;
-					new Assemble({
+					let newInput = new Assemble({
 						content: [[inputClone]],
 						composer: "elementClone",
 						names: this.names,
-					}).initializeSection(null, hint.length ? hint[0] : label);
+					});
+					newInput.initializeSection(null, hint.length ? hint[0] : label);
+					console.log(document.querySelector("[name='" + newInput.currentElement.attributes.name + "']"));
+					document.querySelector("[name='" + newInput.currentElement.attributes.name + "']").focus();
 					window.Masonry.masonry().catch(() => {
 						/*catch error to prevent console error*/
 					});
