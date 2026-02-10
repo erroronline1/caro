@@ -299,7 +299,7 @@ class TOOL extends API {
 
 		$response['render'] = ['form' => [
 			'data-usecase' => 'tool_calculator',
-			'action' => "javascript:api.tool('post', 'calculator', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
+			'action' => "javascript:api.tool('post', 'calculator', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
 		],
 		'content' => [
 			[
@@ -318,7 +318,7 @@ class TOOL extends API {
 						$this->_lang->GET('tool.calculator.price') => $this->_requestedType === 'price' ? ['value' => 'price', 'selected' => true] : ['value' => 'price'],
 					]
 				],
-				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
+				$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
 			]
 		]];
 
@@ -431,7 +431,7 @@ class TOOL extends API {
 
 		$response['render'] = ['form' => [
 			'data-usecase' => 'tool_create_code',
-			'action' => "javascript:api.tool('post', 'code', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
+			'action' => "javascript:api.tool('post', 'code', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
 		],
 		'content' => [
 			[
@@ -443,7 +443,7 @@ class TOOL extends API {
 					],
 					'content' => $options
 				],
-				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
+				$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
 			]
 		]];
 
