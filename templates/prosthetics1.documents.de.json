@@ -1216,10 +1216,22 @@
 						}
 					},
 					{
+						"type": "hr"
+					},
+					{
 						"type": "text",
 						"attributes": {
 							"name": "Weichwandschaft"
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Weichwandschaft"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "text",
@@ -1230,8 +1242,26 @@
 					{
 						"type": "text",
 						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum flexiblen Innenschaft"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
+						"type": "text",
+						"attributes": {
 							"name": "HTV-Innenschaft"
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum HTV-Innenschaft"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "text",
@@ -1242,19 +1272,31 @@
 					{
 						"type": "text",
 						"attributes": {
+							"name": "mitgeltende Vertragspositionen zu zusätzlichen Anproben"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
+						"type": "text",
+						"attributes": {
 							"name": "zusätzliche Testschäfte"
 						}
 					},
 					{
-						"type": "textarea",
+						"type": "text",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zur Grundposition"
+							"name": "mitgeltende Vertragspositionen zu zusätzlichen Testschäften"
 						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "Vertragspositionen sonstiges"
+							"name": "Sonstiges und mitgeltende Vertragspositionen"
 						}
 					}
 				],
@@ -1273,12 +1315,31 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Liner"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Ventil",
 							"multiple": true
 						}
 					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Ventil"
+						}
+					},
+					{
+						"type": "hr"
+					},
+
 					{
 						"type": "productselection",
 						"attributes": {
@@ -1289,15 +1350,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Linerversorgung sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zum Lock"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zur Linerversorgung"
-						}
+							"name": "Linerversorgung sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1315,11 +1379,29 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Schaftansatz"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Anschlussplatte",
 							"multiple": true
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zur Anschlussplatte"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "productselection",
@@ -1329,6 +1411,15 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Schaftadapter"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Rohradapter",
@@ -1336,11 +1427,29 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Rohradapter"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Klemmadapter",
 							"multiple": true
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Klemmadapter"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "productselection",
@@ -1352,15 +1461,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Strukturteile sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zum Drehadapter"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zu Strukturteilen"
-						}
+							"name": "Strukturteile sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1378,11 +1490,29 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Hüftgelenk"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Kniegelenk",
 							"multiple": true
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Kniegelenk"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "productselection",
@@ -1394,15 +1524,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Funktionsteile sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zum Stoßdämpfer"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zu Funktionsteilen"
-						}
+							"name": "Funktionsteile sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1420,24 +1553,36 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Fuß"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
-							"name": "Kosmetik",
+							"name": "Fußkosmetik",
 							"multiple": true
 						}
 					},
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Prothesenfuß sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zur Fußkosmetik"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zum Prothesenfuß"
-						}
+							"name": "Prothesenfuß sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1455,11 +1600,29 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Ventil"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Kniekappe",
 							"multiple": true
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zur Kniekappe"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "productselection",
@@ -1471,15 +1634,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Zubehör sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zur Anziehhilfe"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zum Zubehör"
-						}
+							"name": "Zubehör sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1499,15 +1665,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Stumpfstrümpfe sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zu Stumpfstrümpfen"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zu Stumpfstrümpfen"
-						}
+							"name": "Stumpfstrümpfe sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1525,6 +1694,15 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zur einteiligen Kosmetik"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "zweiteilige Kosmetik",
@@ -1532,11 +1710,29 @@
 						}
 					},
 					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zur zweiteiligen Kosmetik"
+						}
+					},
+					{
+						"type": "hr"
+					},
+					{
 						"type": "productselection",
 						"attributes": {
 							"name": "Skinergy/SoftTouch",
 							"multiple": true
 						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "mitgeltende Vertragspositionen zum Skinergy"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "checkbox",
@@ -1550,15 +1746,18 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Kosmetik sonstiges"
-						},
-						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+							"name": "mitgeltende Vertragspositionen zu Superskin"
+						}
+					},
+					{
+						"type": "hr"
 					},
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "mitgeltende Vertragspositionen zur Kosmetik"
-						}
+							"name": "Kosmetik sonstiges und mitgeltende Vertragspositionen"
+						},
+						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
 				],
 				[
@@ -1610,7 +1809,7 @@
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "Sonstige Aufwendungen"
+							"name": "Sonstige Aufwendungen und mitgeldende Vertragspositionen"
 						}
 					}
 				],
@@ -1958,7 +2157,12 @@
 							"name": "Kontakt mit Feuchtigkeit zulässig",
 							"required": true
 						},
-						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
+						"content": {
+							"nein": [],
+							"feuchtes Milieu": [],
+							"Wasser": [],
+							"Salzwasser": []
+						}
 					},
 					{
 						"type": "textarea",
@@ -2006,7 +2210,10 @@
 							"Ihr Hilfsmittel befindet sich gegenwärtig in einem Testzustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin die Prothese gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung der Prothese unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Aufgrund der verwendeten Materialien ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht sicherzustellen. Die verwendeten Materialien können sich durch starken Lichteinfall, Wärme und erhöhte mechanische Belastungen verformen, verspröden oder brechen, wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Prothesenteilen entstehen könnten. Wir weisen daher ausdrücklich darauf hin die Prothese vor starkem Lichteinfall (z.B. direkte Sonneneinstrahlung), starker Wärme (z.B. Heizkörper) und erhöhten Belastungen (Trage- und Hebearbeiten von mehr als 5kg) zu schützen.": []
 						}
 					},
-					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+					{
+						"type": "date",
+						"attributes": { "name": "Nutzung im Probezustand bis" }
+					}
 				]
 			]
 		}
