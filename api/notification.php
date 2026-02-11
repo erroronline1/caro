@@ -949,6 +949,7 @@ class NOTIFICATION extends API {
 	 * alerts eligible users about documents and components having to be approved
 	 */
 	public function documents(){
+		if (!PERMISSION::permissionFor('documentapproval')) return 0;
 		// prepare all unapproved elements
 		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
@@ -1070,15 +1071,21 @@ class NOTIFICATION extends API {
 		$prepared = 0;
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 		// userlist to decode orderer
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = [];
+		foreach ($preUsers as $user){
+			$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image'], 'units' => $user['units']];
+		}
+
 
 		foreach ($orders as $row) {
 			$order_data = json_decode($row['order_data'], true);
 			// if unit intersects, or orderer is own unit member including self, except admin
-			$unit_intersection = boolval(array_intersect([UTILITY::propertySet($order_data, 'organizational_unit') ? : ''], $_SESSION['user']['units']));
-			if (!$unit_intersection && $user = array_search(UTILITY::propertySet($order_data, 'orderer'), array_column($users, 'id'))){
-				$unit_intersection = boolval(array_intersect($_SESSION['user']['units'], array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin']))));
-			}
+			$orderer_id = UTILITY::propertySet($order_data, 'orderer') ? : null;
+			$unit_intersection =
+				boolval(array_intersect([UTILITY::propertySet($order_data, 'organizational_unit') ? : ''], $_SESSION['user']['units']))
+				|| (array_intersect([UTILITY::propertySet($order_data, 'organizational_unit') ? : ''], ['common']) && $orderer_id && boolval(array_intersect($_SESSION['user']['units'], explode(',', $users[$orderer_id]['units']))))
+			;
 			if ($unit_intersection) {
 				$prepared++;
 			}
