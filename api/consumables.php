@@ -1996,10 +1996,18 @@ class CONSUMABLES extends API {
 					'vendor_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.vendor_label')) ? : '',
 					'article_ean' => ''
 				];
-
+				if ($this->_usecase === 'manualorder'){
+					$search = $manual['article_no'] ?: $manual['article_name'];
+					$vendor = $manual['vendor_name'] ?: null;
+				}
+				else {
+					$search = UTILITY::propertySet($this->_payload, 'search') ? : null;
+					$vendor = UTILITY::propertySet($this->_payload, 'vendor') ? : null;
+				}
+				//var_dump($search, $vendor);
 				$result = $this->productsearch($this->_usecase ? : 'product', [
-					'search' => UTILITY::propertySet($this->_payload, 'search') ? : null,
-					'vendor' => UTILITY::propertySet($this->_payload, 'vendor') ? : null
+					'search' => $search,
+					'vendor' => $vendor
 				]);
 				
 				// also see productsearch
@@ -2025,17 +2033,25 @@ class CONSUMABLES extends API {
 					];
 				if ($result && $result[0]){
 					array_unshift($result[0][0], $tile);
-					array_unshift($result, [
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('order.add_manually_warning_header'),
-							'class' => 'orange'
-						],
-						'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
-					]);
+					array_unshift($result, 
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('order.add_manually_warning_header'),
+								'class' => 'orange'
+							],
+							'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
+						], [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' =>  $this->_lang->GET('order.add_manually_select')
+							]
+						]
+					);
 				}
-				else
+				else {
 					$result = [[[$tile]]];
+				}
 				
 				$this->response(['render' => ['content' => $result]]);
 
