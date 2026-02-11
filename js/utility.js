@@ -608,6 +608,9 @@ export const _client = {
 				};
 			//new Assemble(cart).initializeSection(nodes[nodes.length - 3]); // always append on bottom of article list
 			new Assemble(cart).initializeSection(nodes[1]); // always append on top of article list
+			// remove open dialog if present, e.g. manual order
+			if (document.querySelector('dialog[open]')) document.querySelector('dialog[open]').remove();
+
 			new Toast(api._lang.GET("order.added_confirmation", { ":name": data[3] }), "info");
 		},
 
@@ -668,7 +671,7 @@ export const _client = {
 					content: orderstate,
 				},
 				{
-					type: "text",
+					type: "scanner",
 					attributes: {
 						name: api._lang.GET("order.order_filter_label"),
 						id: "filterterm",
