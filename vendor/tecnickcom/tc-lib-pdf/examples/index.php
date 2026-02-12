@@ -16,15 +16,13 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-//require(__DIR__ . '/../vendor/autoload.php');
-require('../../../autoload.php');
+require(__DIR__ . '/../vendor/autoload.php');
 
 
-\define('OUTPUT_FILE', \realpath(__DIR__ . '') . '/example.pdf');
+\define('OUTPUT_FILE', \realpath(__DIR__ . '/../target') . '/example.pdf');
 
 // define fonts directory
-//\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
-\define('K_PATH_FONTS', \realpath('../../tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');
@@ -41,6 +39,7 @@ $pdf = new \Com\Tecnick\Pdf\Tcpdf(
 
 // ----------
 
+
 $pdf->setCreator('tc-lib-pdf');
 $pdf->setAuthor('John Doe');
 $pdf->setSubject('tc-lib-pdf generic example');
@@ -54,12 +53,13 @@ $pdf->enableDefaultPageContent();
 
 // ----------
 // Insert fonts
+
 $bfont1 = $pdf->font->insert($pdf->pon, 'helvetica', '', 12);
 
 
 // test images directory
-//$imgdir = \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-image/test/images/');
-$imgdir = \realpath('../../tc-lib-pdf-image/test/images/');
+$imgdir = \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-image/test/images/');
+
 
 // ----------
 // Add first page
