@@ -323,7 +323,7 @@ class _ERPINTERFACE {
 					// OR USE INBUILT FUNCTION
 
 					require_once('_table.php');
-					$export = new TABLE($result);
+					$export = new TABLE([$result]);
 					if ($files = $export->dump($key . date(' Y-m-d H-i-s') . '.' . $export)){
 						return substr($files[0], 1);
 					}
@@ -2188,8 +2188,8 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					break;
 				default:
 					require_once('_table.php');
-					$export = new TABLE($result);
-					if ($files = $export->dump($key . date(' Y-m-d H-i-s') . '.' .  $export)){
+					$fileexport = new TABLE([$result]);
+					if ($files = $fileexport->dump($key . date(' Y-m-d H-i-s') . '.' .  $export)){
 						return substr($files[0], 1);
 					}
 			}
