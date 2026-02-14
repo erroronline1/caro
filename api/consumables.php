@@ -171,17 +171,20 @@ class CONSUMABLES extends API {
 
 		// create csv
 		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order', 'last_order'];
-
+		$result = [];
 		// reduce data to required columns, convert null to ''
 		foreach ($products as $row) {
 			foreach (array_diff($columns, array_keys($row)) as $nkey){
 				$row[$nkey] = '';
 			}
-			$result[] = array_map(fn($column) => $row[$column], $columns);
+			$result[] = array_combine($columns, array_map(fn($column) => $row[$column], $columns));
 		}
-		if ($files = UTILITY::csv($result, $columns,
-			$this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
+		// add required array nesting for TABLE
+		$result = [$result];
+		require_once('_table.php');
+		$export = new TABLE($result);
 
+		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'])] = [
 				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
 				'download' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'

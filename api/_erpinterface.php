@@ -237,7 +237,9 @@ class _ERPINTERFACE {
 					],
 				],
 				'export' => [
-					'pdf' => []
+					'pdf' => [],
+					'ods' => [],
+					'xlsx' => []
 				]
 			]
 		];
@@ -320,10 +322,11 @@ class _ERPINTERFACE {
 
 					// OR USE INBUILT FUNCTION
 
-					if ($files = UTILITY::csv($result, array_keys($result[0]),
-						$key . date(' Y-m-d H-i-s') . '.csv')){
+					require_once('_table.php');
+					$export = new TABLE($result);
+					if ($files = $export->dump($key . date(' Y-m-d H-i-s') . '.' . $export)){
 						return substr($files[0], 1);
-				}
+					}
 			}
 
 		}
@@ -1899,8 +1902,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					]
 				],
 				'export' => [
-					'pdf' => [
-					]
+					'pdf' => [],
+					'ods' => [],
+					'xlsx' => []
 				]
 			],
 			'Fälle pro Verordner' => [
@@ -2093,7 +2097,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'export' => [
 					'pdf' => [
 						'40%', '10%', '50%'
-					]
+					],
+					'ods' => [],
+					'xlsx' => []
 				]
 			],
 			/*'Mitarbeiterliste' => [
@@ -2181,10 +2187,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					return $PDF->tablePDF($content);
 					break;
 				default:
-					if ($files = UTILITY::csv($result, array_keys($result[0]),
-						$key . date(' Y-m-d H-i-s') . '.csv')){
+					require_once('_table.php');
+					$export = new TABLE($result);
+					if ($files = $export->dump($key . date(' Y-m-d H-i-s') . '.' .  $export)){
 						return substr($files[0], 1);
-				}
+					}
 			}
 		}
 		return [];

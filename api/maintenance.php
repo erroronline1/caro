@@ -416,15 +416,18 @@ class MAINTENANCE extends API {
 					$_data = [];
 					for($i = 0; $i < $maxlength; $i++){
 						$row = [];
-						foreach ($data as $datalist) {
-							$row[] = $datalist[$i];
+						foreach ($data as $column => $datalist) {
+							$row[$column] = $datalist[$i];
 						}
 						$_data[] = $row;
 					}
+					// add required array nesting for TABLE
+					$_data = [$_data];
 
-					if ($files = UTILITY::csv($_data, array_keys($data),
-						preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
+					require_once('_table.php');
+					$export = new TABLE($_data);
 
+					if ($files = $export->dump(preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'])] = [
 							'href' => './api/api.php/file/stream/' . substr($files[0], 1),
 							'download' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'

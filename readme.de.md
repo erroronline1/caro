@@ -1661,7 +1661,7 @@ Sofern verfügbar, beantwortet diese Methode mit einer Liste von Mitarbeitern di
 * falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
 * für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
 * bereitgestellte Datendateien finden sich unter `UTILITY::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
-* angepasste Datenbankauszüge sollten bevorzugt mit `UTILITY::csv()` und `PDF(CONFIG['pdf']['table'])` erstellt werden
+* angepasste Datenbankauszüge sollten bevorzugt mit der `TABLE`-Klasse (api/_table.php) und `PDF(CONFIG['pdf']['table'])` erstellt werden
 
 `UTILITY`-Methoden finden sich in api/_utility.php.
 

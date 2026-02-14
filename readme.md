@@ -38,6 +38,10 @@ Things are still in motion. Images may be outdated.
 * further implementation of tc-lib-pdf
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
+    * page margins
+    * header
+    * enable csvprocessor/csvfilter to handle xlsx and ods?
+    * enable ods output where applicable
 
 ## Content
 * [Aims](#aims)
@@ -1761,7 +1765,7 @@ If provided, the query returns employees having birthday in a passed timespan, t
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
 * provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
-* custom csv dumps are recommended to be created with `UTILITY::csv()` and `PDF(CONFIG['pdf']['table'])`
+* custom csv dumps are recommended to be created with the `TABLE`-class (api/_table.php) and `PDF(CONFIG['pdf']['table'])`
 
 `UTILITY`-methods can be found in api/_utility.php.
 
@@ -6372,12 +6376,11 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 1.8k stars
     * \> 200 forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
-* [https://github.com/maksimovic/PHP_XLSXWriter](https://github.com/maksimovic/PHP_XLSXWriter)
-    * creates XLSX-files on the server side
-    * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
-    * v1.0.4
-    * maintained fork of [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) with \> 1k stars, \> 650 forks
-    * [MIT license](https://github.com/maksimovic/PHP_XLSXWriter?tab=License-1-ov-file)
+* [https://github.com/openspout/openspout](https://github.com/openspout/openspout)
+    * creates CSV-, ODS- and XLSX-files on the server side
+    * Justification: this library enables consistent and correct creation of widely used table formats for data transfers from the application.
+    * v5.3.0
+    * [MIT license](https://github.com/openspout/openspout/blob/4.x/LICENSE)
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
     * Justification: this library enables the application to handle 2D-codes for transfer of physical to digital data. This is used for the login process and a safe way of consistent tracing of records and products.
@@ -6427,7 +6430,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 All libraries are embedded locally to avoid external, probably prohibited web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
-There are **no** dependency install routines for [composer](https://getcomposer.org/) or [npm](https://www.npmjs.com/) and alike by intent to ensure availability of tested and approved functionality.
+There are **no** dependency install routines for [composer](https://getcomposer.org/) or [npm](https://www.npmjs.com/) and alike by intent during the installation of this application to ensure availability of tested and approved functionality. Libraries may be updated via composer during development and maintenance though. 
 
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)

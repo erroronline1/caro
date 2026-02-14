@@ -2236,25 +2236,6 @@ class AUDIT extends API {
 
 		$orders = $orderstatistics->statistics_get($start, $end);
 
-		$columns = [
-			'vendor_label' => $this->_lang->GET('order.vendor_label'),
-			'ordertype' => $this->_lang->GET('order.order_type'),
-			'organizational_unit' => $this->_lang->GET('order.organizational_unit'),
-			'orderer' => $this->_lang->GET('order.orderer'),
-			'commission' => $this->_lang->GET('order.commission'),
-			'delivery_date' => $this->_lang->GET('order.delivery_date'),
-			'quantity_label' => $this->_lang->GET('order.quantity_label'),
-			'unit_label' => $this->_lang->GET('order.unit_label'),
-			'ordernumber_label' => $this->_lang->GET('order.ordernumber_label'),
-			'productname_label' => $this->_lang->GET('order.productname_label'),
-			'additional_info' => $this->_lang->GET('order.additional_info'),
-			'approved' => $this->_lang->GET('order.order.approved'),
-			'ordered' => $this->_lang->GET('order.order.ordered'),
-			'delivered_partially' => $this->_lang->GET('order.order.delivered_partially'),
-			'delivered_full' => $this->_lang->GET('order.order.delivered_full'),
-			'deliverytime' => $this->_lang->GET('audit.orderstatistics.delivery_time_column')
-		];
-
 		// prepare result as subsets of vendors
 		$vendor_orders = [];
 		foreach ($orders as $order){
@@ -2270,44 +2251,47 @@ class AUDIT extends API {
 			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
 
 			$vendor_orders[$order['order_data']['vendor_label']][] = [
-				$order['order_data']['vendor_label'] ?? '',
-				$this->_lang->GET('order.ordertype.' . $order['ordertype']),
-				$order['organizational_unit'] ? ($this->_lang->_DEFAULT['units'][$order['organizational_unit']] ?? $order['organizational_unit']) : '',
-				$order['orderer_name'] ?? '',
-				$order['order_data']['commission'] ?? '',
-				$order['order_data']['delivery_date'] ?? '',
-				$order['order_data']['quantity_label'] ?? '',
-				$order['order_data']['unit_label'] ?? '',
-				$order['order_data']['ordernumber_label'] ?? '',
-				$order['order_data']['productname_label'] ?? '',
-				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
-				$this->convertFromServerTime($order['approved']),
-				$this->convertFromServerTime($order['ordered']),
-				$this->convertFromServerTime($order['delivered_partially']),
-				$this->convertFromServerTime($order['delivered_full']),
-				$deliverytime
+				$this->_lang->GET('order.vendor_label') => $order['order_data']['vendor_label'] ?? '',
+				$this->_lang->GET('order.order_type') => $this->_lang->GET('order.ordertype.' . $order['ordertype']),
+				$this->_lang->GET('order.organizational_unit') => $order['organizational_unit'] ? ($this->_lang->_DEFAULT['units'][$order['organizational_unit']] ?? $order['organizational_unit']) : '',
+				$this->_lang->GET('order.orderer') => $order['orderer_name'] ?? '',
+				$this->_lang->GET('order.commission') => $order['order_data']['commission'] ?? '',
+				$this->_lang->GET('order.delivery_date') => $order['order_data']['delivery_date'] ?? '',
+				$this->_lang->GET('order.quantity_label') => $order['order_data']['quantity_label'] ?? '',
+				$this->_lang->GET('order.unit_label') => $order['order_data']['unit_label'] ?? '',
+				$this->_lang->GET('order.ordernumber_label') => $order['order_data']['ordernumber_label'] ?? '',
+				$this->_lang->GET('order.productname_label') => $order['order_data']['productname_label'] ?? '',
+				$this->_lang->GET('order.additional_info') => isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
+				$this->_lang->GET('order.order.approved') => $this->convertFromServerTime($order['approved']),
+				$this->_lang->GET('order.order.ordered') => $this->convertFromServerTime($order['ordered']),
+				$this->_lang->GET('order.order.delivered_partially') => $this->convertFromServerTime($order['delivered_partially']),
+				$this->_lang->GET('order.order.delivered_full') => $this->convertFromServerTime($order['delivered_full']),
+				$this->_lang->GET('audit.orderstatistics.delivery_time_column') => $deliverytime
 			];
 		}
 		ksort($vendor_orders);
 
-		$downloadfiles = [];
-		$tempFile = preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
-		if ($files = UTILITY::xlsx($vendor_orders, array_values($columns), $tempFile, [
-			'file' => [
-				'author' => $_SESSION['user']['name']
-			],
-			'header' => [ // according to xslxwriter implementation
-				'font-size' => 8,
-				'types' => array_map(Fn($v) => 'string', array_values($columns))
-			],
-			'row' => [ // according to xslxwriter implementation
+		$format = [
+			'creator' => $_SESSION['user']['name'],
+			'columns' => [] // according to openspout implementation
+		];
+		foreach(array_keys($vendor_orders[array_key_first($vendor_orders)][0]) as $column){
+			$format['columns'][$column] = [
 				'height' => 40,
 				'wrap_text' => true,
 				'font-size' => 8,
 				'halign' => 'left',
 				'valign' => 'top'
-			]
-		])){
+			];
+		}
+
+		$downloadfiles = [];
+		$tempFile = preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
+
+		require_once('_table.php');
+		$export = new TABLE($vendor_orders);
+
+		if ($files = [$export->dump($tempFile, null, $format)]){
 			foreach($files as $file){
 				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 					'href' => './api/api.php/file/stream/' . substr($file, 1),
@@ -2471,9 +2455,12 @@ class AUDIT extends API {
 		
 		// provide downloadfile
 		$downloadfiles = [];
-		if ($files = UTILITY::csv($result, $keys,
-			$this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv')){
+		// add required array nesting for TABLE
+		$result = [$result];
+		require_once('_table.php');
+		$export = new TABLE($result);
 
+		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv')){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
 				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
 				'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
@@ -2987,22 +2974,27 @@ class AUDIT extends API {
 					$result[$sheetname] = $lines;
 				}
 			}
-			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
-			if ($files = UTILITY::xlsx($result, [], $tempFile, [
-				'file' => [
-					'author' => $_SESSION['user']['name']
-				],
-				'header' => [ // according to xslxwriter implementation
-					'font-size' => 8
-				],
-				'row' => [ // according to xslxwriter implementation
+
+			$format = [
+				'creator' => $_SESSION['user']['name'],
+				'columns' => [] // according to openspout implementation
+			];
+			foreach(array_keys($result[array_key_first($result)][0]) as $column){
+				$format['columns'][$column] = [
 					'height' => 40,
 					'wrap_text' => true,
 					'font-size' => 8,
 					'halign' => 'left',
 					'valign' => 'top'
-				]
-		])){
+				];
+			}
+
+			$tempFile = $summary['filename'] . '_' . time() . '.xlsx';
+
+			require_once('_table.php');
+			$export = new TABLE($vendor_orders);
+
+			if ($files = [$export->dump($result, null, $format)]){
 				foreach($files as $file){
 					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 						'href' => './api/api.php/file/stream/' . substr($file, 1),

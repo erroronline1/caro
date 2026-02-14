@@ -94,15 +94,21 @@ class CSVFILTER extends API {
 					'processedYear' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_year'))
 				]);
 
-				//create and write to file
+				// create and write to file
 				$downloadfiles = [];
+				require_once('_table.php');
+				$export = new TABLE($datalist->_list);
+
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
-						if ($files = UTILITY::csv($datalist->_list, $datalist->_setting['filesetting']['columns'],
-							$content['filesetting']['destination'], [
-							'separator' => $datalist->_setting['filesetting']['separator'] ?? CONFIG['csv']['dialect']['separator'],
-							'enclosure' => $datalist->_setting['filesetting']['enclosure'] ?? CONFIG['csv']['dialect']['enclosure'],
-							'escape' => $datalist->_setting['filesetting']['escape'] ?? CONFIG['csv']['dialect']['escape']])){
+						if ($files = $export->dump(
+							$content['filesetting']['destination'], 
+							null,
+							[
+								'separator' => $datalist->_setting['filesetting']['separator'] ?? CONFIG['csv']['dialect']['separator'],
+								'enclosure' => $datalist->_setting['filesetting']['enclosure'] ?? CONFIG['csv']['dialect']['enclosure'],
+								'escape' => $datalist->_setting['filesetting']['escape'] ?? CONFIG['csv']['dialect']['escape']
+							])){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
 									'href' => './api/api.php/file/stream/' . substr($file, 1),
@@ -111,28 +117,30 @@ class CSVFILTER extends API {
 							}
 						}
 						break;
+					case 'odf':
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
 						$downloadfiles = [];
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
 						// some reasonable defaults
 						$format = [
-							'file' => [
-								'author' => $_SESSION['user']['name']
-							],
-							'header' => [ // according to xslxwriter implementation
-								'font-size' => 8,
-							],
-							'row' => [ // according to xslxwriter implementation
+							'creator' => $_SESSION['user']['name'],
+							'columns' => []// according to openspout implementation
+						];
+						foreach(array_keys($datalist->_list[array_key_first((array)$datalist->_list)][0]) as $column){
+							$format['columns'][$column] = [
 								'wrap_text' => true,
 								'font-size' => 8,
 								'halign' => 'left',
 								'valign' => 'top'
-							]
-						];
+							];
+						}
 						if (isset($content['xslxformat'])) $format = array_merge($format, $content['xslxformat']);
 
-						if ($files = UTILITY::xlsx($datalist->_list, [], $content['filesetting']['destination'], $format)){
+						if ($files = $export->dump(
+							$content['filesetting']['destination'], 
+							null,
+							$format)){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
 									'href' => './api/api.php/file/stream/' . substr($file, 1),
