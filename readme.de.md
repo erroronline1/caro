@@ -1546,30 +1546,29 @@ Ein beliebiges Beispiel:
 
 RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl(?:ä|Ä)ngerung` lauten. Die Zeichencodierung löst dies zu `verl(?:Ã¤|Ã„)ngerung` auf und verfehlt daher die Gruppierung `[äÄ]` die zu `[Ã¤Ã„]` aufgelöst wird.
 
-Sofern die Ausgabe eines verarbeiteten Filters (z.B. for einen CSV-Filter) in einer XLSX-Datei erfolgen soll (festgelegt durch die Dateinamenerweiterung in [filesetting][destination]), sind einige Formatierungsoptionen durch die zusätzliche `xslxformat`-Eigenschaft verfügbar:
+Sofern die Ausgabe eines verarbeiteten Filters (z.B. for einen CSV-Filter) in einer XLSX-Datei (oder derezti noch eingeschränkt formatierbaren ODS-Datei) erfolgen soll (festgelegt durch die Dateinamenerweiterung in [filesetting][destination]), sind einige Formatierungsoptionen durch die zusätzliche `xslxformat`-Eigenschaft verfügbar:
 
 ```javascript
 "xslxformat": {
-    "file": {
-        "orientation": "portrait"
-    },
-    "header": {
-        "font-size": 8,
-        "widths": [7, 12, 20, 35, 10, 17, null, 5, 8, 5], // Spaltenbreite
-        "types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", ""] // Formate der Spalten, wobei "" zu Standard aufgelöst wird
-    },
-    "row": {
-        "height": 40,
-        "wrap_text": true,
-        "font-size": 8,
-        "halign": "left",
-        "valign": "top",
-        "border": "top",
-        "border-style": "thin"
+    "structured": true, // to omit everything imported prior to headers, false by default
+    "creator": "Name", // defaults to CARO App
+    "size": "A4", // paper size, A4 by default
+    "orientation": "landscape", // portrait by default
+    "columns": { // as an object with column headers/names as keys and their properties
+        "COLUMNNAME": {
+            "type": "string", // bool, number, date, formula, string by default
+            "border": "top", // right, bottom, left, none by default
+            "font-size": 10, // positive integer, 10 by default,
+            "width": 0, // positive float, 0 as auto by default
+            "height": 0, // positive float, 0 as auto by default
+            "wrap-text": true, // boolean, true by default
+            "halign": "left", // right, center, justify, omit to default
+            "valign": 'auto', // baseline, bottom, center, distributed, justify, top, omit to default
+        }
     }
 }
 ```
-Für weitere Optionen wird auf die Dokumentation der [XLSXWriter-Bibliothek](https://github.com/maksimovic/PHP_XLSXWriter) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
+Für weitere Optionen wird auf die Dokumentation der [OpenSpout-Bibliothek]https://github.com/openspout/openspout/blob/5.x/docs/documentation.md) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
 
 Auch die Ausgabe als PDF ist möglich, hier kann die Spaltenbreite bestimmt werden.
 

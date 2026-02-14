@@ -38,10 +38,8 @@ Things are still in motion. Images may be outdated.
 * further implementation of tc-lib-pdf
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
-    * page margins
-    * header
     * enable csvprocessor/csvfilter to handle xlsx and ods?
-    * enable ods output where applicable
+    * consider ods output where applicable
 
 ## Content
 * [Aims](#aims)
@@ -1650,30 +1648,29 @@ A generic sample:
 
 RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl(?:ä|Ä)ngerung`. Character encoding resolves this to `verl(?:Ã¤|Ã„)ngerung`, thus failing if just using `[äÄ]` grouping being resolved to `[Ã¤Ã„]`.
 
-In case the output of a processed filter (e.g. for the CSV-filter) is supposed to be an XLSX-file (defined by the extension of [filesetting][destination]) there are some formatting options via an additional `xslxformat`-propery available:
+In case the output of a processed filter (e.g. for the CSV-filter) is supposed to be an XLSX-file (ODS with some limitation) defined by the extension of [filesetting][destination], there are some formatting options via an additional `xslxformat`-propery available:
 
 ```javascript
 "xslxformat": {
-    "file": {
-        "orientation": "portrait"
-    },
-    "header": {
-        "font-size": 8,
-        "widths": [7, 12, 20, 35, 10, 17, null, 5, 8, 5], // widths of columns
-        "types": ["string", "string", "string", "string", "string", "string", "string", "string", "string", ""] // formats of columns where "" resolves to general
-    },
-    "row": {
-        "height": 40,
-        "wrap_text": true,
-        "font-size": 8,
-        "halign": "left",
-        "valign": "top",
-        "border": "top",
-        "border-style": "thin"
+    "structured": true, // to omit everything imported prior to headers, false by default
+    "creator": "Name", // defaults to CARO App
+    "size": "A4", // paper size, A4 by default
+    "orientation": "landscape", // portrait by default
+    "columns": { // as an object with column headers/names as keys and their properties
+        "COLUMNNAME": {
+            "type": "string", // bool, number, date, formula, string by default
+            "border": "top", // right, bottom, left, none by default
+            "font-size": 10, // positive integer, 10 by default,
+            "width": 0, // positive float, 0 as auto by default
+            "height": 0, // positive float, 0 as auto by default
+            "wrap-text": true, // boolean, true by default
+            "halign": "left", // right, center, justify, omit to default
+            "valign": 'auto', // baseline, bottom, center, distributed, justify, top, omit to default
+        }
     }
 }
 ```
-Please consult the documentation for the [XLSXWriter-library](https://github.com/maksimovic/PHP_XLSXWriter) for available options. Formulas have to follow the english notation.
+Please consult the documentation for the [OpenSpout-library](https://github.com/openspout/openspout/blob/5.x/docs/documentation.md) for available options. Formulas have to follow the english notation.
 
 Also, PDF is possible, column widths can be defined:
 
