@@ -11,10 +11,22 @@
 
 namespace CARO\API;
 
+use OpenSpout\Writer\XLSX\Options\PageOrientation;
+
+require(__DIR__ . '/../vendor/autoload.php');
+
 CLASS TABLE{
 	private $content = [];
 	private $unstructuredDataAboveHeader = [];
 
+	/**
+	 * imports data from a file or a named array
+	 * @param string|array|object $src file path or raw data
+	 * @param string $type override filetype detected by $src extension if applicable
+	 * @param array $options with csv params for 'separator' and 'enclosure'
+	 * 
+	 * @return bool
+	 */
 	public function __construct($src, $type = null, $options = []){
 		if (gettype($src) === 'string'){
 			// url
@@ -31,6 +43,7 @@ CLASS TABLE{
 					$reader = new \OpenSpout\Reader\XLSX\Reader();
 					break;
 				default:
+					return false;
 					//unsupported type
 			}
 			$reader->open($src);
@@ -59,46 +72,259 @@ CLASS TABLE{
 		}
 		else {
 			//unsupported source
+			return false;
 		}
+		return true;
 	}
 
+	/**
+	 * returns the internal data, e.g. read files in other formats, read files as array or raw data as files
+	 * @param string|array $dst output file path or array
+	 * @param string $type override filetype detected by $dst extension if applicable
+	 * @param array $options with  
+	 * 		* csv params for 'separator' and 'enclosure'
+	 * 		* 'structured' to omit everything imported prior to headers
+	 * 		* 'creator' name
+	 * 		* 'size' paper size
+	 * 		* 'orientation' portrait or landscape
+	 * 		* 'columns' as an array with column headers/names as keys and another array of [
+	 * 				'type' => string, // bool, number, date, formula
+	 * 				'border' => top, // right, bottom, left
+	 * 				'font-size' => int,
+	 * 				'width' => int,
+	 * 				'height' => float,
+	 * 				'wrap_text': bool,
+	 * 				'font-size': int,
+	 * 				'halign': 'left', // right, center, justify
+	 * 				'valign': 'auto', // baseline, bottom, center, distributed, justify, top
+	 * 			// not yet	'border': 'top', // right, bottom, left
+	 * 			// not yet	'border-style': 'thin'
+	 * 			] as value
+	 * 
+	 * @return null|array|string
+	 * 
+	 * exports default the type to string if omitted
+	 * not all options of openspout are available, it's about data in this usecase
+	 */
 	public function dump($dst, $type = null, $options = []){
 		if (gettype($dst) === 'string'){
 			// url
 			$file = pathinfo($dst);
 			switch (strtolower($type ?: $file['extension'])){
 				case 'csv':
-					$csvoptions = new \OpenSpout\Writer\CSV\Options($options['separator'] ?? CONFIG['csv']['dialect']['separator'], $options['enclosure'] ?? CONFIG['csv']['dialect']['enclosure']);
-					$writer = new \OpenSpout\Writer\CSV\Writer($csvoptions);
+					return $this->files($dst, $type, $options);
 					break;
 				case 'ods':
-					$writer = new \OpenSpout\Writer\ODS\Writer();
-					break;
 				case 'xlsx':
-					$writer = new \OpenSpout\Writer\XLSX\Writer();
+					return $this->sheets($dst, $type, $options);
 					break;
 				default:
+					return null;
 					//unsupported source
 			}
-			$writer->openToFile($dst);
+		}
+		else
+			return $this->content;
+	}
 
-			foreach($this->content as $sheetname => $sheet) {
-				$currentSheet = $writer->getCurrentSheet();
-				if ($sheetname) $currentSheet->setName($sheetname);
+	// write to multiple csv
+	private function files($dst, $type = null, $options = []){
+		$response = [];
+		$csvoptions = new \OpenSpout\Writer\CSV\Options($options['separator'] ?? CONFIG['csv']['dialect']['separator'], $options['enclosure'] ?? CONFIG['csv']['dialect']['enclosure']);
+		$writer = new \OpenSpout\Writer\CSV\Writer($csvoptions);
+		$sheetName = $recentSheet = null;
+		// write sheets
+		foreach($this->content as $sheetName => $sheet) {
+			$rows = [];
+	
+			if ($recentSheet !== $sheetName){
+				// add a new file
+				@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+				$writer->openToFile($tmp_name);
+				$recentSheet = $sheetName;
+			}
 
-				$rows = [];
+			// insert data that may have been imported prior from above the header line if not excluded via options
+			if (!($options['structured'] ?? false) && count($this->unstructuredDataAboveHeader) > 1){
+				for($ln = 0; $ln < count($this->unstructuredDataAboveHeader) - 1; $ln++){
+					$rows[] = new \OpenSpout\Common\Entity\Row([
+						...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), $this->unstructuredDataAboveHeader[$ln])
+					]);
+				}
+			}
+			
+			// insert the header line
+			$rows[] = new \OpenSpout\Common\Entity\Row([
+				...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), array_keys($sheet[0]))
+			]);
 
-				if (!($options['structured'] ?? false) && count($this->unstructuredDataAboveHeader) > 1){
-					for($ln = 0; $ln < count($this->unstructuredDataAboveHeader) - 1; $ln++){
-						$rows[] = new \OpenSpout\Common\Entity\Row([
-							...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), $this->unstructuredDataAboveHeader[$ln])
-						]);
-					}
+			// insert data
+			foreach($sheet as $row){
+				$columns = [];
+				foreach($row as $value){
+					$value = $value ?: '';
+					$columns[] = new \OpenSpout\Common\Entity\Cell\StringCell($value);
 				}
 
 				$rows[] = new \OpenSpout\Common\Entity\Row([
-					...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), array_keys($sheet[0]))
+					...$columns
 				]);
+			};
+			$writer->addRows($rows);
+			$writer->close();
+			$response[] = $tmp_name;
+		}
+
+		foreach($response as &$path){
+			$path = UTILITY::handle($path, $dst, 0, [], UTILITY::directory('tmp'), false);
+		}
+		return $response;
+	}
+
+	// write to ods or xlsx
+	private function sheets($dst, $type = null, $options = []){
+		// url
+		$file = pathinfo($dst);
+		$halignment = \OpenSpout\Common\Entity\Style\CellAlignment::class;
+		$valignment = \OpenSpout\Common\Entity\Style\CellVerticalAlignment::class;
+		$orientation = \OpenSpout\Writer\XLSX\Options\PageOrientation::class;
+		$papersize = \OpenSpout\Writer\XLSX\Options\PaperSize::class;
+		$bordername = \OpenSpout\Common\Entity\Style\BorderName::class;
+
+		switch (strtolower($type ?: $file['extension'])){
+			case 'ods':
+				$celloptions = new \OpenSpout\Writer\ODS\Options(
+					// no page options available yet
+				);
+				$writer = new \OpenSpout\Writer\ODS\Writer($celloptions);
+				if (!empty($options['creator']))$writer->setCreator($options['creator']);
+				break;
+			case 'xlsx':
+				$celloptions = new \OpenSpout\Writer\XLSX\Options(
+					pageSetup: new \OpenSpout\Writer\XLSX\Options\PageSetup(
+						!empty($options['orientation']) && enum_exists($orientation) ? $orientation::from($options['orientation']) : null,
+						!empty($options['size']) && enum_exists($papersize) ? $papersize::from($options['size']) : $papersize::from(9), // A4 default
+						0,
+						1
+					),
+					properties: new \OpenSpout\Writer\XLSX\Properties(
+					    $dst, // public ?string $title = 'Untitled Spreadsheet',
+						null, // public ?string $subject = null,
+						'CARO APP', // public ?string $application = 'OpenSpout',
+						$options['creator'] ?? 'CARO App', // public ?string $creator = 'OpenSpout',
+						$options['creator'] ?? 'CARO App', // public ?string $lastModifiedBy = 'OpenSpout',
+					)
+				);
+				$writer = new \OpenSpout\Writer\XLSX\Writer($celloptions);
+				break;
+		}
+
+		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+		$writer->openToFile($tmp_name);
+
+		// determine defined row heights for data rows
+		$rowHeight = max(array_map(Fn($h) => $h['height'] ?? 0, $options['columns'] ?? [])) ? : 0;
+
+		// determine column widths if applicable
+		$widths = [];
+		$border = null;
+		foreach(array_keys($this->content[array_key_first($this->content)][0]) as $index => $key){
+			if (isset($options['columns'][$key]['width']) && $options['columns'][$key]['width']){
+				if (!isset($widths[$options['columns'][$key]['width']])) $widths[$options['columns'][$key]['width']] = [];
+				$widths[$options['columns'][$key]['width']][] = $index + 1;
+			}
+			if (!empty($options['columns'][$key]['border'])) $border = $options['columns'][$key]['border'];
+		}
+
+		// sanitize sheet names according to openspout specifications to max length - 4 characters for possible enumeration up to 99
+		$sheetname = [];
+		foreach(array_keys($this->content) as $sheet){
+			if (empty($sheet)) continue;
+			$sanitizedName = substr(preg_replace('/[^\w\d\s]/', '', $sheet), 0, 31 - 4);
+			// enumerate if multiple similar names are present
+			if (in_array($sanitizedName, $sheetname)) $sanitizedName .= '(' . array_count_values($sheetname)[$sanitizedName] . ')';
+					
+			$sheetname[$sheet] = $sanitizedName;
+		}
+
+		// name default first sheet
+		$currentSheet = $writer->getCurrentSheet();
+		$sheetName = $recentSheet = array_key_first($this->content);
+		if (!empty($sheetName)) $currentSheet->setName($sheetName);
+
+		// write sheets
+		foreach($this->content as $sheetName => $sheet) {
+			$rows = [];
+			
+			if ($recentSheet !== $sheetName){
+				// add and name a new sheet
+				$currentSheet = $writer->addNewSheetAndMakeItCurrent();
+				$recentSheet = $sheetName;
+				if (!empty($sheetName)) $currentSheet->setName($sheetName);
+			}
+
+			// insert data that may have been imported prior from above the header line if not excluded via options
+			if (!($options['structured'] ?? false) && count($this->unstructuredDataAboveHeader) > 1){
+				for($ln = 0; $ln < count($this->unstructuredDataAboveHeader) - 1; $ln++){
+					$rows[] = new \OpenSpout\Common\Entity\Row([
+						...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), $this->unstructuredDataAboveHeader[$ln])
+					]);
+				}
+			}
+			
+			// insert the header line
+			$rows[] = new \OpenSpout\Common\Entity\Row([
+				...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), array_keys($sheet[0]))
+			]);
+
+			// insert data with passed types and formatting if applicable
+			foreach($sheet as $row){
+				$columns = [];
+				foreach($row as $column => $value){
+					$value = $value ?: '';
+
+					$options['columns'][$column]['type'] = $options['columns'][$column]['type'] ?? 'string';
+					$format = new \OpenSpout\Common\Entity\Style\Style(
+						false, // public bool $fontBold = false,
+						false, // public bool $fontItalic = false,
+						false, // public bool $fontUnderline = false,
+						false, // public bool $fontStrikethrough = false,
+						$options['columns'][$column]['font-size'] ?? 10, // public int $fontSize = self::DEFAULT_FONT_SIZE,
+						'000000', // public string $fontColor = self::DEFAULT_FONT_COLOR,
+						'', // public string $fontName = self::DEFAULT_FONT_NAME,
+						!empty($options['columns'][$column]['halign']) && enum_exists($halignment) ? $halignment::from($options['columns'][$column]['halign']) : null, // public ?CellAlignment $cellAlignment = null,
+						!empty($options['columns'][$column]['valign']) && enum_exists($valignment) ? $valignment::from($options['columns'][$column]['valign']) : null, // public ?CellVerticalAlignment $cellVerticalAlignment = null,
+						$options['columns'][$column]['wrap-text'] ?? true, // public ?bool $shouldWrapText = null,
+						0, // public int $textRotation = 0,
+						true, // public ?bool $shouldShrinkToFit = null,
+						$border ? new \OpenSpout\Common\Entity\Style\Border(
+							new \OpenSpout\Common\Entity\Style\BorderPart(
+								$bordername::from($border),
+								'thin'
+							)
+						) : null, // public ?Border $border = null,
+						null, // public ?string $backgroundColor = null,
+						null, // public ?string $format = null,
+					);
+
+					switch ($options['columns'][$column]['type']){
+						case 'number':
+							$columns[] = new \OpenSpout\Common\Entity\Cell\NumericCell($value, $format);
+							break;
+						case 'bool':
+							$columns[] = new \OpenSpout\Common\Entity\Cell\BooleanCell(boolval($value), $format);
+							break;
+						case 'date':
+							$columns[] = new \OpenSpout\Common\Entity\Cell\DateTimeCell(new \DateTimeImmutable($value), $format);
+							break;
+						case 'formula':
+							$columns[] = new \OpenSpout\Common\Entity\Cell\FormulaCell($value, null, $format);
+							break;
+						default: // string
+							$columns[] = new \OpenSpout\Common\Entity\Cell\StringCell($value, $format);
+							break;
+					}
+				}
 				/*	new Cell\BooleanCell(true),
 					new Cell\DateIntervalCell(new DateInterval('P1D')),
 					new Cell\DateTimeCell(new DateTimeImmutable('now')),
@@ -109,23 +335,22 @@ CLASS TABLE{
 				]);
 				*/
 
-				foreach($sheet as $row){
-					$rows[] = new \OpenSpout\Common\Entity\Row([
-						...array_map(Fn($v) => new \OpenSpout\Common\Entity\Cell\StringCell($v), array_values($row))
-					]);
-				};
-				$writer->addRows($rows);
+				$rows[] = new \OpenSpout\Common\Entity\Row([
+					...$columns
+				], $rowHeight);
+			};
+			$writer->addRows($rows);
 
-				$writer->addNewSheetAndMakeItCurrent();
+			if ($celloptions) {
+				foreach($widths as $width => $columNums){
+					$celloptions->setColumnWidth(floatval($width), ...$columNums);
+				}
 			}
-			
-			// remove last sheet
-
-
-			return $writer->close();
 		}
-		else
-			return $this->content;
+		$writer->close();
+		$path = UTILITY::handle($tmp_name, $dst, 0, [], UTILITY::directory('tmp'), false);
+
+		return $path;
 	}
 }
 ?>
