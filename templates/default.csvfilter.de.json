@@ -8,7 +8,16 @@
 				"source": "EVA-Artikelstamm Lagerware....CSV",
 				"headerrow": 1,
 				"destination": "Inventurlisten.xlsx",
-				"columns": ["ARTIKEL_REFERENZ", "LIEFERANTEN_NAME", "BESTELL_NUMMER", "BESTELL_TEXT", "BESTELLEINHEIT", "LAGERORT", "LAGER_REFERENZ", "WARENEINGANGSDATUM"]
+				"columns": [
+					"ARTIKEL_REFERENZ",
+					"LIEFERANTEN_NAME",
+					"BESTELL_NUMMER",
+					"BESTELL_TEXT",
+					"BESTELLEINHEIT",
+					"LAGERORT",
+					"LAGER_REFERENZ",
+					"WARENEINGANGSDATUM"
+				]
 			},
 			"modify": {
 				"add": {
@@ -20,18 +29,40 @@
 				"LAGER_REFERENZ": "(.*)"
 			},
 			"xslxformat": {
-				"structured" : true,
+				"structured": true,
 				"orientation": "landscape",
 				"columns": {
 					"ARTIKEL_REFERENZ": {
-						"height": 40,
-						"wrap_text": true,
-						"font-size": 8,
-						"halign": "left",
-						"valign": "top",
-						"border": "top"
+						"height": 30,
+						"border": "top",
+						"width":7
+					},
+					"LIEFERANTEN_NAME": {
+						"width":15
+					},
+					"BESTELL_NUMMER": {
+						"width":15
+					},
+					"BESTELL_TEXT": {
+						"width":35
+					},
+					"BESTELLEINHEIT": {
+						"width":5
+					},
+					"LAGERORT": {
+						"width":8
+					},
+					"LAGER_REFERENZ": {
+						"width":8
+					},
+					"WARENEINGANGSDATUM": {
+						"width":4
+					},
+					"Anzahl":{
+						"width":8
 					},
 					"Abwertung": {
+						"width":4,
 						"type": "formula"
 					}
 				}
@@ -47,24 +78,58 @@
 				"source": "genehmigt nicht geliefert/nicht genehmigt....CSV",
 				"headerrow": 1,
 				"destination": "Falllisten.xlsx",
-				"columns": ["VORGANG", "ANLAGEDATUM", "NAME", "KOSTENTRAEGER", "LEISTUNG", "AUFTRAGSWERT_BRUTTO", "GENEHMIGT", "GENEHMIGT_DATUM", "BETRIEB", "GENEHMIGT_FLAG"]
+				"columns": [
+					"VORGANG",
+					"ANLAGEDATUM",
+					"NAME",
+					"KOSTENTRAEGER",
+					"LEISTUNG",
+					"AUFTRAGSWERT_BRUTTO",
+					"GENEHMIGT",
+					"GENEHMIGT_DATUM",
+					"BETRIEB",
+					"GENEHMIGT_FLAG"
+				]
 			},
 			"split": {
 				"BETRIEB": "(.*)",
 				"GENEHMIGT_FLAG": "(.*)"
-
+			},
+			"modify2":{
+				"remove": ["KUNDENNUMMER", "GENEHMIGT_FLAG"]
 			},
 			"xslxformat": {
-				"structured" : true,
+				"structured": true,
 				"orientation": "landscape",
 				"columns": {
 					"VORGANG": {
-						"height": 40,
-						"wrap_text": true,
-						"font-size": 8,
-						"halign": "left",
-						"valign": "top",
-						"border": "top"
+						"height": 21,
+						"border": "top",
+						"width": 7
+					},
+					"ANLAGEDATUM": {
+						"width": 4
+					},
+					"NAME": {
+						"width": 20
+					},
+					"KOSTENTRAEGER": {
+						"width": 10
+					},
+					"LEISTUNG": {
+						"width": 35
+					},
+					"AUFTRAGSWERT_BRUTTO": {
+						"width": 12
+					},
+					"GENEHMIGT": {
+						"width": 7
+					},
+					"GENEHMIGT_DATUM": {
+						"width": 4
+					},
+					"BETRIEB": {
+						"width": 8
 					}
 				}
 			}
@@ -146,7 +211,17 @@
 				"rewrite": [
 					{
 						"article_no": ["BESTELL_NUMMER"],
-						"article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"],
+						"article_name": [
+							"BEZEICHNUNG",
+							" ",
+							"Zusatzinformation",
+							" ",
+							"MODELL_NAME",
+							" ",
+							"GROESSEN_NAME",
+							" ",
+							"FARBEN_NAME"
+						],
 						"article_unit": ["BESTELL_EINHEIT"],
 						"article_ean": ["EAN"],
 						"erp_id": ["REFERENZ"],
