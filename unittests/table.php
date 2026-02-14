@@ -14,54 +14,57 @@ namespace CARO\API;
 require_once('../api/_config.php');
 require_once('../api/_utility.php'); // general utilities
 
-require(__DIR__ . '/../vendor/autoload.php');
 require_once('../api/_table.php');
 
 $t = new TABLE(__DIR__.'/sample-csv-files-sample-6.csv', null, ['headerrow' => 2]);
 
 var_dump(
-$t->dump(__DIR__.'/table.ods', null, [
-	'structured' => true,
-	'columns' => [
-		'first' => [
-			'font-size' => 14,
-			'width' => 265.8,
-			'height' => 64.3
-		],
-		'date' => [
-			'type' => 'date'
+	$t->dump('table.ods', null, [
+		'structured' => true,
+		'orientation' => 'landscape',
+		'columns' => [
+			'first' => [
+				'border' => 'bottom',
+				'font-size' => 8,
+				'width' => 265.8,
+				'height' => 64.3
+			],
+			'date' => [
+				'type' => 'date'
+			]
 		]
-	]
-]),
+	]),
 
-$t->dump(__DIR__.'/table.xlsx', null, [
-	'structured' => true,
-	'columns' => [
-		'first' => [
-			'font-size' => 14,
-			'width' => 265.8,
-			'height' => 64.3
-		],
-		'date' => [
-			'type' => 'date'
+	$t->dump('table.xlsx', null, [
+		'structured' => true,
+		'orientation' => 'landscape',
+		'columns' => [
+			'first' => [
+				'border' => 'bottom',
+				'font-size' => 10,
+				'width' => 265.8,
+				'height' => 64.3
+			],
+			'date' => [
+				'type' => 'date'
+			]
 		]
-	]
-]),
+	]),
 
-$t->dump(__DIR__.'/table.csv', null, [
-	'structured' => true,
-	'columns' => [
-		'first' => [
-			'font-size' => 14,
-			'width' => 265.8,
-			'height' => 64.3
-		],
-		'date' => [
-			'type' => 'date'
+	$t->dump('table.csv', null, [
+		'structured' => true,
+		'columns' => [
+			'first' => [
+				'font-size' => 14,
+				'width' => 265.8,
+				'height' => 64.3
+			],
+			'date' => [
+				'type' => 'date'
+			]
 		]
-	]
-]),
+	]),
 
-
-$t->dump([]));
+	$t->dump([])
+);
 ?>
