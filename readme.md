@@ -1471,6 +1471,9 @@ Description of options:
 
 	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
+	"modify2": Modifies the result even after splitting in case this has relied on previous column values
+		"remove": remove columns from result, may have been used solely for filtering/splitting
+
 	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
 	"translations" : Can replace e.g. numerical values with legible translations.

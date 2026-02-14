@@ -1367,6 +1367,9 @@ Beschreibung der Optionen:
 
 	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
 
+	"modify2": Ändert das Ergebnis nach der Aufteilung, falls diese auf Spaltenwerten beruhte
+		"remove":Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung/Aufteilung erforderlich waren
+
 	"evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
 
 	"translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.

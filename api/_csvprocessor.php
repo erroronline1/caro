@@ -101,6 +101,9 @@ filters and returns a named array according to setup.
 
 	"split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
+	"modify2": modifies the result even after splitting in case this has relied on previous column values
+		"remove": remove columns from result, may have been used solely for filtering
+
 	"evaluate": object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
 	translations can replace e.g. numerical values with legible translations.
@@ -305,6 +308,7 @@ class Listprocessor {
 
 			// split list or at least elevate to n = 1 for output
 			$this->split();
+			if ($this->_setting['modify2']) $this->modify2();
 
 			/* add postprocessing message to log if applicable */
 			if (isset($this->_setting['postProcessing'])){
@@ -914,6 +918,34 @@ class Listprocessor {
 						break;
 					}
 			}
+		}
+	}
+
+	/**
+	 *               _ _ ___     ___
+	 *   _____ ___ _| |_|  _|_ _|_  |
+	 *  |     | . | . | |  _| | |  _|
+	 *  |_|_|_|___|___|_|_| |_  |___|
+	 *                      |___|
+	 *	alter split results
+	 *	{
+	 *		"remove": ["SOMEFILTERCOLUMN", "DEATH"],
+	 *	},
+	 */
+	public function modify2(){
+		foreach ($this->_list as $i => $sheet){
+			foreach ($this->_setting['modify2'] as $modify => $modifications){
+				foreach ($modifications as $key => $rule){
+					switch ($modify){
+						case 'remove':
+								foreach($sheet as &$row){
+									unset($row[$rule]);
+								}
+							break;
+					}
+				}
+			}
+			$this->_list[$i] = $sheet;
 		}
 	}
 
