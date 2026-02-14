@@ -2903,7 +2903,6 @@ There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
 * image processing
-* CSV- and XLSX-exports 
 
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 Directory handling creates a .htaccess- / web.config-file preventing direct access to files; these are available through the file/stream-endpoint only. Linking files requires ./api/api.php/file/stream/ as a prefix to otherwise native processed paths.
@@ -2920,11 +2919,12 @@ Using these methods is mandatory. (./api/_utility.php) Deviations are allowed on
 * *groups* not having access to recording
 * *patients* having access to permitted documents and their profile settings only
 
-There are MARKDOWN and SEARCH classes for
+There are MARKDOWN, SEARCH and TABLE classes for
 * parsing Markdown to HTML
 * handling search expressions and filters
+* consistent reading and writing of CSV, ODS and XLSX
 
-Using these methods (./api/_utility.php) is strongly advised for consistency.
+Using these methods (./api/_utility.php) and (./api/_table.php) is strongly advised for consistency.
 
 There is an SQLQUERY class handling
 * database connections
