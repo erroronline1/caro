@@ -194,60 +194,6 @@ class UTILITY {
 	}
 
 	/**
-	 *               
-	 *   ___ ___ _ _ 
-	 *  |  _|_ -| | |
-	 *  |___|___|\_/ 
-	 *
-	 * @param array $data
-	 * @param array $headers
-	 * @param array $options
-	 * @return array file path to tempfile
-	 */
-	public static function csv($data, $headers = [], $filename = '', $options = ['separator' => CONFIG['csv']['dialect']['separator'], 'enclosure' => CONFIG['csv']['dialect']['enclosure'], 'escape' => CONFIG['csv']['dialect']['escape']]){
-		if (!$data) return null;
-		$tmpfiles = [];
-		// determine if data is a set of subsets
-		if (!array_is_list($data) || is_array($data[array_key_first($data)][array_key_first($data[array_key_first($data)])])){
-			foreach($data as $subsetname => $subset) $tmpfiles[] = self::csv_write($subset, $headers, $options);
-		}
-		else $tmpfiles[] = self::csv_write($data, $headers, $options);
-
-		foreach($tmpfiles as &$path){
-			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), false);
-		}
-		return $tmpfiles;
-	}
-	private static function csv_write($data, $headers = [], $options = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
-		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
-		$file = fopen($tmp_name, 'w');
-		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-		if ($headers) fputcsv($file,
-			$headers,
-			$options['separator'],
-			$options['enclosure'],
-			$options['escape']
-		);
-		else fputcsv($file,
-			array_keys($data[0]),
-			$options['separator'],
-			$options['enclosure'],
-			$options['escape']
-		);
-		foreach($data as $row){
-			fputcsv(
-				$file,
-				$row,
-				$options['separator'],
-				$options['enclosure'],
-				$options['escape']
-			);
-		}
-		fclose($file);
-		return $tmp_name;
-	}
-
-	/**
 	 *     _     _           
 	 *   _| |___| |_ _ _ ___ 
 	 *  | . | -_| . | | | . |
@@ -767,7 +713,7 @@ class UTILITY {
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
-	private static function handle($tmpname, $name, $i, $prefix, $folder, $replace = false){
+	public static function handle($tmpname, $name, $i, $prefix, $folder, $replace = false){
 		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
 		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $name);
 		$target = $folder . '/' . $filename;
@@ -869,120 +815,6 @@ class UTILITY {
 			'metadata' => curl_getinfo($request)
 		];
 		return $response;
-	}
-	
-	/**
-	 *       _         
-	 *   _ _| |___ _ _ 
-	 *  |_'_| |_ -|_'_|
-	 *  |_,_|_|___|_,_|
-	 *
-	 * @param array $data
-	 * @param array $headers
-	 * @param array $options
-	 * @return array file path to tempfile
-	 * at time of writing xlsxwriter is a suitable small library to handle these files.
-	 * maybe not as versatile as others but sufficient enough.
-	 * if one day this will be replaced the logic is supposed to mostly being replaced here and not on other files.
-	 */
-	public static function xlsx($data, $headers = [], $filename = '', $options = []){
-		/**
-		 * options = [
-		 * 		'file' => [
-		 * 			'author' => string
-		 * 		],
-		 * 		'header' => [ // according to xslxwriter implementation
-		 *			'font-size' => 8,
-		 *			'widths' => [7, 12, 20, 35, 10, 17, null, 5, 8, 5],
-		 *			'types' => ['number', 'string', 'integer', 'date', 'datetime', ...]
-		 * 		],
-		 * 		'row' => [ // according to xslxwriter implementation
-		 * 			'height' => 40,
-		 *			'wrap_text' => true,
-		 *			'font-size' => 8,
-		 *			'halign' => 'left',
-		 *			'valign' => 'top'
-		 * 		]
-		 * ]
-		 */
-		if (!$data) return null;
-		$options['file']['name'] = $filename; 
-		$tmpfiles = [];
-		// determine if data is a set of subsets
-		// else make it one with int key
-		if (array_is_list($data) || !is_array($data[array_key_first($data)][array_key_first($data[array_key_first($data)])])){
-			$data[1] = $data;
-		}
-		$tmpfiles[] = self::xlsx_write($data, $headers, $options);
-		foreach($tmpfiles as &$path){
-			$path = self::handle($path, $filename ? : pathinfo($path)['basename'], 0, [], self::directory('tmp'), true);
-		}
-		return $tmpfiles;
-	}
-	private static function xlsx_write($data, $headers = [], $options = []){
-
-		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
-		$writer = new XLSXWrapper();
-		if (isset($options['file']) && isset($options['file']['author'])) $writer->setAuthor($options['file']['author']);
-		$settings = [
-			'header' => [],
-			'row' => []
-		];
-
-		$headerformat = [];
-		// apply option header types and general setting for header if applicable
-		if (isset($options['header'])){
-			// assuming that all headers of subsets are the same
-			if (isset($options['header']['types'])) $headerformat = $options['header']['types'];
-			unset ($options['header']['types']);
-			$settings['header'] = $options['header'];
-		}
-		// setup of header type or fill up with empty resolving to xlsxwriters *general* type
-		if ($headers) {
-			if (!$headerformat) $headerformat = array_combine($headers, array_map(Fn($v) => '', $headers));
-			else {
-				for($i = 0; $i < count($headers); $i++){
-					if (!isset($headerformat[$i])) $headerformat[$i] = '';
-				}
-			}
-		}
-
-		// apply general row settings if applicable
-		if (isset($options['row'])) $settings['row'] = $options['row'];
-
-		ksort($data);
-		$subsetnames = [];
-		foreach ($data as $subsetname => $subset){
-			// datalist may contain multiple subsets based on split setting
-			// this application names these, if subsetname is int there is only one subset
-			// write each to xlsx sheet
-			if (intval($subsetname) && isset($options['file']) && isset($options['file']['name'])) {
-				$subsetname = $options['file']['name'];
-			}
-			else {
-				// possible enumeration of subsetnames for excel nags about same names case insensitive
-				$enumeration = '';
-				if (isset($subsetnames[strtolower($subsetname)])) {
-					$enumeration = '(' . $subsetnames[strtolower($subsetname)]++ . ')';
-					
-				}
-				else $subsetnames[strtolower($subsetname)] = 2;
-				$subsetname = $enumeration . $subsetname;
-			}
-
-			if ($headers) $writer->writeSheetHeader($subsetname, array_combine($headers, $headerformat), $settings['header']);
-			else {
-				// no header defined, make first line header defining default to empty resolving to xlsxwriters *general* type
-				$firstline = $subset[0];
-				$format = (count($headerformat) === count($firstline)) ? $headerformat : array_map(Fn($v) => '', $firstline);
-				$writer->writeSheetHeader($subsetname, array_combine(array_keys($firstline), $format), $settings['header'] ?? null);
-			}
-			foreach ($subset as $line)
-				$writer->writeSheetRow($subsetname, $line, $settings['row']);
-			$writer->finalizeSheet($subsetname, ['orientation' => 'landscape', 'header' => (isset($options['file']['name']) ? $options['file']['name'] . ' - ' : '') . $subsetname . ' - '.  date('Y-m-d')]);
-		}
-		$writer->writeToFile($tmp_name);
-		return $tmp_name;
 	}
 }
 
@@ -1905,75 +1737,4 @@ class BLOCKCHAIN {
 		return $chain;
 	}
 }
-
-require_once("../vendor/XLSXWriter.php");
-require_once("../vendor/XLSXWriter_BuffererWriter.php");
-class XLSXWrapper extends \XLSXWriter{
-	public function __construct(){
-		parent::__construct();
-	}
-
-	// customized override
-	public function finalizeSheet($sheet_name, $options = [])
-	{
-		if (empty($sheet_name) || $this->sheets[$sheet_name]->finalized)
-			return;
-
-		$default_options = [
-			'orientation' => 'portrait',
-			'header' => '&C&A',
-			'footer' => '- &P -',
-			'paperSize' => '1',
-			'margins' => [
-				'left' => '0.5',
-				'right' => '0.5',
-				'top' => '1',
-				'bottom' => '1',
-				'header' => '0.5',
-				'footer' => '0.5',
-			],
-			'printOptions' => [
-				'headings' => 'false',
-				'gridLines' => 'false'
-			]
-
-		];
-		$options = array_merge($default_options, $options);
-
-		$sheet = &$this->sheets[$sheet_name];
-
-		$sheet->file_writer->write(    '</sheetData>');
-
-		if (!empty($sheet->merge_cells)) {
-			$sheet->file_writer->write(    '<mergeCells>');
-			foreach ($sheet->merge_cells as $range) {
-				$sheet->file_writer->write(        '<mergeCell ref="' . $range . '"/>');
-			}
-			$sheet->file_writer->write(    '</mergeCells>');
-		}
-
-		$max_cell = self::xlsCell($sheet->row_count - 1, count($sheet->columns) - 1);
-
-		if ($sheet->auto_filter) {
-			$sheet->file_writer->write(    '<autoFilter ref="A1:' . $max_cell . '"/>');
-		}
-
-		$sheet->file_writer->write(    '<printOptions headings="' . $options['printOptions']['headings']. '" gridLines="' . $options['printOptions']['gridLines']. '" gridLinesSet="true" horizontalCentered="false" verticalCentered="false"/>');
-		$sheet->file_writer->write(    '<pageMargins left="' . $options['margins']['left']. '" right="' . $options['margins']['right']. '" top="' . $options['margins']['top']. '" bottom="' . $options['margins']['bottom']. '" header="' . $options['margins']['header']. '" footer="' . $options['margins']['footer']. '"/>');
-		$sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="' . $options['orientation'] . '" pageOrder="downThenOver" paperSize="' . $options['paperSize'] . '" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
-		$sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
-		$sheet->file_writer->write(        '<oddHeader>' . self::xmlspecialchars($options['header']) . '</oddHeader>');
-		$sheet->file_writer->write(        '<oddFooter>' . self::xmlspecialchars($options['footer']) . '</oddFooter>');
-		$sheet->file_writer->write(    '</headerFooter>');
-		$sheet->file_writer->write('</worksheet>');
-
-		$max_cell_tag = '<dimension ref="A1:' . $max_cell . '"/>';
-		$padding_length = $sheet->max_cell_tag_end - $sheet->max_cell_tag_start - strlen($max_cell_tag);
-		$sheet->file_writer->fseek($sheet->max_cell_tag_start);
-		$sheet->file_writer->write($max_cell_tag.str_repeat(" ", $padding_length));
-		$sheet->file_writer->close();
-		$sheet->finalized=true;
-	}
-}
-
 ?>
