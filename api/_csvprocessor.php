@@ -308,7 +308,7 @@ class Listprocessor {
 
 			// split list or at least elevate to n = 1 for output
 			$this->split();
-			if ($this->_setting['modify2']) $this->modify2();
+			if (isset($this->_setting['modify2'])) $this->modify2();
 
 			/* add postprocessing message to log if applicable */
 			if (isset($this->_setting['postProcessing'])){
