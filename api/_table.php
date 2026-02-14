@@ -11,8 +11,6 @@
 
 namespace CARO\API;
 
-use OpenSpout\Writer\XLSX\Options\PageOrientation;
-
 require(__DIR__ . '/../vendor/autoload.php');
 
 CLASS TABLE{
@@ -101,7 +99,7 @@ CLASS TABLE{
 	 * 			// not yet	'border-style': 'thin'
 	 * 			] as value
 	 * 
-	 * @return null|array|string
+	 * @return null|array
 	 * 
 	 * exports default the type to string if omitted
 	 * not all options of openspout are available, it's about data in this usecase
@@ -133,13 +131,14 @@ CLASS TABLE{
 		$csvoptions = new \OpenSpout\Writer\CSV\Options($options['separator'] ?? CONFIG['csv']['dialect']['separator'], $options['enclosure'] ?? CONFIG['csv']['dialect']['enclosure']);
 		$writer = new \OpenSpout\Writer\CSV\Writer($csvoptions);
 		$sheetName = $recentSheet = null;
+
 		// write sheets
 		foreach($this->content as $sheetName => $sheet) {
 			$rows = [];
 	
 			if ($recentSheet !== $sheetName){
 				// add a new file
-				@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+				@$tmp_name = tempnam(UTILITY::directory('tmp'), mt_rand(0, 100000));
 				$writer->openToFile($tmp_name);
 				$recentSheet = $sheetName;
 			}
@@ -194,10 +193,11 @@ CLASS TABLE{
 		switch (strtolower($type ?: $file['extension'])){
 			case 'ods':
 				$celloptions = new \OpenSpout\Writer\ODS\Options(
+					tempFolder: UTILITY::directory('tmp')
 					// no page options available yet
 				);
 				$writer = new \OpenSpout\Writer\ODS\Writer($celloptions);
-				if (!empty($options['creator']))$writer->setCreator($options['creator']);
+				if (!empty($options['creator'])) $writer->setCreator($options['creator']);
 				break;
 			case 'xlsx':
 				$celloptions = new \OpenSpout\Writer\XLSX\Options(
@@ -213,17 +213,18 @@ CLASS TABLE{
 						'CARO APP', // public ?string $application = 'OpenSpout',
 						$options['creator'] ?? 'CARO App', // public ?string $creator = 'OpenSpout',
 						$options['creator'] ?? 'CARO App', // public ?string $lastModifiedBy = 'OpenSpout',
-					)
+					),
+					tempFolder: UTILITY::directory('tmp')
 				);
 				$writer = new \OpenSpout\Writer\XLSX\Writer($celloptions);
 				break;
 		}
 
-		@$tmp_name = tempnam(sys_get_temp_dir(), mt_rand(0, 100000));
+		@$tmp_name = tempnam(UTILITY::directory('tmp'), mt_rand(0, 100000));
 		$writer->openToFile($tmp_name);
 
 		// determine defined row heights for data rows
-		$rowHeight = max(array_map(Fn($h) => $h['height'] ?? 0, $options['columns'] ?? [])) ? : 0;
+		$rowHeight = max([0, ...array_map(Fn($h) => $h['height'] ?? 0, $options['columns'] ?? [])]);
 
 		// determine column widths if applicable
 		$widths = [];
@@ -239,7 +240,7 @@ CLASS TABLE{
 		// sanitize sheet names according to openspout specifications to max length - 4 characters for possible enumeration up to 99
 		$sheetname = [];
 		foreach(array_keys($this->content) as $sheet){
-			if (empty($sheet)) continue;
+			if (!boolval($sheet)) continue;
 			$sanitizedName = substr(preg_replace('/[^\w\d\s]/', '', $sheet), 0, 31 - 4);
 			// enumerate if multiple similar names are present
 			if (in_array($sanitizedName, $sheetname)) $sanitizedName .= '(' . array_count_values($sheetname)[$sanitizedName] . ')';
@@ -250,7 +251,7 @@ CLASS TABLE{
 		// name default first sheet
 		$currentSheet = $writer->getCurrentSheet();
 		$sheetName = $recentSheet = array_key_first($this->content);
-		if (!empty($sheetName)) $currentSheet->setName($sheetName);
+		if (isset($sheetname[$sheetName])) $currentSheet->setName($sheetname[$sheetName]);
 
 		// write sheets
 		foreach($this->content as $sheetName => $sheet) {
@@ -260,7 +261,7 @@ CLASS TABLE{
 				// add and name a new sheet
 				$currentSheet = $writer->addNewSheetAndMakeItCurrent();
 				$recentSheet = $sheetName;
-				if (!empty($sheetName)) $currentSheet->setName($sheetName);
+				if (!empty($sheetName)) $currentSheet->setName($sheetname[$sheetName]);
 			}
 
 			// insert data that may have been imported prior from above the header line if not excluded via options
@@ -350,7 +351,7 @@ CLASS TABLE{
 		$writer->close();
 		$path = UTILITY::handle($tmp_name, $dst, 0, [], UTILITY::directory('tmp'), false);
 
-		return $path;
+		return [$path];
 	}
 }
 ?>
