@@ -2290,8 +2290,7 @@ class AUDIT extends API {
 
 		require_once('_table.php');
 		$export = new TABLE($vendor_orders);
-
-		if ($files = [$export->dump($tempFile, null, $format)]){
+		if ($files = $export->dump($tempFile, null, $format)){
 			foreach($files as $file){
 				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 					'href' => './api/api.php/file/stream/' . substr($file, 1),
@@ -2440,7 +2439,7 @@ class AUDIT extends API {
 		foreach ($result as $i => $line){
 			// complete and sort line columns, unshift default columns
 			foreach (array_diff($keys, array_keys($line)) as $nkey){
-				$result[$i][$nkey] = '';
+				$line[$nkey] = '';
 			}
 			ksort($line, SORT_REGULAR);
 			$result[$i] = array_merge([
@@ -2455,11 +2454,8 @@ class AUDIT extends API {
 		
 		// provide downloadfile
 		$downloadfiles = [];
-		// add required array nesting for TABLE
-		$result = [$result];
 		require_once('_table.php');
-		$export = new TABLE($result);
-
+		$export = new TABLE([$result]);
 		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv')){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
 				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
@@ -2994,7 +2990,7 @@ class AUDIT extends API {
 			require_once('_table.php');
 			$export = new TABLE($vendor_orders);
 
-			if ($files = [$export->dump($result, null, $format)]){
+			if ($files = $export->dump($result, null, $format)){
 				foreach($files as $file){
 					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 						'href' => './api/api.php/file/stream/' . substr($file, 1),
