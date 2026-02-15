@@ -63,8 +63,14 @@ var_dump(
 				'type' => 'date'
 			]
 		]
-	]),
+	])
+);
 
+// $t = new TABLE(UTILITY::directory('tmp') . '/table.xlsx');
+$t = new TABLE(UTILITY::directory('tmp') . '/table.csv');
+
+var_dump(
 	$t->dump([])
 );
+
 ?>
