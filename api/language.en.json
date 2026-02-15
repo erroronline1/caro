@@ -1191,7 +1191,7 @@
 			"download": "Download database entries",
 			"empty": "There are no entries for :unit to export yet.",
 			"unit": "Bereich",
-			"update_abort": "Update has been aborted. Only one column has been found, what is suspicious and most likely a CSV formatting issue. Please adhere: :format",
+			"update_abort": "Update has been aborted. The selected file was empty or could not be read.",
 			"update_deleted": "Previous entries have been deleted.",
 			"update_error": "The update failed.",
 			"update_success": ":unit has been successfully updated.",

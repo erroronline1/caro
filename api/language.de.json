@@ -1191,7 +1191,7 @@
 			"download": "Lade Datenbankeinträge herunter",
 			"empty": "Es gibt noch keine Einträge für :unit die exportiert werden könnten.",
 			"unit": "Bereich",
-			"update_abort": "Die Aktualisierung wurde abgebrochen. Es wurde nur eine einzelne Spalte gefunden, was verdächtigt ist und wahrscheinlich an einer fehlerhaften CSV-Formatierung liegt. Bitte beachten: :format",
+			"update_abort": "Die Aktualisierung wurde abgebrochen. Die gewählte Datei war leer oder konnte nicht eingelesen werden.",
 			"update_deleted": "Bisherige Einträge wurden gelöscht.",
 			"update_error": "Das Update schlug fehl.",
 			"update_success": ":unit wurde erfolgreich aktualisiert.",
