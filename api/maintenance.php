@@ -298,46 +298,33 @@ class MAINTENANCE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
+
+				require_once('_table.php');
 				
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]) && $_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name']) {
-
 					$data = [];
-					$rownum = 0;
-					if (($handle = fopen($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name'][0], 'r')) !== false) {
-						while (($row = fgetcsv($handle, null,
-							CONFIG['csv']['dialect']['separator'],
-							CONFIG['csv']['dialect']['enclosure'],
-							CONFIG['csv']['dialect']['escape'])) !== FALSE) {
-							if ($rownum < 1){
-								if (count($row) < 2){
-									$response['response'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
-									$response['render']['content'][] = [
-										'type' => 'textsection',
-										'attributes' => [
-											'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
-										],
-										'content' => $this->_lang->GET('maintenance.record_datalist.update_abort', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . mb_convert_encoding(implode(', ', $row), 'UTF-8', mb_detect_encoding(implode(', ', $row), ['ASCII', 'UTF-8', 'ISO-8859-1'])),
-									];
-									return $response;
-								}
-								// set header as data keys
-								foreach($row as $column){
-									if ($column) {
-										$bom = pack('H*','EFBBBF'); //coming from excel this is utf8
-										$column = preg_replace("/^$bom/", '', $column);
-										$data[$column] = [];
-									}
-								}
-							}
-							else {
-								// append content to data keys
-								foreach($row as $index => $column){
-									if ($column) $data[array_keys($data)[$index]][] = $column;
-								}
-							}
-							$rownum++;
+
+					$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['name'][0]);
+					$source = new TABLE($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name'][0], $sourceproperties['extension']);
+					$source = $source->dump([]);
+					if (!$source || !$source[array_key_first($source)]) {
+						$response['response'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
+						$response['render']['content'][] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
+							],
+							'content' => $this->_lang->GET('maintenance.record_datalist.update_abort'),
+						];
+						return $response;
+					}
+
+					foreach($source[array_key_first($source)] as $values){
+						foreach($values as $issue => $value){
+							if (!$value) continue;
+							if(!isset($data[$issue])) $data[$issue] = [];
+							$data[$issue][] = $value;
 						}
-						fclose($handle);
 					}
 
 					// sort datalists and append sql query
@@ -424,7 +411,6 @@ class MAINTENANCE extends API {
 					// add required array nesting for TABLE
 					$_data = [$_data];
 
-					require_once('_table.php');
 					$export = new TABLE($_data);
 
 					if ($files = $export->dump(preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
@@ -554,10 +540,14 @@ class MAINTENANCE extends API {
 				];
 
 				$content = $filter[$type];
-				$content['filesetting']['source'] = $_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0];
-				$content['filesetting']['dialect'] =  CONFIG['csv']['dialect'];
-				
+
+				require_once('_table.php');
+				$source = new TABLE($_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0], 'csv', ['headerrow' => 3]);
+				$source = $source->dump([]);
+				$content['filesetting']['source'] = $source[array_key_first($source)];
+
 				$datalist = new Listprocessor($content);
+
 				if (!isset($datalist->_list[1])) $this->response([
 					'response' => [
 						'msg' => implode('<br />', $datalist->_log),
