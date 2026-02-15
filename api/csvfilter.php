@@ -66,9 +66,17 @@ class CSVFILTER extends API {
 					]]);
 				
 				// set up file settings for csvprocessor
+				/*
+				// pure csvprocessor way somehow collides with character encodiing from openspout
 				$content['filesetting']['source'] = $inputfile;
 				if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 				$content['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
+				*/
+				require_once('_table.php');
+				$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['name'][0]);
+				$source = new TABLE($inputfile, $sourceproperties['extension']);
+				$source = $source->dump([]);
+				$content['filesetting']['source'] = $source[array_key_first($source)];
 
 				// check if neccessary compare file is provided 
 				$comparefileindex = 0;
@@ -82,7 +90,10 @@ class CSVFILTER extends API {
 									'msg' => $this->_lang->GET('csvfilter.use.filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
 									'type' => 'error'
 								]]);
-							$filtertype['filesetting']['source'] = $comparefile;
+							$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['name'][$comparefileindex]);
+							$source = new TABLE($comparefile, $sourceproperties['extension']);
+							$source = $source->dump([]);
+							$filtertype['filesetting']['source'] = $source[array_key_first($source)];
 							$comparefileindex++;
 						}
 					}
@@ -127,15 +138,18 @@ class CSVFILTER extends API {
 							'creator' => $_SESSION['user']['name'],
 							'columns' => []// according to openspout implementation
 						];
-						foreach(array_keys($datalist->_list[array_key_first((array)$datalist->_list)][0]) as $column){
-							$format['columns'][$column] = [
-								'wrap_text' => true,
-								'font-size' => 8,
-								'halign' => 'left',
-								'valign' => 'top'
-							];
-						}
 						if (isset($content['xslxformat'])) $format = array_merge($format, $content['xslxformat']);
+
+						foreach(array_keys($datalist->_list[array_key_first((array)$datalist->_list)][0]) as $column){
+							$format['columns'][$column] = array_merge(
+								[
+									'font-size' => 8,
+									'halign' => 'left',
+									'valign' => 'top'
+								],
+								$format['columns'][$column] ?? []
+							);
+						}
 
 						if ($files = $export->dump(
 							$content['filesetting']['destination'], 
