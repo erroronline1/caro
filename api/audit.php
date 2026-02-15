@@ -2953,7 +2953,6 @@ class AUDIT extends API {
 					];
 			}
 		}
-		$downloadfiles = [];
 		if ($entries){
 			// rebuild result array to match xlsx requirements
 			$result = [];
@@ -2988,9 +2987,9 @@ class AUDIT extends API {
 			$tempFile = $summary['filename'] . '_' . time() . '.xlsx';
 
 			require_once('_table.php');
-			$export = new TABLE($vendor_orders);
-
-			if ($files = $export->dump($result, null, $format)){
+			$export = new TABLE($result);
+			
+			if ($files = $export->dump($tempFile, null, $format)){
 				foreach($files as $file){
 					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 						'href' => './api/api.php/file/stream/' . substr($file, 1),
