@@ -38,7 +38,11 @@ CLASS TABLE{
 					$reader = new \OpenSpout\Reader\ODS\Reader();
 					break;
 				case 'xlsx':
-					$reader = new \OpenSpout\Reader\XLSX\Reader();
+					$reader = new \OpenSpout\Reader\XLSX\Reader(
+						new \OpenSpout\Reader\XLSX\Options(
+							tempFolder: UTILITY::directory('tmp'),
+						)
+					);
 					break;
 				default:
 					return false;
@@ -76,6 +80,14 @@ CLASS TABLE{
 	}
 
 	/**
+	 * add data above the header or flush by providing an empty array
+	 * @param $data as tweo dimensional array
+	 */
+	public function dataAboveHeader($data){
+		$this->unstructuredDataAboveHeader = $data;
+	}
+
+	/**
 	 * returns the internal data, e.g. read files in other formats, read files as array or raw data as files
 	 * @param string|array $dst output file path or array
 	 * @param string $type override filetype detected by $dst extension if applicable
@@ -91,13 +103,11 @@ CLASS TABLE{
 	 * 				'font-size' => int,
 	 * 				'width' => int,
 	 * 				'height' => float,
-	 * 				'wrap_text': bool,
-	 * 				'font-size': int,
+	 * 				'wrap-text': bool,
 	 * 				'halign': 'left', // right, center, justify
 	 * 				'valign': 'auto', // baseline, bottom, center, distributed, justify, top
-	 * 			// not yet	'border': 'top', // right, bottom, left
-	 * 			// not yet	'border-style': 'thin'
-	 * 			] as value
+	 * 				'border': 'top', // right, bottom, left
+	* 			] as value
 	 * 
 	 * @return null|array
 	 * 
@@ -128,7 +138,11 @@ CLASS TABLE{
 	// write to multiple csv
 	private function files($dst, $type = null, $options = []){
 		$response = [];
-		$csvoptions = new \OpenSpout\Writer\CSV\Options($options['separator'] ?? CONFIG['csv']['dialect']['separator'], $options['enclosure'] ?? CONFIG['csv']['dialect']['enclosure']);
+		$csvoptions = new \OpenSpout\Writer\CSV\Options(
+			$options['separator'] ?? CONFIG['csv']['dialect']['separator'],
+			$options['enclosure'] ?? CONFIG['csv']['dialect']['enclosure'],
+		//	SHOULD_ADD_BOM: false
+		);
 		$writer = new \OpenSpout\Writer\CSV\Writer($csvoptions);
 		$sheetName = $recentSheet = null;
 
@@ -184,12 +198,8 @@ CLASS TABLE{
 	private function sheets($dst, $type = null, $options = []){
 		// url
 		$file = pathinfo($dst);
-		$halignment = \OpenSpout\Common\Entity\Style\CellAlignment::class;
-		$valignment = \OpenSpout\Common\Entity\Style\CellVerticalAlignment::class;
-		$orientation = \OpenSpout\Writer\XLSX\Options\PageOrientation::class;
-		$papersize = \OpenSpout\Writer\XLSX\Options\PaperSize::class;
-		$bordername = \OpenSpout\Common\Entity\Style\BorderName::class;
 
+		$contentToWrite = $this->content;
 		switch (strtolower($type ?: $file['extension'])){
 			case 'ods':
 				$celloptions = new \OpenSpout\Writer\ODS\Options(
@@ -201,9 +211,10 @@ CLASS TABLE{
 				break;
 			case 'xlsx':
 				$celloptions = new \OpenSpout\Writer\XLSX\Options(
+					tempFolder: UTILITY::directory('tmp'),
 					pageSetup: new \OpenSpout\Writer\XLSX\Options\PageSetup(
-						!empty($options['orientation']) && enum_exists($orientation) ? $orientation::from($options['orientation']) : null,
-						!empty($options['size']) && enum_exists($papersize) ? $papersize::from($options['size']) : $papersize::from(9), // A4 default
+						!empty($options['orientation']) ? \OpenSpout\Writer\XLSX\Options\PageOrientation::{strtoupper($options['orientation'])} : null,
+						!empty($options['size']) ? \OpenSpout\Writer\XLSX\Options\PaperSize::{strtoupper($options['size'])} : \OpenSpout\Writer\XLSX\Options\PaperSize::A4,
 						0,
 						1
 					),
@@ -214,9 +225,15 @@ CLASS TABLE{
 						$options['creator'] ?? 'CARO App', // public ?string $creator = 'OpenSpout',
 						$options['creator'] ?? 'CARO App', // public ?string $lastModifiedBy = 'OpenSpout',
 					),
-					tempFolder: UTILITY::directory('tmp')
+					headerFooter: new \OpenSpout\Writer\XLSX\Options\HeaderFooter(
+						// unfortunately no header per sheet, only global yet
+						$file['basename'] . ' - ' . date("Y-m-d H:i"),
+						'- &amp;P -'
+					)
 				);
 				$writer = new \OpenSpout\Writer\XLSX\Writer($celloptions);
+
+				$row = null;
 				break;
 		}
 
@@ -229,32 +246,32 @@ CLASS TABLE{
 		// determine column widths if applicable
 		$widths = [];
 		$border = null;
-		foreach(array_keys($this->content[array_key_first($this->content)][0]) as $index => $key){
+		foreach(array_keys($contentToWrite[array_key_first($contentToWrite)][0]) as $index => $key){
 			if (isset($options['columns'][$key]['width']) && $options['columns'][$key]['width']){
-				if (!isset($widths[$options['columns'][$key]['width']])) $widths[$options['columns'][$key]['width']] = [];
-				$widths[$options['columns'][$key]['width']][] = $index + 1;
+				$w = strval($options['columns'][$key]['width']);
+				if (!isset($widths[$w])) $widths[$w] = [];
+				$widths[$w][] = $index + 1;
 			}
 			if (!empty($options['columns'][$key]['border'])) $border = $options['columns'][$key]['border'];
 		}
 
 		// sanitize sheet names according to openspout specifications to max length - 4 characters for possible enumeration up to 99
 		$sheetname = [];
-		foreach(array_keys($this->content) as $sheet){
+		foreach(array_keys($contentToWrite) as $sheet){
 			if (!boolval($sheet)) continue;
 			$sanitizedName = substr(preg_replace('/[^\w\d\s]/', '', $sheet), 0, 31 - 4);
 			// enumerate if multiple similar names are present
 			if (in_array($sanitizedName, $sheetname)) $sanitizedName .= '(' . array_count_values($sheetname)[$sanitizedName] . ')';
-					
 			$sheetname[$sheet] = $sanitizedName;
 		}
 
 		// name default first sheet
 		$currentSheet = $writer->getCurrentSheet();
-		$sheetName = $recentSheet = array_key_first($this->content);
+		$sheetName = $recentSheet = array_key_first($contentToWrite);
 		if (isset($sheetname[$sheetName])) $currentSheet->setName($sheetname[$sheetName]);
 
 		// write sheets
-		foreach($this->content as $sheetName => $sheet) {
+		foreach($contentToWrite as $sheetName => $sheet) {
 			$rows = [];
 			
 			if ($recentSheet !== $sheetName){
@@ -293,15 +310,16 @@ CLASS TABLE{
 						$options['columns'][$column]['font-size'] ?? \OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_SIZE, // public int $fontSize = self::DEFAULT_FONT_SIZE,
 						\OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_COLOR, // public string $fontColor = self::DEFAULT_FONT_COLOR,
 						\OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_NAME, // public string $fontName = self::DEFAULT_FONT_NAME,
-						!empty($options['columns'][$column]['halign']) && enum_exists($halignment) ? $halignment::from($options['columns'][$column]['halign']) : null, // public ?CellAlignment $cellAlignment = null,
-						!empty($options['columns'][$column]['valign']) && enum_exists($valignment) ? $valignment::from($options['columns'][$column]['valign']) : null, // public ?CellVerticalAlignment $cellVerticalAlignment = null,
+						!empty($options['columns'][$column]['halign']) ? \OpenSpout\Common\Entity\Style\CellAlignment::{strtoupper($options['columns'][$column]['halign'])} : null, // public ?CellAlignment $cellAlignment = null,
+						!empty($options['columns'][$column]['valign']) ? \OpenSpout\Common\Entity\Style\CellVerticalAlignment::{strtoupper($options['columns'][$column]['valign'])} : null, // public ?CellVerticalAlignment $cellVerticalAlignment = null,
 						$options['columns'][$column]['wrap-text'] ?? true, // public ?bool $shouldWrapText = null,
 						0, // public int $textRotation = 0,
 						true, // public ?bool $shouldShrinkToFit = null,
 						$border ? new \OpenSpout\Common\Entity\Style\Border(
 							new \OpenSpout\Common\Entity\Style\BorderPart(
-								$bordername::from($border),
-								'thin'
+								\OpenSpout\Common\Entity\Style\BorderName::{strtoupper($border)},
+								\OpenSpout\Common\Entity\Style\BorderPart::DEFAULT_COLOR,
+								\OpenSpout\Common\Entity\Style\BorderWidth::THIN
 							)
 						) : null, // public ?Border $border = null,
 						null, // public ?string $backgroundColor = null,
