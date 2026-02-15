@@ -38,7 +38,6 @@ Things are still in motion. Images may be outdated.
 * further implementation of tc-lib-pdf
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
-    * enable csvprocessor/csvfilter to handle xlsx and ods?
     * consider ods output where applicable
 
 ## Content
@@ -1942,7 +1941,7 @@ It is strongly recommended to create an additional development environment to te
     * [pricelist import](#importing-vendor-product-lists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB. On IIS [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) should be configured accordingly.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though. This might have to be adjusted. Possibly there has to be an adjustment for processor timout within the app pool settings of IIS and [session timeout](#runtime-variables) as well.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 600 (10min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though. This might have to be adjusted. Possibly there has to be an adjustment for processor timout within the app pool settings of IIS and [session timeout](#runtime-variables) as well.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
     * pricelist import does take a lot longer on [updating products](#importing-vendor-product-lists) than deleting and reinserting
