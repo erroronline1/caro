@@ -403,7 +403,7 @@ class ERPQUERY extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_update')
 			],
-			'content' => $this->_lang->GET('erpquery.integrations.productlist_erp_update_hint', [':count' => count($vendorlist), ':minutes' => ceil(count($vendorlist)*2/60)])
+			'content' => $this->_lang->GET('erpquery.integrations.productlist_erp_update_hint', [':count' => count($vendorlist), ':minutes' => ceil(count($vendorlist)*2/100)])
 		];
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -422,7 +422,7 @@ class ERPQUERY extends API {
 				}
 				else $response[] = $vendor['name'] . ': ' . $this->_lang->GET('consumables.vendor.productlist_update_error');
 				if ($importfilter){
-					$response[] = $consumables->update_productlist($source, $importfilter, $vendor['id'], true, false);
+					$response[] = [$vendor['name'], ...$consumables->update_productlist($importfilter, $vendor['id'], true, false)];
 				}
 			}
 			$content[] = [
