@@ -2111,28 +2111,8 @@ class CONSUMABLES extends API {
 	 * 
 	 * chunkifies requests to avoid overflow
 	 */
-	public function update_productlist($source, $filter, $vendorID, $erp_match = false, $purge = true){
+	public function update_productlist($filter, $vendorID, $erp_match = false, $purge = true){
 		$filter = json_decode($filter, true);
-
-		if (isset($source['productlist'])){
-			$filter['filesetting']['source'] = $source['productlist'];
-			$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
-			if (!isset($filter['filesetting']['headerrow'])) $filter['filesetting']['headerrow'] = CONFIG['csv']['headerrow'];
-			if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
-
-			// update csv-filter filter_by_comparison_file if set or drop if not
-			if (isset($filter['filter'])){
-				foreach ($filter['filter'] as $ruleindex => &$rule) {
-					if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
-						if (isset($source['match']) && $source['match']) $rule['filesetting']['source'] = $source['match'];
-						else unset($filter['filter'][$ruleindex]);
-					}
-				}
-			}
-		}
-		else {
-			// direct data from erp import of selected vendor
-		}
 
 		$productlist = new Listprocessor($filter);
 		$sqlchunks = [];
@@ -2472,11 +2452,26 @@ class CONSUMABLES extends API {
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
 						if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 
-						$source = [
-							'productlist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0],
-						];
+						// read data from file and set primary source
+						require_once('_table.php');
+						$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['name'][0]);
+						$source = new TABLE($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0], $sourceproperties['extension'], ['headerrow' => $vendor[':products']['filefilter']['filesetting']['headerrow'] ?? 0]);
+						$source = $source->dump([]);
+						$vendor[':products']['filefilter']['filesetting'] = $source[array_key_first($source)];
+
 						if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name']){
-							$source['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name'][0];
+							$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['name'][0]);
+
+							// read data from comparison file and set match source
+							if (isset($vendor[':products']['filefilter']['filter'])){
+								foreach ($vendor[':products']['filefilter']['filter'] as $ruleindex => &$rule) {
+									if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
+										$source2 = new TABLE($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name'][0], $sourceproperties['extension'], ['headerrow' => $vendor[':products']['filefilter']['filesetting']['headerrow'] ?? 0]);
+										$source2 = $source2->dump([]);
+										$rule['filesetting']['source'] = $source2[array_key_first($source2)];
+									}
+								}
+							}
 						}
 						$importfilter = $vendor[':products']['filefilter'];
 						// unset productlist files for later file processing after successful update
@@ -2497,7 +2492,7 @@ class CONSUMABLES extends API {
 						else $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
 					if ($importfilter){
-						$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected')) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport_option')));
+						$productlistImportResult = $this->update_productlist($importfilter, $vendor[':id'], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected')) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport_option')));
 						$vendor[':products']['validity'] = $productlistImportResult[0];
 						if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
