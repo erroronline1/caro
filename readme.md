@@ -1319,7 +1319,7 @@ a phone number: tel:012345678
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | --- | --- | --- |
 | *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | not | though |
+| linebreaks | are | not | though<br />without<br />html-tag `<br />` |
 
 - - -
 
@@ -6429,7 +6429,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 All libraries are embedded locally to avoid external, probably prohibited web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
-There are **no** dependency install routines for [composer](https://getcomposer.org/) or [npm](https://www.npmjs.com/) and alike by intent during the installation of this application to ensure availability of tested and approved functionality. Libraries may be updated via composer during development and maintenance though. 
+There are **no** dependency install routines for [composer](https://getcomposer.org/) or [npm](https://www.npmjs.com/) and alike by intent during the installation of this application to ensure availability of tested and approved functionality. Libraries may be updated via composer during development and maintenance though and it is required to import libraries during runtime.
 
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
