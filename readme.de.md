@@ -1219,7 +1219,7 @@ eine Telefonnummer: tel:012345678
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
-| Zeilenumbrüche | sind es | jedoch | nicht |
+| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />html-befehl `<br />` |
 
 - - -
 
