@@ -39,6 +39,9 @@ Things are still in motion. Images may be outdated.
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
     * consider ods output where applicable
+* records state filter like orders (processed/delivered, not showing previous)
+    * request parameter, no css filtering?
+    * optional table display as per user settings?
 
 ## Content
 * [Aims](#aims)
