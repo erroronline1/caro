@@ -1670,18 +1670,15 @@ class ORDER extends API {
 		// handle attachments
 		$attachments = [];
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
-			foreach ($attachments as $key => $value){
-				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
-				else unset($attachments[$key]);
-			}
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
-			foreach ($attachments as $key => $value){
-				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
-				else unset($attachments[$key]);
-			}
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
+		}
+		// sanitize array for empty values
+		foreach ($attachments as $key => $value){
+			if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
+			else unset($attachments[$key]);
 		}
 		$existingattachments = UTILITY::propertySet($this->_payload, 'existingattachments') ? : '';
 		if ($attachments || $existingattachments) {
