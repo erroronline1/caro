@@ -515,6 +515,9 @@ class UTILITY {
 				$raw_data = file_get_contents('php://input');
 				// linebreak depending on apache vs iis
 				$linebreak = stristr("\r\n", $raw_data) ? "\r\n" : "\n";
+				
+				// unset proper setup for POST requests prior to this methods population
+				$_FILES = [];
 
 				// Fetch content and determine boundary
 				$boundary = rtrim(substr($raw_data, 0, strpos($raw_data, $linebreak)));
