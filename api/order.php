@@ -1297,7 +1297,7 @@ class ORDER extends API {
 
 		// gather products to assign database id to order data if vendor and ordernumber match
 		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
+			$allproducts_key[$product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']] = $product;
 		}
 
 		// iterate over items and create one order per item
@@ -1310,10 +1310,8 @@ class ORDER extends API {
 			// try to match product id, assign if found
 			// this is done here instead of checking on display of orders for performance reasons!
 			// i am aware this may lead to buttons for adding a product after product list updates
-			if (isset($order_data2['ordernumber_label']) && isset($order_data2['vendor_label'] )){
-				if (isset($allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']])){
-					$product = $allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']];
-				}
+			if (isset($order_data2['ordernumber_label']) && isset($order_data2['vendor_label']) && isset($order_data2['productname_label'])){
+				$product = $allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label'] . '_' . $order_data2['productname_label']] ?? null;
 				if ($product) $order_data2['productid'] = $product['id'];
 			}
 
