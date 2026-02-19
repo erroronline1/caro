@@ -681,7 +681,7 @@ class CALENDARUTILITY {
 		$easter->setTimestamp(easter_date($year));
 		foreach ($this->_easter_holidays as $offset){
 			$easterholiday = clone $easter;
-			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
+			$easterholiday->modify(strval(intval($offset)) .' days');
 			$holidays[] = $easterholiday->format('Y-m-d');
 		}
 		return $holidays;
