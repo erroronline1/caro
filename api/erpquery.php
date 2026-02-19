@@ -205,7 +205,7 @@ class ERPQUERY extends API {
 					foreach($cases as $case){
 						$description = $case['caseid'] . ' - ' . $case['text'];
 						if ($case['info']) $description .= ' - ' . $case['info'];
-						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "const formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', 'erpcasepositions', null, formdata);"];
+						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "let formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', 'erpcasepositions', null, formdata);"];
 					}
 					$content[] = [
 						'type' => 'links',
@@ -274,7 +274,7 @@ class ERPQUERY extends API {
 								':amount' => $order['amount'],
 								':delivered_full' => $order['delivered_full'] ? $this->convertFromServerTime($order['delivered_full']) : '?'
 							]
-						)] = ['href' => "javascript: api.purchase('get', 'order'); const data = {vendor: encodeURIComponent('" . $order['vendor'] . "'), search: encodeURIComponent('" . $order['article_no'] . "')}; setTimeout(api.purchase('get', 'search', 'order', data), 500)"];
+						)] = ['href' => "javascript: api.purchase('get', 'order'); setTimeout(api.purchase('get', 'search', 'order', {vendor: encodeURIComponent('" . $order['vendor'] . "'), search: encodeURIComponent('" . $order['article_no'] . "')}), 500)"];
 					}
 					$content[] = [
 						'type' => 'links',
