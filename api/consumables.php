@@ -2260,7 +2260,7 @@ class CONSUMABLES extends API {
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
 
-			// update entries with data from erp interface is available and selected
+			// update entries with data from erp interface if available and selected
 			if ($erp_match && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
 					'values' => [
@@ -2283,6 +2283,8 @@ class CONSUMABLES extends API {
 					$query = SQLQUERY::PREPARE('consumables_put_product_productlist_erp_amendment');
 					foreach($erp_dump[$vendor['name']] as $article){
 						// update articles based on same vendor and article_no
+						// CAVEAT: there may be shitty vendors with the same order number for different versions. currently i have no clue on how to address that
+						// since i consider it a better idea in general being able to update the product name too
 						if (!$article['article_no']) continue;
 						$replace = [
 							':article_unit' => $article['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['article_unit'])): 'NULL',
@@ -2302,9 +2304,9 @@ class CONSUMABLES extends API {
 							':stock_item' => isset($article['stock_item']) && boolval(intval($article['stock_item'])) ? 1 : 'NULL',
 							':erp_id' => $article['erp_id'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['erp_id'] ? : '')): 'NULL',
 							':thirdparty_order' => isset($article['thirdparty_order']) && intval($article['thirdparty_order']) ? 1 : 'NULL',
+							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL',
 							':vendor_id' => $vendor['id'],
 							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no'])),
-							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
 						];
 
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
@@ -2492,7 +2494,7 @@ class CONSUMABLES extends API {
 						else $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
 					if ($importfilter){
-						$productlistImportResult = $this->update_productlist($importfilter, $vendor[':id'], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected')) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport_option')));
+						$productlistImportResult = $this->update_productlist($importfilter, $vendor[':id'], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected')));
 						$vendor[':products']['validity'] = $productlistImportResult[0];
 						if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}

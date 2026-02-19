@@ -422,7 +422,7 @@ class ERPQUERY extends API {
 				}
 				else $response[] = $vendor['name'] . ': ' . $this->_lang->GET('consumables.vendor.productlist_update_error');
 				if ($importfilter){
-					$response[] = [$vendor['name'], ...$consumables->update_productlist($importfilter, $vendor['id'], true, false)];
+					$response[] = [$vendor['name'], ...$consumables->update_productlist($importfilter, $vendor['id'], false, false)];
 				}
 			}
 			$content[] = [
