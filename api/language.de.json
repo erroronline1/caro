@@ -1907,7 +1907,8 @@
 			"weekly_hours": "Wochenarbeitszeit",
 			"weekly_hours_hint": "YYYY-MM-DD; Stunden in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung empfohlen, frühere Kalendereinträge werden nicht mit berechnet.\nBitte weise den Nutzer darauf hin etwaige Überzeit zu Beginn der Erfassung als Korrekturwert anzugeben."
 		},
-		"take_photo": "Wähle ein Foto für das Profil",
+		"take_image": "Wähle eine Bilddatei für das Profilbild",
+		"take_photo": "Wähle ein Foto für das Profilbild",
 		"take_photo_hint": "Das Bild ist für alle Nutzer sichtbar, wie z.B. in den Unterhaltungen.",
 		"timesheet_format_error": "Speichern nicht möglich, eine der Angaben zur Zeiterfassung haben kein gültiges Format!",
 		"token": "Zugangstoken",

@@ -111,9 +111,14 @@ class USER extends API {
 					];
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
-					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user['image']);
-
+					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
 					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
+					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					$user[':image'] = substr($user[':image'], 3);
+				}
+				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
+					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
+					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
 					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
@@ -362,12 +367,23 @@ class USER extends API {
 				if (!array_intersect(['patient'], $_SESSION['user']['permissions'])) {
 					$response['render']['content'][] = [
 							[
-								'type' => 'photo',
-								'attributes' => [
-									'name' => $this->_lang->GET('user.take_photo')
-								],
-								'hint' => $this->_lang->GET('user.take_photo_hint')
-							],
+								[
+									'type' => 'photo',
+									'attributes' => [
+										'name' => $this->_lang->GET('user.take_photo')
+									],
+									'hint' => $this->_lang->GET('user.take_photo_hint')
+								]
+							], [
+								[
+									'type' => 'file',
+									'attributes' => [
+										'name' => $this->_lang->GET('user.take_image'),
+										'accept' => '.jpg,.jpeg,.png,.gif'
+									],
+									'hint' => $this->_lang->GET('user.take_photo_hint')
+								]
+							]
 						];
 						
 
@@ -384,12 +400,12 @@ class USER extends API {
 									]
 								]
 							],
-							$response['render']['content'][1]
-						];
-						$response['render']['content'][1][1][] = [
-							'type' => 'checkbox',
-							'content' => [
-								$this->_lang->GET('user.reset_photo') => []
+							...$response['render']['content'][1],
+							[
+								'type' => 'checkbox',
+								'content' => [
+									$this->_lang->GET('user.reset_photo') => []
+								]
 							]
 						];
 					}
@@ -725,6 +741,12 @@ class USER extends API {
 					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
+				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
+					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
+					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
+					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					$user[':image'] = substr($user[':image'], 3);
+				}
 
 				// insert user into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
@@ -1001,12 +1023,23 @@ class USER extends API {
 						]
 					], [
 						[
-							'type' => 'photo',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.take_photo')
-							],
-							'hint' => $this->_lang->GET('user.take_photo_hint')
-						],
+							[
+								'type' => 'photo',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.take_photo')
+								],
+								'hint' => $this->_lang->GET('user.take_photo_hint')
+							]
+						], [
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.take_image'),
+									'accept' => '.jpg,.jpeg,.png,.gif'
+								],
+								'hint' => $this->_lang->GET('user.take_photo_hint')
+							]
+						]
 					], [
 						[
 							'type' => 'radio',
@@ -1080,12 +1113,12 @@ class USER extends API {
 									]
 								]
 							],
-							$response['render']['content'][2]
-						];
-						$response['render']['content'][2][1][] = [
-							'type' => 'checkbox',
-							'content' => [
-								$this->_lang->GET('user.reset_photo') => []
+							...$response['render']['content'][2],
+							[
+								'type' => 'checkbox',
+								'content' => [
+									$this->_lang->GET('user.reset_photo') => []
+								]
 							]
 						];
 					}
