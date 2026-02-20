@@ -171,7 +171,7 @@ export const _serviceWorker = {
 				data.message_unnotified > 1
 					? api._lang.GET("message.message.new_messages", {
 							":amount": data.message_unnotified,
-					  })
+						})
 					: api._lang.GET("message.message.new_message");
 			this.showLocalNotification(api._lang.GET("message.navigation.header"), body);
 		}
@@ -609,7 +609,7 @@ export const _client = {
 			//new Assemble(cart).initializeSection(nodes[nodes.length - 3]); // always append on bottom of article list
 			new Assemble(cart).initializeSection(nodes[1]); // always append on top of article list
 			// remove open dialog if present, e.g. manual order
-			if (document.querySelector('dialog[open]')) document.querySelector('dialog[open]').remove();
+			if (document.querySelector("dialog[open]")) document.querySelector("dialog[open]").remove();
 
 			new Toast(api._lang.GET("order.added_confirmation", { ":name": data[3] }), "info");
 		},
@@ -1284,20 +1284,7 @@ export const _client = {
 						}
 							.toString()
 							._replaceArray(
-								[
-									"element.purchasemembers",
-									"element.quantity",
-									"element.unit",
-									"element.ordernumber",
-									"element.name",
-									"element.vendor",
-									"element.information",
-									"element.commission",
-									"element.aut_idem",
-									"element.ordertext",
-									"element.identifier",
-									"buttons",
-								],
+								["element.purchasemembers", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "element.ordertext", "element.identifier", "buttons"],
 								[
 									element.purchasemembers.join(","),
 									element.quantity,
@@ -1445,8 +1432,8 @@ export const _client = {
 
 					let reasons = {};
 
-					if (api._lang._USER.orderreturns.critical) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.critical)) reasons[value] = {value: key};
-					if (api._lang._USER.orderreturns.easy) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.easy)) reasons[value] = {value: key};
+					if (api._lang._USER.orderreturns.critical) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.critical)) reasons[value] = { value: key };
+					if (api._lang._USER.orderreturns.easy) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.easy)) reasons[value] = { value: key };
 					reasons = Object.keys(reasons)
 						.sort()
 						.reduce((obj, key) => {
@@ -2018,6 +2005,89 @@ export const _client = {
 					},
 				],
 			};
+		},
+		table: (data) => {
+			let content = [],
+				context = [];
+			// iterate over records and construct Assemble syntax
+			for (const [contextdata, records] of Object.entries(data)) {
+				context = {
+					type: "table",
+					attributes: {
+						name: contextdata,
+					},
+					content: [],
+				};
+				context.content.push([{ c: "" }, { c: "" }]); // empty header
+
+				records.forEach((record) => {
+					context.content.push([
+						{ c: record.identifier, a: { "data-type": "record", class: record.closed ? "green" : record.complaint ? "orange" : "" } },
+						{
+							c: api._lang.GET("record.list_touched", {
+								":date": record.last_touch,
+								":document": record.last_document,
+								":user": record.last_user,
+							}),
+							a: {
+								onclick: "api.record('get', 'record', '" + record.identifier + "')",
+								onkeydown: "if (event.key==='Enter') api.record('get', 'record', '" + record.identifier + "')",
+								style: "cursor:pointer",
+								role: "link",
+								tabindex: "0",
+								class: "cta",
+							},
+						},
+					]);
+				});
+				content.push(context);
+			}
+
+			const render = new Assemble({ content: content });
+			document.getElementById("main").firstChild.append(...render.initializeSection(null, null, "icanhasnodes"));
+			render.processAfterInsertion();
+		},
+		tile: (data) => {
+			let content = [],
+				context = [];
+			// iterate over records and construct Assemble syntax
+			for (const [contextdata, records] of Object.entries(data)) {
+				context = [];
+				context.push({
+					type: "textsection",
+					attributes: { name: contextdata },
+				});
+				records.forEach((record) => {
+					context.push({
+						type: "tile",
+						attributes: {
+							onclick: "api.record('get', 'record', '" + record.identifier + "')",
+							onkeydown: "if (event.key==='Enter') api.record('get', 'record', '" + record.identifier + "')",
+							role: "link",
+							tabindex: "0",
+						},
+						content: [
+							{
+								type: "textsection",
+								attributes: {
+									"data-type": "record",
+									name: record.identifier,
+								},
+								content: api._lang.GET("record.list_touched", {
+									":date": record.last_touch,
+									":document": record.last_document,
+									":user": record.last_user,
+								}),
+							},
+						],
+					});
+				});
+				content.push(context);
+			}
+
+			const render = new Assemble({ content: content });
+			document.getElementById("main").firstChild.append(...render.initializeSection(null, null, "icanhasnodes"));
+			render.processAfterInsertion();
 		},
 	},
 	texttemplate: {
