@@ -1901,6 +1901,7 @@
 			"primary_unit": "Primary unit",
 			"location": "State",
 			"location_change_alert": "Changing the state with its linked holidays has an effect on your timesheet calculations. On changing this must be initialized anew!",
+			"records_layout": "Records overview layout",
 			"theme": "Colour scheme",
 			"timezone": "Timezone",
 			"timezone_hint": "Dates and Times will be displayed in your local time",

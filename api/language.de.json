@@ -1901,6 +1901,7 @@
 			"primary_unit": "Primärer Bereich",
 			"location": "Bundesland",
 			"location_change_alert": "Die Änderung des Bundeslandes hat mit den verknüpften Feiertagen Auswirkungen auf deine Arbeitszeitberechnungen. Bei einer Änderung muss diese zwingend neu angelegt werden!",
+			"records_layout": "Darstellung der Übersicht von Aufzeichnungen",
 			"theme": "Farbschema",
 			"timezone": "Zeitzone",
 			"timezone_hint": "Daten und Uhrzeiten werden in deiner lokalen Zeit angezeigt",

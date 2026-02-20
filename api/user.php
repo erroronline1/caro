@@ -157,11 +157,22 @@ class USER extends API {
 					else
 						switch($orderLayout){
 							// in case other options may become implemented also see utility.js _client.order.approved()
+							case $this->_lang->GET('user.settings.order_layout_tile'):
+								$user[':app_settings']['orderLayout'] = 'tile';
+								break;
 							case $this->_lang->GET('user.settings.order_layout_table'):
 								$user[':app_settings']['orderLayout'] = 'table';
 								break;
-							case $this->_lang->GET('user.settings.order_layout_tile'):
-								$user[':app_settings']['orderLayout'] = 'tile';
+						}
+				}
+				if ($recordsLayout = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.records_layout'))){
+					if ($recordsLayout === $this->_lang->GET('user.settings.order_layout_tile'))
+						unset($user[':app_settings']['recordsLayout']);
+					else
+						switch($recordsLayout){
+							// in case other options may become implemented also see utility.js _client.record
+							case $this->_lang->GET('user.settings.order_layout_table'):
+								$user[':app_settings']['recordsLayout'] = 'table';
 								break;
 						}
 				}
@@ -483,8 +494,18 @@ class USER extends API {
 							],
 							'content' => [
 								$this->_lang->GET('user.settings.order_layout_full') => !isset($user['app_settings']['orderLayout']) ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings.order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
+							]
+						], [
+							// append preferred records overview layout
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings.records_layout')
+							],
+							'content' => [
+								$this->_lang->GET('user.settings.order_layout_tile') => !isset($user['app_settings']['recordsLayout']) || $user['app_settings']['recordsLayout'] === 'tile' ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.order_layout_table') => isset($user['app_settings']['recordsLayout']) && $user['app_settings']['recordsLayout'] === 'table' ? ['checked' => true] : [],
 							]
 						], [
 							'type' => 'hr'
