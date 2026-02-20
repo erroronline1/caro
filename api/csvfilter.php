@@ -345,7 +345,7 @@ class CSVFILTER extends API {
 			case 'POST':
 				// set up filter properties by payload
 				$filter = [
-					':id' => null,
+					':id' => $this->_requestedID,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
@@ -360,12 +360,22 @@ class CSVFILTER extends API {
 				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.filter_content_hint'), 'type' => 'error']]);
 				$filter[':content'] = UTILITY::json_encode(json_decode($filter[':content'], true), JSON_PRETTY_PRINT);
 
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+				// get filter passed by id
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
 					'values' => [
-						':name' => $filter[':name']
-					]
+						':id' => intval($filter[':id'])
+						]
 				]);
 				$exists = $exists ? $exists[0] : null;
+				// if not found query most recent by name
+				if (!$exists) {
+					$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+						'values' => [
+							':name' => $filter[':name']
+						]
+					]);
+					$exists = $exists ? $exists[0] : null;
+				}
 
 				if ($exists){
 					// overwrite if content remains the same or not fully approved yet (draft mode)
@@ -478,7 +488,7 @@ class CSVFILTER extends API {
 				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',
-						'action' => "javascript:api.csvfilter('post', 'rule')"],
+						'action' => "javascript:api.csvfilter('post', 'rule' " . ($filter['id'] ? ',' . $filter['id'] : '') . ")"],
 					'content' => [
 						[
 							[

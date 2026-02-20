@@ -3889,13 +3889,14 @@ Sample response
 {"render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung":{"value":1}}},{"type":"search","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"},"datalist":["Terminerinnerung"]}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung  created by error on line 1 on 2025-01-26 01:34:00":{"value":1}}}]],[{"type":"text","attributes":{"name":"Name","value":"","required":true,"data-loss":"prevent"}},{"type":"code","hint":"Please adhere to proper JSON format to describe a working CSV filter. A programmer can help you with that.","attributes":{"name":"Content","value":"","rows":16,"id":"content","required":true,"data-loss":"prevent"}}]]}}
 ```
 
-> POST ./api/api.php/csvfilter/rule
+> POST ./api/api.php/csvfilter/rule/{id}
 
 Saves a filter preset.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | filter to be updated, new if omitted |
 | payload | form data | required | filter json and name to be stored |
 
 Sample response
