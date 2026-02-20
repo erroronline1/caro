@@ -1908,14 +1908,20 @@ export const api = {
 						break;
 					case "records":
 						payload = {
-							_filter: document.getElementById('_recordfilter') ? encodeURIComponent(document.getElementById('_recordfilter').value) : null,
-							_unit: document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`) && document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`).value !== 'null' ? document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`).value : null,
-							_state: document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`) && document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`).value !== 'null' ? document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`).value : null
-						}
-						for (const [key, value] of Object.entries(payload)){
+							_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
+							_unit:
+								document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`) && document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value !== "null"
+									? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value
+									: null,
+							_state:
+								document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`) && document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value !== "null"
+									? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value
+									: null,
+						};
+						for (const [key, value] of Object.entries(payload)) {
 							if (!value) delete payload[key];
 						}
-						// no break by intent
+					// no break by intent
 					default:
 						successFn = function (data) {
 							if (data.render) {
@@ -1923,6 +1929,18 @@ export const api = {
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
+							}
+							if (request[1] === "records" && data.data) {
+								if (api._settings.user.app_settings.recordsLayout) {
+									switch (api._settings.user.app_settings.recordsLayout) {
+										// in case other options may become implemented also see user.php profile
+										case "table":
+											_client.record.table(data.data);
+											break;
+										default:
+											_client.record.tile(data.data);
+									}
+								} else _client.record.tile(data.data);
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							api.preventDataloss.start();
