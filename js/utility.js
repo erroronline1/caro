@@ -1939,20 +1939,6 @@ export const _client = {
 	},
 	record: {
 		/**
-		 * filter records by case state
-		 * @param {string} casestate to display, hide all others
-		 * @event hiding or displaying records
-		 */
-		casestatefilter: (casestate) => {
-			document.querySelectorAll("article[role]").forEach((anchor) => {
-				anchor.style.display = casestate ? "none" : "block";
-			});
-			if (casestate)
-				document.querySelectorAll("[data-" + casestate + "]").forEach((anchor) => {
-					anchor.style.display = "block";
-				});
-		},
-		/**
 		 * radio selection with preview
 		 * @param {array} files array
 		 * @returns assemble radio widget

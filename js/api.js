@@ -1907,17 +1907,15 @@ export const api = {
 						// fall back to default successFn
 						break;
 					case "records":
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] || data.header);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								_client.record.casestatefilter(api._settings.user.app_settings.primaryRecordState);
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
+						payload = {
+							_filter: document.getElementById('_recordfilter') ? encodeURIComponent(document.getElementById('_recordfilter').value) : null,
+							_unit: document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`) && document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`).value !== 'null' ? document.querySelector(`input[name="${api._lang.GET('order.organizational_unit')}"]:checked`).value : null,
+							_state: document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`) && document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`).value !== 'null' ? document.querySelector(`input[name="${api._lang.GET('record.pseudodocument_casedocumentation')}"]:checked`).value : null
+						}
+						for (const [key, value] of Object.entries(payload)){
+							if (!value) delete payload[key];
+						}
+						// no break by intent
 					default:
 						successFn = function (data) {
 							if (data.render) {
