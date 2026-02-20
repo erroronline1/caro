@@ -39,9 +39,6 @@ Things are still in motion. Images may be outdated.
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
     * consider ods output where applicable
-* records state filter like orders (processed/delivered, not showing previous)
-    * request parameter, no css filtering?
-    * optional table display as per user settings?
 
 ## Content
 * [Aims](#aims)
@@ -4977,7 +4974,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","onkeydown":"if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}","onblur":"api.record('get', 'records', this.value); return false;","value":""},"datalist":["elisabeth m\u00fcller "]}],{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"name":"Organizational_unit","onchange":"api.record('get', 'records', document.getElementById('_recordfilter').value || 'null')","checked":true},....
+{"render":{"content":[[{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","onkeydown":"if (event.key === 'Enter') {api.record('get', 'records');}","value":""},"datalist":[]},{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"value":"null","name":"Organizational unit","onchange":"api.record('get', 'records');","checked":true},"Administration":{"value":"admin","name":"Organizational unit","onchange":"api.record('get', 'records');"},"CAD":....},"data":[]}
 ```
 
 > POST ./api/api.php/record/reidentify/

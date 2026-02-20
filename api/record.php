@@ -1642,7 +1642,10 @@ class RECORD extends API {
 	 * display records overview
 	 */
 	public function records(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => ['content' => []],
+			'data' => []
+		];
 		$this->_payload->_filter = $this->_payload->_filter ?? null;
 		$this->_payload->_unit = $this->_payload->_unit ?? null;
 		$this->_payload->_state = $this->_payload->_state ?? null;
@@ -1656,7 +1659,7 @@ class RECORD extends API {
 		}
 
 		// prepare datalists, display values, available units to select and styling
-		$recorddatalist = $contexts = $available_units = [];
+		$recorddatalist = $available_units = [];
 		foreach ($data as $contextkey => $context){
 			foreach ($context as $record){
 				// prefilter record datalist for performance reasons
@@ -1688,41 +1691,15 @@ class RECORD extends API {
 						}
 					}
 				}
-
-				// create entry
-				$tile = [
-					'type' => 'tile',
-					'attributes' => [
-						'onclick' => "api.record('get', 'record', '" . $record['identifier'] . "')",
-						'onkeydown' => "if (event.key==='Enter') api.record('get', 'record', '" . $record['identifier'] . "')",
-						'role' => 'link',
-						'tabindex' => '0'
-					],
-					'content' => [
-						[
-							'type' => 'textsection',
-							'content' => $this->_lang->GET('record.list_touched', [
-								':date' => $this->convertFromServerTime($record['last_touch']),
-								':document' => $record['last_document'],
-								':user' => $last_user[$record['last_user']] ?? $this->_lang->GET('general.deleted_user')
-							]),
-							'attributes' => [
-								'data-type' => 'record',
-								'name' => $record['identifier']
-							]
-						]
-					]
+				if (!isset($response['data'][$this->_lang->GET('documentcontext.' . $contextkey)])) $response['data'][$this->_lang->GET('documentcontext.' . $contextkey)] = [];
+				$response['data'][$this->_lang->GET('documentcontext.' . $contextkey)][] = [
+					'identifier' => $record['identifier'],
+					'last_touch' =>$this->convertFromServerTime($record['last_touch']),
+					'last_document' => $record['last_document'],
+					'last_user' => $last_user[$record['last_user']] ?? $this->_lang->GET('general.deleted_user'),
+					'complaint' => $record['complaint'],
+					'closed' => $record['closed'],
 				];
-				// append dataset states
-				foreach ($record['case_state'] as $case => $state){
-					$tile['attributes']['data-' . $case] = $state;
-				}
-				// style closed and complaints
-				if ($record['complaint']) $tile['content'][0]['attributes']['class'] = 'orange';
-				if ($record['closed']) $tile['content'][0]['attributes']['class'] = 'green';
-
-				// add to result
-				$contexts[$contextkey][] = $tile;
 			}
 		}
 
@@ -1791,24 +1768,9 @@ class RECORD extends API {
 			]
 		];
 
-		// append records
-		if ($contexts){
-			foreach ($contexts as $context => $tiles){
-				if ($tiles){
-					$article = [];
-					array_push($article, [
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('documentcontext.' . $context)
-						]
-					]);
-					array_push($article, ...$tiles);
-					array_push($content, $article);
-				}
-				else array_push($content, $this->noContentAvailable($this->_lang->GET('record.no_records')));
-			}
+		if (!$response['data']){
+			array_push($content, ...$this->noContentAvailable($this->_lang->GET('record.no_records')));
 		}
-		else array_push($content, ...$this->noContentAvailable($this->_lang->GET('record.no_records')));
 
 		$response['render']['content'] = $content;
 		$this->response($response);		
