@@ -29,8 +29,6 @@ Things are still in motion. Images may be outdated.
     * https://databasefaqs.com/mariadb-set-auto-increment-value/, https://stackoverflow.com/questions/15821532/get-current-auto-increment-value-for-any-table
 
 ## to do
-* contain filtered filenames into csvfilter export (filename, print header), if available
-    * chain destination and source or only if destination does contain ____ or whatever
 * record restricted_access for generalrecords-context 
     * {unit:[...], permission:[...], user:[...]} with unit/permission intersection, ceo/admin full access
     * exclude self only
@@ -504,7 +502,7 @@ Some elements are only processible as proper records.
 * signature and
 * calendarbutton
 
-are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored. Former input recommendations are not available.
+are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.embedded (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored. Former input recommendations are not available.
 
 Elements can be rearranged via [drag and drop editor](#miscellaneous). Most elements can be edited - their content can be imported into the respective editor to be altered or appended and reinserted afterwards. The original element remains though and has to be deleted manually. 
 

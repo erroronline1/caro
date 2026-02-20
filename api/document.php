@@ -1759,7 +1759,7 @@ class DOCUMENT extends API {
 		// also see application.php start()
 		// prepare existing documents lists grouped by context
 		foreach ($documents as $row) {
-			if (in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
+			if (in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['embedded']))) continue;
 			if (!in_array($row['name'], $documentdatalist)) {
 				$documentdatalist[] = $row['name'];
 				foreach (preg_split('/[^\w\d]/', $row['alias']) as $alias) if ($alias) $documentdatalist[] = $alias;

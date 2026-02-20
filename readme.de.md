@@ -411,7 +411,7 @@ Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
 * Unterschriftenfelder und
 * Kalenderschaltflächen
 
-sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
+sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.embedded (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
 
 Elemente können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Die meisten Elemente können bearbeitet werden - ihr Inhalt kann in den entsprechenden Editor importiert werden um geändert oder ergänzt und anschließend wieder hinzugefügt zu werden. Das Original-Element verbleibt dabei und muss manuell entfernt werden.
 

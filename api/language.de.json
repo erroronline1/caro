@@ -114,7 +114,7 @@
 		"anonymous": {
 			"descriptions": "Verfahrens- oder Arbeitsanweisung"
 		},
-		"notdisplayedinrecords": {
+		"embedded": {
 			"mdr_sample_check_document": "MDR §14 Stichprobenprüfung",
 			"product_incorporation_document": "Produkteinführung",
 			"training_evaluation_document": "Schulungsbewertung",

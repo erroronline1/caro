@@ -510,7 +510,7 @@ class APPLICATION extends API {
 			$documents = $search->documentsearch(['search' => null]);
 			// prepare existing documents lists grouped by context
 			foreach ($documents as $row) {
-				if (!$row['patient_access'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
+				if (!$row['patient_access'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['embedded']))) continue;
 				if (!in_array($row['name'], $documentdatalist)) {
 					$documentdatalist[] = $row['name'];
 					// filter by unit

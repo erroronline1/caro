@@ -851,7 +851,7 @@ class RECORD extends API {
 		$hidden = [];
 		foreach ($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
-			if ($row['hidden'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($row['hidden'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['embedded']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $validDocuments) && !in_array($row['name'], $hidden)) {
 				$validDocuments[] = $row['name'];
 			}

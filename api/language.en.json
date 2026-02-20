@@ -114,7 +114,7 @@
 		"anonymous": {
 			"descriptions": "Process or work instruction"
 		},
-		"notdisplayedinrecords": {
+		"embedded": {
 			"mdr_sample_check_document": "MDR §14 Sample Check",
 			"product_incorporation_document": "Product incorporation",
 			"training_evaluation_document": "Training evaluation",
