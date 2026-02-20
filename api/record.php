@@ -1828,7 +1828,7 @@ class RECORD extends API {
 				'case_state' => json_decode($row['case_state'] ?? '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
-				'units' => explode(',', $row['units'] ?? ''),
+				'units' => $row['units'] ? explode(',', $row['units']) : null,
 				'last_user' => $row['last_user']
 			];
 		}
