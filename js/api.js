@@ -593,7 +593,7 @@ export const api = {
 					button.onclick = () => {
 						api.history.go("back");
 					};
-					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-left.svg')";
+					button.style.maskImage = "url('./media/angle-left.svg')";
 					elements.push(button);
 
 					// iterate over main categories
@@ -610,7 +610,7 @@ export const api = {
 						label.setAttribute("data-notification", 0);
 						label.title = group;
 						div = document.createElement("div");
-						div.style.maskImage = div.style.webkitMaskImage = icons[group];
+						div.style.maskImage = icons[group];
 						div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
 						label.append(div);
 
@@ -675,7 +675,7 @@ export const api = {
 					button.onclick = () => {
 						api.history.go("forth");
 					};
-					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
+					button.style.maskImage = "url('./media/angle-right.svg')";
 					elements.push(button);
 					elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMenu"), "#menustart"));
 
@@ -727,7 +727,7 @@ export const api = {
 							await _.sleep(50);
 							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("application.navigation.header") + "]");
 						}
-						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
+						applicationLabel.style.maskImage = "none";
 						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
 						applicationLabel.style.backgroundSize = "cover";
 						applicationLabel.style.borderRadius = "50%";
