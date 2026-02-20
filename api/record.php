@@ -24,7 +24,6 @@ class RECORD extends API {
 	private $_passedIdentify = null;
 	private $_documentExport = null;
 	private $_caseState = null;
-	private $_unit = null;
 	private $_caseStateValue = null;
 
 	public function __construct(){
@@ -35,7 +34,7 @@ class RECORD extends API {
 		) $this->response([], 401);
 
 		$this->_requestedID = $this->_appendDate = REQUEST[2] ?? null;
-		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = REQUEST[3] ?? '';
+		$this->_passedIdentify = $this->_documentExport = $this->_caseState = REQUEST[3] ?? '';
 		$this->_caseStateValue = REQUEST[4] ?? null;
 	}
 
@@ -158,14 +157,14 @@ class RECORD extends API {
 				$content = [];
 				$checked = json_decode($checked ? : '', true);
 				if ($type === 'radio'){
-					$content[$this->_lang->GET('record.casestate_filter_all')] = ['onchange' => "_client.record.casestatefilter(undefined)"];
-					if (!$checked) $content[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
+					$content[$this->_lang->GET('record.casestate_filter_all')] = ['value' => null, ...$action];
+					// check all-option if not passed or key does not exist
+					if (!$checked || !in_array(array_key_first($checked),array_keys($this->_lang->_USER['casestate'][$context]))) $content[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 				}
 				foreach ($this->_lang->_USER['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
-					$content[$translation]['data-casestate'] = $state;
+					$content[$translation]['value'] = $state;
 					if (isset($checked[$state])) $content[$translation]['checked'] = true;
-					if ($type === 'radio' && isset($_SESSION['user']['app_settings']['primaryRecordState']) && $state === $_SESSION['user']['app_settings']['primaryRecordState']) $content[$translation]['checked'] = true;
 					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$translation]['disabled'] = true;
 				}
 				return [
@@ -1644,9 +1643,12 @@ class RECORD extends API {
 	 */
 	public function records(){
 		$response = ['render' => ['content' => []]];
-		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
+		$this->_payload->_filter = $this->_payload->_filter ?? null;
+		$this->_payload->_unit = $this->_payload->_unit ?? null;
+		$this->_payload->_state = $this->_payload->_state ?? null;
+
 		// get all records or these fitting the search
-		$data = $this->recordsearch(['search' => $this->_requestedID]);
+		$data = $this->recordsearch(['search' => $this->_payload->_filter]);
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$last_user = [];
 		foreach($users as $user){
@@ -1666,11 +1668,26 @@ class RECORD extends API {
 				else $available_units[] = null;
 
 				// filter results by selected unit
-				if (!$this->_requestedID && (
-					(!$this->_unit && !array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
-					|| ($this->_unit === '_unassigned' && $record['units'])
-					|| ($this->_unit && $this->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_unit, $record['units'])))
-				)) continue;
+				if (
+					((!$this->_payload->_unit) && !array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
+					|| ($this->_payload->_unit === '_unassigned' && $record['units'])
+					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_payload->_unit, $record['units'])))
+				) continue;
+				// filter case documentations by case state
+				if (($caseState = $this->_payload->_state ?? $_SESSION['user']['app_settings']['primaryRecordState'] ?? null) && explode('.', $contextkey)[1] === 'casedocumentation'){
+					// compare if submitted state is a valid key - not 'all'
+					if (in_array($caseState, array_keys($this->_lang->_USER['casestate']['casedocumentation']))){
+						// skip whatever has the next logical steps already set
+						if (!$record['case_state']) continue;
+						foreach (array_reverse(array_keys($this->_lang->_USER['casestate']['casedocumentation'])) as $s){
+							if ($caseState !== $s && (isset($record['case_state'][$s]))) continue 2;
+							if ($caseState === $s) {
+								if (!isset($record['case_state'][$s])) continue 2;
+								break;
+							}
+						}
+					}
+				}
 
 				// create entry
 				$tile = [
@@ -1714,19 +1731,31 @@ class RECORD extends API {
 		$available_units = array_unique($available_units);
 		sort($available_units);
 		$assignable = true;
-		$organizational_units[$this->_lang->GET('record.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null')"];
-		if (!$this->_unit) $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
+		$organizational_units[$this->_lang->GET('record.mine')] = [
+			'value' => 'null',
+			'name' => $this->_lang->PROPERTY('order.organizational_unit'),
+			'onchange' => "api.record('get', 'records');"
+		];
+		if (!$this->_payload->_unit || $this->_payload->_unit === 'null') $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
 		foreach ($available_units as $unit){
 			if (!$unit) {
 				$assignable = false;
 				continue;
 			}
-			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null', '" . $unit . "')"];
-			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = [
+				'value' => $unit,
+				'name' => $this->_lang->PROPERTY('order.organizational_unit'),
+				'onchange' => "api.record('get', 'records');"
+			];
+			if ($this->_payload->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 		if (!$assignable) {
-			$organizational_units[$this->_lang->GET('record.unassigned')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null', '_unassigned')"];
-			if ($this->_unit === '_unassigned') $organizational_units[$this->_lang->GET('record.unassigned')]['checked'] = true;
+			$organizational_units[$this->_lang->GET('record.unassigned')] = [
+				'value' => '_unassigned',
+				'name' => $this->_lang->PROPERTY('order.organizational_unit'),
+				'onchange' => "api.record('get', 'records');"
+			];
+			if ($this->_payload->_unit === '_unassigned') $organizational_units[$this->_lang->GET('record.unassigned')]['checked'] = true;
 		}
 
 		$content = [
@@ -1741,28 +1770,31 @@ class RECORD extends API {
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
-						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records', encodeURIComponent(this.value));}",
-						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
+						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records');}",
+						'value' => $this->_payload->_filter ?? ''
 					],
 					'datalist' => array_values(array_unique($recorddatalist))
-				],
-				[
+				], [
 					'type' => 'radio',
 					'attributes' => [
 						'name' => $this->_lang->GET('order.organizational_unit')
 					],
 					'content' => $organizational_units,
 					'hint' => $this->_lang->GET('record.assign_hint')
-				]
+				],
+				$this->casestate(
+					'casedocumentation',
+					'radio',
+					['onchange' => "api.record('get', 'records');"],
+					isset($this->_payload->_state) ? '{"' . $this->_payload->_state . '":1}' : (isset($_SESSION['user']['app_settings']['primaryRecordState']) ? '{"' . $_SESSION['user']['app_settings']['primaryRecordState'] . '":1}': null)
+				)
 			]
 		];
+
 		// append records
 		if ($contexts){
 			foreach ($contexts as $context => $tiles){
 				if ($tiles){
-					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], $_SESSION['user']['app_settings']['primaryRecordState'] ?? null))
-					array_push($content, $casestate);
-
 					$article = [];
 					array_push($article, [
 						'type' => 'textsection',
@@ -1818,8 +1850,6 @@ class RECORD extends API {
 				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
 			) continue;
 
-			$row['units'] = $row['units'] ? explode(',', $row['units'] ? : '') : [];
-
 			foreach ($this->_lang->_USER['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
@@ -1833,10 +1863,10 @@ class RECORD extends API {
 				'identifier' => $row['identifier'],
 				'last_touch' => substr($row['last_touch'], 0, -3),
 				'last_document' => $row['last_document'] ? : $this->_lang->GET('record.altering_pseudodocument_name'),
-				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
+				'case_state' => json_decode($row['case_state'] ?? '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
-				'units' => $row['units'],
+				'units' => explode(',', $row['units'] ?? ''),
 				'last_user' => $row['last_user']
 			];
 		}

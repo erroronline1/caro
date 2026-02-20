@@ -4965,15 +4965,14 @@ Sample response
 {"response": {"msg": "The record has been saved.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/records/{filter}/{unit}
+> GET ./api/api.php/record/records?{payload}
 
 Returns current active records grouped by record type and organizational units.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {filter} | path parameter | optional | filter by identifier |
-| {unit} | path parameter | optional | filter by unit |
+| {payload} | query parameters | optional | filter, unit, state |
 
 Sample response
 ```
