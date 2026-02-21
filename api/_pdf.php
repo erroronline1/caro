@@ -10,7 +10,6 @@
  */
 
 namespace CARO\API;
-error_reporting(0);
 require_once('../vendor/TCPDF/tcpdf.php');
 
 class PDF{
@@ -18,6 +17,7 @@ class PDF{
 	private $_pdf = null;
 
 	public function __construct($setup){
+		error_reporting(0);
 		$this->_setup = [
 			'format' => $setup['format'] ?? 'A4',
 			'unit' => $setup['unit'] ?? PDF_UNIT,
