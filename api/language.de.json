@@ -1172,7 +1172,7 @@
 		"erp_connection": {
 			"confirmation": "Die ERP-Anbindung ist jetzt :state",
 			"enabled": "aktiviert",
-			"explanation":"Du kannst die Anbindung des ERPs im Falle von Wartungsarbeiten ändern. Bitte ziehe eine :announcement in Erwägung, falls du den Status änderst.",
+			"explanation": "Du kannst die Anbindung des ERPs im Falle von Wartungsarbeiten ändern. Bitte ziehe eine :announcement in Erwägung, falls du den Status änderst.",
 			"disabled": "deaktiviert",
 			"select": "Status der ERP-Anbindung"
 		},
@@ -1593,6 +1593,10 @@
 		"reidentify_unauthorized_name": "Kennzeichen nicht richtig?",
 		"reidentify_warning": "Die Ähnlichkeit beider Kennzeichen liegt unter der Schwelle von :percent%. Bitte bestätige erneut.",
 		"reminder_message": "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :document statt.\nHilf bei der Weiterbearbeitung oder schließe den Fall ab.",
+		"restricted_access": "Zugriffsbeschränkung",
+		"restricted_access_hint": "Die Aufzeichnungen werden anderen - mit Ausnahme der Leitung - nicht angezeigt.",
+		"restricted_access_units":"Zugriff auf ausgewählte Gruppen beschränken",
+		"restricted_access_users":"und/oder namentliche Nutzer",
 		"retype_content": "Die Aufzeichnung wurde von :previoustype zu :newtype geändert",
 		"retype_header": "Dies ist keine :type? Dann wähle neu!",
 		"retype_pseudodocument_name": "Dokumentationstyp",

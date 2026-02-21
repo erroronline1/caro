@@ -1172,7 +1172,7 @@
 		"erp_connection": {
 			"confirmation": "The ERP-interface is now :state",
 			"enabled": "enabled",
-			"explanation":"You can change the availability of the ERP-interface in case of maintenance work. Please consider an :announcement if changing states.",
+			"explanation": "You can change the availability of the ERP-interface in case of maintenance work. Please consider an :announcement if changing states.",
 			"disabled": "disabled",
 			"select": "State of the ERP-interface"
 		},
@@ -1593,6 +1593,10 @@
 		"reidentify_unauthorized_name": "Identifier not correct?",
 		"reidentify_warning": "The similarity of both identifiers are below the threshold of :percent%. Please reaffirm.",
 		"reminder_message": "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :document.\nHelp continuing or close the record.",
+		"restricted_access": "Restricted access",
+		"restricted_access_hint": "Records will be hidden from everyone else except administrative users.",
+		"restricted_access_units":"Limit access to selected groups",
+		"restricted_access_users":"and/or named users",
 		"retype_content": "The record has been retyped from :previoustype to :newtype",
 		"retype_header": "This is not a :type? Reselect then!",
 		"retype_pseudodocument_name": "Record retyped",
