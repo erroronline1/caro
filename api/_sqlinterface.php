@@ -876,8 +876,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE caro_records.identifier = :identifier"
 		],
 		'records_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
-			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
+			'mysql' => "SELECT caro_records.*, caro_user.units, caro_user.name FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
+			'sqlsrv' => "SELECT caro_records.*, caro_user.units, caro_user.name FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
 		],
 		'records_delete' => [
 			'mysql' => "DELETE FROM caro_records WHERE id = :id",
