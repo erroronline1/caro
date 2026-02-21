@@ -442,6 +442,54 @@ class RECORD extends API {
 					'content' => $options
 				];
 			}
+
+			if (in_array($document['context'], ['generalrecords'])) {
+				$preset = null;
+				if ($this->_passedIdentify){
+					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+						'values' => [
+							':identifier' => $this->_passedIdentify
+						]
+					]);
+					$data = $data ? $data[0] : null;
+					if ($data) $preset = $data['restricted_access'] ? json_decode($data['restricted_access'], true) : [];
+				}
+
+				// select roles, units or users to restrict access to this record 
+				$restrictedToUnit = [$this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')]) => []];
+				if (isset($preset['permission'])) $restrictedToUnit[$this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')])]['checked'] = true;
+				foreach ($this->_lang->_USER['units'] as $unit => $translation){
+					$restrictedToUnit[$translation] = ['value' => $unit];
+					if (isset($preset['unit']) && in_array($unit, $preset['unit'])) $restrictedToUnit[$translation]['checked'] = true;
+				}
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$datalist = $restrictedToUser = [];
+				foreach ($user as $key => $row) {
+					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient', 'group']])) continue;
+					$datalist[] = $row['name'];
+					if (isset($preset['user']) && in_array($row['id'], $preset['user'])) $restrictedToUser[] = $row['name'];
+				}
+				array_push($defaults, 
+					[
+						'type' => 'textsection',
+						'content' => $this->_lang->GET('record.restricted_access'),
+						'hint' => $this->_lang->GET('record.restricted_access_hint')
+					],	[
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => 'DEFAULT_' . $this->_lang->GET('record.restricted_access_units')
+						],
+						'content' => $restrictedToUnit
+					], [
+						'type' => 'text',
+						'attributes' => [
+							'name' => 'DEFAULT_' . $this->_lang->GET('record.restricted_access_users'),
+							'value' => implode(', ', $restrictedToUser)
+						],
+						'datalist' => $datalist
+					]
+				);
+			}
 			$response['render']['content'][] = $defaults;
 		}
 
@@ -708,6 +756,15 @@ class RECORD extends API {
 						$result[$key] = $value;
 					}
 					$result['DEFAULT_' . $this->_lang->PROPERTY('record.type_description')] = $data['record_type'];
+
+					$preset = $data['restricted_access'] ? json_decode($data['restricted_access'], true) : [];
+					if (isset($preset['permission'])) $result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')][] = $this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')]);
+					if (isset($preset['unit'])) array_push($result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')], ...array_map(Fn($v) => $this->_lang->_USER['units'][$v], $preset['unit']));
+					if (isset($result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')])) $result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')] = implode(' | ', $result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')]);
+					if (isset($preset['user'])) {
+						$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+						$result['DEFAULT_' . $this->_lang->GET('record.restricted_access_users')] = implode(', ', array_map(Fn($usr, $id) => $usr['id'] === $id ? $usr['name'] : false, $user, $preset['user']));
+					}
 				} 
 				$this->response([
 					'data' => $result,
@@ -870,6 +927,10 @@ class RECORD extends API {
 				if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 				if ($entry_datetime = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.datetime'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.datetime')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
+				
+				// clear restricted access from payload, processed further down if documentation context allows it
+				if ($restricted_groups = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_units'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_units')});
+				if ($restricted_users = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_users'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_users')});
 
 				require_once('document.php');
 				$documentfinder = new DOCUMENT();
@@ -1016,6 +1077,25 @@ class RECORD extends API {
 						]
 					]);
 					$case = $case ? $case[0] : null;
+
+					// construct restricted access 
+					$restricted_access = [];
+					if (!$case || $case['context'] === 'generalrecords'){
+						if ($restricted_users) {
+							$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$restricted_access['user'] = array_map(Fn($usr, $name) => $usr['name'] === $name ? $usr['id'] : false, $user, preg_split('/[,;]\s{0,}/', $restricted_users));
+						}
+						if ($restricted_groups){
+							foreach(explode(' | ', $restricted_groups) as $group){
+								// check whether selected items are units
+								if ($restriction = array_search($group, $this->_lang->_USER['units'])) $restricted_access['unit'][] = $restriction; 
+								// must be supervisor
+								else $restricted_access['permission'][] = 'supervisor'; 
+							}
+						}
+						if ($restricted_access) $restricted_access['set'] = ['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i')];
+					}
+
 					if ($case){ 
 						$case = [
 							':id' => $case['id'],
@@ -1029,7 +1109,7 @@ class RECORD extends API {
 							':lifespan' => $case['lifespan'],
 							':erp_case_number' => $case['erp_case_number'],
 							':note' => $case['note'],
-							':restricted_access' => $case['restricted_access']
+							':restricted_access' => $restricted_access ? json_encode($restricted_access) : $case['restricted_access']
 						];
 					}
 					else {
@@ -1045,7 +1125,7 @@ class RECORD extends API {
 							':lifespan' => null,
 							':erp_case_number' => null,
 							':note' => null,
-							':restricted_access' => null
+							':restricted_access' => $restricted_access ? json_encode($restricted_access) : null
 						];
 					}
 					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
@@ -1336,7 +1416,7 @@ class RECORD extends API {
 							'content' => $files
 						]);
 					}
-					if ($document != $this->_lang->GET('record.altering_pseudodocument_name')){
+					if (!in_array($document, [$this->_lang->GET('record.altering_pseudodocument_name'), $this->_lang->GET('record.restricted_access')])){
 						// option to append to document entries
 						if (in_array($document, $includedDocuments) && in_array($document, $validDocuments) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
@@ -1665,7 +1745,7 @@ class RECORD extends API {
 				// prefilter record datalist for performance reasons
 				preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $record['identifier'], $simplified_identifier);
 				if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
-				
+
 				// append units of available records 
 				if ($record['units']) array_push($available_units, ...$record['units']);
 				else $available_units[] = null;
@@ -1699,6 +1779,7 @@ class RECORD extends API {
 					'last_user' => $last_user[$record['last_user']] ?? $this->_lang->GET('general.deleted_user'),
 					'complaint' => $record['complaint'],
 					'closed' => $record['closed'],
+					'restricted_access' => $record['restricted_access']
 				];
 			}
 		}
@@ -1807,6 +1888,21 @@ class RECORD extends API {
 
 		$contexts = [];
 		foreach ($data as $row){
+
+			// continue on unsatisfied restricted access
+			if ($row['restricted_access']){
+				$row['restricted_access'] = json_decode($row['restricted_access'], true);
+				if (
+					!(
+						(isset($row['restricted_access']['permission']) && PERMISSION::permissionIn('ceo', 'prrc', 'qmo', ...$row['restricted_access']['permission']))
+						|| (isset($row['restricted_access']['user']) && in_array($_SESSION['user']['id'], $row['restricted_access']['user']))
+						|| (isset($row['restricted_access']['unit']) && array_intersect($_SESSION['user']['units'], $row['restricted_access']['unit']))
+					)
+				){
+					continue;
+				}
+			}
+
 			// continue if record has been closed unless explicitly searched for
 			if (!$parameter['search'] && (($row['record_type'] !== 'complaint' && $row['closed']) ||
 				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
@@ -1829,7 +1925,9 @@ class RECORD extends API {
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
 				'units' => $row['units'] ? explode(',', $row['units']) : null,
-				'last_user' => $row['last_user']
+				'last_user' => $row['last_user'],
+				'last_user_name' => $row['name'],
+				'restricted_access' => !empty($row['restricted_access']),
 			];
 		}
 		return $contexts;
@@ -2101,6 +2199,20 @@ class RECORD extends API {
 		]);
 		$data = $data ? $data[0] : null;
 		if (!$data) return false;
+
+		if ($data['restricted_access']){
+			$data['restricted_access'] = json_decode($data['restricted_access'], true);
+			if (
+				!(
+					(isset($data['restricted_access']['permission']) && PERMISSION::permissionIn('ceo', 'prrc', 'qmo', ...$data['restricted_access']['permission']))
+					|| (isset($data['restricted_access']['user']) && in_array($_SESSION['user']['id'], $data['restricted_access']['user']))
+					|| (isset($data['restricted_access']['unit']) && array_intersect($_SESSION['user']['units'], $data['restricted_access']['unit']))
+				)
+			){
+				$this->response([], 403);
+			}
+		}
+
 		//set up summary
 		$summary = [
 			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_requestedID . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
@@ -2161,6 +2273,30 @@ class RECORD extends API {
 			$pseudodocument = $accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)];
 			unset($accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)]);
 			$accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)] = $pseudodocument;
+		}
+
+		if ($data['restricted_access']){
+			$restricted = [];
+			if (isset($data['restricted_access']['permission'])) $restricted[] = $this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')], $export);
+			if (isset($data['restricted_access']['unit'])) array_push($restricted, ...array_map(Fn($v) => $this->_lang->GET('units.' . $v, [], $export), $data['restricted_access']['unit']));
+			if (isset($preset['user'])) {
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				array_push($restricted, ...array_map(Fn($usr, $id) => $usr['id'] === $id ? $usr['name'] : false, $user, $preset['user']));
+			}
+			if ($restricted)
+				$accumulatedcontent = [
+					$this->_lang->GET('record.restricted_access') => [
+						'content' => [
+							$this->_lang->GET('record.restricted_access_hint') => [
+								[
+									'value' => implode(', ', $restricted),
+									'author' => $this->_lang->GET('record.export_author', [':author' => $data['restricted_access']['set']['name'], ':date' => $this->convertFromServerTime($data['restricted_access']['set']['date'], $export)], $export),
+								]
+							]
+						],
+						'last_record' => $this->convertFromServerTime($data['restricted_access']['set']['date'], $export),
+					]
+				] + $accumulatedcontent;
 		}
 
 		foreach ($accumulatedcontent as $document => $entries){
