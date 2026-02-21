@@ -880,14 +880,15 @@ class APPLICATION extends API {
 				require_once('record.php');
 				$search = new RECORD();
 
-				// search records, style like record overview
+				// search records
 				if ($records = $search->recordsearch(['search' => $this->_search])){
 					$matches = [];
 					foreach ($records as $contextkey => $context){
 						foreach ($context as $record){
 							$display = $record['identifier'] . ', ' . $this->_lang->GET('record.list_touched', [
 								':date' => $this->convertFromServerTime($record['last_touch']),
-								':document' => $record['last_document']
+								':document' => $record['last_document'],
+								':user' => $record['last_user_name'] ?: $this->_lang->GET('general.deleted_user')
 							]);
 							$matches[$display] = [
 									'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
