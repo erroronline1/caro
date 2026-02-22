@@ -526,6 +526,15 @@ Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallsta
 
 Aufzeichnungen die außerhalb manuell angelegter Dokumente durch die Anwendung unterstützt werden (z.B. Fallstatus, s.o.) werden in der [Systemsprache](#laufzeitvariablen) gespeichert.
 
+Allgemeine Dokumentationen kann eine Zugriffsbeschränkung für freigegebene Bereiche, Bereichsleiter oder namentlich benannte Nutzer zugeordnet werden. Diese Aufzeichnungen tauchen in der Übersicht von Nutzern, die diesen Einschränkungen nicht entsprechen nicht auf, es sei denn sie haben die [Freigabe](#nutzer) CEO, PRRC, QMO oder Administrator. Wie auch [Dokumente mit eingeschränktem Zugriff](#dokumentenbearbeitung) können diese Aufzeichnungen vertraulichen Bewerbungs- oder Mitarbeitergesprächen, Abteilungs- oder Leitungsbesprechungen, anderen Themen mit einer gewissen Vertraulichkeit oder der Absicht die Übersichtlichkeit für nicht involvierte Nutzer zu erhöhen dienen. Einmal festgelegt kann die Zugriffsbeschränkung nicht mehr vollständig aufgehoben werden, es sei denn alle verfügbaren Bereiche werden ausgewählt. Zeitpunkt und Nutzername der letzten Änderung wird gespeichert. Beschränkungen werden im Export angezeigt.
+
+#### Umgang mit einer fehlerhaften Nutzung von Dokumentkontexten
+Die Wahl eines unvorgesehenen Dokuments für einen Aufzeichnungskontext ist ein vorhersehbarer Fehler. Auch ist es denkbar, dass sich der Kontext im Laufe der Zeit ändert.
+
+Die Verwendung eines allgemeinen Dokuments für eine laufende Versorgungsdokumentation beeinflusst die Aufzeichnung nicht; Zugriffsbeschränkungen werden ignoriert, da Versorgungsdokumentationen für alle Nutzer erreichbar und transparent sein sollen. Generell wird empfohlen geeignete Dokumente für Versorgungsdokumentationen bereitzustellen, aber dies ist kein ernstes Problem.
+
+Um eine allgemeine Aufzeichnung in eine Versorgungsdokumentation oder Vorkommnismeldung zu überführen, wird empfohlen eine neue Dokumentation mit dem erwarteten Kontext zu beginnen und anschließend die allgemeine Aufzeichnung mit dem neuen Vorgang zusammenzuführen.
+
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen%20de-fullpage.png)
 
 ```mermaid
@@ -1187,7 +1196,10 @@ und nicht einfach fortgeführt zu werden.
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `Code mit einem \`-Zeichen`.  
-Außerdem ``Code mit ` maskiert durch umgebende doppelte Gravis'``
+Außerdem ``Code mit ` maskiert durch umgebende doppelte Gravis'`` und ==markierter Text==  
+Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
+[ ] Aufgabe  
+[x] erledigt
 
 http://eine.url, nicht besonders gestaltet  
 eine Telefonnummer: tel:012345678  
@@ -1195,7 +1207,7 @@ eine Telefonnummer: tel:012345678
 
 --------
 
-## Listen (h2 Überschrift)
+## Listen (h2 Überschrift) {#miteigenerid}
 
 1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
     * Verschachtelte Listen
@@ -1212,6 +1224,7 @@ eine Telefonnummer: tel:012345678
     2. spielt eigentlich
     3. keine Rolle
 * ungeordneter Listeneintrag 2
+    - [x] mit Aufgabe
 * ungeordneter Listeneintrag 3
 
 ### Tabellen (h3 Überschrift)
@@ -1219,7 +1232,7 @@ eine Telefonnummer: tel:012345678
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
-| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />html-befehl `<br />` |
+| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl `<br />` |
 
 - - -
 
@@ -1270,7 +1283,8 @@ eine@email.addresse und maskierte\@email.addresse
 > | sind | auch | möglich |
 > | so wie | spaltenweise | Ausrichtung |
 
-[erste Überschrift](#einfacher-text)
+[erste Überschrift](#einfacher-text)  
+[zweite Überschrift](#miteigenerid)
 ```
 
 und werden in etwa folgendermaßen angezeigt:
@@ -2231,6 +2245,9 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
         * Definitionen
         * Mehrzeiliger Code innerhalb von Listen
         * HTML Direkteingabe (absichtlich)
+		* Syntax Highlighting
+		* Fußnoten
+		* Emojis
 * Die Zeiterfassung nutzt Eingaben vom Typ `time` für Arbeitszeiten und Pausen, was verwirrend erscheint sofern die Systemeinstellungen im Browser ein 12h-Format erzwingen. Bitte sprechen Sie mit Ihrem Betreiber über vernünftige Systemeinstellungen.
 
 [Übersicht](#übersicht)

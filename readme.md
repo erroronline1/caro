@@ -29,10 +29,6 @@ Things are still in motion. Images may be outdated.
     * https://databasefaqs.com/mariadb-set-auto-increment-value/, https://stackoverflow.com/questions/15821532/get-current-auto-increment-value-for-any-table
 
 ## to do
-* record restricted_access for generalrecords-context 
-    * {unit:[...], permission:[...], user:[...]} with unit/permission intersection, ceo/admin full access
-    * exclude self only
-    * also see record.inquiry selection $notification_recipients
 * further implementation of tc-lib-pdf
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
@@ -627,6 +623,15 @@ If records contain data from restricted documents, summaries will only contain t
 All alterings on records (reidentification, retyping, case state) are recorded as well.
 
 Records outside of manually created documents, that are being supported by the application (e.g. case state, see above), are being stored in the [system language](#runtime-variables).
+
+General company records can be assigned a restricted access to units, supervisors or named users. These records do not show up in the overview for those users not matching the restrictions unless having the [permission](#users) of CEO, PRRC, QMO or admin. Like [documents with restricted access](#document-editing) these can serve the purpose of sensitive job interviews or staff appraisals, but also unit or administrative meetings, other topics of a certain confidentiality or the intention of decluttering the overview for all users not directly involved. Once set, the restricted access can not be revoked completely unless all possible units are marked as permitted. The last setting user and time are stored. Restrictions are displayed in the export.  
+
+#### Handling wrong application of document contexts
+The selection of an unintended document for the given record context is a predictable mistake at some point. Also it may be possible for the context to change over time.
+
+Using a general record document for an ongoing case documentation does not affect the record; access restrictions are ignored, since case documentations are supposed to be accessible and transparent for all users. In general it is advised to provide sufficient documents for case documentations, but this is not a serious issue.
+
+To transition a general record into a case documentation or incident, it is advised to initiate a new record with the expected context and merge the general record afterwards.
 
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen%20en-fullpage.png)
 
@@ -1285,7 +1290,10 @@ and not just continuing.
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.  
-Also ``code with ` escaped by double backticks``
+Also ``code with ` escaped by double backticks`` and ==marked text==  
+Subscript like H~2~O and superscript like X^2^  
+[ ] task  
+[x] accomplished
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
@@ -1293,7 +1301,7 @@ a phone number: tel:012345678
 
 --------
 
-## Lists (h2 header)
+## Lists (h2 header) {#withcustomid}
 
 1. Ordered list items start with a number and a period
     * Sublist nesting
@@ -1310,6 +1318,7 @@ a phone number: tel:012345678
     2. actually doesn't
     3. matter at all
 * Unordered list item 2
+    - [x] with task
 * Unordered list item 3
 
 ### Tables (h3 header)
@@ -1369,7 +1378,7 @@ some@mail.address and escaped\@mail.address
 > | like | aligning | colums |
 
 [top header](#plain-text)  
-[second header](#plain-text-1)
+[second header](#withcustomid)
 ```
 
 rendered to something as
@@ -2329,6 +2338,9 @@ Albeit Safari being capable of displaying most of the content and contributing r
         * definitions
         * multiline code within lists
         * inline HTML on purpose
+		* syntax highlighting
+		* footnotes
+		* emojis
 * Timetracking makes use of time inputs for working hours and breaks which may be confusing if your browsers locale settings forces a 12h-layout. Please speak to your systems operator for a decent locale setting.
 
 [Content](#content)
@@ -6128,7 +6140,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
 
-* [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint for VSC, PHPIntelephense for VSC
+* [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint for VSCodium, PHPIntelephense for VSCodium
 
 > O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
 
