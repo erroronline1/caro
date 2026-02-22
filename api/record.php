@@ -1728,6 +1728,7 @@ class RECORD extends API {
 		];
 		$this->_payload->_filter = $this->_payload->_filter ?? null;
 		$this->_payload->_unit = $this->_payload->_unit ?? null;
+		if (!in_array($this->_payload->_unit, array_keys($this->_lang->_USER['units'])) && $this->_payload->_unit !== '_unassigned') $this->_payload->_unit = null;
 		$this->_payload->_state = $this->_payload->_state ?? null;
 
 		// get all records or these fitting the search
@@ -1790,11 +1791,10 @@ class RECORD extends API {
 		sort($available_units);
 		$assignable = true;
 		$organizational_units[$this->_lang->GET('record.mine')] = [
-			'value' => 'null',
 			'name' => $this->_lang->PROPERTY('order.organizational_unit'),
 			'onchange' => "api.record('get', 'records');"
 		];
-		if (!$this->_payload->_unit || $this->_payload->_unit === 'null') $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
+		if (!$this->_payload->_unit) $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
 		foreach ($available_units as $unit){
 			if (!$unit) {
 				$assignable = false;
@@ -2277,7 +2277,7 @@ class RECORD extends API {
 
 		if ($data['restricted_access']){
 			$restricted = [];
-			if (isset($data['restricted_access']['permission'])) $restricted[] = $this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')], $export);
+			if (isset($data['restricted_access']['permission'])) $restricted[] = $this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor', [], $export)], $export);
 			if (isset($data['restricted_access']['unit'])) array_push($restricted, ...array_map(Fn($v) => $this->_lang->GET('units.' . $v, [], $export), $data['restricted_access']['unit']));
 			if (isset($preset['user'])) {
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -2285,9 +2285,9 @@ class RECORD extends API {
 			}
 			if ($restricted)
 				$accumulatedcontent = [
-					$this->_lang->GET('record.restricted_access') => [
+					$this->_lang->GET('record.restricted_access', [], $export) => [
 						'content' => [
-							$this->_lang->GET('record.restricted_access_hint') => [
+							$this->_lang->GET('record.restricted_access_hint', [], $export) => [
 								[
 									'value' => implode(', ', $restricted),
 									'author' => $this->_lang->GET('record.export_author', [':author' => $data['restricted_access']['set']['name'], ':date' => $this->convertFromServerTime($data['restricted_access']['set']['date'], $export)], $export),
