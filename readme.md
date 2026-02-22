@@ -33,6 +33,8 @@ Things are still in motion. Images may be outdated.
     * refactor _pdf.php
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
     * consider ods output where applicable
+* markdown
+    * check export of checkboxes, mark, sub, sup
 
 ## Content
 * [Aims](#aims)
