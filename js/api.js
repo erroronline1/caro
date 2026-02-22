@@ -1910,11 +1910,11 @@ export const api = {
 						payload = {
 							_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
 							_unit:
-								document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`) && document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value !== "null"
+								document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`)
 									? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value
 									: null,
 							_state:
-								document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`) && document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value !== "null"
+								document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`)
 									? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value
 									: null,
 						};
