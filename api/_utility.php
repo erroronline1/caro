@@ -1417,7 +1417,7 @@ class MARKDOWN {
 		//replace tasks
 		return preg_replace_callback($this->_task,
 			function($match){
-				return '<input type="checkbox" disabled' . (strtolower($match[1]) === 'x' ? ' checked': '') . '> ' . $match[2];
+				return '<input type="checkbox" disabled' . (strtolower($match[1]) === 'x' ? ' checked': '') . ' class="markdown"> ' . $match[2];
 			},
 			$content
 		);

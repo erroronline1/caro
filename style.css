@@ -1394,6 +1394,13 @@ header[data-type] {
 	margin-top: 1rem;
 }
 
+/* e.g. checkboxes*/
+.markdown{
+	width: auto !important;
+	height: auto !important;
+	appearance: auto !important;
+}
+
 /*************************** decorators ******************************/
 
 .red {
