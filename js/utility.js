@@ -2022,7 +2022,7 @@ export const _client = {
 
 				records.forEach((record) => {
 					context.content.push([
-						{ c: record.identifier, a: { "data-type": "record", class: record.closed ? "green" : record.complaint ? "orange" : "" } },
+						{ c: record.identifier, a: { "data-type": record.restricted_access ? "password": "record", class: record.closed ? "green" : record.complaint ? "orange" : "" } },
 						{
 							c: api._lang.GET("record.list_touched", {
 								":date": record.last_touch,
@@ -2070,7 +2070,7 @@ export const _client = {
 							{
 								type: "textsection",
 								attributes: {
-									"data-type": "record",
+									"data-type": record.restricted_access ? "password": "record",
 									name: record.identifier,
 								},
 								content: api._lang.GET("record.list_touched", {
