@@ -756,7 +756,10 @@ and not just continuing.
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.  
-also ``code with ` escaped by double backticks``
+also ``code with ` escaped by double backticks`` and ==marked text==  
+Subscript like H~2~O and superscript like X^2^  
+[ ] task  
+[x] accomplished
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
@@ -766,7 +769,7 @@ Plain text (h1 header)
 -------------------
 --------
 
-## Lists (h2 header)
+## Lists (h2 header) {#withcustomid}
 
 1. Ordered list items start with a number and a period
     * Sublist nesting
@@ -783,6 +786,7 @@ Plain text (h1 header)
     2. actually doesn't
     3. matter at all
 * Unordered list item 2
+    - [x] with task
 * Unordered list item 3
 
 ### Tables (h3 header)
@@ -842,7 +846,8 @@ some@mail.address and escaped\@mail.address
 > | like | aligning | colums |
 
 [top header](#plain-text)  
-[second header](#plain-text-1)
+[second header](#plain-text-1)  
+[third header](#withcustomid)  
 END;
 		$markdown = new MARKDOWN();
 		return $markdown->md2html($sample);

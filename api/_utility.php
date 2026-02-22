@@ -953,17 +953,20 @@ class MARKDOWN {
 		* definitions
 		* multiline code within lists
 		* inline HTML on purpose
+		* syntax highlighting
+		* footnotes
+		* emojis
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)]|$)/m'; // regular md links
 	private $_blockquote = '/(^>{1,} .*(?:\n|$|\Z))+/m';
 	private $_br = '/ +\n/';
-	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
+	private $_code_block = '/^ {0,3}([`~]{3}.*?)\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
+	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
 	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>|\Z)/mi';
@@ -971,10 +974,14 @@ class MARKDOWN {
 	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?(?:\n|\Z)))+/m';
 	private $_list_ul = '/(^( ){0,3}(\*|\-|\+) (.+?(?:\n|\Z)))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_mark = '/==(.+?)==/';
 	private $_p = '/(?:^$\n|\A)((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)(?:\n^$|\Z)/mi';
 	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_sub = '/~{1}(.+?)~{1}/';
+	private $_sup = '/\^{1}(.+?)\^{1}/';
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
+	private $_task = '/\[(.)\] (.+?(?:\n|\Z))/m';
 
 	private $headings = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
@@ -1095,10 +1102,14 @@ class MARKDOWN {
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
 		$text = $this->emphasis($text);
 		$text = $this->img($text);
+		$text = $this->task($text); // before list otherwise only the first occasionally nested item is converted
 		$text = $this->list($text);
 		$text = $this->mail($text);
+		$text = $this->mark($text);
 		$text = $this->pre($text);
 		$text = $this->s($text);
+		$text = $this->sub($text);
+		$text = $this->sup($text);
 		$text = $this->table($text);
 		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		$text = $this->br($text);
@@ -1203,18 +1214,18 @@ class MARKDOWN {
 		return preg_replace_callback($this->_headings,
 			function($match){
 				if (!isset($match[4])){
-					// atx heading
+					// atx heading starting with #
 					$size = min(strlen($match[1]) - 1, 6);
 					$heading = trim($match[2]);
 				}
 				else {
-					// setext heading
+					// setext heading underlined with === or ---
 					$size = str_starts_with($match[5], '=') ? 1 : 2;
 					$heading = trim($match[4]);
 				}
 				preg_match($this->headerchars, $heading, $id);
-				if (isset($id[0])){
-					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($id[0])));
+				if (isset($match[3]) || isset($id[0])){
+					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($match[3] ?? $id[0])));
 					// enumerate
 					$existing = array_filter($this->headings, fn($e) => str_starts_with($e, $id));
 					if ($existing) {
@@ -1316,6 +1327,13 @@ class MARKDOWN {
 		return $content;
 	}
 
+	private function mark($content){
+		// replace mark
+		return preg_replace($this->_mark,
+			"<mark>$1</mark>",
+			$content);
+	}
+
 	private function p($content){
 		// replace p
 		return preg_replace($this->_p,
@@ -1338,6 +1356,22 @@ class MARKDOWN {
 		// replace s
 		return preg_replace($this->_s,
 			"<s>$1</s>",
+			$content
+		);
+	}
+
+	private function sub($content){
+		// replace s
+		return preg_replace($this->_sub,
+			"<sub>$1</sub>",
+			$content
+		);
+	}
+
+	private function sup($content){
+		// replace s
+		return preg_replace($this->_sup,
+			"<sup>$1</sup>",
 			$content
 		);
 	}
@@ -1377,6 +1411,16 @@ class MARKDOWN {
 			$content
 		);
 		return $content;
+	}
+
+	private function task($content){
+		//replace tasks
+		return preg_replace_callback($this->_task,
+			function($match){
+				return '<input type="checkbox" disabled' . (strtolower($match[1]) === 'x' ? ' checked': '') . '> ' . $match[2];
+			},
+			$content
+		);
 	}
 }
 

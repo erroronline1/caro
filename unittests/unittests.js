@@ -1923,15 +1923,19 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.
+**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.  
+also \`\`code with \` escaped by double backticks\`\` and ==marked text==  
+Subscript like H~2~O and superscript like X^2^  
+[ ] task  
+[x] accomplished
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
-[Styled link to Markdown information](https://www.markdownguide.org)  
+[Styled link to Markdown information](https://www.markdownguide.org)
 
 --------
 
-## Lists (h2 header)
+## Lists (h2 header) {#withcustomid}
 
 1. Ordered list items start with a number and a period
     * Sublist nesting
@@ -1957,9 +1961,9 @@ a phone number: tel:012345678
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | --- | --- | --- |
 | *emphasis* | **is** | ***possible*** | \`too\` |
-| linebreaks | are | not | though |
+| linebreaks | are | not | though<br />without<br />html-tag \`<br />\` |
 
-* * *
+- - -
 
 #### Blockquotes and code (h4 header)
 
@@ -1981,7 +1985,7 @@ some \`code with <brackets>\`
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
-123\. escaped period avoiding a list
+123\\. escaped period avoiding a list
 
 ### Nested items in lists
 
@@ -2008,7 +2012,8 @@ some@mail.address and escaped\@mail.address
 > | are | possible | as well |
 > | like | aligning | colums |
 
-[top header](#plain-text)
+[top header](#plain-text)  
+[second header](#withcustomid)
 `
 					);
 					await api.tool("post", "markdown", null, data);
@@ -2034,15 +2039,19 @@ und nicht einfach fortgeführt zu werden.
 
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.  
+Außerdem \`\`Code mit \` maskiert durch umgebende doppelte Gravis'\`\` und ==markierter Text==  
+Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
+[ ] Aufgabe  
+[x] erledigt
 
 http://eine.url, nicht besonders gestaltet  
 eine Telefonnummer: tel:012345678  
-[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)  
+[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)
 
 --------
 
-## Listen (h2 Überschrift)
+## Listen (h2 Überschrift) {#miteigenerid}
 
 1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
     * Verschachtelte Listen
@@ -2059,6 +2068,7 @@ eine Telefonnummer: tel:012345678
     2. spielt eigentlich
     3. keine Rolle
 * ungeordneter Listeneintrag 2
+    - [x] mit Aufgabe
 * ungeordneter Listeneintrag 3
 
 ***
@@ -2068,9 +2078,9 @@ eine Telefonnummer: tel:012345678
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
-| Zeilenumbrüche | sind es | jedoch | nicht |
+| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl \`<br />\` |
 
-* * *
+- - -
 
 #### Zitatblöcke und Code (h4 Überschrift)
 
@@ -2092,7 +2102,7 @@ ein \`code mit <Klammern>\`
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
 ![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
-123\. maskierter Punkt um eine Liste zu vermeiden
+123\\. maskierter Punkt um eine Liste zu vermeiden
 
 ### Verschachtelte Elemente in Listen
 
@@ -2119,7 +2129,8 @@ eine@email.addresse und maskierte\@email.addresse
 > | sind | auch | möglich |
 > | so wie | spaltenweise | Ausrichtung |
 
-[erste Überschrift](#plain-text)
+[erste Überschrift](#einfacher-text)  
+[zweite Überschrift](#miteigenerid)
 `
 					);
 					await api.tool("post", "markdown", null, data);
