@@ -37,7 +37,13 @@
 }
 
 body {
-	background: radial-gradient(farthest-corner at top left, var(--background), transparent), radial-gradient(farthest-corner at top right, var(--lightershadow), transparent), radial-gradient(farthest-corner at bottom left, var(--darkshadow), transparent),
+	background:
+		radial-gradient(farthest-corner at top left, var(--background), transparent), radial-gradient(farthest-corner at top right, var(--lightershadow), transparent), radial-gradient(farthest-corner at bottom left, var(--darkshadow), transparent),
 		radial-gradient(farthest-corner at bottom right, var(--darkshadow), transparent), linear-gradient(90deg, rgb(180, 142, 173) 0%, rgb(191, 97, 106) 25%, rgb(208, 135, 112) 50%, rgb(235, 203, 139) 75%, rgb(163, 190, 140) 100%);
 	background-attachment: fixed;
+}
+
+mark {
+	background-color: var(--yellow);
+	color: var(--foreground);
 }

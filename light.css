@@ -39,3 +39,8 @@
 body {
 	background: var(--background);
 }
+
+mark {
+	background-color: var(--yellow);
+	color: var(--foreground);
+}
