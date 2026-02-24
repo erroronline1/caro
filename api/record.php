@@ -55,7 +55,7 @@ class RECORD extends API {
 	 * 
 	 * also see application.php->cron()
 	 */
-	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = ''){
+	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = '', $additionaloptions = []){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PATCH':
 				if (!PERMISSION::permissionFor('recordscasestate') || array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
@@ -166,6 +166,12 @@ class RECORD extends API {
 					$content[$translation]['value'] = $state;
 					if (isset($checked[$state])) $content[$translation]['checked'] = true;
 					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$translation]['disabled'] = true;
+				}
+				// added options with name and value
+				foreach($additionaloptions as $state => $options){
+					$content[$state] = $action + $options;
+					if (($value = $content[$state]['value'] ?? $state) && isset($checked[$value])) $content[$state]['checked'] = true;
+					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$state]['disabled'] = true;
 				}
 				return [
 					'type' => $type,
@@ -1743,22 +1749,45 @@ class RECORD extends API {
 		$recorddatalist = $available_units = [];
 		foreach ($data as $contextkey => $context){
 			foreach ($context as $record){
-				// prefilter record datalist for performance reasons
-				preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $record['identifier'], $simplified_identifier);
-				if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
-
 				// append units of available records 
 				if ($record['units']) array_push($available_units, ...$record['units']);
 				else $available_units[] = null;
 
+				// filters not within recordsearch to get all available units and states
+
 				// filter results by selected unit
 				if (
-					((!$this->_payload->_unit) && !array_intersect(array_filter($record['units'], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
+					(!$this->_payload->_unit && !array_intersect(array_filter($record['units'] ?? [], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
 					|| ($this->_payload->_unit === '_unassigned' && $record['units'])
 					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_payload->_unit, $record['units'])))
 				) continue;
+
+				// prefilter record datalist for performance reasons of reasonable selected units
+				preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $record['identifier'], $simplified_identifier);
+				if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
+
+				// filter closed records
+				$recordType = explode('.', $contextkey)[1];
+				if (
+					(
+						$this->_payload->_state === 'closed' && 
+						!(
+							($recordType !== 'complaint' && $record['closed']) ||
+							($recordType === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $record['closed']))
+						)
+					) ||
+					(
+						$this->_payload->_state !== 'closed' && // continue if record has been closed unless explicitly searched for
+						!$this->_payload->_filter &&
+						(
+							(($recordType !== 'complaint' && $record['closed']) ||
+							($recordType === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $record['closed'])))
+						)
+					)
+				) continue;
+
 				// filter case documentations by case state
-				if (($caseState = $this->_payload->_state ?? $_SESSION['user']['app_settings']['primaryRecordState'] ?? null) && explode('.', $contextkey)[1] === 'casedocumentation'){
+				if (($caseState = $this->_payload->_state ?? $_SESSION['user']['app_settings']['primaryRecordState'] ?? null) && $recordType === 'casedocumentation'){
 					// compare if submitted state is a valid key - not 'all'
 					if (in_array($caseState, array_keys($this->_lang->_USER['casestate']['casedocumentation']))){
 						// skip whatever has the next logical steps already set
@@ -1789,6 +1818,8 @@ class RECORD extends API {
 		$organizational_units = [];
 		$available_units = array_unique($available_units);
 		sort($available_units);
+		$recorddatalist = array_values(array_unique($recorddatalist));
+		sort($recorddatalist);
 		$assignable = true;
 		$organizational_units[$this->_lang->GET('record.mine')] = [
 			'name' => $this->_lang->PROPERTY('order.organizational_unit'),
@@ -1831,7 +1862,7 @@ class RECORD extends API {
 						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records');}",
 						'value' => $this->_payload->_filter ?? ''
 					],
-					'datalist' => array_values(array_unique($recorddatalist))
+					'datalist' => $recorddatalist
 				], [
 					'type' => 'radio',
 					'attributes' => [
@@ -1843,8 +1874,17 @@ class RECORD extends API {
 				$this->casestate(
 					'casedocumentation',
 					'radio',
-					['onchange' => "api.record('get', 'records');"],
-					isset($this->_payload->_state) ? '{"' . $this->_payload->_state . '":1}' : (isset($_SESSION['user']['app_settings']['primaryRecordState']) ? '{"' . $_SESSION['user']['app_settings']['primaryRecordState'] . '":1}': null)
+					[
+						'onchange' => "api.record('get', 'records');"
+					],
+					isset($this->_payload->_state) ? '{"' . $this->_payload->_state . '":1}' : (isset($_SESSION['user']['app_settings']['primaryRecordState']) ? '{"' . $_SESSION['user']['app_settings']['primaryRecordState'] . '":1}': null),
+					[
+						// honestly i can't say if this is suitable in the future if the numbers go up
+						 $this->_lang->GET('record.casestate_filter_closed') => [
+							'value' => 'closed',
+							'class' => 'red'
+						]
+					]
 				)
 			]
 		];
@@ -1888,7 +1928,6 @@ class RECORD extends API {
 
 		$contexts = [];
 		foreach ($data as $row){
-
 			// continue on unsatisfied restricted access
 			if ($row['restricted_access']){
 				$row['restricted_access'] = json_decode($row['restricted_access'], true);
@@ -1902,11 +1941,6 @@ class RECORD extends API {
 					continue;
 				}
 			}
-
-			// continue if record has been closed unless explicitly searched for
-			if (!$parameter['search'] && (($row['record_type'] !== 'complaint' && $row['closed']) ||
-				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
-			) continue;
 
 			foreach ($this->_lang->_USER['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
