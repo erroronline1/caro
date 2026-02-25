@@ -35,6 +35,10 @@ Things are still in motion. Images may be outdated.
     * consider ods output where applicable
 * markdown
     * check export of checkboxes, mark, sub, sup
+* notifications/order
+    * refactor filter for approved orders to pass search filter within notification message on undelivered/unissued orders for easier navigation
+* order
+    * consider forwarding article id directly from orders (null if manual), avoid detection in approved based on vendro/number/name?
 
 ## Content
 * [Aims](#aims)
@@ -2790,7 +2794,7 @@ A solution could be established due to an erp database connection thus implement
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission<br/>&bull; Vendor filter as text with dataset on product searches |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission<br/>&bull; Vendor filter as text with dataset on product searches<br/>&bull; Record state filter: no display of further proceedings |
 | Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 | Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
 
