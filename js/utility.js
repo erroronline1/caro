@@ -2072,6 +2072,7 @@ export const _client = {
 								attributes: {
 									"data-type": record.restricted_access ? "password": "record",
 									name: record.identifier,
+									class: record.closed ? "green" : record.complaint ? "orange" : "",
 								},
 								content: api._lang.GET("record.list_touched", {
 									":date": record.last_touch,
