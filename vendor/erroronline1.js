@@ -1,10 +1,10 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -88,12 +88,11 @@ const _ = {
 	},
 
 	/**
-	 * 
 	 * @param {String} method get, put, post, delete, etc
 	 * @param {String} destination url
-	 * @param {Array|FormData} payload 
+	 * @param {Array|FormData} payload
 	 * @param {Array} errorless_status get response instead of error message
-	 * @returns 
+	 * @returns
 	 */
 	api: async function (method, destination, payload, errorless_status = [200]) {
 		method = method.toUpperCase();
@@ -190,21 +189,28 @@ const _ = {
 			document.getElementById(data).remove();
 		},
 	},
+	/**
+	 * returns either a FormData- or generic object with key-value pairs of inputs detected by target
+	 * @param {string|Node} target query selector string or node
+	 * @param {boolean} form_data return type
+	 * @returns FormData or Object
+	 */
 	getInputs: function (target, form_data = false) {
 		// target can either be a querySelector or a passed node object
-		let fields;
+		let fields, formdata;
 		let form = typeof target === "string" ? document.querySelector(target) : target;
-		if (form_data && form) {
-			fields = new FormData(form);
+
+		if (form && form.localName === "form") {
+			formdata = new FormData(form);
 
 			// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
 			for (const input of Object.values(form)) {
 				if (input.dataset.wrap && input.value) {
-					fields.set(input.name, input.dataset.wrap.replace("___", input.value));
+					formdata.set(input.name, input.dataset.wrap.replace("___", input.value));
 				}
 			}
 
-			// add special comma separated dataset for checkboxes with data-grouped attribute
+			// add special pipe separated dataset for checkboxes with data-grouped attribute
 			const grouped = document.querySelectorAll("[data-grouped]"),
 				groups = {};
 			for (const checkbox of grouped) {
@@ -214,33 +220,79 @@ const _ = {
 				}
 			}
 			for (const [group, values] of Object.entries(groups)) {
-				fields.append(group, values.join(" | "));
+				formdata.append(group, values.join(" | "));
+			}
+
+			if (form_data) return formdata;
+			// else create object returned at the end
+			for (const [key, value] of formdata.entries()) {
+				formdata[key] = value;
 			}
 		} else {
 			fields = {};
 			let inputs = document.querySelectorAll(target), // inputs must have their own grouping querySelector
-				sanitizedname;
-			for (const input of inputs) {
-				input.value = encodeURIComponent(input.value);
-				sanitizedname = input.name.replaceAll(/\W/g, "_");
-				if (input.type == "radio" && input.checked) fields[sanitizedname] = input.value;
-				else if (input.type == "checkbox") {
-					if (input.name.contains("[]")) {
-						input.name = input.name.replace("[]", "");
-						if (typeof fields[sanitizedname] === "object" && input.value) fields[sanitizedname].push(input.checked ? input.value : 0);
-						else if (input.value) fields[sanitizedname] = [input.checked ? input.value : 0];
-					} else fields[sanitizedname] = input.checked ? input.value : 0;
-				} else if (["text", "tel", "time", "date", "number", "hidden", "email"].contains(input.type)) {
-					// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
-					if (input.dataset.wrap && input.value) {
-						input.value = input.dataset.wrap.replace("___", input.value);
+				input;
+			for (const _input of inputs) {
+				input = _input.cloneNode(true); // clone because we do not want to override original node attributes
+				switch (input.type) {
+					case "radio":
+						if (!input.checked) continue;
+						if (input.name.contains("[]")) {
+							input.name = input.name.replace("[]", "");
+							if (typeof fields[input.name] === "object") fields[input.name].push(input.checked ? input.value || input.name : 0);
+							else fields[input.name] = [input.checked ? input.value || input.name : 0];
+						} else fields[input.name] = input.checked ? input.value || input.name : 0;
+						break;
+					case "checkbox":
+						if (!input.checked) continue;
+						if (input.name.contains("[]")) {
+							input.name = input.name.replace("[]", "");
+							if (typeof fields[input.name] === "object") fields[input.name].push(input.checked ? input.value || input.name : 0);
+							else fields[input.name] = [input.checked ? input.value || input.name : 0];
+						} else fields[input.name] = input.checked ? input.value || input.name : 0;
+						break;
+					case "text":
+					case "tel":
+					case "time":
+					case "date":
+					case "number":
+					case "hidden":
+					case "email":
+					case "datetime-local":
+						if (!input.value) continue;
+						// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
+						if (input.dataset.wrap && input.value) {
+							input.value = input.dataset.wrap.replace("___", input.value);
+						}
+					default:
+						if (!input.value) continue;
+						if (input.name.contains("[]")) {
+							input.name = input.name.replace("[]", "");
+							if (typeof fields[input.name] === "object" && input.value) fields[input.name].push(input.value);
+							else if (input.value) fields[input.name] = [input.value];
+						} else fields[input.name] = input.value;
+				}
+
+				// add special pipe separated dataset for checkboxes with data-grouped attribute
+				const grouped = document.querySelectorAll("[data-grouped]"),
+					groups = {};
+				for (const checkbox of grouped) {
+					if (checkbox.form === form && checkbox.checked) {
+						if (groups[checkbox.dataset.grouped]) groups[checkbox.dataset.grouped].push(checkbox.name);
+						else groups[checkbox.dataset.grouped] = [checkbox.name];
 					}
-					if (input.name.contains("[]")) {
-						input.name = input.name.replace("[]", "");
-						if (typeof fields[sanitizedname] === "object" && input.value) fields[sanitizedname].push(input.value);
-						else if (input.value) fields[sanitizedname] = [input.value];
-					} else fields[sanitizedname] = input.value;
-				} else fields[sanitizedname] = input.value;
+				}
+				for (const [group, values] of Object.entries(groups)) {
+					fields[group] = values.join(" | ");
+				}
+
+				if (form_data) {
+					formdata = new FormData();
+					for (const [key, value] of Object.entries(fields)) {
+						formdata.append(key, value);
+					}
+					return formdata;
+				}
 			}
 		}
 		return fields;
