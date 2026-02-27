@@ -16,6 +16,7 @@ class ORDER extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_filterTerm = null;
 	private $_orderState = null;
 	private $_stateSet = null;
 
@@ -23,7 +24,7 @@ class ORDER extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? (!in_array(REQUEST[2], ['false', 'null']) ? REQUEST[2]: null) : null;
+		$this->_requestedID = $this->_filterTerm = isset(REQUEST[2]) ? (!in_array(REQUEST[2], ['false', 'null']) ? REQUEST[2]: null) : null;
 		$this->_orderState =  isset(REQUEST[3]) ? (REQUEST[3] != 'null' ? REQUEST[3]: null) : null;
 		$this->_stateSet = REQUEST[4] ?? null;
 	}
@@ -360,6 +361,9 @@ class ORDER extends API {
 					if ($f === 'timespan' && $filter[$f]) $filter[$f] = $this->convertToServerTime($filter[$f]) . ':00'; // append seconds to datetime-local
 					if (in_array($f, ['unit', 'etc']) && $filter[$f]) $filter[$f] = explode('|', $filter[$f]);
 				}
+				// the filter-term can be passed by path parameter $this->_filterTerm as well, but it is considered for notification messages only
+				$filter['term'] = $filter['term'] ?? $this->_filterTerm ?? null;
+
 				// this parcour maneuver is necessary to set the requested units for users with unit selector
 				// as well as these without
 				if ($filter['unit']) $units = $filter['unit']; // override units with selected filter
