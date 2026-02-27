@@ -109,11 +109,10 @@ class ORDER extends API {
 								break;
 							case 'issued_full':
 								// sets last order date for next overview
-								if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'])){
-									$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+								if (isset($decoded_order_data['productid'])){
+									$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 										'values' => [
-											':article_no' => $decoded_order_data['ordernumber_label'],
-											':vendor' => $decoded_order_data['vendor_label']
+											':ids' => intval($decoded_order_data['productid'])
 										]
 									]);
 									$product = $product ? $product[0] : null;
@@ -1185,15 +1184,15 @@ class ORDER extends API {
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => $this->_lang->GET('order.barcode_label') . '[]',
-									'value' => UTILITY::propertySet($order['items'][$i], 'barcode_label') ?  : ' '
+									'name' => $this->_lang->GET('order.vendor_label') . '[]',
+									'value' => UTILITY::propertySet($order['items'][$i], 'vendor_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => $this->_lang->GET('order.vendor_label') . '[]',
-									'value' => UTILITY::propertySet($order['items'][$i], 'vendor_label') ? : ' '
+									'name' => '_productid[]',
+									'value' => UTILITY::propertySet($order['items'][$i], '_productid') ? : ' '
 								]
 							],
 							[
@@ -1295,24 +1294,11 @@ class ORDER extends API {
 		$order_data2 = [];
 		$sqlchunks = [];
 
-		// gather products to assign database id to order data if vendor and ordernumber match
-		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			$allproducts_key[$product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']] = $product;
-		}
-
 		// iterate over items and create one order per item
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
-			$product =null;
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
 				if (!in_array($key, ['items', 'organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
-			}
-			// try to match product id, assign if found
-			// this is done here instead of checking on display of orders for performance reasons!
-			// i am aware this may lead to buttons for adding a product after product list updates
-			if (isset($order_data2['ordernumber_label']) && isset($order_data2['vendor_label']) && isset($order_data2['productname_label'])){
-				$product = $allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label'] . '_' . $order_data2['productname_label']] ?? null;
-				if ($product) $order_data2['productid'] = $product['id'];
 			}
 
 			// verify return_reason 
@@ -1689,7 +1675,7 @@ class ORDER extends API {
 		$this->_payload->{$this->_lang->PROPERTY('order.organizational_unit')} = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.organizational_unit')), $this->_lang->_USER['units']);
 
 		// translate payload-names to languagefile keys
-		$language = [];
+		$language = ['productid' => '_productid'];
 		foreach (array_keys($this->_lang->_USER['order']) as $key){
 			$language[$key] = $this->_lang->PROPERTY('order.' . $key);
 		}
