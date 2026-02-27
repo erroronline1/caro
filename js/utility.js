@@ -519,12 +519,10 @@ export const _client = {
 		 * order to be taken into account in consumables.php "productsearch" method as well!
 		 * cart-content has a twin within order.php "order"-get method
 		 * @requires api, Assemble
-		 * @param  {...any} data
+		 * @param {object} data
 		 * @event insert domNodes
 		 */
-		addProduct: (...data) => {
-			if ([...data].length < 6) data = ["", ...data];
-			else data = [...data];
+		addProduct: (data) => {
 			const autidem = {};
 			autidem[api._lang.GET("order.aut_idem")] = [];
 			const nodes = document.querySelectorAll("main>form>article"),
@@ -535,7 +533,7 @@ export const _client = {
 								type: "number",
 								attributes: {
 									name: api._lang.GET("order.quantity_label") + "[]",
-									value: data[0],
+									value: data.quantity || '',
 									min: "1",
 									max: "99999",
 									required: true,
@@ -546,10 +544,10 @@ export const _client = {
 								type: "textsection",
 								attributes: {
 									name: api._lang.GET("order.added_product", {
-										":unit": data[1],
-										":number": data[2],
-										":name": data[3],
-										":vendor": data[5],
+										":unit": data.unit || '',
+										":number": data.ordernumber || '',
+										":name": data.productname || '',
+										":vendor": data.vendor || '',
 									}),
 								},
 							},
@@ -557,35 +555,35 @@ export const _client = {
 								type: "hidden",
 								attributes: {
 									name: api._lang.GET("order.unit_label") + "[]",
-									value: data[1] ? data[1] : " ",
+									value: data.unit || "",
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
 									name: api._lang.GET("order.ordernumber_label") + "[]",
-									value: data[2],
+									value: data.ordernumber || "",
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
 									name: api._lang.GET("order.productname_label") + "[]",
-									value: data[3],
-								},
-							},
-							{
-								type: "hidden",
-								attributes: {
-									name: api._lang.GET("order.barcode_label") + "[]",
-									value: data[4] ? data[4] : " ",
+									value: data.productname || '',
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
 									name: api._lang.GET("order.vendor_label") + "[]",
-									value: data[5],
+									value: data.vendor || "",
+								},
+							},
+							{
+								type: "hidden",
+								attributes: {
+									name: "_productid[]",
+									value: data.productid || "",
 								},
 							},
 							{
@@ -611,7 +609,7 @@ export const _client = {
 			// remove open dialog if present, e.g. manual order
 			if (document.querySelector("dialog[open]")) document.querySelector("dialog[open]").remove();
 
-			new Toast(api._lang.GET("order.added_confirmation", { ":name": data[3] }), "info");
+			new Toast(api._lang.GET("order.added_confirmation", { ":name": data.productname }), "info");
 		},
 
 		/**

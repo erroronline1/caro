@@ -1743,7 +1743,7 @@ class CONSUMABLES extends API {
 	 */
 	public function productsearch($usecase = '', $parameter = []){
 		$slides = [];
-		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
+		// keys of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 		$search = [];
@@ -1956,8 +1956,8 @@ class CONSUMABLES extends API {
 					$slides[$slide][$tiles][] = [
 						'type' => 'tile',
 						'attributes' => [
-							'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+							'onclick' => "_client.order.addProduct({unit: '" . $row['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $row['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $row['article_name']) . "', vendor: '" . $row['vendor_name'] . "', productid: " . $row['id'] . "}); return false;",
+							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct({unit: '" . $row['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $row['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $row['article_name']) . "', vendor: '" . $row['vendor_name'] . "', productid: " . $row['id'] . "}); return false;",
 							'role' => 'link',
 							'tabindex' => '0',
 							'title' => $this->_lang->GET('order.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
@@ -2017,8 +2017,8 @@ class CONSUMABLES extends API {
 				$tile = [
 						'type' => 'tile',
 						'attributes' => [
-							'onclick' => "_client.order.addProduct('" . $manual['article_unit'] . "', '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', '" . $manual['article_ean'] . "', '" . $manual['vendor_name'] . "'); return false;",
-							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $manual['article_unit'] . "', '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', '" . $manual['article_ean'] . "', '" . $manual['vendor_name'] . "'); return false;",
+							'onclick' => "_client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
+							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
 							'role' => 'link',
 							'tabindex' => '0',
 							'title' => $this->_lang->GET('order.tile_title', [':product' => $manual['article_name'], ':vendor' => $manual['vendor_name']])
