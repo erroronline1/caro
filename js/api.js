@@ -847,6 +847,16 @@ export const api = {
 						};
 						break;
 					case "export":
+						// take whatever request param is formdata
+						for (const[index, value] of Object.entries(request)){
+							if (value instanceof FormData) {
+								payload = value;
+								delete request[index];
+								break;
+							}
+						}
+						// if not set get inputs with usecase
+						if (!payload) payload = _.getInputs("[data-usecase=audit]", false);
 						break;
 					case "import":
 						switch (request[2]) {
@@ -860,6 +870,16 @@ export const api = {
 						}
 						break;
 					default:
+						// take whatever request param is formdata
+						for (const[index, value] of Object.entries(request)){
+							if (value instanceof FormData) {
+								payload = value;
+								delete request[index];
+								break;
+							}
+						}
+						// if not set get inputs with usecase
+						if (!payload) payload = _.getInputs("[data-usecase=audit]", false);
 						successFn = function (data) {
 							if (data.render) {
 								api.update_header(title[request[1]] + (request[2] && request[2] !== "null" ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));

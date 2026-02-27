@@ -26,10 +26,8 @@ class AUDIT extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 	private $_requestedTemplate = null;
-	private $_requestedDatetime = null;
 	private $_requestedID = null;
 	private $_requestedOption = null;
-	private $_requestedDatetime2 = null;
 	private $_markdown = null;
 
 	/**
@@ -40,8 +38,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('regulatory') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = $this->_requestedTemplate = REQUEST[2] ?? null;
-		$this->_requestedDatetime = $this->_requestedID = $this->_requestedOption = REQUEST[3] ?? null;
-		$this->_requestedDatetime2 = REQUEST[4] ?? null;
+		$this->_requestedID = $this->_requestedOption = REQUEST[3] ?? null;
 		$this->_markdown = new MARKDOWN();
 	}
 
@@ -482,7 +479,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given audit
 	 */
 	private function exportaudit(){
-		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => UTILITY::propertySet($this->_payload, '_auditid') ?: 0]]);
 		$audit = $audit ? $audit[0] : null;
 		if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
@@ -648,7 +645,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', 'audit', " . $audit['id'] . ")",
+					'onclick' => "const fd = new FormData(); fd.append('_auditid', " . $audit['id'] . "); api.audit('get', 'export', 'audit', fd)",
 					'data-type' => 'download'
 				]
 			];
@@ -1035,7 +1032,7 @@ class AUDIT extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 				$permitted = [
-					// add respective mathods that are allowed to have a deletion
+					// add respective methods that are allowed to have a deletion
 				];
 				if (in_array($this->_requestedType, $permitted)) $this->{'delete' . $this->_requestedType}();
 				break;
@@ -1135,10 +1132,9 @@ class AUDIT extends API {
 	 */
 	private function documents(){
 		$content = [];
-
-		$this->_requestedDatetime = $this->_requestedDatetime ? : $this->_date['usertime']->format('Y-m-d\TH:i:59');
-		if (strlen($this->_requestedDatetime) < 17) $this->_requestedDatetime .= ':00'; // append to datetime-locale format
-		$requestedTimestamp = $this->convertToServerTime($this->_requestedDatetime);
+		
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: $this->_date['usertime']->format('Y-m-d\TH:i');
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		function latestApprovedComponent($components, $requestedTimestamp, $name = ''){
 			if (!$name) return false;
@@ -1185,7 +1181,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_datetime').value)",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -1196,15 +1192,15 @@ class AUDIT extends API {
 				'type' => 'datetime_local',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents.datetime'),
-					'value' => $this->_requestedDatetime,
-					'id' => '_documents_datetime'
+					'value' => $_requestedDateTime,
+					'data-usecase' => 'audit'
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.documents.update_button'),
-					'onclick' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_datetime').value)"
+					'onclick' => "api.audit('get', 'checks', 'documents')"
 				]
 			], [
 				'type' => 'textsection',
@@ -1275,7 +1271,7 @@ class AUDIT extends API {
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_maxDocumentTimestamp',
-									'value' => $this->_requestedDatetime
+									'value' => $_requestedDateTime . ':00'
 								]
 							], [
 								'type' => 'hidden',
@@ -1496,9 +1492,8 @@ class AUDIT extends API {
 	private function incorporation(){
 		$content = $orderedunincorporated = $incorporated = [];
 
-		$this->_requestedDatetime = $this->_requestedDatetime ? : '2023-10-01T00:00:00';
-		if (strlen($this->_requestedDatetime) < 17) $this->_requestedDatetime .= ':00'; // append to datetime-locale format
-		$requestedTimestamp = $this->convertToServerTime($this->_requestedDatetime);
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: '2023-10-01T00:00';
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// get unincorporated articles from approved orders
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
@@ -1548,15 +1543,15 @@ class AUDIT extends API {
 				'type' => 'datetime_local',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents.datetime'),
-					'value' => $this->_requestedDatetime,
-					'id' => '_documents_datetime'
+					'value' => $_requestedDateTime,
+					'data-usecase' => 'audit'
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.checks_update_button'),
-					'onclick' => "api.audit('get', 'checks', 'incorporation', document.getElementById('_documents_datetime').value)"
+					'onclick' => "api.audit('get', 'checks', 'incorporation')"
 				]
 			],
 		];
@@ -1565,7 +1560,7 @@ class AUDIT extends API {
 			'type' => 'button',
 			'attributes' => [
 				'value' => $this->_lang->GET('audit.records.export'),
-				'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_datetime'))",
+				'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 				'data-type' => 'download'
 			]
 		];
@@ -1583,7 +1578,7 @@ class AUDIT extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('audit.checks_type.incorporation')
 			],
-			'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDatetime, true)])
+			'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
 		];
 
 		foreach ($incorporated as $product){
@@ -1615,7 +1610,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.incorporation.export_vendor', [':vendor' => $vendor])
 					],
-					'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDatetime, true)])
+					'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
 				],
 				...$vendorchecks
 			];
@@ -1868,7 +1863,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given management review
 	 */
 	private function exportmanagementreview(){
-		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => UTILITY::propertySet($this->_payload, '_reviewid') ?: 0]]);
 		$managementreview = $managementreview ? $managementreview[0] : null;
 		if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
 
@@ -1956,7 +1951,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', 'managementreview', " . $managementreview['id'] . ")",
+					'onclick' => "const fd = new FormData(); fd.append('_reviewid', " . $managementreview['id'] . "); api.audit('get', 'export', 'managementreview', fd)",
 					'data-type' => 'download'
 				]
 			];
@@ -1977,9 +1972,8 @@ class AUDIT extends API {
 	private function mdrsamplecheck(){
 		$content = $unchecked = [];
 
-		$this->_requestedDatetime = $this->_requestedDatetime ? : '2023-10-01T00:00:00';
-		if (strlen($this->_requestedDatetime) < 17) $this->_requestedDatetime .= ':00'; // append to datetime-locale format
-		$requestedTimestamp = $this->convertToServerTime($this->_requestedDatetime);
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: '2023-10-01T00:00';
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// get unchecked articles for MDR §14 sample check
 		// this is actually faster than a nested sql query
@@ -2033,15 +2027,15 @@ class AUDIT extends API {
 				'type' => 'datetime_local',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents.datetime'),
-					'value' => $this->_requestedDatetime,
-					'id' => '_documents_datetime'
+					'value' => $_requestedDateTime,
+					'data-usecase' => 'audit'
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.checks_update_button'),
-					'onclick' => "api.audit('get', 'checks', '" . $this->_requestedType . "', document.getElementById('_documents_datetime').value)",
+					'onclick' => "api.audit('get', 'checks', '" . $this->_requestedType . "')",
 					]
 			]
 		];
@@ -2051,7 +2045,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_datetime').value)",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -2105,7 +2099,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.mdrsamplecheck.export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDatetime), true])
+					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $requestedTimestamp, true])
 				],
 				...$vendorchecks
 			];
@@ -2195,14 +2189,14 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.orderstatistics.start'),
 					'value' => $from !== '-' ? $from . 'T00:00' : '',
-					'id' => '_start'
+					'data-usecase' => 'audit'
 				],
 			], [
 				'type' => 'datetime_local',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.orderstatistics.end'),
 					'value' => $until !== '-' ? $until . 'T23:59' : '',
-					'id' => '_end'
+					'data-usecase' => 'audit'
 				],
 			]
 		];
@@ -2214,7 +2208,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.records.export_xlsx'),
-						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_start').value, document.getElementById('_end').value)",
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
 				]
@@ -2231,8 +2225,10 @@ class AUDIT extends API {
 		require_once('order.php');
 		$orderstatistics = new ORDER();
 
-		$start = $this->_requestedDatetime ? $this->convertToServerTime($this->_requestedDatetime . ':00') : null;
-		$end = $this->_requestedDatetime2 ? $this->convertToServerTime($this->_requestedDatetime2 . ':00') : null;
+		$start = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.start_date'));
+		$start = $start ? $this->convertToServerTime($start . ':00') : null;
+		$end = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.end_date'));
+		$end = $end ? $this->convertToServerTime($end . ':00') : null;
 
 		$orders = $orderstatistics->statistics_get($start, $end);
 
@@ -2331,14 +2327,14 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.records.start_date'),
 						'value' => '2023-10-01',
-						'id' => '_records_start_date'
+						'data-usecase' => 'audit'
 					]
 				], [
 					'type' => 'date',
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.records.end_date'),
 						'value' => $this->_date['usertime']->format('Y-m-d'),
-						'id' => '_records_end_date'
+						'data-usecase' => 'audit'
 					]
 				], [
 					'type' => 'textsection',
@@ -2347,7 +2343,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.records.export_csv'),
-						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_records_start_date').value, document.getElementById('_records_end_date').value)",
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
 				]
@@ -2360,8 +2356,10 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for all of records
 	 */
 	private function exportrecords(){
-		$startDate = $this->convertToServerTime($this->_requestedDatetime) ? : '2023-10-01'; // records use date inputs instead of datetime_locale
-		$endDate = $this->convertToServerTime($this->_requestedDatetime2 ? : $this->_date['usertime']->format('Y-m-d')); // records use date inputs instead of datetime_locale
+		$startDate = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.start_date')) ? : '2023-10-01'; // records use date inputs instead of datetime_locale
+		$startDate = $this->convertToServerTime($startDate);
+		$endDate = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.end_date'))? : $this->_date['usertime']->format('Y-m-d'); // records use date inputs instead of datetime_locale
+		$endDate = $this->convertToServerTime($endDate);
 
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
@@ -2531,7 +2529,7 @@ class AUDIT extends API {
 				}
 
 				// include code for verification into output
-				$reflector = new \ReflectionMethod('CARO\API\BLOCKCHAIN::verified');
+				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\BLOCKCHAIN::verified');
 				$reflector_start = $reflector->getStartLine() - 1;
 				$reflector_end = $reflector->getEndLine() - 1;
 				$code = $reflector->__toString() . "\n";
@@ -2758,9 +2756,8 @@ class AUDIT extends API {
 	private function risks(){
 		$content = $issues = [];
 
-		$this->_requestedDatetime = $this->_requestedDatetime ? : $this->_date['usertime']->format('Y-m-d\TH:i:59');
-		if (strlen($this->_requestedDatetime) < 17) $this->_requestedDatetime .= ':00'; // append to datetime-locale format
-		$requestedTimestamp = $this->convertToServerTime($this->_requestedDatetime);
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: $this->_date['usertime']->format('Y-m-d\TH:i');
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// prepare existing risks lists
 		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
@@ -2837,21 +2834,21 @@ class AUDIT extends API {
 				'type' => 'datetime_local',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents.datetime'),
-					'value' => $this->_requestedDatetime,
-					'id' => '_documents_datetime'
+					'value' => $_requestedDateTime,
+					'data-usecase' => 'audit'
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.risks_update_button'),
-					'onclick' => "api.audit('get', 'checks', 'risks', document.getElementById('_documents_datetime').value)"
+					'onclick' => "api.audit('get', 'checks', 'risks')"
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_datetime').value)",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -2883,7 +2880,8 @@ class AUDIT extends API {
 			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 		$downloadfiles = [];
-		$requestedTimestamp = $this->convertToServerTime($this->_requestedDatetime);
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: $this->_date['usertime']->format('Y-m-d\TH:i');
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// render issue list for pdf export
 		$issues = $this->risks();
@@ -3323,18 +3321,21 @@ class AUDIT extends API {
 
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
+		$selectedUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.organizational_unit'));
+
 		$organizational_units = [];
-		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills')"];
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['value' => 'null', 'onchange' => "if (this.checked) api.audit('get', 'checks', 'userskills')"];
+		if (!$selectedUnit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 		foreach ($this->_lang->_USER['units'] as $unit => $description){
-			$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills', '" . $unit . "')"];
+			$organizational_units[$description] = ['value' => $unit, 'onchange' => "if (this.checked) api.audit('get', 'checks', 'userskills')"];
+			if ($selectedUnit === $unit) $organizational_units[$description]['checked'] = true;
 		}
-		if (!$this->_requestedOption) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
-		else $organizational_units[$this->_lang->GET('units.' . $this->_requestedOption)]['checked'] = true;
 		$content[] = [
 			[
 				'type' => 'radio',
 				'attributes' => [
-					'name' => $this->_lang->GET('order.organizational_unit')
+					'name' => $this->_lang->GET('order.organizational_unit'),
+					'data-usecase' => 'audit'
 				],
 				'content' => $organizational_units
 			]
@@ -3346,7 +3347,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', '" . $this->_requestedOption . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -3386,8 +3387,8 @@ class AUDIT extends API {
 			}
 
 			if (!(
-				in_array($this->_requestedOption, $user['units']) ||
-				((!$this->_requestedOption || $this->_requestedOption == 'null') && array_intersect($_SESSION['user']['units'], $user['units']))
+				in_array($selectedUnit, $user['units']) ||
+				((!$selectedUnit || $selectedUnit == 'null') && array_intersect($_SESSION['user']['units'], $user['units']))
 			)) continue;
 
 			$content[] = [
@@ -3572,8 +3573,9 @@ class AUDIT extends API {
 		];
 
 		$skills = $this->userskills();
+		$selectedUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.organizational_unit'));
 
-		$summary['content'][''] = (!$this->_requestedOption || $this->_requestedOption == 'null') ? implode(', ', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], $_SESSION['user']['units'])) : $this->_lang->_DEFAULT['units'][$this->_requestedOption];
+		$summary['content'][''] = (!$selectedUnit || $selectedUnit == 'null') ? implode(', ', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], $_SESSION['user']['units'])) : $this->_lang->_DEFAULT['units'][$selectedUnit];
 
 		for($i = 1; $i < count($skills); $i++){
 			foreach ($skills[$i] as $item){
