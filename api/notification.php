@@ -552,7 +552,7 @@ class NOTIFICATION extends API {
 										['unit' => $organizational_unit],
 										$this->_lang->GET('order.alert_unissued_order', [
 											':days' => $delivered_full->diff($this->_date['servertime'])->days,
-											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'delivered_full\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
+											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 											':quantity' => $decoded_order_data['quantity_label'],
 											':unit' => $decoded_order_data['unit_label'] ?? '',
 											':number' => $decoded_order_data['ordernumber_label'] ?? '',
