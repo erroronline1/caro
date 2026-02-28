@@ -274,10 +274,10 @@ const _ = {
 				}
 
 				// add special pipe separated dataset for checkboxes with data-grouped attribute
-				const grouped = document.querySelectorAll("[data-grouped]"),
+				const grouped = document.querySelectorAll(target + "[data-grouped]"),
 					groups = {};
 				for (const checkbox of grouped) {
-					if (checkbox.form === form && checkbox.checked) {
+					if (checkbox.checked) {
 						if (groups[checkbox.dataset.grouped]) groups[checkbox.dataset.grouped].push(checkbox.name);
 						else groups[checkbox.dataset.grouped] = [checkbox.name];
 					}
