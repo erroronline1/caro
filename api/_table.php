@@ -203,6 +203,23 @@ CLASS TABLE{
 		switch (strtolower($type ?: $file['extension'])){
 			case 'ods':
 				$celloptions = new \OpenSpout\Writer\ODS\Options(
+					new \OpenSpout\Common\Entity\Style\Style(
+						false, // public bool $fontBold = false,
+						false, // public bool $fontItalic = false,
+						false, // public bool $fontUnderline = false,
+						false, // public bool $fontStrikethrough = false,
+						\OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_SIZE, // public int $fontSize = self::DEFAULT_FONT_SIZE,
+						\OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_COLOR, // public string $fontColor = self::DEFAULT_FONT_COLOR,
+						\OpenSpout\Common\Entity\Style\Style::DEFAULT_FONT_NAME, // public string $fontName = self::DEFAULT_FONT_NAME,
+						\OpenSpout\Common\Entity\Style\CellAlignment::LEFT, // public ?CellAlignment $cellAlignment = null,
+						\OpenSpout\Common\Entity\Style\CellVerticalAlignment::TOP, // public ?CellVerticalAlignment $cellVerticalAlignment = null,
+						true, // public ?bool $shouldWrapText = null,
+						0, // public int $textRotation = 0,
+						true, // public ?bool $shouldShrinkToFit = null,
+						null, // public ?Border $border = null,
+						null, // public ?string $backgroundColor = null,
+						null, // public ?string $format = null,
+					),
 					tempFolder: UTILITY::directory('tmp')
 					// no page options available yet
 				);
