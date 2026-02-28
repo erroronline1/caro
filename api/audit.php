@@ -2198,6 +2198,17 @@ class AUDIT extends API {
 					'value' => $until !== '-' ? $until . 'T23:59' : '',
 					'data-usecase' => 'audit'
 				],
+			], [
+				'type' => 'radio',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.records.export_type'),
+					'data-usecase' => 'audit'
+				],
+				'content' => [
+					'CSV' => [],
+					'ODS' => ['checked' => true],
+					'XLSX' => []
+				]
 			]
 		];
 
@@ -2207,7 +2218,7 @@ class AUDIT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.records.export_xlsx'),
+						'value' => $this->_lang->GET('audit.records.export_button'),
 						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
@@ -2282,7 +2293,7 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$tempFile = preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
+		$tempFile = preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
 
 		require_once('_table.php');
 		$export = new TABLE($vendor_orders);
@@ -2320,6 +2331,15 @@ class AUDIT extends API {
 		$content = [];
 
 		if (PERMISSION::permissionFor('regulatoryoperation')){
+
+			$context = $units = [];
+			foreach($this->_lang->_USER['documentcontext']['identify'] as $translation){
+				$context[$translation] = ['data-usecase' => 'audit'];
+			}
+			foreach($this->_lang->_USER['units'] as $translation){
+				$units[$translation] = ['data-usecase' => 'audit'];
+			}
+
 			// add export button
 			$content[] = [
 				[
@@ -2337,12 +2357,35 @@ class AUDIT extends API {
 						'data-usecase' => 'audit'
 					]
 				], [
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => $this->_lang->GET('assemble.compose.document.context')						
+					],
+					'content' => $context
+				], [
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.units')
+					],
+					'content' => $units
+				], [
 					'type' => 'textsection',
 					'content' => $this->_lang->GET('audit.records.hint')
 				], [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.export_type'),
+						'data-usecase' => 'audit'
+					],
+					'content' => [
+						'CSV' => ['checked' => true],
+						'ODS' => [],
+						'XLSX' => []
+					]
+				], [
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.records.export_csv'),
+						'value' => $this->_lang->GET('audit.records.export_button'),
 						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
@@ -2361,6 +2404,13 @@ class AUDIT extends API {
 		$endDate = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.end_date'))? : $this->_date['usertime']->format('Y-m-d'); // records use date inputs instead of datetime_locale
 		$endDate = $this->convertToServerTime($endDate);
 
+		$contexts = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.document.context'));
+		$units = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.units'));
+		if (!$contexts || !$units) $this->response([], 417);
+
+		$contexts = array_map(Fn($v) => array_search($v, $this->_lang->_USER['documentcontext']['identify']), explode(' | ', $contexts));
+		$units = array_map(Fn($v) => array_search($v, $this->_lang->_USER['units']), explode(' | ', $units));
+
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$result = [];
@@ -2376,7 +2426,9 @@ class AUDIT extends API {
 		];
 		// iterate over all entries, create arrays with all available keys and append to result
 		foreach ($records as $row){
-			if (!in_array($row['context'], ['casedocumentation'])) continue;
+			if (!in_array($row['context'], $contexts)) continue;
+			$row['units'] = explode(',', $row['units']);
+			if (!array_intersect($row['units'], $units)) continue;
 
 			$line = [];
 			$skip = false;
@@ -2405,25 +2457,33 @@ class AUDIT extends API {
 				}
 
 				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
-				// iterate over all entries, fill up result line with the most recent value
+				// iterate over all entries, fill up result line values
 				foreach ($entry['content'] as $field => $input){
-					$field = $document_name . str_replace('_', ' ', $field);
+
+				$field = $document_name . str_replace('_', ' ', $field);
 					if ($input) {
 						if (!in_array($field, $keys)) $keys[] = $field;
-						$line[$field] = $input;
+						if (!isset($line[$field])) $line[$field] = [];
+						$line[$field][] = $input . ' ' . $this->_lang->GET('record.export_author', [':author' => $entry['author'], ':date' => $this->convertFromServerTime(substr($entry['date'], 0, -3), true)], true);
 					}
 				}
 			}
 			if ($skip) continue;
 
+			// concatenate entries per line columns
+			foreach($keys as $key){
+				if (isset($line[$key])) $line[$key] = implode ("\n\n", $line[$key]);
+			}
+
 			// complete default columns and append to result
 			$line[$defaultColumn['identifier']] = $row['identifier'];
 			$line[$defaultColumn['erp_case_number']] = $row['erp_case_number'] ? : '';
-			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
+			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, $row['units']));
 			$line[$defaultColumn['type']] = isset($this->_lang->_DEFAULT['record']['type'][$row['record_type']]) ? $this->_lang->_DEFAULT['record']['type'][$row['record_type']] : '';
 			$result[] = $line;
 		}
 
+		if (!$result) $this->response([], 404);
 		// sort keys and unshift leading default columns
 		sort($keys, SORT_REGULAR);
 		array_unshift($keys,
@@ -2454,8 +2514,9 @@ class AUDIT extends API {
 		$downloadfiles = [];
 		require_once('_table.php');
 		$export = new TABLE([$result]);
-		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv')){
-			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
+		$filename = $this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
+		if ($files = $export->dump($filename)){
+			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $filename])] = [
 				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
 				'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
 			];
@@ -2845,9 +2906,23 @@ class AUDIT extends API {
 					'onclick' => "api.audit('get', 'checks', 'risks')"
 				]
 			], [
+				'type' => 'radio',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.records.export_type'),
+					'data-usecase' => 'audit'
+				],
+				'content' => [
+					'CSV' => [],
+					'ODS' => ['checked' => true],
+					'XLSX' => []
+				]
+			], [
+				'type' => 'textsection',
+				'content' => $this->_lang->GET('audit.risk_export_hint')
+			], [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.records.export'),
+					'value' => $this->_lang->GET('audit.records.export_button'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
@@ -2982,7 +3057,7 @@ class AUDIT extends API {
 				];
 			}
 
-			$tempFile = $summary['filename'] . '_' . time() . '.xlsx';
+			$tempFile = $summary['filename'] . '_' . time() . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
 
 			require_once('_table.php');
 			$export = new TABLE($result);
