@@ -35,10 +35,6 @@ Things are still in motion. Images may be outdated.
     * consider ods output where applicable
 * markdown
     * check export of checkboxes, mark, sub, sup
-* notifications/order
-    * refactor filter for approved orders to pass search filter within notification message on undelivered/unissued orders for easier navigation
-* order
-    * consider forwarding article id directly from orders (null if manual), avoid detection in approved based on vendro/number/name?
 
 ## Content
 * [Aims](#aims)
@@ -3312,7 +3308,7 @@ Sample response
 
 > DELETE ./api/api.php/audit/checks/{type}
 
-Legary endpoint for possible future use. Currently without effect.
+Legacy endpoint for possible future use. Currently without effect.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3324,7 +3320,7 @@ Supposed sample response
 {"response":{"msg":"... have been deleted.","type":"success"}}
 ```
 
-> GET ./api/api.php/audit/checks/{type}/{date}/{time}
+> GET ./api/api.php/audit/checks/{type}?{param}
 
 Returns selection of available checks, given type the result of the selected type.
 
@@ -3332,24 +3328,23 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | optional | adds contents based on given type to response |
-| {date} | path parameter | optional | e.g. contents validity limited to date/time |
-| {time} | path parameter | optional | e.g. contents validity limited to date/time |
+| {param} | query parameter | optional | additional filters if applicable |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"documents"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by documents and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+{"render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":{"value":"skillfulfilment"},"Employee skills and trainings":{"value":"userskills"},"Employee training evaluation":{"value":"trainingevaluation"},"Internal audits":{"value":"audits"},"Management reviews":{"value":"managementreviews"},"Products - Incorporations":{"value":"incorporation"},"Products - MDR sample check":{"value":"mdrsamplecheck"},"Record export":{"value":"records"},"Record verification":{"value":"recordverification"},"Risk management":{"value":"risks"},"Vendor list":{"value":"vendors"},"Vendor order statistics":{"value":"orderstatistics"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
-> GET/POST ./api/api.php/audit/export/{type}/{date}/{date/time}
+> GET/POST ./api/api.php/audit/export/{type}?{param}
 
-Returns a download link to a temporary file based on type.
+Returns filters for creation of or a download link to a temporary file based on type.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
-| {date} | path parameter | optional | e.g. contents validity limited to date/time |
-| {date/time} | path parameter | optional | e.g. contents validity limited to date/time |
+
+| {param} | query parameter/form data | optional | additional filters if applicable |
 
 Sample response
 ```
@@ -3806,8 +3801,9 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check, as well as automated matching with order state."},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","role":"link","tabindex":"0","title":"add deusith 3,5 by Fritz Minke GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Fritz Minke GmbH  deusith 3,5 "}]},{"type":"textsection","attributes":{"name":"Add article from 3 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('Platte', '3166.35 - 000', 'DEUSITH - Zuschnitte 60 x 45 cm, 70° Shore 3,5 mm, weiß, haut ', 'ab 5 Platten', 'Fritz Minke GmbH'); return false;","onkeydown":....
+{"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check. Please add information if the product has skin contact, an expiry date or if it is a trading good."},{"type":"textsection","attributes":{"name":"The first result is your manual order. Select this if there are no alternatives."}},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: '', ordernumber: '99b25', productname: '', vendor: 'Otto Bock Healthcare GmbH'}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: '', ordernumber: '99b25', productname: '', vendor: 'Otto Bock Healthcare GmbH'}); return false;","role":"link","tabindex":"0","title":"add  by Otto Bock Healthcare GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Otto Bock Healthcare GmbH 99b25  "}]},{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","role":"link","tabindex":"0","title":"add Schlauch-Strumpf by Otto Bock Healthcare GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"Stock item","data-type":"cart"},"content":"Otto Bock Healthcare GmbH 99B25 Schlauch-Strumpf Packung 4,03E+12"}]}]]]]}}
 ```
+
 > GET ./api/api.php/consumables/search/{usecase}?{search}
 
 Returns a search form based on usecase and products matching {search}. If {_usecase} is set to *product* the returned elements events lead to consumables editing or product information depending on permissions. *productselection* returns only results for the respective widget. *order* results lead to adding the selected product to a new order.
@@ -4665,13 +4661,14 @@ Sample response
 {"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/approved/null/{orderstate}?{payload}
+> GET ./api/api.php/order/approved/{null}/{orderstate}?{payload}
 
-Returns approved orders as data.
+Returns approved orders as data. {null} can be a search term for filtering primarily considered for internal use of notification messages. The paramteter will be overriden by the payload if applicable.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {null} | path parameter | optional | usually literal `null` but can also be a filtering term |
 | {orderstate} | path parameter | optional | ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived |
 | {payload} | query parameters | optional | term, timespan, unit, etc |
 
@@ -4702,12 +4699,12 @@ Sample response
 {"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/export/null/{orderstate}?{payload}
+> GET ./api/api.php/order/export/{null}/{orderstate}?{payload}
 
 Returns a PDF-export of approved order by selected state.
 
 Parameters
-see GET ./api/api.php/order/approved/null/{orderstate}?{payload}
+see GET ./api/api.php/order/approved/{null}/{orderstate}?{payload}
 
 Sample response
 ```
