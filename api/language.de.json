@@ -231,7 +231,7 @@
 			"413": "Anfrage zu groß",
 			"414": "Anfrage-URI zu lang",
 			"415": "Medientyp nicht unterstützt",
-			"416": "angefragter Bereicht kann nicht erfüllt werden",
+			"416": "angefragter Bereich kann nicht erfüllt werden",
 			"417": "Erwartungen wurden nicht erfüllt",
 			"500": "Interner Serverfehler",
 			"501": "Nicht Implementiert",
@@ -710,11 +710,13 @@
 		},
 		"records": {
 			"export": "Aufzeichnung als PDF exportieren",
+			"export_button": "Exportieren",
 			"export_csv": "Aufzeichnung als CSV exportieren",
+			"export_type": "Exportformat",
 			"export_xlsx": "Aufzeichnung als XLSX exportieren",
 			"end_date": "Bis",
 			"erp_case_number": "Vorgangsnummer",
-			"hint": "Es werden die jeweils neuesten Einträge aller Versorgungsdokumentationen, die im angegebenen Zeitraum begonnen wurden, exportiert. Diese können im Anschluss statistisch ausgewertet werden.",
+			"hint": "Der Export kann statistisch ausgewertet werden. Bitte Einträge herausfiltern, die nicht für Statistiken freigegeben sind, gemäß verwendeter Formulierungen der Dokumente und Patientenfreigabe, beziehungsweise deren Fehlen, sofern Teil der Dokumentation.",
 			"identifier": "Kennzeichen",
 			"start_date": "Von",
 			"type": "Typ",
@@ -727,6 +729,7 @@
 			"effective_date": "Gültigkeit am :date",
 			"measureacceptancelevel": "Akzeptanzlevel danach"
 		},
+		"risk_export_hint": "Risiken werden im gewählten Format ausgegeben, ein etwaiger Problembericht sofern verfügbar, als PDF.",
 		"risk_issues": {
 			"assignmenterror": "Folgende Risiken oder Eigenschaften des Prozesses :process haben einen Zuordnungsfehler. Bitte überarbeite:",
 			"characteristic": "Für den Prozess :process sind Risiken beschrieben, aber keine passenden Eigenschaften erfasst:",

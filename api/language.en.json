@@ -710,11 +710,13 @@
 		},
 		"records": {
 			"export": "Export record as PDF",
+			"export_button": "Export",
 			"export_csv": "Export record as CSV",
+			"export_type": "Export format",
 			"export_xlsx": "Export record as XLSX",
 			"end_date": "Until",
 			"erp_case_number": "ERP case number",
-			"hint": "The most recent entries of all treatment documentations starting within the given time period are about to be exported. These can be statistically analysed.",
+			"hint": "The export can be statistically analysed. Please filter out results that are not eligible for statistics according to your document wording and patient selection or rather lack of permission if part of the documentation.",
 			"identifier": "Identifier",
 			"start_date": "From",
 			"type": "Type",
@@ -727,6 +729,7 @@
 			"effective_date": "Effective as of :date",
 			"measureacceptancelevel": "Acceptance level afterwards"
 		},
+		"risk_export_hint": "Risks are exported in the selected format, a possible issue report if available, as PDF.",
 		"risk_issues": {
 			"assignmenterror": "Following risks or characteristics for :process have an assignment error. Please revise:",
 			"characteristic": "Risks are described for :process, but no fitting characteristics:",
