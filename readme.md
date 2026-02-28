@@ -9,10 +9,9 @@ see also [Usability test plan](#usability-test-plan) and [Usability test](#usabi
 ```mermaid
 graph LR;
     Prototyping-->test[Test environment];
-    test-->alpha["Alpha testing
-    with selected users"];
+    test-->alpha["Alpha testing with selected users"];
     alpha-.->it{{IT and data safety approval}};
-    it-.->network{{Network environment}};
+    it-.->network{{Network environment and infrastructure}};
     network-.->beta{{"Beta testing"}};
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
@@ -29,12 +28,8 @@ Things are still in motion. Images may be outdated.
     * https://databasefaqs.com/mariadb-set-auto-increment-value/, https://stackoverflow.com/questions/15821532/get-current-auto-increment-value-for-any-table
 
 ## to do
-* further implementation of tc-lib-pdf
-    * refactor _pdf.php
-* [https://github.com/openspout/openspout](https://github.com/openspout/openspout) instead of xlsx-writer in favour of ods support because open!
-    * consider ods output where applicable
-* markdown
-    * check export of checkboxes, mark, sub, sup
+* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
+* review openspout ods cell formatting
 
 ## Content
 * [Aims](#aims)
