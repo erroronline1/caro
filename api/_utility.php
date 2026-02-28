@@ -1092,7 +1092,7 @@ class MARKDOWN {
 	 * @param string $text Markdown styled
 	 * @return string as HTML
 	 */
-	public function md2html($text){
+	public function md2html($text, $forPDF = false){
 		$text = preg_replace("/\r/", '', $text);
 
 		$text = $this->blockquote($text); // should come first to enable nesting
@@ -1102,10 +1102,10 @@ class MARKDOWN {
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
 		$text = $this->emphasis($text);
 		$text = $this->img($text);
-		$text = $this->task($text); // before list otherwise only the first occasionally nested item is converted
+		$text = $this->task($text, $forPDF); // before list otherwise only the first occasionally nested item is converted
 		$text = $this->list($text);
 		$text = $this->mail($text);
-		$text = $this->mark($text);
+		$text = $this->mark($text, $forPDF);
 		$text = $this->pre($text);
 		$text = $this->s($text);
 		$text = $this->sub($text);
@@ -1327,8 +1327,12 @@ class MARKDOWN {
 		return $content;
 	}
 
-	private function mark($content){
+	private function mark($content, $forPDF = false){
 		// replace mark
+		if ($forPDF) return preg_replace($this->_mark,  // current implementation of tcpdf does not support mark
+			"<span style=\"background-color:yellow\">$1</span>",
+			$content);
+
 		return preg_replace($this->_mark,
 			"<mark>$1</mark>",
 			$content);
@@ -1413,8 +1417,14 @@ class MARKDOWN {
 		return $content;
 	}
 
-	private function task($content){
+	private function task($content, $forPDF = false){
 		//replace tasks
+		if ($forPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
+			function($match){
+				return (strtolower($match[1]) === 'x' ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];
+			},
+			$content
+		);
 		return preg_replace_callback($this->_task,
 			function($match){
 				return '<input type="checkbox" disabled' . (strtolower($match[1]) === 'x' ? ' checked': '') . ' class="markdown"> ' . $match[2];
