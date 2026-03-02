@@ -30,6 +30,14 @@ Things are still in motion. Images may be outdated.
 ## to do
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
+* records
+    * assignable unit to override automatic "detection"
+* [enhance data safety measures](#rejected-requirements)
+    * Two factor authentification with additional password/pin
+    * No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
+    * Token hashing in database
+    * Automate user access invalidation on set date
+    * consider statement on user verification before handing out login tokens
 
 ## Content
 * [Aims](#aims)
@@ -2711,6 +2719,7 @@ Stakeholder identification:
 * Office
 * Purchase
 * Operator of infrastructure
+* Data safety officer
 
 #### Discussed major stakeholder requirements:
 | Requirement / issue | Stakeholder | Time | Implementation |
@@ -2775,6 +2784,10 @@ Stakeholder identification:
 | Autodeletion for messages | User | 2025-11-06 | Implemented as optional user setting; 2025-11-07 |
 | Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 | Implemented; 2025-12-20 |
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
+| Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | |
+| No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | |
+| Token hashing in database | Data safety officer | 2026-03-02 | |
+| Automate user access invalidation on set date | Data safety officer | 2026-03-02 | |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
@@ -2788,6 +2801,7 @@ A solution could be established due to an erp database connection thus implement
 | Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission<br/>&bull; Vendor filter as text with dataset on product searches<br/>&bull; Record state filter: no display of further proceedings |
 | Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 | Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
+| Data safety officer demonstration | Data safety officer | 2026-03-02 | &bull; two factor login, add an additional password/pin to token login<br/>&bull; no onscreen display/download of signatures, add watermark to pdf output<br/>&bull; consider storing login tokens as hash (requires a new generation on every export)<br/>&bull; consider a mechanism to automate invalidating user access (e.g. on expected discharge)<br/>&bull; consider statement on user verification before handing out login tokens
 
 [Content](#content)
 
