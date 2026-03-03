@@ -270,7 +270,8 @@ class ORDER extends API {
 									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
+									. "\n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 								
 								// rewrite order as cancelled type
@@ -287,9 +288,10 @@ class ORDER extends API {
 									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered_full', [], true) . ': ' . $order['delivered_full'];
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
+									. "\n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered']
+									. "\n" . $this->_lang->GET('order.order.delivered_full', [], true) . ': ' . $order['delivered_full']
+									. "\n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 
 								// determine criticality, append to info or review incorporation

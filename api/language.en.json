@@ -1444,6 +1444,7 @@
 		"order_filter_etc": "Other filters",
 		"order_filter_label": "Searchterm",
 		"order_last_ordered": "Last ordered and delivered on :date",
+		"ordered_on": "Processed on",
 		"order_type": "Order type",
 		"order_reference": "ERP order reference",
 		"order_type_revoked": "State as :type revoked",
