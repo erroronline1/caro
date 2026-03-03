@@ -34,10 +34,12 @@ Things are still in motion. Images may be outdated.
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
     * Two factor authentification with additional password/pin
-    * No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
-    * Token hashing in database
-    * Automate user access invalidation on set date
+    * No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively): imagesettile()
+    * Token hashing in database?
+    * Automate user access invalidation on set date, defined within user management
     * consider statement on user verification before handing out login tokens
+* reconsider storing files in media database for backup reasons? performance may be not that important after all
+    * except non critical profile pictures, sharepoint, tmp
 
 ## Content
 * [Aims](#aims)
