@@ -38,25 +38,74 @@ function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE
 
 			// patterned watermark
 			if ($watermarkPattern){
-				imagealphablending($output, true);
+				// create a gradient ressource
+				// adapted from https://www.php.net/manual/en/function.imagefill.php#93920
+				$gradient = imagecreatetruecolor($new['w'], $new['h']);
+				$colors = [
+					[255, 0, 0], // top left
+					[0, 255, 0], // top right
+					[0, 0, 255], // bottom left
+					[255, 255, 0], // bottom right
+				];
 
-				// load pattern and make it more transparent
+				$rgb = $colors[0]; // start with top left color
+				for($x = 0; $x <= $new['w']; $x++) { // loop columns
+					for($y = 0; $y <= $new['h']; $y++) { // loop rows
+					// set pixel color 
+					$col = imagecolorallocate($gradient, $rgb[0], $rgb[1], $rgb[2]);
+					imagesetpixel($gradient, $x - 1, $y - 1, $col);
+					// calculate new color  
+					for($i = 0; $i <= 2; $i++) {
+						$rgb[$i] =
+							$colors[0][$i] * (($new['w'] - $x) * ($new['h'] - $y) / ($new['w'] * $new['h'])) +
+							$colors[1][$i] * ($x * ($new['h'] - $y) / ($new['w'] * $new['h'])) +
+							$colors[2][$i] * (($new['w'] - $x) * $y / ($new['w'] * $new['h'])) +
+							$colors[3][$i] * ($x * $y / ($new['w'] * $new['h']));
+						}
+					}
+
+				}
+
+				// load pattern
 				$tileSrc = imagecreatefrompng('../media/favicon/watermarkpattern.png');
-				imagealphablending($tileSrc, false);
-				imagesavealpha($tileSrc, true);
-				imagefilter($tileSrc, IMG_FILTER_COLORIZE,0,0,0,72);
+				$tileSrc_dim = ['w' => imagesx($tileSrc), 'h' => imagesy($tileSrc)];
 
-				// create smaller pattern ressource
-				$tile = imagecreatetruecolor(10,10);
-				imagefill($tile, 0, 0, imagecolorallocatealpha($tile, 0, 0, 0, 127));
-				imagecolortransparent($tile, imagecolorallocate($tile, 0, 0, 0));
-				imagecopyresampled($tile, $tileSrc, 0, 0, 0, 0, 10, 10, 88, 72);
+				// create smaller pattern ressource based on output dimensions
+				$tile_w = max($new['w'] * .035, 15);
+				$tile_h = $tile_w * $tileSrc_dim['h'] / $tileSrc_dim['w'] ;
+				$tile = imagecreatetruecolor($tile_w, $tile_h);
+				imagealphablending($tile, false);
+				imagesavealpha($tile, true);
+				imagecopyresampled($tile, $tileSrc, 0, 0, 0, 0, $tile_w, $tile_h, $tileSrc_dim['w'], $tileSrc_dim['h']);
+				$tileSrc = null;
 
-				// apply tiled pattern
-				imagesettile($output, $tile);
-				imagefilledrectangle($output, 0, 0, $new['w'], $new['h'], IMG_COLOR_TILED);
+				// create a tiled ressource as mask
+				$tiled = imagecreatetruecolor($new['w'], $new['h']);
+				imagealphablending($tiled, false);
+				imagesavealpha($tiled, true);
+				imagesettile($tiled, $tile);
+				imagefilledrectangle($tiled, 0, 0, $new['w'], $new['h'], IMG_COLOR_TILED);
+				$tile = null;
 
-				imagealphablending($output, false);
+				// create the gradient masked by tiled
+				$watermarkLayer = imagecreatetruecolor($new['w'], $new['h']);;
+				imagealphablending($tiled, false);
+				imagesavealpha($watermarkLayer, true);
+				imagefill($watermarkLayer, 0, 0, imagecolorallocatealpha($watermarkLayer, 0, 0, 0, 127));
+
+				// Perform pixel-based alpha map application
+				// adapted from https://stackoverflow.com/a/10942364
+				for ($x = 0; $x < $new['w']; $x++) {
+					for ($y = 0; $y < $new['h']; $y++) {
+						$mask = imagecolorsforindex($tiled, imagecolorat($tiled, $x, $y));
+						$color = imagecolorsforindex($gradient, imagecolorat($gradient, $x, $y));
+						imagesetpixel($watermarkLayer, $x, $y, imagecolorallocatealpha( $watermarkLayer, $color[ 'red' ], $color[ 'green' ], $color[ 'blue' ], $mask['alpha'])); // apply the masks alpha value
+					}
+				}
+
+				// merge the gradient watermark with output
+				imagecopymerge($output, $watermarkLayer, 0, 0, 0, 0, $new['w'], $new['h'], 35);
+				$tiled = $watermarkLayer = null;
 			}
 
 			$scale = .15; // of shorter length
@@ -151,7 +200,7 @@ function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE
 }
 
 
-alterImage('../media/developer.png', 1024, UTILITY_IMAGE_STREAM, false, '', '', true);
+alterImage('../assets/CAROsignature.jpg', 512, UTILITY_IMAGE_STREAM, false, '', '', true);
 
 die();
 require_once('_language.php');
