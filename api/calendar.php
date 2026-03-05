@@ -271,7 +271,8 @@ class CALENDAR extends API {
 					$start->modify('first day of this month');
 					$end = new \DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')));
 					$end->modify('last day of this month');
-					$span = $start->diff($end)->format('%m') * 2; // half months
+					$span = $end->diff($start);
+					$span = ($span->m + 12 * $span->y) *2;
 					if ($span < 2) $this->response([], 406);
 
 					// import if requested
@@ -292,6 +293,7 @@ class CALENDAR extends API {
 						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
 					}
 					
+					$content = [];
 					// import if available, do first to append new given names
 					if (isset($schedule['misc']['content'])){
 						foreach ($schedule['misc']['content'] as $name => $importtimeunit){
@@ -303,7 +305,6 @@ class CALENDAR extends API {
 						}
 					}
 					// create default content with requested names assigning default timeunits
-					$content = [];
 					foreach ($this->_payload as $key => $value){
 						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
 							$content[$value] = $defaulttimeunits;
@@ -343,56 +344,33 @@ class CALENDAR extends API {
 					// payload prepared by _client.calendar.longtermplanning()
 					$content = json_decode($this->_payload->content, true);
 					$preset = json_decode($this->_payload->preset, true);
-					$id = $this->_payload->id;
+					$id = $this->_payload->id ? : null;
 					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')]) : null;
 					if (!$content) $this->response([], 406);
 
-					if (intval($id) > 0){
-						// update
-						$columns = [
-							':id' => $id,
-							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
-							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
-							':author_id' => $_SESSION['user']['id'],
-							':affected_user_id' => null,
-							':organizational_unit' => null,
-							':subject' => $this->_payload->name,
-							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => $closed,
-							':alert' => null,
-							':autodelete' => null
-						];
-						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
-							'values' => $columns
-						])) $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
-								'type' => 'success'
-							]]);
-					} else {
-						// post
-						$columns = [
-							':type' => 'longtermplanning',
-							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
-							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
-							':author_id' => $_SESSION['user']['id'],
-							':affected_user_id' => null,
-							':organizational_unit' => null,
-							':subject' => $this->_payload->name,
-							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => $closed,
-							':alert' => null,
-							':autodelete' => null
-						];
-						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-							'values' => $columns
-						])) $this->response([
-							'response' => [
-								'id' => $this->_pdo->lastInsertId(),
-								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
-								'type' => 'success'
-							]]);
-					}
+					// post
+					$columns = [
+						':id' => $id,
+						':type' => 'longtermplanning',
+						':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
+						':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
+						':author_id' => $_SESSION['user']['id'],
+						':affected_user_id' => null,
+						':organizational_unit' => null,
+						':subject' => $this->_payload->name,
+						':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
+						':closed' => $closed,
+						':alert' => null,
+						':autodelete' => null
+					];
+					if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+						'values' => $columns
+					])) $this->response([
+						'response' => [
+							'id' => $this->_pdo->lastInsertId(),
+							'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
+							'type' => 'success'
+						]]);
 
 					$this->response([
 						'response' => [
