@@ -34,12 +34,14 @@ Things are still in motion. Images may be outdated.
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
     * Two factor authentification with additional password/pin
-    * No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively): imagesettile()
+    * No downloadable onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
     * Token hashing in database?
     * Automate user access invalidation on set date, defined within user management
     * consider statement on user verification before handing out login tokens
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
-    * except non critical profile pictures, sharepoint, tmp
+    * except non critical profile pictures, sharepoint, tmp, order attachments
+* signature max size 512 and drawing canvas dimension accuracy, watermark pattern source more delicate
+* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html
 
 ## Content
 * [Aims](#aims)
