@@ -1772,7 +1772,6 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					vorgaenge.STATUS = 0
 					AND [sys].GENEHMIGT NOT IN ('abgelehnt', 'Storno', 'verstorben')
 					AND [sys2].GELIEFERT NOT IN ('geliefert')
-					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
 					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
 					AND UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
@@ -1860,7 +1859,6 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			
 					WHERE 
 					vorgaenge.STATUS = 0
-					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 0
 					AND vorgaenge.FAKTURIERT_DATUM IS NULL
 					AND [sys2].GELIEFERT NOT IN ('geliefert')
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
