@@ -265,12 +265,13 @@ class API {
 			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) // on submitting a token return confirmed
 		);
 
-		if (isset($_SESSION['user'])
-			&& !($token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)))
-			&& !($two_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor', [], true)))
-		) {
-			$token = $_SESSION['user']['token'];
-			$two_factor = $_SESSION['user']['two_factor'] ?? null;
+		$token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) ?: null;
+		$two_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor', [], true)) ?: null;
+		if (isset($_SESSION['user'])){
+			if (!$token)
+				$token = $_SESSION['user']['token'];
+			if (!$two_factor)
+				$two_factor = $_SESSION['user']['two_factor'] ?? null;
 		}
 
 		$valid = false;
@@ -279,8 +280,8 @@ class API {
 			// get user by token and their application settings for frontend setup
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
-					':token' => strval($token),
-					//':two_factor' => intval($two_factor)
+					':token' => $token,
+					':two_factor' => $two_factor
 				]
 			]);
 			$user = $user ? $user[0]: null;
@@ -347,13 +348,15 @@ class API {
 							'type' => 'scanner',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.token', [], true),
-								'type' => 'password'
+								'type' => 'password',
+								'required' => true
 							]
 						], [
-							'type' => 'input',
+							'type' => 'number',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.two_factor', [], true),
-								'type' => 'password'
+								'type' => 'password',
+								//'required' => true
 							]
 						]
 					]
