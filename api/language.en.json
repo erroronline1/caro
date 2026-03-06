@@ -241,7 +241,6 @@
 			"505": "HTTP Version Not Supported",
 			"507": "Insufficient Storage"
 		},
-		"login": "User authentification",
 		"navigation": {
 			"about": "About CARO App",
 			"ariaSkipMenuOption": "next menu option for :option",
@@ -1862,6 +1861,8 @@
 		}
 	},
 	"user": {
+		"auto_access_denial": "Automated access denial on",
+		"auto_access_denial_hint": "On this date a new token will be generated. This restricts the access in the first place but does not delete the user yet.",
 		"delete_button": "Delete user",
 		"delete_confirm_cancel": "No, thank you",
 		"delete_confirm_header": "Delete :name permanently?",
@@ -1874,7 +1875,7 @@
 		"existing_user": "Search by name",
 		"existing_user_new": "New user",
 		"existing_user_select": "Edit existing user",
-		"export_qr_token": "Export QR token",
+		"export_login_credentials": "Export current login credentials",
 		"export_user_image": "Export user image",
 		"name": "Name",
 		"order_authorization": "Order authorization pin",
@@ -1922,7 +1923,7 @@
 		"take_photo_hint": "This photo is public to all users, e.g. in messages",
 		"timesheet_format_error": "Saving aborted, one of the entries for time tracking have an invalid format!",
 		"token": "Access token",
-		"token_renew": "Renew on save",
+		"token_renew": "Renew token on save",
 		"training": {
 			"add_training": "Add training",
 			"add_date": "Date of training",
@@ -1950,6 +1951,8 @@
 			"schedule_timespan": "Time of scheduled training",
 			"schedule_timespan_hint": "e.g. a date, month or calendar quarter"
 		},
+		"two_factor": "2FA-pin",
+		"two_factor_renew": "Renew 2FA-pin on save",
 		"units": "Organizational units",
 		"units_hint": "e.g. only orders from the selected units appear for this user",
 		"user_deleted": "User :name has been permanently deleted",

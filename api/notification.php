@@ -623,6 +623,32 @@ class NOTIFICATION extends API {
 
 							$execution = true;
 							break;
+						case 'restrict_user_access':
+							// set new token for users that have an expired access date
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$sqlchunks = [];
+							foreach($users as $user){
+								if (!$user['invalidation_date']) continue;
+								if ($user['invalidation_date'] < date('Y-m-d')) {
+									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('user_put_auto_restrict'),
+									[
+										':id' => $user['id'],
+										':token' => $this->_pdo->quote(hash('sha256', $user[':name'] . random_int(100000,999999) . time())),
+									]) . '; ');
+								}
+							}
+							foreach ($sqlchunks as $chunk){
+								try {
+									SQLQUERY::EXECUTE($this->_pdo, $chunk);
+								}
+								catch (\Exception $e) {
+									echo $e, $chunk;
+									die();
+								}
+							}
+
+							$execution = true;
+							break;
 						case 'schedule_archived_orders_review':
 							// schedule archived approved orders review
 							$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');

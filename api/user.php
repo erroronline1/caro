@@ -97,6 +97,8 @@ class USER extends API {
 					':image' => $user['image'],
 					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
 					':skills' => $user['skills'],
+					':invalidation_date' => $user['invalidation_date'],
+					':two_factor' => $user['two_factor']
 				];
 
 				// convert image
@@ -651,6 +653,8 @@ class USER extends API {
 					':image' => $user['image'] ?? '',
 					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
 					':skills' => [],
+					':invalidation_date' => $user['invalidation_date'],
+					':two_factor' => $user['two_factor']
 				];
 
 				//check forbidden names
@@ -744,6 +748,10 @@ class USER extends API {
 				// generate token
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
 					$user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
+				}
+				// generate 2fa-pin
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor_renew'))){
+					$user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
 				}
 
 				// save and convert image or create default
@@ -864,7 +872,9 @@ class USER extends API {
 					'orderauth' => '',
 					'image' => '',
 					'app_settings' => '',
-					'skills' => ''
+					'skills' => '',
+					'invalidation_date' => '',
+					'two_factor' => ''
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $response['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
@@ -1101,8 +1111,17 @@ class USER extends API {
 								'name' => $this->_lang->GET('user.token')
 							],
 							'content' => [
-								$this->_lang->GET('user.token_renew') => []
+								$this->_lang->GET('user.token_renew') => [],
+								$this->_lang->GET('user.two_factor_renew') => []
 							]
+						],
+						[
+							'type' => 'date',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.auto_access_denial'),
+								'value' => $user['invalidation_date']
+							],
+							'hint' => $this->_lang->GET('user.auto_access_denial_hint')
 						],
 						[
 							'type' => 'deletebutton',
@@ -1164,7 +1183,7 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => $this->_lang->GET('user.export_qr_token'),
+								'description' => $this->_lang->GET('user.export_login_credentials'),
 								'attributes' => [
 									'name' => $user['name'] . '_token.png',
 									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name']))
