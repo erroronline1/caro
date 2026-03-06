@@ -36,7 +36,7 @@ function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE
 			imagecolortransparent($output, imagecolorallocate($output, 0, 0, 0));
 			imagecopyresampled($output, $input, 0, 0, 0, 0, $new['w'], $new['h'], $src['w'], $src['h']);
 
-			// patterned watermark
+			// patterned watermark to raise the difficulty in misusing a signature
 			if ($watermarkPattern){
 				// create a gradient ressource
 				// adapted from https://www.php.net/manual/en/function.imagefill.php#93920
@@ -103,6 +103,8 @@ function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE
 					}
 				}
 
+				// blur edges a bit to make it more difficult to select edges for removing watermark
+				imagefilter($output, IMG_FILTER_SMOOTH, 10);
 				// merge the gradient watermark with output
 				imagecopymerge($output, $watermarkLayer, 0, 0, 0, 0, $new['w'], $new['h'], 35);
 				$tiled = $watermarkLayer = null;
@@ -199,8 +201,8 @@ function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE
 		}
 }
 
-
-alterImage('../assets/CAROsignature.jpg', 512, UTILITY_IMAGE_STREAM, false, '', '', true);
+// make signatures low res to have a shitty enough quality to not make it reuseable but good enough to recognize in caro context
+alterImage('../assets/CAROsignature.jpg', 192, UTILITY_IMAGE_STREAM, false, '', '', true);
 
 die();
 require_once('_language.php');
