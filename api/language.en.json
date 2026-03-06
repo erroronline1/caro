@@ -1877,6 +1877,7 @@
 		"existing_user_select": "Edit existing user",
 		"export_login_credentials": "Export current login credentials",
 		"export_user_image": "Export user image",
+		"login_credentials": "Login credentials",
 		"name": "Name",
 		"order_authorization": "Order authorization pin",
 		"order_authorization_current": "Current order authorization pin",

@@ -730,13 +730,14 @@ class USER extends API {
 				}
 				$user[':skills'] = $user[':skills'] ? implode(',', $user[':skills']) : null;
 
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
 				// generate order auth
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
 					$user[':orderauth'] = '';
 				}
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
-					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
 						$orderauths[] = $row['orderauth'];
 					}
@@ -745,13 +746,20 @@ class USER extends API {
 					} while (in_array($user[':orderauth'], $orderauths));
 				}
 
-				// generate token
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
-					$user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
+				// renew login credentials
+				if ($renewCredentials = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_credentials'))){
+					$renewCredentials = explode(' | ', $renewCredentials);
+					if (in_array($this->_lang->PROPERTY('user.token_renew'), $renewCredentials))
+						// generate token
+						$user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
+					if (in_array($this->_lang->PROPERTY('user.two_factor_renew'), $renewCredentials))
+						// generate 2fa-pin
+						$user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
 				}
-				// generate 2fa-pin
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor_renew'))){
-					$user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
+				// if current user is permitted to change their own data, keep the ongoing session alive
+				if ($user[':id'] === $_SESSION['user']['id']){
+					$_SESSION['user']['token'] = $user[':token'];
+					$_SESSION['user']['two_factor'] = $user[':two_factor'];
 				}
 
 				// save and convert image or create default
@@ -1108,7 +1116,7 @@ class USER extends API {
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.token')
+								'name' => $this->_lang->GET('user.login_credentials')
 							],
 							'content' => [
 								$this->_lang->GET('user.token_renew') => [],
@@ -1186,7 +1194,7 @@ class USER extends API {
 								'description' => $this->_lang->GET('user.export_login_credentials'),
 								'attributes' => [
 									'name' => $user['name'] . '_token.png',
-									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name']))
+									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name'], $user['two_factor']))
 								],
 								'dimensions' => [
 									'width' => 1024,
@@ -1252,7 +1260,7 @@ class USER extends API {
 	 *
 	 * returns an image in credit card format containing a token qr and the user name
 	 */
-	private function token($CODE, $STRING){
+	private function token($CODE, $STRING, $PIN = null){
 		if (!PERMISSION::permissionFor('users')) return null;
 
 		require(__DIR__ . '/../vendor/autoload.php');
@@ -1278,11 +1286,17 @@ class USER extends API {
 		imagecopyresampled($image, $pngcode->getGD(), $margin['qr']['x'], $margin['qr']['y'], 0, 0, $dimensions[1] - $margin['qr']['x'] * 4, $dimensions[1] - $margin['qr']['y'] * 2, intval($code_data['full_width']), intval($code_data['full_width']));
 
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
+		$pin_color = imagecolorallocate($image, 191, 97, 106); // nord red
 		$font_size = 36;
 		$l = 0;
 		foreach (preg_split('/\s+/m', $STRING) as $line){
 			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, __DIR__ . '/../media/UbuntuMono-R.ttf', $line);
 		}
+		if ($PIN) {
+			imagefttext($image, $font_size, 90, $dimensions[0] - 2 * $font_size, $dimensions[1], $pin_color, __DIR__ . '/../media/UbuntuMono-R.ttf', str_repeat('.', 25));
+			imagefttext($image, $font_size, 90, $dimensions[0] - $font_size, $dimensions[1]-$margin['qr']['y'], $pin_color, __DIR__ . '/../media/UbuntuMono-R.ttf', $PIN);
+		}
+
 		ob_start();
 		imagepng($image);
 		$image = ob_get_contents();

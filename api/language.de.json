@@ -1877,6 +1877,7 @@
 		"existing_user_select": "Bestehende Nutzer verwalten",
 		"export_login_credentials": "Aktuelle Anmeldeinformationen exportieren",
 		"export_user_image": "Exportiere Profilbild",
+		"login_credentials": "Anmeldeinformationen",
 		"name": "Name",
 		"order_authorization": "Bestellberechtigungs-PIN",
 		"order_authorization_current": "Aktuelle Bestellberechtigungs-PIN",
