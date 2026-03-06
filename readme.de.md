@@ -1109,6 +1109,7 @@ Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Au
 * alert_unclosed_audits
 * alert_undelivered_orders
 * delete_files_and_calendar
+* restrict_user_access
 * schedule_archived_orders_review
 * schedule_outdated_consumables_documents_review
 * schedule_responsibilities_renewal
