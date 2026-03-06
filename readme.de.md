@@ -194,7 +194,7 @@ Das Verfahren der Personenvalidierung vor der Nutzernanlage sollte aus Datenschu
 
 Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden.
 
-Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Im Falle einer vergebenen empfohlenen Zwei-Faktor-PIN ist diese Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
+Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Die Zwei-Faktor-PIN ist Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
@@ -1914,7 +1914,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*
 * Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind. Die Durchführung kann nur erfolgen, wenn ein Nutzer mit Administrator-Berechtigung angemeldet ist.
-* Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Eine PIN sollte ebenfalls in Erwägung gezogen werden. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
+* Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren, inclusive PIN, die nicht Bestandteil der initialen Installation ist. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine [Installation als Progressive Web App (PWA)](https://developer.mozilla.org/de/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_aus_dem_web) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 Nach der Installation können

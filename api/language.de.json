@@ -1878,6 +1878,7 @@
 		"export_login_credentials": "Aktuelle Anmeldeinformationen exportieren",
 		"export_user_image": "Exportiere Profilbild",
 		"login_credentials": "Anmeldeinformationen",
+		"login_credentials_renew": "Anmeldeinformationen beim Speichern erneuern",
 		"name": "Name",
 		"order_authorization": "Bestellberechtigungs-PIN",
 		"order_authorization_current": "Aktuelle Bestellberechtigungs-PIN",
@@ -1924,7 +1925,6 @@
 		"take_photo_hint": "Das Bild ist für alle Nutzer sichtbar, wie z.B. in den Unterhaltungen.",
 		"timesheet_format_error": "Speichern nicht möglich, eine der Angaben zur Zeiterfassung haben kein gültiges Format!",
 		"token": "Zugangstoken",
-		"token_renew": "Zugangstoken beim Speichern erneuern",
 		"training": {
 			"add_training": "Schulung hinzufügen",
 			"add_date": "Datum der Schulung",
@@ -1953,7 +1953,6 @@
 			"schedule_timespan_hint": "z.B. ein Datum, Monat oder Quartal"
 		},
 		"two_factor": "2FA-Pin",
-		"two_factor_renew": "2FA-Pin beim Speichern erneuern",
 		"units": "Bereich",
 		"units_hint": "Es werden z.B. nur Bestellungen der zugeordneten Bereiche angezeigt.",
 		"user_deleted": "Der Nutzer :name wurde dauerhaft gelöscht",

@@ -848,7 +848,7 @@ export const api = {
 						break;
 					case "export":
 						// take whatever request param is formdata
-						for (const[index, value] of Object.entries(request)){
+						for (const [index, value] of Object.entries(request)) {
 							if (value instanceof FormData) {
 								payload = value;
 								delete request[index];
@@ -871,7 +871,7 @@ export const api = {
 						break;
 					default:
 						// take whatever request param is formdata
-						for (const[index, value] of Object.entries(request)){
+						for (const [index, value] of Object.entries(request)) {
 							if (value instanceof FormData) {
 								payload = value;
 								delete request[index];
@@ -1929,14 +1929,8 @@ export const api = {
 					case "records":
 						payload = {
 							_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
-							_unit:
-								document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`)
-									? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value
-									: null,
-							_state:
-								document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`)
-									? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value
-									: null,
+							_unit: document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value : null,
+							_state: document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value : null,
 						};
 						for (const [key, value] of Object.entries(payload)) {
 							if (!value) delete payload[key];
@@ -2433,20 +2427,6 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "token":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-						break;
 					case "training":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -2486,7 +2466,22 @@ export const api = {
 					// training
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];
-				} else payload = _.getInputs("[data-usecase=user]", true);
+				} else {
+					payload = _.getInputs("[data-usecase=user]", true);
+					successFn = function (data) {
+						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						if (data.render !== undefined) {
+							const options = {};
+							options[api._lang.GET("general.ok_button")] = false;
+							new Dialog({
+								type: "input",
+								render: data.render,
+								options: options,
+							});
+						}
+					};
+					break;
+				}
 				break;
 			case "patch":
 				// profile

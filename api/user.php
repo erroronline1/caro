@@ -747,14 +747,12 @@ class USER extends API {
 				}
 
 				// renew login credentials
+				$exportToken = [];
 				if ($renewCredentials = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_credentials'))){
-					$renewCredentials = explode(' | ', $renewCredentials);
-					if (in_array($this->_lang->PROPERTY('user.token_renew'), $renewCredentials))
-						// generate token
-						$user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
-					if (in_array($this->_lang->PROPERTY('user.two_factor_renew'), $renewCredentials))
-						// generate 2fa-pin
-						$user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
+					// generate token
+					$exportToken[':token'] = $user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
+					// generate 2fa-pin
+					$exportToken[':two_factor'] = $user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
 				}
 				// if current user is permitted to change their own data, keep the ongoing session alive
 				if ($user[':id'] === $_SESSION['user']['id']){
@@ -834,12 +832,28 @@ class USER extends API {
 						];
 						$this->alertUserGroup(['user' => [$user[':name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
 					}
-					$this->response([
-					'response' => [
-						'id' => $user[':id'] ? : $this->_pdo->lastInsertId(),
-						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
-						'type' => 'success'
-					]]);
+					$response = [
+						'response' => [
+							'id' => $user[':id'] ? : $this->_pdo->lastInsertId(),
+							'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
+							'type' => 'success'
+						]
+					];
+					if ($renewCredentials) $response['render'] = [
+						[
+							'type' => 'image',
+							'description' => $this->_lang->GET('user.export_login_credentials'),
+							'attributes' => [
+								'name' => $user[':name'] . '_token.png',
+								'url' => 'data:image/png;base64, ' . base64_encode($this->token($exportToken[':token'] ?? '', $user[':name'], $exportToken[':two_factor'] ?? ''))
+							],
+							'dimensions' => [
+								'width' => 1024,
+								'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
+							]
+						]
+					];
+					$this->response($response);
 				}
 				else $this->response([
 					'response' => [
@@ -1119,8 +1133,7 @@ class USER extends API {
 								'name' => $this->_lang->GET('user.login_credentials')
 							],
 							'content' => [
-								$this->_lang->GET('user.token_renew') => [],
-								$this->_lang->GET('user.two_factor_renew') => []
+								$this->_lang->GET('user.login_credentials_renew') => [],
 							]
 						],
 						[
@@ -1184,25 +1197,6 @@ class USER extends API {
 							]
 						],
 						$response['render']['content'][3]
-					];
-
-					// append login token options
-					if ($user['token']) $response['render']['content'][6]=[
-						[
-							[
-								'type' => 'image',
-								'description' => $this->_lang->GET('user.export_login_credentials'),
-								'attributes' => [
-									'name' => $user['name'] . '_token.png',
-									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name'], $user['two_factor']))
-								],
-								'dimensions' => [
-									'width' => 1024,
-									'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
-								]
-							]
-						],
-						$response['render']['content'][6]
 					];
 
 				$this->response($response);

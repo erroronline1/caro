@@ -293,7 +293,7 @@ Please describe how you validate the person you are registering as a new user fo
 
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified.
 
-The generated access token can be exported and, for example, used as a laminated card. If the recommended two-factor-pin is selected it will be part of the export and is to be cut off and disposed of prior to laminating.
+The generated access token can be exported and, for example, used as a laminated card. The two-factor-pin is part of the export and is to be cut off and disposed of prior to laminating.
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
@@ -2016,7 +2016,7 @@ If you are going to prepare the deployment you are free to create multiple files
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*
 * choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken. You must be logged in with adminstrator privileges to take these actions.
-* Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Consider adding a pin, export the token qr-code and store it in a safe place!
+* Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token including a pin that is not part of the initial installation. Export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
 
 After installation you can
@@ -2842,7 +2842,7 @@ A solution could be established due to an erp database connection thus implement
 | Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within network environment not accessible from the web | none |
 | Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
 | Unencrypted data access | Medium | High (regulatory penalties) | Use within network environment not accessible from the web | Bears the same risk as accessing confidential data on personal network drives |
-| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens and non custom minimum 5 integer pin | |
+| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens and non custom minimum 5 digit pin | |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
 | No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
 | User error | High | High (faulty data) | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |

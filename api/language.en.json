@@ -1878,6 +1878,7 @@
 		"export_login_credentials": "Export current login credentials",
 		"export_user_image": "Export user image",
 		"login_credentials": "Login credentials",
+		"login_credentials_renew": "Renew credentials on save",
 		"name": "Name",
 		"order_authorization": "Order authorization pin",
 		"order_authorization_current": "Current order authorization pin",
@@ -1924,7 +1925,6 @@
 		"take_photo_hint": "This photo is public to all users, e.g. in messages",
 		"timesheet_format_error": "Saving aborted, one of the entries for time tracking have an invalid format!",
 		"token": "Access token",
-		"token_renew": "Renew token on save",
 		"training": {
 			"add_training": "Add training",
 			"add_date": "Date of training",
@@ -1953,7 +1953,6 @@
 			"schedule_timespan_hint": "e.g. a date, month or calendar quarter"
 		},
 		"two_factor": "2FA-pin",
-		"two_factor_renew": "Renew 2FA-pin on save",
 		"units": "Organizational units",
 		"units_hint": "e.g. only orders from the selected units appear for this user",
 		"user_deleted": "User :name has been permanently deleted",
