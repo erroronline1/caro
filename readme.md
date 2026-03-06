@@ -33,15 +33,17 @@ Things are still in motion. Images may be outdated.
 * records
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
-    * Two factor authentification with additional password/pin
+    * Two factor authentification with additional password/pin, export in one credential image
     * No downloadable onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
     * Token hashing in database?
-    * Automate user access invalidation on set date, defined within user management
+    * Automate user access invalidation on set date, defined within user management -> documentation
     * consider statement on user verification before handing out login tokens
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
 * signature max size 192
 * NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/
+* enable multiple signatures (cpo/patient)
+* whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
 
 ## Content
 * [Aims](#aims)
@@ -1212,6 +1214,7 @@ The 'cron job' initiates automated message alerts and scheduled tasks (see below
 * alert_unclosed_audits
 * alert_undelivered_orders
 * delete_files_and_calendar
+* restrict_user_access
 * schedule_archived_orders_review
 * schedule_outdated_consumables_documents_review
 * schedule_responsibilities_renewal
@@ -2791,7 +2794,7 @@ Stakeholder identification:
 | Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | |
 | No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | |
 | Token hashing in database | Data safety officer | 2026-03-02 | |
-| Automate user access invalidation on set date | Data safety officer | 2026-03-02 | |
+| Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
