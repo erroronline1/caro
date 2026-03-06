@@ -310,6 +310,8 @@ define('DEFAULTSQL', [
 				"	`image` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`app_settings` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`skills` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`invalidation_date` date NULL DEFAULT NULL," .
+				"	`two_factor` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -629,6 +631,8 @@ define('DEFAULTSQL', [
 				"	image varchar(MAX) NOT NULL," .
 				"	app_settings varchar(MAX) NOT NULL," .
 				"	skills varchar(MAX) NOT NULL" .
+				"	invalidation_date date NULL DEFAULT NULL," .
+				"	two_factor varchar(255) NULL DEFAULT NULL," .
 				");"
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_responsibility', N'U') IS NULL " .
@@ -925,7 +929,9 @@ class INSTALL {
 				':orderauth' => '',
 				':image' => 'media/favicon/icon192.png',
 				':app_settings' => '',
-				':skills' => ''
+				':skills' => '',
+				':invalidation_date' => null,
+				':two_factor' => null
 			]
 		])) $response .= $this->printSuccess('Default user has been installed.');
 		else $response .= $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
@@ -1309,6 +1315,7 @@ class INSTALL {
 					$orderauths[] = $entry['orderauth'];
 				}
 				$entry['token'] = hash('sha256', $entry['name'] . random_int(100000,999999) . time());
+				$entry['two_factor'] = random_int(10000, max(99999, count($DBall)*100));
 
 				$tempPhoto = tmpfile();
 				fwrite($tempPhoto, $this->defaultPic($entry['name'])); 
@@ -1330,7 +1337,7 @@ class INSTALL {
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 				$entry['units'] = preg_split('/[^\w\d]+/m', $entry['units'] ? : '');
 				// set default primary unit if only one has been selected
-				if (count($entry['units']) && count($entry['units']) < 2)$user['app_settings']['primaryUnit'] = $entry['units'][0];
+				if (count($entry['units']) && count($entry['units']) < 2) $user['app_settings']['primaryUnit'] = $entry['units'][0];
 				$entry['units'] = implode(',', $entry['units']);
 
 				$names[] = $entry['name'];
@@ -1346,6 +1353,8 @@ class INSTALL {
 					':image' =>$this->_pdo->quote( $entry['image']),
 					':app_settings' =>$this->_pdo->quote( UTILITY::json_encode($entry['app_settings'])),
 					':skills' => '',
+					':invalidation_date' => 'NULL',
+					':two_factor' => $this->_pdo->quote($entry['two_factor'])
 				]) . '; ');
 			}
 		}

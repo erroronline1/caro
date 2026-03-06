@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_01_26'] as $update){
+		foreach (['_2026_03_06'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -431,6 +431,21 @@ class UPDATE{
 		];
 	}
 
+	private function _2026_03_06(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_user ADD COLUMN IF NOT EXISTS invalitation_date date NULL DEFAULT NULL, two_factor tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_user', 'invalitation_date') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_user" .
+				"    ADD invalidation_date date NULL DEFAULT NULL," .
+				"        two_factor varchar(255) NULL DEFAULT NULL" .
+				" END; "
+			]
+		];
+	}
 }
 
 $db = new UPDATE();
