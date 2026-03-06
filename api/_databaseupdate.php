@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_06'] as $update){
+		foreach (['_2026_03_06_credentials'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -446,6 +446,53 @@ class UPDATE{
 				" END; "
 			]
 		];
+	}
+
+	private function _2026_03_06_credentials(){
+		echo '<br /><br />[!] This update hashes the login credentials of the user database. The actual execution has to be activated within this files <code>_2026_03_06_credentials</code> update sourcecode. Please refrain from repetition as you will have to recreate login credentials for all users and we both do not want this.<br />';
+		
+		/////////////////////////////
+		$EXECUTE = false;
+		////////////////////////////
+
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		foreach($users as $user){
+			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				'values' => [
+					':id' => $user['id'],
+					':name' => $user['name']
+				]
+			]);
+			$user = $user ? $user[0] : null;
+
+			$u_user = [
+				':id' => $user['id'],
+				':name' => $user['name'],
+				':permissions' => $user['permissions'],
+				':units' => $user['units'],
+				':token' => hash('sha256', $user['token']),
+				':orderauth' => $user['orderauth'],
+				':image' => $user['image'],
+				':app_settings' => $user['app_settings'],
+				':skills' => $user['skills'],
+				':invalidation_date' => $user['invalidation_date'],
+				':two_factor' => $user['two_factor'] ? hash('sha256', $user['two_factor']) : null
+			];
+			echo "<pre>";
+			print_r($u_user);
+			echo "</pre>";
+			if ($EXECUTE && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+					'values' => $u_user
+				])) echo "<br />[!] CREDENTIALS HAVE BEEN ADJUSTED, NOW DISABLE THE EXECUTION AGAIN!";
+		}
+
+		return [
+			'mysql' => [
+			],
+			'sqlsrv' => [
+			]
+		];
+
 	}
 }
 
