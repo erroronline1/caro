@@ -333,6 +333,8 @@ class SQLQUERY {
 		'application_login' => [
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token"
+//			'mysql' => "SELECT * FROM caro_user WHERE token = :token AND two_factor = :two_factor LIMIT 1",
+//			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token AND two_factor = :two_factor"
 		],
 		'application_get_permission_group' => [
 			'mysql' => "SELECT id FROM caro_user WHERE (permissions LIKE :group OR permissions LIKE CONCAT(:group, ',%') OR permissions LIKE CONCAT('%,', :group, ',%') OR permissions LIKE CONCAT('%,', :group))",
