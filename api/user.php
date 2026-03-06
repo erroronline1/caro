@@ -753,6 +753,10 @@ class USER extends API {
 					$exportToken[':token'] = $user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
 					// generate 2fa-pin
 					$exportToken[':two_factor'] = $user[':two_factor'] = random_int(10000, max(99999, count($users)*100));
+
+					// hash actual credentials
+					$user[':token'] = hash('sha256', $user[':token']);
+					$user[':two_factor'] = hash('sha256', $user[':two_factor']);
 				}
 				// if current user is permitted to change their own data, keep the ongoing session alive
 				if ($user[':id'] === $_SESSION['user']['id']){

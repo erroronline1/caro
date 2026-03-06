@@ -265,8 +265,14 @@ class API {
 			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) // on submitting a token return confirmed
 		);
 
+		// read credentials from payload
 		$token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) ?: null;
 		$two_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor', [], true)) ?: null;
+
+		// hash credentials for matching with database entries
+		$token = $token ? hash('sha256', $token) : null;
+		$two_factor = $two_factor ? hash('sha256', $two_factor) : null;
+
 		if (isset($_SESSION['user'])){
 			if (!$token)
 				$token = $_SESSION['user']['token'];
@@ -278,6 +284,7 @@ class API {
 		if ($returnUser){
 			// login or reauth by token
 			// get user by token and their application settings for frontend setup
+			// if database has changed in the meantime, session credentials do not match, invalidating the session
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $token,

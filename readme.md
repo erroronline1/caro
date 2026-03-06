@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
     * No downloadable onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
-    * Token hashing in database?
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
 * signature max size 192
@@ -2796,7 +2795,7 @@ Stakeholder identification:
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
 | Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | |
-| Token hashing in database | Data safety officer | 2026-03-02 | |
+| Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 
 #### Rejected requirements
@@ -6344,7 +6343,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
 
-* As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
+* Login credentials are only stored as a sha256-hash within the database.
 
 [Content](#content)
 
