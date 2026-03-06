@@ -124,7 +124,7 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 ## Datenintegrität
 
 ### Identifikation
-Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
+Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein Token erstellt der als QR-Code exportiert und bei der Anmeldung gescannt werden kann. Dadurch muss weniger getippt werden. Eine zusätzliche PIN ist allerdings aus Datenschutzgründen erforderlich.
 
 ### Aufzeichnungen
 Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
@@ -190,13 +190,19 @@ Einträge zur Zeiterfassung sind nur erreichbar, wenn eine Wochenarbeitszeit fü
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
-Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
+Das Verfahren der Personenvalidierung vor der Nutzernanlage sollte aus Datenschutzgründen beschrieben werden.
+
+Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden.
+
+Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Im Falle einer vergebenen empfohlenen Zwei-Faktor-PIN ist diese Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
 Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern.
 
 Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht veknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben.
+
+Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden. Ist das Datum erreicht wird ein neuer Token generiert und macht alle laufenden Anmeldungen ungültig. Nutzer sind dann noch nicht gelöscht, können aber die Anwendung nicht ohne Weiteres nutzen.
 
 > In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.
 
@@ -1908,7 +1914,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*
 * Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind. Die Durchführung kann nur erfolgen, wenn ein Nutzer mit Administrator-Berechtigung angemeldet ist.
-* Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
+* Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Eine PIN sollte ebenfalls in Erwägung gezogen werden. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine [Installation als Progressive Web App (PWA)](https://developer.mozilla.org/de/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_aus_dem_web) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 Nach der Installation können
@@ -2554,7 +2560,7 @@ Basis für die Bewertung sind die Richtlinien des BSI für [Frontend](https://ww
 ## Nutzungsrichtlinien für die Nutzung der Anwendung
 
 ### Datenschutz
-Diese Anwendung enthält sensible Daten. Bitte lass das Gerät nicht unbeaufsichtigt während du angemeldet bist um eine unbeabsichtigte Verbeitung der Daten zu vermeiden. Beachte, dass sensible Daten durch Bildschirmaufnahmen und Anwendungswechsel kompromittiert werden können und vermeide die Verbreitung außerhalb der Anwendung. Wenn du sensible Daten aus der Anwendung exportierst bist du selbst für eine sichere Behandlung verantwortlich. Auch bei einer Gerätesperre kann die Anwendung im Hintergrund aktiv sein. Bei Verbindungsabbrüchen werden sensible Daten auf dem Gerät gespeichert. Bitte stelle schnellstmöglich eine Netzwerkverbindung her, damit die Daten bereinigt und auf dem Server im Sinne der Datensicherheit und durchgängigen Dokumentation verarbeitet werden können. Melde dich ab, wenn du die Anwendung nicht verwendest und lasse das Gerät nicht unbeaufsichtigt. Verwende nur zugelassene Geräte um die Datensicherheit zu gewährleisten. Informiere im Falle eines Verlusts deiner Zugangskennung für eine Neuvergabe unverzüglich einen Mitarbeiter der folgenden Berechtigungsgruppen: :permissions (*wie in config.ini für permissions->users festgelegt*)
+Diese Anwendung enthält sensible Daten. Bitte lass das Gerät nicht unbeaufsichtigt während du angemeldet bist um eine unbeabsichtigte Verbeitung der Daten zu vermeiden. Beachte, dass sensible Daten durch Bildschirmaufnahmen und Anwendungswechsel kompromittiert werden können und vermeide die Verbreitung außerhalb der Anwendung. Wenn du sensible Daten aus der Anwendung exportierst bist du selbst für eine sichere Behandlung verantwortlich. Auch bei einer Gerätesperre kann die Anwendung im Hintergrund aktiv sein. Bei Verbindungsabbrüchen werden sensible Daten auf dem Gerät gespeichert. Bitte stelle schnellstmöglich eine Netzwerkverbindung her, damit die Daten bereinigt und auf dem Server im Sinne der Datensicherheit und durchgängigen Dokumentation verarbeitet werden können. Melde dich ab, wenn du die Anwendung nicht verwendest und lasse das Gerät nicht unbeaufsichtigt. Verwende nur zugelassene Geräte um die Datensicherheit zu gewährleisten. Informiere im Falle eines Verlusts deiner Zugangskennung oder bei Bekanntwerden deiner PIN für eine Neuvergabe unverzüglich einen Mitarbeiter der folgenden Berechtigungsgruppen: :permissions (*wie in config.ini für permissions->users festgelegt*)
 
 ### Personenbezogene Daten (Nutzer)
 Diese Anwendung ist Bestandteil des Qualitätsmanagements. Deine Daten sind für die Dokumentation und die Ressourcenplanung erforderlich. Deine Daten sind in deinem Profil einsehbar. Manche Daten können nur durch die Leitung bearbeitet werden, andere von dir selbst. Im Falle einer Löschung deines Nutzerprofils verbleiben gesendete Nachrichten und allgemein genutzte Informationen (Bestellungen, Prüfungen, dein Name als Verfasser und Mitarbeiter für die Dokumentation) aufgrund berechtigten Interesses im Sinne einer durchgängigen Dokumentation und operativer Prozesse im System.

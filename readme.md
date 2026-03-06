@@ -33,11 +33,8 @@ Things are still in motion. Images may be outdated.
 * records
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
-    * Two factor authentification with additional password/pin, export in one credential image
     * No downloadable onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
     * Token hashing in database?
-    * Automate user access invalidation on set date, defined within user management -> documentation
-    * consider statement on user verification before handing out login tokens
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
 * signature max size 192
@@ -226,7 +223,7 @@ Orders can be deleted by administrative users and requesting unit members at any
 ## Data integrity
 
 ### Identification
-As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things reasonably easy a unique token has to be created that can be exported as an QR code that is scannable on login. This reduces the need for typing. An additional pin has to be provided for data safety reasons, though.
 
 ### Records
 An encoded user identifier is added to the payload of submitted form data, the server verifies the identity and data integrity with a checksum.
@@ -292,13 +289,19 @@ Contributing to timesheets is accessible only if weekly hours are defined for th
 
 Users can have multiple assigned organizational units and permissions.
 
-On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+Please describe how you validate the person you are registering as a new user for data safety reasons.
+
+On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified.
+
+The generated access token can be exported and, for example, used as a laminated card. If the recommended two-factor-pin is selected it will be part of the export and is to be cut off and disposed of prior to laminating.
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
 The token lacks any further identification, like the application name or logo, by intent to obfuscate its use.
 
 Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. The profile picture will always be overwritten with the default image following a name change.
+
+Users can be assigned a date of an automated access denial for data safety reasons. Once the date is met a new token is generated, invalidating all current sessions. The user is not deleted yet but not able to access the application without further action.
 
 > On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.
 
@@ -2013,7 +2016,7 @@ If you are going to prepare the deployment you are free to create multiple files
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*
 * choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken. You must be logged in with adminstrator privileges to take these actions.
-* Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
+* Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Consider adding a pin, export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
 
 After installation you can
@@ -2791,7 +2794,7 @@ Stakeholder identification:
 | Autodeletion for messages | User | 2025-11-06 | Implemented as optional user setting; 2025-11-07 |
 | Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 | Implemented; 2025-12-20 |
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
-| Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | |
+| Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | |
 | Token hashing in database | Data safety officer | 2026-03-02 | |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
@@ -2839,7 +2842,7 @@ A solution could be established due to an erp database connection thus implement
 | Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within network environment not accessible from the web | none |
 | Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
 | Unencrypted data access | Medium | High (regulatory penalties) | Use within network environment not accessible from the web | Bears the same risk as accessing confidential data on personal network drives |
-| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
+| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens and non custom minimum 5 integer pin | |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
 | No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
 | User error | High | High (faulty data) | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
@@ -5578,7 +5581,7 @@ This software aims to match as much relevant aspects of security measures as rea
 ## Terms of service for using the application
 
 ### Data safety
-This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application may be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token inform a user of following permission groups immediately: :permissions (*as defined within config.ini for permissions->users*)
+This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application may be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token or compromised pin inform a user of following permission groups immediately: :permissions (*as defined within config.ini for permissions->users*)
 
 ### Your data
 This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures.
@@ -5813,7 +5816,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 ### 3.1.6 Objective (6): Authentication
 > O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session.
 
-* User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
+* User log in via token and pin, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
 
 > O.Auth_2 The application SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
 
@@ -5821,7 +5824,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web and not being able to call any method of sending tokens to any third party device. 
+* Login occurs using a token and a PIN of minimum 5 random integers. 
 
 > O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -5853,7 +5856,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_11 The authentication data MUST NOT be changed without re-authenticating the user.
 
-* Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
+* Every request matches the login credentials with the database (server side only). If the credentials are not found in the database, the user is logged out and the session destroyed.
 
 > O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
 
@@ -5873,30 +5876,30 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_16 If the login credentials are changed, the user SHOULD be informed of the change via the last valid contact details stored. In this way, the user SHOULD be offered the option of blocking the reported change and setting new login credentials after authentication.
 
-* Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
+* Login credentials are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
 
 > O.Auth_17 The user MUST be made aware of the residual risk associated with the storage of login credentials in the web browser or another external application for a more comfortable login process in the terms of use of the web application.
 
-* The input form for the login token is set to one-time-code and can not be stored.
+* The input form for the login credentials is set to one-time-code and can not be stored.
 
 [Content](#content)
 
 ### 3.1.6.1 Passwords
 > O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
 
-* Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
+* Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters. Pins are randomly generated and no shorter than 5 integers.
 
 > O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
 
-* Login tokens are always generated by the system on request of an authorized administrative user.
+* Login credentials are always generated by the system on request of an authorized administrative user.
 
 > O.Pass_3 The user MUST have the option to change their password.
 
-* Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
+* Login credentials can be renewed by authorized administrative users only. Since the credentials are exportable as a physical qr-code and to prevent unwanted spread or misuse, this option is only available to authorized users. Updated credentials may be basically one phone call away if necessary.
 
 > O.Pass_4 The changing and resetting of passwords MUST be logged.
 
-* Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
+* Login credentials can be renewed by authorized administrative users. Logging changes is not reasonable.
 
 > O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
 
@@ -6231,14 +6234,14 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 ### 3.1.5.1 Random numbers
 > O.Rand_1 All random values MUST be generated by a strong cryptographic random number generator which has been seeded with sufficient entropy (cf. [TR02102-1]).
 
-* Random values for tokens are created by PHPs [random_int()](#https://www.php.net/manual/en/function.random-int.php) and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
+* Random values for login credentials are created by PHPs [random_int()](#https://www.php.net/manual/en/function.random-int.php) and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
 [Content](#content)
 
 ### 3.1.6 Objective (6): Authentication
 > O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session. This concept MUST consider internal network connections within the backend system as well.
 
-* User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
+* User log in via token and pin, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
 
 > O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
 
@@ -6250,7 +6253,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web not being able to call any method of sending tokens to any third party device.
+* Login occurs using a token and a PIN of minimum 5 random integers. 
 
 > O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -6282,11 +6285,11 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_12 The authentication data MUST NOT be changed without re-authenticating the user.
 
-* Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
+* Every request matches the login credentials with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
 
 > O.Auth_13 Whenever changing access parameters, the backend system SHOULD inform the user via last known valid contact details Therefore the user SHOULD get the opportunity to block the change and reset access parameters after successful authentication.
 
-* Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
+* Login credentials are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
 
 > O.Auth_14 The manufacturer MUST submit a concept concerning privilege management (e.g. user roles).
 
@@ -6310,11 +6313,11 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_19 Sensitive data MUST NOT be embedded in any authentication token.
 
-* Login tokens only include a generated partially random hash.
+* Login credentials only include a generated partially random hash and a random integer.
 
 > O.Auth_20 Any authentication token MUST contain only the expected fields.
 
-* Login tokens consist of a 64 byte string only. PHPSESSID-cookies are default.
+* Login credentials consist of a 64 byte string and minimum 5 digit integer only. PHPSESSID-cookies are default.
 
 > O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
 
@@ -6325,19 +6328,19 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 ### 3.1.6.1 Passwords
 > O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
 
-* Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
+* Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters. Pins are randomly generated and no shorter than 5 integers.
 
 > O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
 
-* Login tokens are always generated by the system on request of an authorized administrative user.
+* Login credentials are always generated by the system on request of an authorized administrative user.
 
 > O.Pass_3 The user MUST have the option to change their password.
 
-* Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
+* Login credentials can be renewed by authorized administrative users only. Since the credentials are exportable as a physical qr-code and to prevent unwanted spread or misuse, this option is only available to authorized users. Updated credentials may be basically one phone call away if necessary.
 
 > O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
 
-* Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
+* Login credentials can be renewed by authorized administrative users. Logging changes is not reasonable.
 
 > O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
 
@@ -6364,7 +6367,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
 
-* Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
+* Login credentials are to be exported as a qr-code, for scanning login credentials. Provided pins are part of the export but marked to be disposed of. There are no other keys to be exported.
 
 > O.Data_6 The backend system MUST NOT write sensitive data in messages or notifications the user did not explicitly gave permission for.
 
