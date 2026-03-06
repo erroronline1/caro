@@ -163,9 +163,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.8313066"
-     inkscape:cx="67.965297"
-     inkscape:cy="164.19935"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="2.1213203"
+     inkscape:cy="53.033008"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -196,8 +196,8 @@
      transform="translate(-23.55228,-40.739082)">
     <path
        id="rect2"
-       style="display:none;fill:#000000;stroke:#000000;stroke-width:0.530802"
-       d="M 44.466189,41.124344 V 116.73977 H 136.94981 V 41.124344 Z"
+       style="display:none;fill:#000000;stroke:#000000;stroke-width:0.531146"
+       d="M 44.350421,41.164299 V 116.78279 H 136.94964 V 41.164299 Z"
        inkscape:export-filename="watermarkpattern.png"
        inkscape:export-xdpi="24.016947"
        inkscape:export-ydpi="24.016947" />
