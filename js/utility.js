@@ -1008,9 +1008,9 @@ export const _client = {
 						type: "image",
 						attributes: {
 							imageonly: {},
-							qrcode: element.commission,
+							qrcode: element.administrative_mark,
 							class: "order2dcode",
-							name: api._lang.GET("order.commission"),
+							name: api._lang.GET("order.administrative_mark"),
 						},
 					});
 
@@ -1168,9 +1168,9 @@ export const _client = {
 						type: "image",
 						attributes: {
 							imageonly: {},
-							qrcode: element.commission,
+							qrcode: element.identifier,
 							class: "order2dcode",
-							name: api._lang.GET("order.commission"),
+							name: api._lang.GET("order.identifier"),
 						},
 					});
 				}
