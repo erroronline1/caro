@@ -262,10 +262,10 @@ class API {
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
-			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true)) // on submitting a token return confirmed
+			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) // on submitting a token return confirmed
 		);
 
-		if (!($token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true))) && isset($_SESSION['user'])) $token = $_SESSION['user']['token'];
+		if (!($token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true))) && isset($_SESSION['user'])) $token = $_SESSION['user']['token'];
 
 		$valid = false;
 		if ($returnUser){
@@ -339,7 +339,7 @@ class API {
 						[
 							'type' => 'scanner',
 							'attributes' => [
-								'name' => $this->_lang->GET('application.login', [], true),
+								'name' => $this->_lang->GET('user.token', [], true),
 								'type' => 'password'
 							]
 						]
@@ -380,7 +380,7 @@ class API {
 				]
 			];
 			// linux style delay of login form wrong attempts
-			if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true))) sleep(2);
+			if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true))) sleep(2);
 		}
 		$this->response($response, 511);
 	}
