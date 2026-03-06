@@ -40,8 +40,8 @@ Things are still in motion. Images may be outdated.
     * consider statement on user verification before handing out login tokens
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
-* signature max size 512 and drawing canvas dimension accuracy, watermark pattern source more delicate
-* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html
+* signature max size 192
+* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/
 
 ## Content
 * [Aims](#aims)
