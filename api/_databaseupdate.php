@@ -434,10 +434,11 @@ class UPDATE{
 	private function _2026_03_06(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_user ADD COLUMN IF NOT EXISTS invalitation_date date NULL DEFAULT NULL, two_factor tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+				"ALTER TABLE caro_user ADD COLUMN IF NOT EXISTS invalidation_date date NULL DEFAULT NULL; " .
+				"ALTER TABLE caro_user ADD COLUMN IF NOT EXISTS  two_factor tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
 			],
 			'sqlsrv' => [
-				"IF COL_LENGTH('caro_user', 'invalitation_date') IS NULL" .
+				"IF COL_LENGTH('caro_user', 'invalidation_date') IS NULL" .
 				" BEGIN" .
 				"    ALTER TABLE caro_user" .
 				"    ADD invalidation_date date NULL DEFAULT NULL," .
