@@ -984,20 +984,21 @@ class RECORD extends API {
 				$entry_datetime .= ':00'; // append seconds for database format
 
 				// handle attachments and images
-				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
+				if (!file_exists(FILEHANDLER::directory('record_attachments'))) mkdir(FILEHANDLER::directory('record_attachments'), 0777, true);
 				$attachments = [];
+				$FILEHANDLER = new FILEHANDLER;
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)], null, false)){
+					if ($uploaded = $FILEHANDLER->storeUploadedFiles([$fileinput], FILEHANDLER::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
-								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 
 								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
 							}
 						}
 						else {
-							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[0], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[0], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 							$attachments[$fileinput] = [substr($uploaded[0], 1)];
 						}
 					}
@@ -1414,7 +1415,7 @@ class RECORD extends API {
 					if (isset($content['attachments'][$document])){
 						foreach($content['attachments'][$document] as $path){
 							$file = pathinfo($path);
-							$files[$file['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . substr(UTILITY::directory('record_attachments'), 1) . '/'. $path]);
+							$files[$file['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('record_attachments'), 1) . '/'. $path]);
 						}
 						array_push($body[count($body) -1][0]['content'], [
 							'type' => 'links',
@@ -2343,7 +2344,7 @@ class RECORD extends API {
 						$displayvalue = $entry['value'];
 						// populate file image and attachments based on values containing respective paths and extensions
 						// guess file url; special regex delimiter
-						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
+						if (stripos($entry['value'], substr(FILEHANDLER::directory('record_attachments'), 1)) !== false) {
 							$displayvalue = '';
 							$files = [];
 							foreach (explode(', ', $entry['value']) as $file){

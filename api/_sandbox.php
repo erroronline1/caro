@@ -5,7 +5,7 @@ require_once('_utility.php'); // general utilities
 //require_once('_erpinterface.php');
 //var_dump(ERPINTERFACE->orderdata());
 
-UTILITY::alterImage('../assets/CAROsignature.jpg', 192, UTILITY_IMAGE_STREAM, false, '', '', true);
+FILEHANDLER::alterImage('../assets/CAROsignature.jpg', 192, FILEHANDLER_IMAGE_STREAM, false, '', '', true);
 
 die();
 require_once('_language.php');

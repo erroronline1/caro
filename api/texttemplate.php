@@ -934,7 +934,7 @@ class TEXTTEMPLATE extends API {
 				$files = [];
 				foreach($template['linked_files'] as $path){
 					$filename = pathinfo($path)['basename'];
-					$files[$filename] = UTILITY::link(['href' => substr($path, 1), 'download' => $filename]);
+					$files[$filename] = FILEHANDLER::link(['href' => substr($path, 1), 'download' => $filename]);
 				}
 
 				$response['render']['content'][] = [

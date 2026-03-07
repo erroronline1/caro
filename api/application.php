@@ -928,7 +928,7 @@ class APPLICATION extends API {
 				if ($files = $search->filesearch(['search' => $this->_search])){
 					$matches = [];
 					foreach ($files as $file){
-						$matches[preg_replace('/.+fileserver\//', '', $file)] = UTILITY::link(['href' => $file]);
+						$matches[preg_replace('/.+fileserver\//', '', $file)] = FILEHANDLER::link(['href' => $file]);
 					}
 					$searchelements[] = [
 						'type' => 'links',

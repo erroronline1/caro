@@ -908,7 +908,7 @@ class INSTALL {
 	public function installDatabase(){
 		//secure fileserver by default
 		if (!file_exists( '../fileserver' )) mkdir('../fileserver');
-		UTILITY::secureDirectory('../fileserver');
+		FILEHANDLER::secureDirectory('../fileserver');
 
 		if (SQLQUERY::EXECUTE($this->_pdo, DEFAULTSQL['installed'][$this->_pdoDriver])){
 			return $this->printWarning('Databases already installed.');
@@ -1283,7 +1283,7 @@ class INSTALL {
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
 		];
-
+		$FILEHANDLER = new FILEHANDLER();
 		$sqlchunks = $names = $orderauths = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
@@ -1324,8 +1324,8 @@ class INSTALL {
 					'type' => 'image/png',
 					'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 				];
-				$entry['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $entry['name']])[0];
-				UTILITY::alterImage($entry['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+				$entry['image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], FILEHANDLER::directory('users'), ['profilepic_' . $entry['name']])[0];
+				FILEHANDLER::alterImage($entry['image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 				$entry['image'] = substr($entry['image'], 3);
 
 				// gather timesheet setup

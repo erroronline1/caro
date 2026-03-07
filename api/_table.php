@@ -40,7 +40,7 @@ CLASS TABLE{
 				case 'xlsx':
 					$reader = new \OpenSpout\Reader\XLSX\Reader(
 						new \OpenSpout\Reader\XLSX\Options(
-							tempFolder: UTILITY::directory('tmp'),
+							tempFolder: FILEHANDLER::directory('tmp'),
 						)
 					);
 					break;
@@ -152,7 +152,7 @@ CLASS TABLE{
 	
 			if ($recentSheet !== $sheetName){
 				// add a new file
-				@$tmp_name = tempnam(UTILITY::directory('tmp'), mt_rand(0, 100000));
+				@$tmp_name = tempnam(FILEHANDLER::directory('tmp'), mt_rand(0, 100000));
 				$writer->openToFile($tmp_name);
 				$recentSheet = $sheetName;
 			}
@@ -189,7 +189,7 @@ CLASS TABLE{
 		}
 
 		foreach($response as &$path){
-			$path = UTILITY::handle($path, $dst, 0, [], UTILITY::directory('tmp'), false);
+			$path = FILEHANDLER::handle($path, $dst, 0, [], FILEHANDLER::directory('tmp'), false);
 		}
 		return $response;
 	}
@@ -220,7 +220,7 @@ CLASS TABLE{
 						null, // public ?string $backgroundColor = null,
 						null, // public ?string $format = null,
 					),
-					tempFolder: UTILITY::directory('tmp')
+					tempFolder: FILEHANDLER::directory('tmp')
 					// no page options available yet
 				);
 				$writer = new \OpenSpout\Writer\ODS\Writer($celloptions);
@@ -228,7 +228,7 @@ CLASS TABLE{
 				break;
 			case 'xlsx':
 				$celloptions = new \OpenSpout\Writer\XLSX\Options(
-					tempFolder: UTILITY::directory('tmp'),
+					tempFolder: FILEHANDLER::directory('tmp'),
 					pageSetup: new \OpenSpout\Writer\XLSX\Options\PageSetup(
 						!empty($options['orientation']) ? \OpenSpout\Writer\XLSX\Options\PageOrientation::{strtoupper($options['orientation'])} : null,
 						!empty($options['size']) ? \OpenSpout\Writer\XLSX\Options\PaperSize::{strtoupper($options['size'])} : \OpenSpout\Writer\XLSX\Options\PaperSize::A4,
@@ -254,7 +254,7 @@ CLASS TABLE{
 				break;
 		}
 
-		@$tmp_name = tempnam(UTILITY::directory('tmp'), mt_rand(0, 100000));
+		@$tmp_name = tempnam(FILEHANDLER::directory('tmp'), mt_rand(0, 100000));
 		$writer->openToFile($tmp_name);
 
 		// determine defined row heights for data rows
@@ -384,7 +384,7 @@ CLASS TABLE{
 			}
 		}
 		$writer->close();
-		$path = UTILITY::handle($tmp_name, $dst, 0, [], UTILITY::directory('tmp'), false);
+		$path = FILEHANDLER::handle($tmp_name, $dst, 0, [], FILEHANDLER::directory('tmp'), false);
 
 		return [$path];
 	}

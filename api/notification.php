@@ -404,14 +404,14 @@ class NOTIFICATION extends API {
 									}
 									elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
 										// delete record attachments that begin with the identifier
-										if (file_exists(UTILITY::directory('record_attachments'))){
+										if (file_exists(FILEHANDLER::directory('record_attachments'))){
 											$delete = [];
 											$fileidentifier = preg_replace('/[^\w\d]/m', '', $row['identifier']);
-											foreach (glob(UTILITY::directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
+											foreach (glob(FILEHANDLER::directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
 												if($file == '.' || $file == '..') continue;
 												$delete[] = $file;
 											}
-											UTILITY::delete($delete);
+											FILEHANDLER::delete($delete);
 										}
 										// prepare deletion
 										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
@@ -442,7 +442,7 @@ class NOTIFICATION extends API {
 													]);
 													if (count($others)<2){
 														$files = explode(',', $order['attachments']);
-														UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+														FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
 													}
 												}
 												$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_delete_approved_order'),
@@ -592,8 +592,8 @@ class NOTIFICATION extends API {
 						case 'delete_files_and_calendar':
 							// clear up folders with limited files lifespan
 							// clear up calendar entries marked as closed and for autodeletion
-							UTILITY::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
-							UTILITY::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
+							FILEHANDLER::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
+							FILEHANDLER::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
 
 							// delete order statistics
@@ -694,7 +694,7 @@ class NOTIFICATION extends API {
 							foreach ($vendors as $vendor){
 								if ($vendor['hidden']) continue;
 								// process vendor-documents
-								if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]))) {
+								if ($docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_documents', [':id' => $vendor['id']]))) {
 									$documents = [];
 									$considered = [];
 									foreach ($docfiles as $path){
@@ -736,7 +736,7 @@ class NOTIFICATION extends API {
 									}
 								}
 								// process product-documents
-								if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':id' => $vendor['id']]))) {
+								if ($docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_products', [':id' => $vendor['id']]))) {
 									$documents = [];
 									$considered = [];
 									foreach ($docfiles as $path){

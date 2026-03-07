@@ -701,10 +701,10 @@ class STRESSTEST extends INSTALL{
 					]))	{
 						// delete training attachments (certificates)
 						foreach ($trainings as $row){
-							if ($row['file_path']) UTILITY::delete('.' . $row['file_path']);
+							if ($row['file_path']) FILEHANDLER::delete('.' . $row['file_path']);
 						}
 						// delete user image
-						if ($dbentry['image'] && $dbentry['id'] > 1) UTILITY::delete('../' . $dbentry['image']);
+						if ($dbentry['image'] && $dbentry['id'] > 1) FILEHANDLER::delete('../' . $dbentry['image']);
 						$matches++;
 					}
 				}

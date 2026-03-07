@@ -86,9 +86,10 @@ class AUDIT extends API {
 				// process content
 				// process files
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])], null, false)){
+					$FILEHANDLER = new FILEHANDLER;
+					if ($uploaded = $FILEHANDLER->storeUploadedFiles([$fileinput], FILEHANDLER::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])], null, false)){
 						for($i = 0; $i < count($files['name']); $i++){
-							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
 							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
@@ -326,7 +327,7 @@ class AUDIT extends API {
 									'name' => $fileinfo['basename'],
 									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
-								$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+								$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -620,7 +621,7 @@ class AUDIT extends API {
 							'link' => './api/api.php/file/stream/' . substr($file, 1)
 						];
 
-						$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+						$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [
@@ -3748,7 +3749,7 @@ class AUDIT extends API {
 			// gather documents
 			$documents = ['valid' => [], 'expired' => []];
 			if ($vendor['id']) {
-				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]));
+				$docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_documents', [':id' => $vendor['id']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension

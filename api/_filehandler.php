@@ -40,7 +40,7 @@ class FILEHANDLER{
 	 * 
 	 * @return string|object|null a GdImage ressource or no return
 	 */
-	public function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false){
+	public static function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false){
 		if (is_file($file)){
 			$filetype = getimagesize($file)[2];
 			switch($filetype){
@@ -246,9 +246,9 @@ class FILEHANDLER{
 	 * 
 	 * @return bool on success
 	 */
-	private function createDirectory($dir){
+	private static function createDirectory($dir){
 		if (!file_exists($dir) && mkdir($dir, 0777, true)) {
-			$this->secureDirectory($dir);
+			self::secureDirectory($dir);
 			return true;
 		}
 		return false;
@@ -266,13 +266,13 @@ class FILEHANDLER{
 	 * 
 	 * @return bool about success
 	 */
-	public function delete($paths = []){
+	public static function delete($paths = []){
 		$result = false;
 		$allowed = false;
 		if (gettype($paths) === 'string') $paths=[$paths];
 		foreach ($paths as $path) {
 			foreach (array_keys(CONFIG['fileserver']) as $fileserver){
-				if (stristr($path, $this->directory($fileserver))) $allowed = true;
+				if (stristr($path, self::directory($fileserver))) $allowed = true;
 			}
 			if (!$allowed) return false;
 			if (is_file($path)){
@@ -281,7 +281,7 @@ class FILEHANDLER{
 			elseif (is_dir($path)){
 				foreach (scandir($path) as $subdir){
 					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
-					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) $this->delete($path . '/' . $subdir);
+					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
 				}
 				$result = rmdir($path);
 			}
@@ -302,7 +302,7 @@ class FILEHANDLER{
 	 * 
 	 * @return string directory
 	 */
-	public function directory($request, $replace = []){
+	public static function directory($request, $replace = []){
 		if (!isset(CONFIG['fileserver'][$request])){
 			return '../fileserver';
 		}
@@ -332,7 +332,7 @@ class FILEHANDLER{
 	 * @param array $attributes anchor attributes
 	 * @return array modified attributes
 	 */
-	public function link($attributes){
+	public static function link($attributes){
 		if ($attributes['href']){
 			$file = pathinfo($attributes['href']);
 			if (in_array(strtolower($file['extension']), ['stl', 'obj'])){
@@ -363,7 +363,7 @@ class FILEHANDLER{
 	 * 
 	 * @return array file list 
 	 */
-	public function listDirectories($folder, $order = 'desc'){
+	public static function listDirectories($folder, $order = 'desc'){
 		$result = [];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
@@ -393,7 +393,7 @@ class FILEHANDLER{
 	 * 
 	 * @return array file list 
 	 */
-	public function listFiles($folder, $order = 'desc'){
+	public static function listFiles($folder, $order = 'desc'){
 		$result = [];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
@@ -424,7 +424,7 @@ class FILEHANDLER{
 	 * 
 	 * @return bool on success
 	 */
-	public function secureDirectory($dir){
+	public static function secureDirectory($dir){
 		if (!file_exists($dir . '/.htaccess')) {
 			$file = fopen($dir . '/.htaccess', 'w');
 			fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
@@ -457,7 +457,7 @@ class FILEHANDLER{
 	 */
 	public function storeUploadedFiles($input = [], $destination = '', $prefix = [], $rename = [], $replace = true, $dbdata = []){
 		/* process $_FILES, store to folder and return an array of destination paths */
-		if ($destination !== 'DATABASE' && !file_exists($destination)) $this->createDirectory($destination);
+		if ($destination !== 'DATABASE' && !file_exists($destination)) self::createDirectory($destination);
 		$targets = [];
 		for ($i = 0; $i < count($input); $i++) {
 			if (gettype($_FILES[$input[$i]]['name']) !== 'array') {
@@ -486,26 +486,24 @@ class FILEHANDLER{
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
-	public function handle($tmpname, $filename, $i, $prefix, $destination, $replace = false){
+	public static function handle($tmpname, $filename, $i, $prefix, $destination, $replace = false){
 		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
 		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $filename);
-		if ($destination ==! 'DATABASE') {
-			$target = $destination . '/' . $filename;
-			if (!$replace){
-				$extension = '.' . pathinfo($target)['extension'];
-				$files = glob(str_replace($extension, '*' . $extension, $target));
-				$target = $this->enumerate($target, $files);
-			}
-			// move_uploaded_file is for post only, else rename for put files
-			if ($tmpname && (@move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
-				return $target;
-			}
+		$target = $destination . '/' . $filename;
+		if (!$replace){
+			$extension = '.' . pathinfo($target)['extension'];
+			$files = glob(str_replace($extension, '*' . $extension, $target));
+			$target = self::enumerate($target, $files);
+		}
+		// move_uploaded_file is for post only, else rename for put files
+		if ($tmpname && (@move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
+			return $target;
 		}
 	}
 	public function dbhandle($tmpname, $filename, $i, $prefix, $type, $dbdata = []){
 		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
 		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $filename);
-		$filename = $this->enumerate($filename, $this->_files);
+		$filename = self::enumerate($filename, $this->_files);
 		$this->_files[] = $filename;
 		$fileHandle = fopen($tmpname, 'rb');
 		$fileContents = fread($fileHandle, filesize($tmpname));
@@ -522,13 +520,13 @@ class FILEHANDLER{
 		
 		//return $this->_pdo->lastInsertId();
 	}
-	private function enumerate($target, $withinfiles){
+	private static function enumerate($target, $withinfiles){
 		if (in_array($target, $withinfiles)){
 			$pi_target = pathinfo($target);
 			preg_match('/\((\d+)\)$/m', $pi_target['filename'], $matches, PREG_OFFSET_CAPTURE, 0);
 			if ($matches) $enumeratedTarget = str_replace($matches[0][0], '(' . (intval($matches[1][0]) + 1) . ')', $pi_target['filename']);
 			else $enumeratedTarget = $pi_target['filename'] . '(2)';
-			$target = $this->enumerate(str_replace($pi_target['filename'], $enumeratedTarget, $target), $withinfiles);
+			$target = self::enumerate(str_replace($pi_target['filename'], $enumeratedTarget, $target), $withinfiles);
 		}
 		return $target;
 	}
@@ -546,14 +544,14 @@ class FILEHANDLER{
 	 * 
 	 * @return bool if 
 	 */
-	public function tidydir($dir = '', $lifespan = null){
+	public static function tidydir($dir = '', $lifespan = null){
 		if (!$dir) return false;
-		$success = !file_exists($this->directory($dir)) ? $this->createDirectory($this->directory($dir)) : true;
-		if ($lifespan && file_exists($this->directory($dir))){
-			$files = $this->listFiles($this->directory($dir), 'asc');
+		$success = !file_exists(self::directory($dir)) ? self::createDirectory(self::directory($dir)) : true;
+		if ($lifespan && file_exists(self::directory($dir))){
+			$files = self::listFiles(self::directory($dir), 'asc');
 			foreach ($files as $file){
 				if ((time() - filemtime($file)) / 3600 > $lifespan) {
-					$this->delete($file);
+					self::delete($file);
 				}
 			}
 		}

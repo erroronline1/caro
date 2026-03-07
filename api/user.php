@@ -112,16 +112,17 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
+				$FILEHANDLER = new FILEHANDLER();
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
-					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
-					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
-					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					if ($user[':image'] && $user[':id'] > 1) FILEHANDLER::delete('../' . $user[':image']);
+					$user[':image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], FILEHANDLER::directory('users'), ['profilepic_' . $user[':name']])[0];
+					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
-					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
-					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
-					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					if ($user[':image'] && $user[':id'] > 1) FILEHANDLER::delete('../' . $user[':image']);
+					$user[':image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], FILEHANDLER::directory('users'), ['profilepic_' . $user[':name']])[0];
+					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 				// process settings
@@ -326,7 +327,7 @@ class USER extends API {
 					if ($row['file_path']) $usertrainings[] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
+							$row['file_path'] => FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
 						]
 					];
 				}
@@ -774,16 +775,17 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
+				$FILEHANDLER = new FILEHANDLER();
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
-					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
-					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
-					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					if ($user[':image'] && $user[':id'] > 1) FILEHANDLER::delete('../' . $user[':image']);
+					$user[':image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], FILEHANDLER::directory('users'), ['profilepic_' . $user[':name']])[0];
+					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
-					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
-					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
-					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					if ($user[':image'] && $user[':id'] > 1) FILEHANDLER::delete('../' . $user[':image']);
+					$user[':image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_image')], FILEHANDLER::directory('users'), ['profilepic_' . $user[':name']])[0];
+					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 
@@ -968,7 +970,7 @@ class USER extends API {
 					if ($row['file_path']) $skillmatrix[0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
+							$row['file_path'] => FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
 						]
 					];
 					$skillmatrix[0][] = [
@@ -1218,7 +1220,7 @@ class USER extends API {
 				if ($user['id'] < 2) $this->response([], 401);
 
 				// delete user image
-				if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
+				if ($user['image'] && $user['id'] > 1) FILEHANDLER::delete('../' . $user['image']);
 
 				// delete training attachments (certificates)
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -1227,7 +1229,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					if ($row['file_path']) UTILITY::delete('.' . $row['file_path']);
+					if ($row['file_path']) FILEHANDLER::delete('.' . $row['file_path']);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
@@ -1358,6 +1360,7 @@ class USER extends API {
 				if (!($usernames && $usernames = preg_split('/([,;]\s{0,})/', $usernames))) $this->response([], 406);
 
 				$notfound = [];
+				$FILEHANDLER = new FILEHANDLER();
 				foreach ($usernames as $username){
 					if (!$username) continue;
 					if ($user = array_search($username, array_column($users, 'name'))){
@@ -1365,7 +1368,7 @@ class USER extends API {
 						$training[':user_id'] = $user['id'];
 						// upload files only if date is set
 						if ($training[':date'] && isset($_FILES[$this->_lang->PROPERTY('user.training.add_document')]) && $_FILES[$this->_lang->PROPERTY('user.training.add_document')]['tmp_name']) {
-							$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.training.add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+							$training[':file_path'] = substr($FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.training.add_document')], FILEHANDLER::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 						}
 						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 							'values' => $training
@@ -1502,7 +1505,7 @@ class USER extends API {
 				]);
 
 				if ($training = $training ? $training[0] : null){
-					if ($training['file_path']) UTILITY::delete(['.' . $training['file_path']]);
+					if ($training['file_path']) FILEHANDLER::delete(['.' . $training['file_path']]);
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
 						'values' => [
 							':id' => $training['id']

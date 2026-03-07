@@ -66,8 +66,8 @@ var_dump(
 	])
 );
 
-// $t = new TABLE(UTILITY::directory('tmp') . '/table.xlsx');
-$t = new TABLE(UTILITY::directory('tmp') . '/table.csv');
+// $t = new TABLE(FILEHANDLER::directory('tmp') . '/table.xlsx');
+$t = new TABLE(FILEHANDLER::directory('tmp') . '/table.csv');
 
 var_dump(
 	$t->dump([])

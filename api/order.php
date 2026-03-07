@@ -669,7 +669,7 @@ class ORDER extends API {
 					// order attachments
 					if (isset($decoded_order_data['attachments'])){
 						foreach (explode(',', $decoded_order_data['attachments']) as $file){
-							$data['attachments'][pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
+							$data['attachments'][pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
 						}
 					}
 
@@ -770,7 +770,7 @@ class ORDER extends API {
 			]);
 			if (count($others)<2){
 				$files = explode(',', $order['attachments']);
-				UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+				FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
 			}
 		}
 		return SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
@@ -1119,7 +1119,7 @@ class ORDER extends API {
 				// append existing attachments
 				if (isset($order['attachments'])){
 					foreach (explode(',', $order['attachments']) as $file){
-						$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
+						$files[pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
 					}
 					array_splice($response['render']['content'], 3, 0, [
 						[
@@ -1256,7 +1256,7 @@ class ORDER extends API {
 				// delete attachments
 				if (isset($order['attachments'])){
 					$files = explode(',', $order['attachments']);
-					UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+					FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
 				}
 
 				// delete prepared order
@@ -1386,7 +1386,7 @@ class ORDER extends API {
 				}
 				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
 				}
 				if (!$approval) $this->response([], 401);
 
@@ -1546,7 +1546,7 @@ class ORDER extends API {
 						if (isset($processedOrderData['attachments'])){
 							$files = [];
 							foreach (explode(',', $processedOrderData['attachments']) as $file){
-								$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
+								$files[pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
 							}
 							array_splice($response['render']['content'][count($response['render']['content']) - 1], 2, 0, [
 								[
@@ -1651,7 +1651,7 @@ class ORDER extends API {
 
 		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+			$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
 		}
 
 		// initiate data
@@ -1659,11 +1659,12 @@ class ORDER extends API {
 		
 		// handle attachments
 		$attachments = [];
+		$FILEHANDLER = new FILEHANDLER();
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
+			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], FILEHANDLER::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
+			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], FILEHANDLER::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
 		}
 		// sanitize array for empty values
 		foreach ($attachments as $key => $value){

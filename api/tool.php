@@ -546,18 +546,19 @@ class TOOL extends API {
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.image.source')]) && $_FILES[$this->_lang->PROPERTY('tool.image.source')]['tmp_name'][0]) {
 					$response['render']['content'][] = [];
-					$images = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('tool.image.source')], UTILITY::directory('tmp'), [$size]);
+					$FILEHANDLER = new FILEHANDLER();
+					$images = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('tool.image.source')], FILEHANDLER::directory('tmp'), [$size]);
 					$size = explode(' x ', $size);
 					$size = isset ($size[1]) ? max(intval($size[0]), intval($size[1])) : null;
 					foreach ($images as $image){
-						UTILITY::alterImage($image, $size, UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
+						FILEHANDLER::alterImage($image, $size, FILEHANDLER_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
 						$dimensions = getimagesize($image);
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',
 							'description' => pathinfo($image)['basename'],
 							'attributes' => [
 								'name' => pathinfo($image)['basename'],
-								'url' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($image)['basename']
+								'url' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($image)['basename']
 							],
 							'dimensions' => [
 								'width' => $dimensions[0],
@@ -626,11 +627,11 @@ class TOOL extends API {
 						$this->response($response);
 					}
 
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
+					$tempFile = FILEHANDLER::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
 					rename( $result['tmpfile'], $tempFile);
 					// provide downloadfile
 					$csv[pathinfo($tempFile)['basename']] = [
-						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 						'download' => pathinfo($tempFile)['basename']
 					];
 				}
@@ -786,9 +787,9 @@ class TOOL extends API {
 						for($i = 0; $i < $zip->numFiles; $i++) {
 							$filename = $zip->getNameIndex($i);
 							$fileinfo = pathinfo($filename);
-							copy('zip://' . $file . '#' . $filename, UTILITY::directory('tmp') . '/' . $fileinfo['basename']);
+							copy('zip://' . $file . '#' . $filename, FILEHANDLER::directory('tmp') . '/' . $fileinfo['basename']);
 							$downloadfiles[$filename] = [
-								'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 3) . '/' . $fileinfo['basename'],
+								'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 3) . '/' . $fileinfo['basename'],
 								'download' => $fileinfo['basename']
 							];
 						}							
@@ -805,14 +806,14 @@ class TOOL extends API {
 					$zipname = substr(preg_replace('/[^\w\.]/', '', $zipname), 0, 240);
 					// create zip
 					$zip = new \ZipArchive();
-					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+					$zip->open(FILEHANDLER::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 					foreach ($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
 						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'][$index]);
 					}
 					$zip->close();
 
 					$downloadfiles[$zipname .'.zip'] = [
-						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 3) . '/' . $zipname .'.zip',
+						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 3) . '/' . $zipname .'.zip',
 						'download' => $zipname .'.zip'
 					];
 				}

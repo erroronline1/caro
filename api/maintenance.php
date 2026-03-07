@@ -715,7 +715,8 @@ class MAINTENANCE extends API {
 			case 'POST':
 				// store within temp to remain for put action, display matches and selection
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]) && $_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]['tmp_name']) {
-					$file = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('maintenance.vendorupdate.file')], UTILITY::directory('tmp'), [], [$_SESSION['user']['id'] . 'vendorupdate'], true);
+					$FILEHANDLER = new FILEHANDLER;
+					$file = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('maintenance.vendorupdate.file')], FILEHANDLER::directory('tmp'), [], [$_SESSION['user']['id'] . 'vendorupdate'], true);
 					$json = file_get_contents($file[0]);
 					$json = json_decode($json, true);
 					if (!$json)	{
@@ -778,7 +779,7 @@ class MAINTENANCE extends API {
 				// actual update vendors as per selection
 
 				// no exception handling, since the file validity has been checked upon upload already
-				$json = file_get_contents(UTILITY::directory('tmp') . '/' . $_SESSION['user']['id'] . 'vendorupdate.json');
+				$json = file_get_contents(FILEHANDLER::directory('tmp') . '/' . $_SESSION['user']['id'] . 'vendorupdate.json');
 				$json = json_decode($json, true);
 				$DBall = [
 					...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),

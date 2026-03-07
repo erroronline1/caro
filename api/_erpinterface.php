@@ -304,7 +304,7 @@ class _ERPINTERFACE {
 					return $PDF->tablePDF($content);
 					break;
 				default:
-					$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+					$tempFile = FILEHANDLER::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 					fputcsv($file, array_keys($result),
@@ -318,7 +318,7 @@ class _ERPINTERFACE {
 						CONFIG['csv']['dialect']['escape']);
 					}
 					fclose($file);
-					return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+					return (substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
 
 					// OR USE INBUILT FUNCTION
 
@@ -486,8 +486,8 @@ class _ERPINTERFACE {
 	 * returns an array of usecase descriptions and filenames to rename to
 	 * @return null|array
 	 * 
-	 * files are stored within UTILITY::directory('erp_documents'),  
-	 * access them from the other methods using UTILITY::directory('erp_documents') . '/intended_name.csv' as path
+	 * files are stored within FILEHANDLER::directory('erp_documents'),  
+	 * access them from the other methods using FILEHANDLER::directory('erp_documents') . '/intended_name.csv' as path
 	 * 
 	 * not necessarily csv files but whatever you can process in your custom methods
 	 */
@@ -645,7 +645,7 @@ class TEST extends _ERPINTERFACE {
 		if (!isset($queries[$key])) return null;
 		if ($params === null) return [];
 
-		return substr(UTILITY::directory('tmp'), 1) . '/' . $queries[$key];
+		return substr(FILEHANDLER::directory('tmp'), 1) . '/' . $queries[$key];
 		return [];
 	}
 
@@ -698,8 +698,8 @@ class TEST extends _ERPINTERFACE {
 	 * returns an array of usecase descriptions and filenames to rename to
 	 * @return null|array
 	 * 
-	 * files are stored within UTILITY::directory('erp_documents'),  
-	 * access them from the other methods using UTILITY::directory('erp_documents') . '/intended_name.csv' as path
+	 * files are stored within FILEHANDLER::directory('erp_documents'),  
+	 * access them from the other methods using FILEHANDLER::directory('erp_documents') . '/intended_name.csv' as path
 	 * 
 	 * not necessarily csv files but whatever you can process in your custom methods
 	 */

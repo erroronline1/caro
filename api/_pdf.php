@@ -82,8 +82,8 @@ class PDF{
 		$this->_pdf->lastPage();
 		$this->_pdf->setProtection(['modify'], '', null, 1);
 
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		$this->_pdf->Output(__DIR__ . '/' . FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return substr(FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
 	public function auditPDF($content){
@@ -386,7 +386,7 @@ class PDF{
 						$possibleFiles = explode(', ', $link[1]);
 						if (isset($content['attachments'][$document]) && array_intersect($possibleFiles, $content['attachments'][$document])){
 							foreach($possibleFiles as $filename){
-								$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $filename;
+								$path = substr(FILEHANDLER::directory('record_attachments'), 1) . '/' . $filename;
 								$file = pathinfo($path);
 								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 									// inline image embedding

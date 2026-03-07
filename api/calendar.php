@@ -106,13 +106,13 @@ class CALENDAR extends API {
 					];
 
 					// add ics file to send by mail
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics';
+					$tempFile = FILEHANDLER::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
-						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics'
 					];
 

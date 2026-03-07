@@ -1784,7 +1784,7 @@ If provided, the query returns employees having birthday in a passed timespan, t
 * if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor)
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
-* provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
+* provided data dumps are accessible via `FILEHANDLER::directory('erp_documents') . '/intended_name.csv'`
 * custom csv dumps are recommended to be created with the `TABLE`-class (api/_table.php) and `PDF(CONFIG['pdf']['table'])`
 
 `UTILITY`-methods can be found in api/_utility.php.

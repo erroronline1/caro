@@ -84,8 +84,8 @@ class PDF{
 		$this->_pdf->lastPage();
 		$this->_pdf->setProtection(['modify'], '', null, 1);
 
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		$this->_pdf->Output(__DIR__ . '/' . FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return substr(FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
 	public function auditPDF($content){
@@ -384,7 +384,7 @@ class PDF{
 						}
 						preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value with contributor for full export
 						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
-						$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
+						$path = substr(FILEHANDLER::directory('record_attachments'), 1) . '/' . $link[1];
 						if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
 							$file = pathinfo($path);
 							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {

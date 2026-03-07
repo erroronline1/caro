@@ -606,7 +606,7 @@ class DOCUMENT extends API {
 						}
 						elseif (in_array($documentname, $externaldocuments)){
 							$documentname = substr($documentname, 1);
-							$bundles[$row['name']][$documentname] = UTILITY::link(['href' => './api/api.php/file/stream/' . $documentname, 'data-filtered' => $row['id']]);
+							$bundles[$row['name']][$documentname] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $documentname, 'data-filtered' => $row['id']]);
 						}
 					}
 				}
@@ -712,10 +712,11 @@ class DOCUMENT extends API {
 				function fileupload($content, $component_name, $timestamp){
 					// recursively replace images with actual $_FILES content according to content nesting
 					if (isset($_FILES['composedComponent_files'])){
-						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
+						$FILEHANDLER = new FILEHANDLER;
+						$uploads = $FILEHANDLER->storeUploadedFiles(['composedComponent_files'], FILEHANDLER::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
 						foreach ($uploads as $path){
-							UTILITY::alterImage($path, CONFIG['limits']['document_image'], UTILITY_IMAGE_REPLACE);
+							FILEHANDLER::alterImage($path, CONFIG['limits']['document_image'], FILEHANDLER_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
@@ -791,7 +792,7 @@ class DOCUMENT extends API {
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
 						$new_images = array_unique(usedImages($component['content']));
-						foreach (array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
+						foreach (array_diff($former_images, $new_images) as $path) FILEHANDLER::delete($path);
 
 						$document_component[':id'] = $exists['id'];
 						$document_component[':content'] = UTILITY::json_encode($component);
@@ -893,7 +894,7 @@ class DOCUMENT extends API {
 							deleteImages($sub);
 						} else {
 							if (isset($sub['type']) && $sub['type'] === 'image')
-								UTILITY::delete('.' . $sub['attributes']['url']);
+								FILEHANDLER::delete('.' . $sub['attributes']['url']);
 						}
 					}
 				}
