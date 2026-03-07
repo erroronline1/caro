@@ -1386,7 +1386,7 @@ class ORDER extends API {
 				}
 				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
 				}
 				if (!$approval) $this->response([], 401);
 
@@ -1651,7 +1651,7 @@ class ORDER extends API {
 
 		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
+			$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png'));
 		}
 
 		// initiate data

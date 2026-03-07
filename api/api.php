@@ -336,7 +336,7 @@ class API {
 							]
 						],
 						'limits' => [
-							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+							'qr_errorlevel' => CONFIG['limits']['quality']['qr_error_level']
 						],
 						'label' => CONFIG['label'],
 						'forbidden' => CONFIG['forbidden'],

@@ -33,10 +33,9 @@ Things are still in motion. Images may be outdated.
 * records
     * assignable unit to override automatic "detection"
 * [enhance data safety measures](#rejected-requirements)
-    * No downloadable onscreen signatures in records, watermark for PDF exports (image altering before storage respectively)
+    * No downloadable onscreen signatures in records
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
-* signature max size 192
 * NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/
 * enable multiple signatures (cpo/patient)
 * whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
@@ -2140,18 +2139,20 @@ record_reidentify_similarity = 50 ; percent, warning on low identifier similarit
 records_search_similarity = 50 ; percent
 
 [limits]
-document_image = 2048 ; max pixels on longer side
-identifier =  128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
-max_records = 1024 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-order_approvalsignature_image = 2048 ; max pixels on longer side
-order_approved_archived = 512 ; schedules a review to delete unused archived orders to free up space
-qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
-record_image = 2048 ; max pixels on longer side
-risk_acceptance_level = 4 ; product of probability times damage to be highlighted
-storage_warning = 10 ; gigabyte, lower value of remaining space raises a dashboard warning
-user_image = 256 ; max pixels on longer side
-bundle_files_per_slide = 12
-products_per_slide = 6
+image[document] = 2048 ; max pixels on longer side
+image[signature] = 192 ; max pixels on longer side, crappy resolution by intent to make it more difficult to abuse
+image[profile] = 128 ; max pixels on longer side
+image[records] = 2048 ; max pixels on longer side
+
+length[identifier] = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 8-9 characters will be appended by default for a timestamp
+length[record_overview] = 1024 ; display of record summaries
+length [products_per_slide] = 6 ; less creates more slides, more grows the respective boxes
+
+quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
+quality[risk_acceptance_level] = 4 ; product of probability times damage to be highlighted, according to count of respective values within the language files
+
+storage[approved_order_archive] = 512 ; schedules a review to delete unused archived orders to free up space
+storage[file_storage_warning] = 10 ; gigabyte, lower value of remaining space raises a dashboard warning
 
 ; permissions based of and matching language.XX.json permissions
 ; dynamic handling for modules and methods
@@ -2794,7 +2795,8 @@ Stakeholder identification:
 | Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 | Implemented; 2025-12-20 |
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
 | Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
-| No onscreen signatures in records, watermark for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | |
+| No onscreen signatures in records | Data safety officer | 2026-03-02 | |
+| Watermarked signatures for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | CAROsignatures are now watermarked by default; 2026-03-07 |
 | Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 

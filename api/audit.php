@@ -99,7 +99,6 @@ class AUDIT extends API {
 						]
 					)){
 						for($i = 0; $i < count($files['name']); $i++){
-							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
 							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
@@ -3025,11 +3024,11 @@ class AUDIT extends API {
 						$this->_lang->GET('risk.effect', [], true) => $risk['effect'] ? : '',
 						$this->_lang->GET('risk.probability', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['probability'], count($this->_lang->_DEFAULT['risk']['probabilities'])) - 1],
 						$this->_lang->GET('risk.damage', [], true) => $this->_lang->_DEFAULT['risk']['damages'][min($risk['damage'], count($this->_lang->_DEFAULT['risk']['damages'])) - 1],
-						$this->_lang->GET('audit.risk_export_column.acceptancelevel', [], true) => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
+						$this->_lang->GET('audit.risk_export_column.acceptancelevel', [], true) => $risk['probability'] * $risk['damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
 						$this->_lang->GET('risk.measure', [], true) => $risk['measure'] ? : '',
 						$this->_lang->GET('risk.measure_probability', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['measure_probability'], count($this->_lang->_DEFAULT['risk']['probabilities'])) - 1],
 						$this->_lang->GET('risk.measure_damage', [], true) => $this->_lang->_DEFAULT['risk']['damages'][min($risk['measure_damage'], count($this->_lang->_DEFAULT['risk']['damages'])) - 1],
-						$this->_lang->GET('audit.risk_export_column.measureacceptancelevel', [], true) => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
+						$this->_lang->GET('audit.risk_export_column.measureacceptancelevel', [], true) => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
 						$this->_lang->GET('risk.risk_benefit', [], true) => $risk['risk_benefit'] ? : '',
 						$this->_lang->GET('risk.measure_remainder', [], true) => $risk['measure_remainder'] ? : '',
 						$this->_lang->GET('risk.proof', [], true) => $risk['proof'] ? implode("\n", explode(', ', $risk['proof'])): '',

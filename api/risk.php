@@ -523,8 +523,8 @@ class RISK extends API {
 							], [
 								'type' => 'textsection',
 								'attributes' => [
-									'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-									'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+									'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? 'red' : 'green',
+									'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 								]
 							], [
 								// non editable after injection
@@ -551,8 +551,8 @@ class RISK extends API {
 							], [
 								'type' => 'textsection',
 								'attributes' => [
-									'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-									'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+									'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? 'red' : 'green',
+									'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 								]
 							], [
 								// non editable after injection
@@ -656,8 +656,8 @@ class RISK extends API {
 								], [
 									'type' => 'textsection',
 									'attributes' => [
-										'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-										'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+										'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? 'red' : 'green',
+										'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 									]
 								], [
 									'type' => 'textsection',
@@ -667,8 +667,8 @@ class RISK extends API {
 								], [
 									'type' => 'textsection',
 									'attributes' => [
-										'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-										'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+										'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? 'red' : 'green',
+										'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['quality']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 									]
 								], [
 									'type' => 'textsection',
@@ -736,7 +736,7 @@ class RISK extends API {
 		foreach ($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 			$row['risk'] = implode(' ', array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
-			if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+			if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 				$slides[] = [
 					[
 						'type' => 'textsection',

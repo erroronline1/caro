@@ -2039,18 +2039,20 @@ record_reidentify_similarity = 50 ; Prozent, Warnung bei geringer Übereinstimmu
 records_search_similarity = 50 ; Prozent
 
 [limits]
-form_image = 2048 ; maximale Pixel für längste Seite
-identifier = 128 ; Zeichenlänge für Kennzeichen, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
-max_records = 1024 ; maximal angezeigte offene Dokumentationen
-order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
-order_approved_archived = 512 ; Plant eine Überprüfung der archivierten Bestellungen um aufzuräumen
-qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
-record_image = 2048 ; maximale Pixel für längste Seite
-risk_acceptance_level = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe
-storage_warning = 10 ; Gigabyte, ein niedrigerer Wert für verbleibenden Speicherplatz erzeugt eine Warnung auf der Startseite
-user_image = 256 ; maximale Pixel für längste Seite
-bundle_files_per_slide = 12
-products_per_slide = 6
+image[document] = 2048 ; maximale Pixel für längste Seite
+image[signature] = 192 ;maximale Pixel für längste Seite, extra schlechte Auflösung  um Missbrauch zu erschweren
+image[profile] = 128 ; maximale Pixel für längste Seite
+image[records] = 2048 ; maximale Pixel für längste Seite
+
+length[identifier] = 128 ; Zeichenlänge für Kennzeichen, je länger desto komplexer und fehleranfälliger wird der QR-Code. 8-9 Zeichen werden für einen Zeitstempel automatisch angefügt
+length[record_overview] = 1024 ; maximal angezeigte offene Dokumentationen
+length [products_per_slide] = 6 ; weniger erzeugt mehr Slides, mehr vergößert die jeweiligen Boxen
+
+quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
+quality[risk_acceptance_level] = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe, gemäß der Anzahl entsprechender Einträge in den Sprachdateien
+
+storage[approved_order_archive] = 512 ; Plant eine Überprüfung der archivierten Bestellungen um aufzuräumen
+storage[file_storage_warning] = 10 ; Gigabyte, ein niedrigerer Wert für verbleibenden Speicherplatz erzeugt eine Warnung auf der Startseite
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
 ; dynamische Verarbeitung innerhalb der Module

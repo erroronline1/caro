@@ -465,7 +465,7 @@ class CONSUMABLES extends API {
 						$check = explode("\n", $vendorproduct['sample_checks'][count($vendorproduct['sample_checks']) - 1]['content']); // extract check information
 						if ($check[count($check) - 1] !== $this->_lang->GET('order.incorporation.revoked', [], true)){
 							$article = intval(count($matches) - 1);
-							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 								$matches[$article][] = [
 									[
 										'type' => 'textsection',
@@ -1531,7 +1531,7 @@ class CONSUMABLES extends API {
 							}
 							if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
 
-							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 								$checkslides[] = [];
 							}
 							$slide = intval(count($checkslides) - 1);
@@ -1577,7 +1577,7 @@ class CONSUMABLES extends API {
 					$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 					if ($product['sample_checks']) {
 						foreach ($product['sample_checks'] as $check){
-							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 								$checkslides[] = [];
 							}
 							$slide = intval(count($checkslides) - 1);
@@ -1943,7 +1943,7 @@ class CONSUMABLES extends API {
 			foreach ($row as $key => $value){
 				$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 			}
-			if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+			if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 				$slides[] = [
 					[
 						'type' => 'textsection',

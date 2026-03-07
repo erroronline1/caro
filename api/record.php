@@ -690,7 +690,7 @@ class RECORD extends API {
 								'hint' => $this->_lang->GET('record.create_identifier_hint'),
 								'attributes' => [
 									'name' => $this->_lang->GET('record.create_identifier'),
-									'maxlength' => CONFIG['limits']['identifier'],
+									'maxlength' => CONFIG['limits']['length']['identifier'],
 									'id' => '_identifier'
 								]
 							]
@@ -1004,14 +1004,11 @@ class RECORD extends API {
 					)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
-								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
-
 								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
 							}
 						}
 						else {
-							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[0], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 							$attachments[$fileinput] = [substr($uploaded[0], 1)];
 						}
 					}
@@ -1591,7 +1588,7 @@ class RECORD extends API {
 										'hint' => $this->_lang->GET('record.create_identifier_hint'),
 										'attributes' => [
 											'name' => $this->_lang->GET('record.create_identifier'),
-											'maxlength' => CONFIG['limits']['identifier']
+											'maxlength' => CONFIG['limits']['length']['identifier']
 										]
 									],
 									[
@@ -1869,7 +1866,7 @@ class RECORD extends API {
 					'description' => $this->_lang->GET('record.scan')
 				], [
 					'type' => 'filtered',
-					'hint' => $this->_lang->GET('record.filter_hint', [':max' => CONFIG['limits']['max_records']]),
+					'hint' => $this->_lang->GET('record.filter_hint', [':max' => CONFIG['limits']['length']['record_overview']]),
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
@@ -1961,7 +1958,7 @@ class RECORD extends API {
 			}
 			if (isset($contexts[$row['context']])) {
 				// limit results per context to max_records
-				if (count($contexts[$row['context']]) > CONFIG['limits']['max_records']) continue;
+				if (count($contexts[$row['context']]) > CONFIG['limits']['length']['record_overview']) continue;
 			}
 			else $contexts[$row['context']] = [];
 
@@ -2028,7 +2025,7 @@ class RECORD extends API {
 										'hint' => $this->_lang->GET('record.create_identifier_hint'),
 										'attributes' => [
 											'name' => $this->_lang->GET('record.create_identifier'),
-											'maxlength' => CONFIG['limits']['identifier'],
+											'maxlength' => CONFIG['limits']['length']['identifier'],
 											'value' => $new_id
 										]
 									],

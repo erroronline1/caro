@@ -129,7 +129,6 @@ class USER extends API {
 							'size' => CONFIG['limits']['image']['profile']
 						]
 					)[0];
-					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
@@ -148,7 +147,6 @@ class USER extends API {
 							'size' => CONFIG['limits']['image']['profile']
 						]
 					)[0];
-					FILEHANDLER::alterImage($user[':image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
 					$user[':image'] = substr($user[':image'], 3);
 				}
 				// process settings

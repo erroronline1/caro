@@ -729,7 +729,6 @@ class DOCUMENT extends API {
 						);
 						$uploaded_files = [];
 						foreach ($uploads as $path){
-							FILEHANDLER::alterImage($path, CONFIG['limits']['document_image'], FILEHANDLER_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
