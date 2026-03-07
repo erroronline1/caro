@@ -549,10 +549,10 @@ define('DEFAULTSQL', [
 				"	closed varchar(MAX) NULL" .
 				");"
 				.
-				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
-				"CREATE TABLE caro_consumables_order_statistics (" .
+				"IF OBJECT_ID(N'caro_media', N'U') IS NULL " .
+				"CREATE TABLE caro_media (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
-				"	context varchar(255) NOT NULL" .
+				"	context varchar(255) NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	mime_type varchar(255) NOT NULL," .
 				"	content varbinary(max) NOT NULL," .
