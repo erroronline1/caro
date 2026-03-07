@@ -674,6 +674,28 @@ class SQLQUERY {
 		],
 
 
+		'media_post' => [
+			'mysql' => "INSERT INTO caro_media (id, context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (NULL, :context, :name, :mime_type, :content, :upload_date, :expiry_date, :metadata)",
+			'sqlsrv' => "INSERT INTO caro_media (context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (:context, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(SMALLDATETIME, :upload_date, 120), CONVERT(SMALLDATETIME, :expiry_date, 120), :metadata)"
+		],
+		'media_put' => [
+			'mysql' => "UPDATE caro_media SET expiry_date = :expiry_date, metadata = :metadata WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_media SET expiry_date = CONVERT(SMALLDATETIME, :expiry_date, 120), metadata = :metadata WHERE id = :id"
+		],
+		'media_get_info_by_name_and_context' => [
+			'mysql' => "SELECT id, name, metadata FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context",
+			'sqlsrv' => "SELECT id, name, metadata FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context"
+		],
+		'media_get_by_name_and_context' => [
+			'mysql' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context",
+			'sqlsrv' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context"
+		],
+		'media_delete' => [
+			'mysql' => "DELETE FROM caro_media WHERE id IN (:ids)",
+			'sqlsrv' => "DELETE FROM caro_media WHERE id IN (:ids)"
+		],
+
+
 
 		'message_post_message' => [
 			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)",
