@@ -86,8 +86,18 @@ class AUDIT extends API {
 				// process content
 				// process files
 				foreach ($_FILES as $fileinput => $files){
-					$FILEHANDLER = new FILEHANDLER;
-					if ($uploaded = $FILEHANDLER->storeUploadedFiles([$fileinput], FILEHANDLER::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])], null, false)){
+					$FILEHANDLER = new FILEHANDLER($this->_pdo);
+					if ($uploaded = $FILEHANDLER->storeUploadedFiles(
+						input: [
+							$fileinput
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('audit_attachments')
+						],
+						naming: [
+							'prefix' => preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])
+						]
+					)){
 						for($i = 0; $i < count($files['name']); $i++){
 							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field

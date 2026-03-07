@@ -547,11 +547,25 @@ class TOOL extends API {
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.image.source')]) && $_FILES[$this->_lang->PROPERTY('tool.image.source')]['tmp_name'][0]) {
 					$response['render']['content'][] = [];
 					$FILEHANDLER = new FILEHANDLER();
-					$images = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('tool.image.source')], FILEHANDLER::directory('tmp'), [$size]);
-					$size = explode(' x ', $size);
-					$size = isset ($size[1]) ? max(intval($size[0]), intval($size[1])) : null;
+					$maxsize = explode(' x ', $size);
+					$images = $FILEHANDLER->storeUploadedFiles(
+						input: [
+							$this->_lang->PROPERTY('tool.image.source')
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('tmp')
+							// no overwriting of present files within temp dir
+						],
+						naming: [
+							'prefix' => $size
+						],
+						imageoptions: [
+							'size' => isset ($maxsize[1]) ? max(intval($maxsize[0]), intval($maxsize[1])) : null,
+							'label' => $label ?: null,
+							'watermark' => $watermark ? '../' . CONFIG['application']['watermark'] : null
+						]
+					);
 					foreach ($images as $image){
-						FILEHANDLER::alterImage($image, $size, FILEHANDLER_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
 						$dimensions = getimagesize($image);
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',

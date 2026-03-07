@@ -587,7 +587,17 @@ class ERPQUERY extends API {
 				$upload = null;
 				$rename = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.upload.select'));
 				$FILEHANDLER = new FILEHANDLER();
-				if ($rename) $upload = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('erpquery.upload.file')], FILEHANDLER::directory('erp_documents'), [], [$rename]);
+				if ($rename) $upload = $FILEHANDLER->storeUploadedFiles(
+					input: [
+						$this->_lang->PROPERTY('erpquery.upload.file')
+					],
+					destination: [
+						'path' => FILEHANDLER::directory('erp_documents')
+					],
+					naming: [
+						'rename' => $rename
+					]
+				);
 				if ($upload) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('erpquery.upload.success'),

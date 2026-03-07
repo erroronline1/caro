@@ -64,10 +64,17 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// $_FILES is submitted always even if empty
-				$FILEHANDLER = new FILEHANDLER();
+				$FILEHANDLER = new FILEHANDLER($this->_pdo);
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name']) {
 					// process provided files 
-					$files = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], FILEHANDLER::directory('external_documents'), null, null, false);
+					$files = $FILEHANDLER->storeUploadedFiles(
+						input: [
+							$this->_lang->PROPERTY('file.manager.new_file')
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('external_documents')
+						]
+					);
 					$insertions = [];
 					foreach ($files as $file){
 						$insertions[] = [
@@ -314,7 +321,7 @@ class FILE extends API {
 
 					// create new folder if not present
 					$new_folder = FILEHANDLER::directory('files_documents', [':category' => $new_folder]);
-					$FILEHANDLER->storeUploadedFiles([], $new_folder);
+					if (!is_dir($new_folder)) FILEHANDLER::createDirectory($new_folder);
 
 					$this->response(['response' => [
 						'msg' => $this->_lang->GET('file.manager.new_folder_created', [':name' => $new_folder]),
@@ -326,7 +333,14 @@ class FILE extends API {
 				// store uploaded files to reqested folder
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name'] && $destination) {
-					$FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], FILEHANDLER::directory('files_documents', [':category' => $destination]));
+					$FILEHANDLER->storeUploadedFiles(
+						input: [
+							$this->_lang->PROPERTY('file.manager.new_file')
+						], 
+						destination: [
+							'path' => FILEHANDLER::directory('files_documents', [':category' => $destination])
+						]
+					);
 					$this->response(['response' => [
 						'msg' => $this->_lang->GET('file.manager.new_file_created'),
 						'redirect' => ['filemanager', $destination],
@@ -700,8 +714,18 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('file.sharepoint_upload_header')]) && $_FILES[$this->_lang->PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
-					$FILEHANDLER = new FILEHANDLER();
-					$FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('file.sharepoint_upload_header')], FILEHANDLER::directory('sharepoint'), [$_SESSION['user']['name']]);
+					$FILEHANDLER = new FILEHANDLER($this->_pdo);
+					$FILEHANDLER->storeUploadedFiles(
+						input: [
+							$this->_lang->PROPERTY('file.sharepoint_upload_header')
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('sharepoint')
+						],
+						naming: [
+							'prefix' => $_SESSION['user']['name']
+						]
+					);
 					$this->response(['response' => [
 						'msg' => $this->_lang->GET('file.manager.new_file_created'),
 						'redirect' => ['sharepoint'],

@@ -709,11 +709,24 @@ class DOCUMENT extends API {
 				 * 
 				 * @return array $content altered
 				 */
-				function fileupload($content, $component_name, $timestamp){
+				$FILEHANDLER = new FILEHANDLER($this->_pdo);
+				function fileupload($FILEHANDLER, $content, $component_name, $timestamp){
 					// recursively replace images with actual $_FILES content according to content nesting
 					if (isset($_FILES['composedComponent_files'])){
-						$FILEHANDLER = new FILEHANDLER;
-						$uploads = $FILEHANDLER->storeUploadedFiles(['composedComponent_files'], FILEHANDLER::directory('component_attachments'), [$component_name . '_' . $timestamp]);
+						$uploads = $FILEHANDLER->storeUploadedFiles(
+							input: [
+								'composedComponent_files'
+							],
+							destination: [
+								'path' => FILEHANDLER::directory('component_attachments')
+							],
+							naming: [
+								'prefix' => $component_name . '_' . $timestamp
+							],
+							imageoptions: [
+								'size' => CONFIG['limits']['image']['document']
+							]
+						);
 						$uploaded_files = [];
 						foreach ($uploads as $path){
 							FILEHANDLER::alterImage($path, CONFIG['limits']['document_image'], FILEHANDLER_IMAGE_REPLACE);
@@ -788,7 +801,7 @@ class DOCUMENT extends API {
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
 						$exists_date = new \DateTime($exists['date']);
-						$component['content'] = fileupload($component['content'], $exists['name'], $exists_date->format('YmdHis'));
+						$component['content'] = fileupload($FILEHANDLER, $component['content'], $exists['name'], $exists_date->format('YmdHis'));
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
 						$new_images = array_unique(usedImages($component['content']));
@@ -831,7 +844,7 @@ class DOCUMENT extends API {
 				// check for forbidden name
 				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
-				$component['content'] = fileupload($component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
+				$component['content'] = fileupload($FILEHANDLER, $component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
 
 				$document_component[':content'] = UTILITY::json_encode($component);
 

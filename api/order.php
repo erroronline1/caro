@@ -1661,10 +1661,30 @@ class ORDER extends API {
 		$attachments = [];
 		$FILEHANDLER = new FILEHANDLER();
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], FILEHANDLER::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
+			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles(
+				input: [
+					$this->_lang->PROPERTY('order.attach_photo')
+				],
+				destination: [
+					'path' => FILEHANDLER::directory('order_attachments')
+				],
+				naming: [
+					'prefix' => $this->_date['servertime']->format('YmdHis')
+				]
+			));
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], FILEHANDLER::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')], null, false));
+			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles(
+				input: [
+					$this->_lang->PROPERTY('order.attach_file')
+				],
+				destination: [
+					'path' => FILEHANDLER::directory('order_attachments')
+				],
+				naming: [
+					'prefix' => $this->_date['servertime']->format('YmdHis')
+				]
+			));
 		}
 		// sanitize array for empty values
 		foreach ($attachments as $key => $value){

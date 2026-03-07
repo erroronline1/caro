@@ -986,9 +986,22 @@ class RECORD extends API {
 				// handle attachments and images
 				if (!file_exists(FILEHANDLER::directory('record_attachments'))) mkdir(FILEHANDLER::directory('record_attachments'), 0777, true);
 				$attachments = [];
-				$FILEHANDLER = new FILEHANDLER;
+				$FILEHANDLER = new FILEHANDLER($this->_pdo);
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = $FILEHANDLER->storeUploadedFiles([$fileinput], FILEHANDLER::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)], null, false)){
+					if ($uploaded = $FILEHANDLER->storeUploadedFiles(
+						input: [
+							$fileinput
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('record_attachments')
+						],
+						naming: [
+							'prefix' => preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)
+						],
+						imageoptions: [
+							'size' => CONFIG['limits']['image']['records']
+						]
+					)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
 								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) FILEHANDLER::alterImage($uploaded[$i], CONFIG['limits']['record_image'], FILEHANDLER_IMAGE_REPLACE);

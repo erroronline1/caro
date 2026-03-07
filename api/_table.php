@@ -189,7 +189,7 @@ CLASS TABLE{
 		}
 
 		foreach($response as &$path){
-			$path = FILEHANDLER::handle($path, $dst, 0, [], FILEHANDLER::directory('tmp'), false);
+			$path = FILEHANDLER::saveToFilesystem($path, FILEHANDLER::directory('tmp') . '/' . $dst);
 		}
 		return $response;
 	}
@@ -384,7 +384,7 @@ CLASS TABLE{
 			}
 		}
 		$writer->close();
-		$path = FILEHANDLER::handle($tmp_name, $dst, 0, [], FILEHANDLER::directory('tmp'), false);
+		$path = FILEHANDLER::saveToFilesystem($tmp_name, FILEHANDLER::directory('tmp') . '/' . $dst);
 
 		return [$path];
 	}

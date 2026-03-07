@@ -716,7 +716,18 @@ class MAINTENANCE extends API {
 				// store within temp to remain for put action, display matches and selection
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]) && $_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]['tmp_name']) {
 					$FILEHANDLER = new FILEHANDLER;
-					$file = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('maintenance.vendorupdate.file')], FILEHANDLER::directory('tmp'), [], [$_SESSION['user']['id'] . 'vendorupdate'], true);
+					$file = $FILEHANDLER->storeUploadedFiles(
+						input: [
+							$this->_lang->PROPERTY('maintenance.vendorupdate.file')
+						],
+						destination: [
+							'path' => FILEHANDLER::directory('tmp'),
+							'replace' => true
+						], 
+						naming: [
+							'rename' => $_SESSION['user']['id'] . 'vendorupdate'
+						]
+					);
 					$json = file_get_contents($file[0]);
 					$json = json_decode($json, true);
 					if (!$json)	{
