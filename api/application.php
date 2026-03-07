@@ -545,11 +545,11 @@ class APPLICATION extends API {
 
 			// storage warning
 			$storage = round(disk_free_space("/") / pow(1024, 3), 3);
-			if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
+			if ($storage < CONFIG['limits']['storage']['file_storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
 				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
+						'name' => $this->_lang->GET('application.file_storage_warning', [':space' => $storage . ' GB']),
 						'class' => 'red'
 					]
 				];
