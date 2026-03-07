@@ -219,6 +219,18 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_media` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`mime_type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` longblob NOT NULL," .
+				"	`upload_date` datetime NOT NULL," .
+				"	`expiry_date` datetime NULL DEFAULT NULL," .
+				"	`metadata` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -535,6 +547,18 @@ define('DEFAULTSQL', [
 				"	last_user varchar(255) NULL," .
 				"	last_touch smalldatetime NULL," .
 				"	closed varchar(MAX) NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_order_statistics (" .
+				"	id int NOT NULL IDENTITY PRIMARY KEY," .
+				"	context varchar(255) NOT NULL" .
+				"	name varchar(MAX) NOT NULL," .
+				"	mime_type varchar(255) NOT NULL," .
+				"	content varbinary(max) NOT NULL," .
+				"	upload_date smalldatetime NOT NULL," .
+				"	expiry_date smalldatetime NULL DEFAULT NULL," .
+				"	metadata varchar(MAX) NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
@@ -907,8 +931,7 @@ class INSTALL {
 	 */
 	public function installDatabase(){
 		//secure fileserver by default
-		if (!file_exists( '../fileserver' )) mkdir('../fileserver');
-		FILEHANDLER::secureDirectory('../fileserver');
+		FILEHANDLER::createDirectory('../fileserver');
 
 		if (SQLQUERY::EXECUTE($this->_pdo, DEFAULTSQL['installed'][$this->_pdoDriver])){
 			return $this->printWarning('Databases already installed.');
@@ -1324,8 +1347,20 @@ class INSTALL {
 					'type' => 'image/png',
 					'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 				];
-				$entry['image'] = $FILEHANDLER->storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], FILEHANDLER::directory('users'), ['profilepic_' . $entry['name']])[0];
-				FILEHANDLER::alterImage($entry['image'], CONFIG['limits']['user_image'], FILEHANDLER_IMAGE_REPLACE);
+				$entry['image'] = $FILEHANDLER->storeUploadedFiles(
+					input: [
+						$this->_lang->PROPERTY('user.take_photo')
+					],
+					destination: [
+						'path' => FILEHANDLER::directory('users'),
+						'replace' => true
+					],
+					naming: [
+						'rename' => 'profilepic_' . $entry['name']
+					],
+					imageoptions: [
+						'size' => CONFIG['limits']['image']['profile'] 
+					])[0];
 				$entry['image'] = substr($entry['image'], 3);
 
 				// gather timesheet setup
