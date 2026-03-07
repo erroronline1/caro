@@ -67,14 +67,24 @@ class FILEHANDLER{
 			else $resize = 1;
 			$new = ['w' => ceil($src['w'] * $resize), 'h' => ceil($src['h'] * $resize)];
 			$output = imagecreatetruecolor($new['w'], $new['h']);
-			imagefill($output, 0, 0, imagecolorallocatealpha($input, 0, 0, 0, 127));
-			imagealphablending($output, false);
-			imagesavealpha($output, true);
-			imagecolortransparent($output, imagecolorallocate($output, 0, 0, 0));
+
+			// add a white background color instead of transparency
+			if ($watermarkPattern) {
+				imagefill($output, 0, 0, imagecolorallocatealpha($input, 255, 255, 255, 0));
+			}
+			else {
+				imagefill($output, 0, 0, imagecolorallocatealpha($input, 0, 0, 0, 127));
+				imagealphablending($output, false);
+				imagesavealpha($output, true);
+				imagecolortransparent($output, imagecolorallocate($output, 0, 0, 0));
+			}
 			imagecopyresampled($output, $input, 0, 0, 0, 0, $new['w'], $new['h'], $src['w'], $src['h']);
 
 			// patterned watermark to raise the difficulty in misusing a signature
 			if ($watermarkPattern){
+				// add a white background color instead of transparency
+				imagefill($output, 0, 0, imagecolorallocatealpha($input, 255, 255, 255, 0));
+
 				// create a gradient ressource
 				// adapted from https://www.php.net/manual/en/function.imagefill.php#93920
 				$gradient = imagecreatetruecolor($new['w'], $new['h']);
@@ -140,9 +150,9 @@ class FILEHANDLER{
 				}
 
 				// blur edges a bit to make it more difficult to select edges for removing watermark
-				imagefilter($output, IMG_FILTER_SMOOTH, 10);
+				imagefilter($output, IMG_FILTER_SMOOTH, 5);
 				// merge the gradient watermark with output
-				imagecopymerge($output, $watermarkLayer, 0, 0, 0, 0, $new['w'], $new['h'], 35);
+				imagecopymerge($output, $watermarkLayer, 0, 0, 0, 0, $new['w'], $new['h'], 25);
 				$tiled = $watermarkLayer = null;
 			}
 
