@@ -332,7 +332,7 @@ class PDF{
 		);
 		for ($row = 0; $row < $this->_setup['rows']; $row++){
 			for ($column = 0; $column < $this->_setup['columns']; $column++){
-				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['quality']['qr_error_level'], $column * $columnwidth + $this->_setup['marginleft'] , $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
+				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'] , $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
 				$this->_pdf->MultiCell($columnwidth - $codesize - $this->_setup['codepadding'], $rowheight, $content['content'][1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'] + $this->_setup['codepadding'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
 			}
 		}
@@ -557,7 +557,7 @@ class RECORDTCPDF extends \TCPDF {
 				'module_width' => 1, // width of a single module in points
 				'module_height' => 1 // height of a single module in points
 			);
-			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . CONFIG['limits']['quality']['qr_error_level'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
+			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
 			$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
 		}
 	}

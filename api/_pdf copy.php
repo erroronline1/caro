@@ -334,7 +334,7 @@ class PDF{
 		);
 		for ($row = 0; $row < $this->_setup['rows']; $row++){
 			for ($column = 0; $column < $this->_setup['columns']; $column++){
-				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['quality']['qr_error_level'], $column * $columnwidth + $this->_setup['marginleft'] , $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
+				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'] , $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
 				$this->_pdf->MultiCell($columnwidth - $codesize - $this->_setup['codepadding'], $rowheight, $content['content'][1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'] + $this->_setup['codepadding'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
 			}
 		}
@@ -648,7 +648,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			];
 
 			$identifier = $this->getBarcode(
-				'QRCODE,H' . CONFIG['limits']['quality']['qr_error_level'],
+				'QRCODE,H' . CONFIG['limits']['quality']['qr_errorlevel'],
 				$this->qrcodecontent,
 				$this->_setup['marginleft'],
 				$this->_setup['margintop'],
