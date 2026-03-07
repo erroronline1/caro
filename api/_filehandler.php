@@ -42,7 +42,7 @@ class FILEHANDLER{
 	 * 
 	 * @return string|object|null a GdImage ressource or no return
 	 */
-	public static function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false){
+	public static function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false, $resourceExtension = null){
 		if (is_file($file)){
 			$filetype = getimagesize($file)[2];
 			switch($filetype){
@@ -57,7 +57,21 @@ class FILEHANDLER{
 					break;
 			}
 		}
-		else $input = imagecreatefromstring($file); // bytestring
+		else {
+			switch($resourceExtension){
+				case 'gif':
+					$filetype = 1;
+					break;
+				case 'jpg':
+				case 'jpeg':
+					$filetype = 2;
+					break;
+				case 'png':
+					$filetype = 3;
+					break;
+			}
+			$input = imagecreatefromstring($file); // bytestring
+		}
 		if ($input) {
 			$filename = pathinfo($file)['basename'];
 			// resizing
@@ -570,7 +584,7 @@ class FILEHANDLER{
 		// alter images by default to strip metadata for data safety reasons
 		// also apply watermark pattern for CARO signatures by default.
 		if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
-			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['name'], 'CAROsignature')));
+			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')), strtolower($file['extension']));
 		}
 
 		$destination['metadata'] = $destination['metadata'] ?? null;
@@ -580,7 +594,7 @@ class FILEHANDLER{
 				':context' => $destination['context'],
 				':name' => $filename,
 				':mime_type' => $mime_type,
-				':content' => $fileContents,
+				':content' => bin2hex($fileContents), // bloats the data unfortunately. direct you complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
 				':expiry_date' => $destination['expiry_date'] ?? null,
 				':metadata' => $destination['metadata']
