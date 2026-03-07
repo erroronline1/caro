@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_06_credentials'] as $update){
+		foreach (['_2026_03_07'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -499,12 +499,12 @@ class UPDATE{
 			'mysql' => [
 				"CREATE TABLE IF NOT EXISTS `caro_media` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`mime_type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` longblob NOT NULL," .
 				"	`upload_date` datetime NOT NULL," .
 				"	`expiry_date` datetime NULL DEFAULT NULL," .
-				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`metadata` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -513,14 +513,14 @@ class UPDATE{
 				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_order_statistics (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
+				"	context varchar(255) NOT NULL" .
 				"	name varchar(MAX) NOT NULL," .
 				"	mime_type varchar(255) NOT NULL," .
 				"	content varbinary(max) NOT NULL," .
 				"	upload_date smalldatetime NOT NULL," .
 				"	expiry_date smalldatetime NULL DEFAULT NULL," .
-				"	context varchar(255) NOT NULL" .
 				"	metadata varchar(MAX) NULL" .
-				");",
+				");"
 			]
 		];
 	}
