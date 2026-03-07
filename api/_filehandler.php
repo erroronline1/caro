@@ -16,10 +16,12 @@ define("FILEHANDLER_IMAGE_STREAM", 0x2);
 define("FILEHANDLER_IMAGE_RESOURCE", 0x4);
 
 class FILEHANDLER{
-	private $_pdo = null;
-	private $_files = null;
+	public $_pdo = null;
 
-	public function __construct__($_pdo = null){
+	/**
+	 * @param object $_pdo current pdo necessary if files are to be stored in a database
+	 */
+	public function __construct($_pdo = null){
 		$this->_pdo = $_pdo;
 	}
 
@@ -87,7 +89,7 @@ class FILEHANDLER{
 				for($x = 0; $x <= $new['w']; $x++) { // loop columns
 					for($y = 0; $y <= $new['h']; $y++) { // loop rows
 					// set pixel color 
-					$col = imagecolorallocate($gradient, $rgb[0], $rgb[1], $rgb[2]);
+					$col = imagecolorallocate($gradient, intval($rgb[0]), intval($rgb[1]), intval($rgb[2]));
 					imagesetpixel($gradient, $x - 1, $y - 1, $col);
 					// calculate new color  
 					for($i = 0; $i <= 2; $i++) {
@@ -105,8 +107,8 @@ class FILEHANDLER{
 				$tileSrc_dim = ['w' => imagesx($tileSrc), 'h' => imagesy($tileSrc)];
 
 				// create smaller pattern ressource based on output dimensions
-				$tile_w = max($new['w'] * .035, 15);
-				$tile_h = $tile_w * $tileSrc_dim['h'] / $tileSrc_dim['w'] ;
+				$tile_w = ceil(max($new['w'] * .035, 15));
+				$tile_h = ceil($tile_w * $tileSrc_dim['h'] / $tileSrc_dim['w']);
 				$tile = imagecreatetruecolor($tile_w, $tile_h);
 				imagealphablending($tile, false);
 				imagesavealpha($tile, true);
@@ -246,9 +248,18 @@ class FILEHANDLER{
 	 * 
 	 * @return bool on success
 	 */
-	private static function createDirectory($dir){
+	public static function createDirectory($dir){
 		if (!file_exists($dir) && mkdir($dir, 0777, true)) {
-			self::secureDirectory($dir);
+			if (!file_exists($dir . '/.htaccess')) {
+				$file = fopen($dir . '/.htaccess', 'w');
+				fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
+				fclose($file);
+			}
+			if (!file_exists($dir . '/web.config')) {
+				$file = fopen($dir . '/web.config', 'w');
+				fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
+				fclose($file);
+			}
 			return true;
 		}
 		return false;
@@ -414,112 +425,162 @@ class FILEHANDLER{
 	}
 
 	/**
-	 *                             _ _             _
-	 *   ___ ___ ___ _ _ ___ ___ _| |_|___ ___ ___| |_ ___ ___ _ _
-	 *  |_ -| -_|  _| | |  _| -_| . | |  _| -_|  _|  _| . |  _| | |
-	 *  |___|___|___|___|_| |___|___|_|_| |___|___|_| |___|_| |_  |
-	 *                                                        |___|
-	 * secures a directory by inserting an .htaccess- and web.config file preventing any access without authorization
-	 * @param string $dir path
-	 * 
-	 * @return bool on success
-	 */
-	public static function secureDirectory($dir){
-		if (!file_exists($dir . '/.htaccess')) {
-			$file = fopen($dir . '/.htaccess', 'w');
-			fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
-			fclose($file);
-		}
-		if (!file_exists($dir . '/web.config')) {
-			$file = fopen($dir . '/web.config', 'w');
-			fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
-			fclose($file);
-		}
-		return true;
-	}
-
-	/**
 	 *       _                       _           _       _ ___ _ _
 	 *   ___| |_ ___ ___ ___ _ _ ___| |___ ___ _| |___ _| |  _|_| |___ ___
 	 *  |_ -|  _| . |  _| -_| | | . | | . | .'| . | -_| . |  _| | | -_|_ -|
 	 *  |___|_| |___|_| |___|___|  _|_|___|__,|___|___|___|_| |_|_|___|___|
 	 *                          |_|
-	 * moves uploaded files to folder according to input name, adds possible prefix
+	 * routes the uploaded files to the destination handler
 	 * 
 	 * @param array $input mandatory array of input names
-	 * @param string $destination where to store, with DATABASE as reserved keyword
-	 * @param array $prefix to add to filename, length according to $files
-	 * @param array $rename to rename file, length according to $files. does not change the extension!
-	 * @param bool $replace to replace files, false adds an enumerator
-	 * @param array $dbdata context and metadata
+	 * @param array $destination  
+	 * **either database:** [  
+	 *     'context' => string, mandatory
+	 *     'expiration_date' => string Y-m-d H:i:s,  
+	 *     'metadata' => array|string named array or stringified json  
+	 * ]  
+	 * **or filesystem:** [  
+	 *     'path' => string, mandatory  
+	 *     'replace' => bool, to replace files, otherwise enumerated if applicable  
+	 * ]
+	 * @param array $naming [  
+	 *     'prefix' => string|array, to add to filename, array length according to $files,  
+	 *     'rename' => string|array, to rename file, array length according to $files  
+	 * ]
+	 * @param array $imageoptions [  
+	 *     'forceimgtype' => string, change image type  
+	 *     'label' => string, add a text label in lower left corner  
+	 *     'size' => integer, max value for the longer side  
+	 *     'watermark' => bool, add a watermark in lower right corner according to config-file  
+	 * ]
 	 * 
-	 * @return array paths of stored files
-	 */
-	public function storeUploadedFiles($input = [], $destination = '', $prefix = [], $rename = [], $replace = true, $dbdata = []){
-		/* process $_FILES, store to folder and return an array of destination paths */
-		if ($destination !== 'DATABASE' && !file_exists($destination)) self::createDirectory($destination);
+	 * @return array paths of stored files or media-table ids
+	*/
+	public function storeUploadedFiles($input = [], $destination = [], $naming = [], $imageoptions = []){
+		if (!$input || (empty($destination['path']) && empty($destination['context']))) return [];
 		$targets = [];
+
+		if (isset($destination['path']) && !file_exists($destination['path'])) self::createDirectory($destination['path']);
+
+		// iterate over $_FILE input names
 		for ($i = 0; $i < count($input); $i++) {
-			if (gettype($_FILES[$input[$i]]['name']) !== 'array') {
-				$file = pathinfo($_FILES[$input[$i]]['name']);
-				if ($rename && isset($rename[$i])) $file['filename'] = $rename[$i];
-				if ($_FILES[$input[$i]]['tmp_name']) {
-					$this->_files = [$file['filename']];
-					$targets[] = 
-						$destination !== 'DATABASE'
-						? $this->handle($_FILES[$input[$i]]['tmp_name'], $file['filename'] . '.' . $file['extension'], $i, $prefix, $destination, $replace)
-						: $this->dbhandle($_FILES[$input[$i]]['tmp_name'], $file['filename'] . '.' . $file['extension'], $i, $prefix, $_FILES[$input[$i]]['type'], $dbdata);
+			$inputname = $input[$i];
+			if (gettype($_FILES[$inputname]['name']) !== 'array') {
+				// convert to nested $_FILES just to be sure
+				foreach($_FILES[$inputname] as $key => &$value){
+					$value = [$value];
 				}
 			}
-			else {
-				$this->_files = $_FILES[$input[$i]]['name'];
-				for ($j = 0; $j < count($_FILES[$input[$i]]['name']); $j++){
-					if (!$_FILES[$input[$i]]['tmp_name'][$j]) continue;
-					$file = pathinfo($_FILES[$input[$i]]['name'][$j]);
-					if ($rename && isset($rename[$i])) $file['filename'] = $rename[$i];
-					$targets[] = 
-						$destination !== 'DATABASE'
-						? $this->handle($_FILES[$input[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $destination, $replace)
-						: $this->dbhandle($_FILES[$input[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $_FILES[$input[$i]]['type'][$j], $dbdata);
+
+			//iterate over the provided files for the current input
+			for ($j = 0; $j < count($_FILES[$inputname]['name']); $j++){
+				if (!$_FILES[$inputname]['tmp_name'][$j]) continue;
+				$file = pathinfo($_FILES[$inputname]['name'][$j]);
+
+				// apply renames and prefixes if applicable
+				if ($rename = $naming['rename'] ?? null){
+					if (gettype($rename) === 'array' && isset($rename[$j])) $rename = $rename[$j]; // otherwise supposedly a string or int, you never know
+					$file['filename'] = strval($rename);
 				}
+				if ($prefix = $naming['prefix'] ?? null){
+					if (gettype($prefix) === 'array' && isset($prefix[$j])) $prefix = $prefix[$j]; // otherwise supposedly a string or int, you never know
+					$file['filename'] = strval($prefix) . '_'. $file['filename'];
+				}
+				// resanitze filename just to be sure
+				$file['filename'] = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $file['filename']);
+
+				// process current file and expect a path or database id
+				$targets[] = 
+					isset($destination['path'])
+					? $this->saveToFilesystem(
+						$_FILES[$inputname]['tmp_name'][$j],
+						$destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						$destination['replace'] ?? null,
+						$imageoptions)
+					: $this->saveToDatabase(
+						$this->_pdo,
+						$_FILES[$inputname]['tmp_name'][$j],
+						$file['filename'] . '.' . $file['extension'],
+						$_FILES[$inputname]['type'][$j],
+						$destination,
+						$imageoptions)
+				;
 			}
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
-	public static function handle($tmpname, $filename, $i, $prefix, $destination, $replace = false){
-		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
-		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $filename);
-		$target = $destination . '/' . $filename;
+	/**
+	 * @param string $tmpname temporary file
+	 * @param string destination expected path with full filename and extension
+	 * @param bool $replace overwrite existing file or enumerate if already present
+	 * @param array $imageoptions
+	 * 
+	 * @return string destination path, occasionally enumerated 
+	 */
+	public static function saveToFilesystem($tmpname, $destination, $replace = false, $imageoptions = []){
+		$file = pathinfo($destination);
 		if (!$replace){
-			$extension = '.' . pathinfo($target)['extension'];
-			$files = glob(str_replace($extension, '*' . $extension, $target));
-			$target = self::enumerate($target, $files);
+			$extension = '.' . $file['extension'];
+			$files = glob(str_replace($extension, '*' . $extension, $destination)); // find all ./directory/subdirectory/filename*.ext
+			$destination = self::enumerate($destination, $files);
 		}
 		// move_uploaded_file is for post only, else rename for put files
-		if ($tmpname && (@move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
-			return $target;
+		if ($tmpname && (@move_uploaded_file($tmpname, $destination) || rename( $tmpname, $destination))){
+			// alter images by default to strip metadata for data safety reasons
+			// also apply watermark pattern for CARO signatures by default.
+			if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
+				self::alterImage($destination, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_REPLACE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')));
+			}
+			return $destination;
 		}
 	}
-	public function dbhandle($tmpname, $filename, $i, $prefix, $type, $dbdata = []){
-		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
-		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $filename);
-		$filename = self::enumerate($filename, $this->_files);
-		$this->_files[] = $filename;
+	/**
+	 * @param string $tmpname temporary file
+	 * @param string destination expected path with full filename and extension
+	 * @param bool $replace overwrite existing file or enumerate if already present
+	 * @param array $imageoptions
+	 * 
+	 * @return int destination database id 
+	 */
+	public static function saveToDatabase($_pdo, $tmpname, $filename, $mime_type, $destination, $imageoptions = []){
+		$file = pathinfo($filename);
+		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_info_by_name_and_context', [
+			'values' => [
+				':name' => $file['filename'],
+				':extension' => '.' . $file['extension'],
+				':context' => $destination['context']
+			]
+		]);
+		
+		$filename = self::enumerate($filename, array_column($present, 'name'));
 		$fileHandle = fopen($tmpname, 'rb');
 		$fileContents = fread($fileHandle, filesize($tmpname));
     	fclose($fileHandle);
-		$data = [
-			':name' => $filename,
-			':mime_type' => $type,
-			':content' => $fileContents,
-			':upload_date' => date('Y-m-d H:i:s'),
-			':expiry_date' => $dbdata['expiry_date'] ?? null,
-			':context' => $dbdata['context'] ?? null,
-			':metadata' => $dbdata['metadata'] ?? null
-		];
-		
-		//return $this->_pdo->lastInsertId();
+
+		// alter images by default to strip metadata for data safety reasons
+		// also apply watermark pattern for CARO signatures by default.
+		if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
+			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['name'], 'CAROsignature')));
+		}
+
+		$destination['metadata'] = $destination['metadata'] ?? null;
+		if (gettype($destination['metadata']) === 'array') $destination['metadata'] = UTILITY::json_encode($destination['metadata']);
+		if (SQLQUERY::EXECUTE($_pdo, 'media_post', [
+			'values' => [
+				':context' => $destination['context'],
+				':name' => $filename,
+				':mime_type' => $mime_type,
+				':content' => $fileContents,
+				':upload_date' => date('Y-m-d H:i:s'),
+				':expiry_date' => $destination['expiry_date'] ?? null,
+				':metadata' => $destination['metadata']
+			]
+		])) return $_pdo->lastInsertId();
 	}
+	/**
+	 * @param string $target filename to be appenden a number if found in
+	 * @param array $withinfiles as list of filenames
+	 */
 	private static function enumerate($target, $withinfiles){
 		if (in_array($target, $withinfiles)){
 			$pi_target = pathinfo($target);
