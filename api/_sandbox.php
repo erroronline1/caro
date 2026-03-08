@@ -5,7 +5,27 @@ require_once('_utility.php'); // general utilities
 //require_once('_erpinterface.php');
 //var_dump(ERPINTERFACE->orderdata());
 
-FILEHANDLER::alterImage('../assets/CAROsignature.jpg', 192, FILEHANDLER_IMAGE_STREAM, false, '', '', true);
+require_once('_sqlinterface.php');
+$options = [
+	\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+	\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+	//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
+];
+$_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
+$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+if ($dbsetup) $_pdo->exec($dbsetup);
+
+$files = FILEHANDLER::retrieveFromDatabase($_pdo, 'test')[0];
+/*ob_start();
+header("Content-type: application/octet-stream");
+header("Content-Disposition: attachment; filename=" . $files['name']);
+echo $files['content'];
+ob_flush();
+// works
+*/
+echo '<img src="data:' . $files['mime_type'] . ';base64,' . base64_encode($files['content']) . '" />';
+// also works
+
 
 die();
 require_once('_language.php');
