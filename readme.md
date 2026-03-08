@@ -32,8 +32,6 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * records
     * assignable unit to override automatic "detection"
-* [enhance data safety measures](#rejected-requirements)
-    * No downloadable onscreen signatures in records
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
     * process returned hash file binary strings for blockchain
@@ -2796,7 +2794,7 @@ Stakeholder identification:
 | Slightly more detailed order statistics, also longterm storage | QMO | 2025-12-15 | Implemented; 2025-12-20 |
 | Export (print) of approved orders commission-wise for delivery organisation, more versatile filtering | Purchase | 2025-12-19 | Implemented - poor trees; 2025-12-20 |
 | Two factor authentification with additional password/pin | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
-| No onscreen signatures in records | Data safety officer | 2026-03-02 | |
+| No onscreen signatures in records | Data safety officer | 2026-03-02 | *Rejected*; 2026-03-08 |
 | Watermarked signatures for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | CAROsignatures are now watermarked by default; 2026-03-07 |
 | Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
@@ -2805,6 +2803,10 @@ Stakeholder identification:
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
 
 A solution could be established due to an erp database connection thus implementing an ERP interface into the application.
+
+> No onscreen signatures in records (03/26)
+
+This has been interpreted merely as a recommendation than a requirement to avoid malicious use. Signatures can always be accessed on screen at some point. It does not appear to be worth it at the moment to create another edge case since watermarking all signatures and processing them in a deliberate low resolution does make it cumbersome to postprocess and retrace for adverse use.
 
 #### Usability tests
 | Goals | Stakeholder | Time | Outcome |
@@ -2866,6 +2868,7 @@ A solution could be established due to an erp database connection thus implement
 | Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
 | Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
 | Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain | This is the safest to get to work without keys and should likely meet the criteria for a advanced electronic signature. Validity can be checked and a report exported in case of judicial disputes |
+| Malicious use of signatures by exporting | Low | High (loss of trust) | Watermarking and adapting file resolution to a just about recognizable quality does make it cumbersome to retrace the signature properly | none |
 
 [Content](#content)
 
