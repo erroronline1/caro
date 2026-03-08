@@ -449,6 +449,29 @@ class FILEHANDLER{
 	}
 
 	/**
+	 * @param object $_pdo an active pdo instance
+	 * @param string $context
+	 * @param string $nameprefix as start of the saved filename
+	 * 
+	 * @return array of files and their information
+	 */
+	public static function retrieveFromDatabase($_pdo, $context, $nameprefix = ''){
+		$result = [];
+		$files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
+			'values' => [
+				':name' => $nameprefix . '%',
+				':context' => $context
+			]
+		]);
+		foreach($files as $file){
+			// inflate and reconvert to binary again
+			$file['content'] = gzinflate(hex2bin($file['content']));
+			$result[] = $file;
+		}
+		return $result;
+	}
+
+	/**
 	 *       _                       _           _       _ ___ _ _
 	 *   ___| |_ ___ ___ ___ _ _ ___| |___ ___ _| |___ _| |  _|_| |___ ___
 	 *  |_ -|  _| . |  _| -_| | | . | | . | .'| . | -_| . |  _| | | -_|_ -|
@@ -553,12 +576,14 @@ class FILEHANDLER{
 			// alter images by default to strip metadata for data safety reasons
 			// also apply watermark pattern for CARO signatures by default.
 			if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
+				if (stristr($file['filename'], 'CAROsignature')) $imageoptions['size'] = CONFIG['limits']['image']['signature']; 
 				self::alterImage($destination, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_REPLACE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')));
 			}
 			return $destination;
 		}
 	}
 	/**
+	 * @param object $_pdo an active pdo instance
 	 * @param string $tmpname temporary file
 	 * @param string destination expected path with full filename and extension
 	 * @param bool $replace overwrite existing file or enumerate if already present
@@ -584,6 +609,7 @@ class FILEHANDLER{
 		// alter images by default to strip metadata for data safety reasons
 		// also apply watermark pattern for CARO signatures by default.
 		if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
+			if (stristr($file['filename'], 'CAROsignature')) $imageoptions['size'] = CONFIG['limits']['image']['signature']; 
 			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')), strtolower($file['extension']));
 		}
 
@@ -594,12 +620,12 @@ class FILEHANDLER{
 				':context' => $destination['context'],
 				':name' => $filename,
 				':mime_type' => $mime_type,
-				':content' => bin2hex($fileContents), // bloats the data unfortunately. direct you complaints to microsoft as mariadb does have no issues storing binary directly
+				':content' => bin2hex(gzdeflate($fileContents)), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
 				':expiry_date' => $destination['expiry_date'] ?? null,
 				':metadata' => $destination['metadata']
 			]
-		])) return $_pdo->lastInsertId();
+		])) return ['id' => $_pdo->lastInsertId(), 'name' => $filename, 'hash' => hash('sha256', $fileContents)];
 	}
 	/**
 	 * @param string $target filename to be appenden a number if found in
