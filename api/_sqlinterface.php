@@ -687,8 +687,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id, name, metadata FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context"
 		],
 		'media_get_by_name_and_context' => [
-			'mysql' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context",
-			'sqlsrv' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%', :extension) AND context = :context"
+			'mysql' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%') AND context = :context",
+			'sqlsrv' => "SELECT * FROM caro_media WHERE name like CONCAT(:name, '%') AND context = :context"
 		],
 		'media_delete' => [
 			'mysql' => "DELETE FROM caro_media WHERE id IN (:ids)",
