@@ -51,7 +51,7 @@ class MARKDOWN {
 	private $_sub = '/~{1}(.+?)~{1}/';
 	private $_sup = '/\^{1}(.+?)\^{1}/';
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
-	private $_task = '/\[(.)\] (.+?(?:\n|\Z))/m';
+	private $_task = '/\[(.*)\] (.+?(?:\n|\Z))/m';
 
 	private $headings = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
@@ -491,13 +491,13 @@ class MARKDOWN {
 		//replace tasks
 		if ($forPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
 			function($match){
-				return (strtolower($match[1]) === 'x' ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];
+				return (trim(strtolower($match[1])) ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];
 			},
 			$content
 		);
 		return preg_replace_callback($this->_task,
 			function($match){
-				return '<input type="checkbox" disabled' . (strtolower($match[1]) === 'x' ? ' checked': '') . ' class="markdown"> ' . $match[2];
+				return '<input type="checkbox" disabled' . (trim(strtolower($match[1])) ? ' checked': '') . ' class="markdown"> ' . $match[2];
 			},
 			$content
 		);
