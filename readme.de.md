@@ -2040,7 +2040,7 @@ records_search_similarity = 50 ; Prozent
 
 [limits]
 image[document] = 2048 ; maximale Pixel für längste Seite
-image[signature] = 512 ;maximale Pixel für längste Seite, extra schlechte Auflösung um Missbrauch zu erschweren
+image[signature] = 512 ; maximale Pixel für längste Seite, extra schlechte Auflösung um Missbrauch zu erschweren
 image[profile] = 128 ; maximale Pixel für längste Seite
 image[records] = 2048 ; maximale Pixel für längste Seite
 
@@ -2481,7 +2481,7 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
 [Übersicht](#übersicht)
 
 # Regulatorische Anforderungen an die Software
-Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
+Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [NIS-2](https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf) und [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
 
 ### Empfehlungen zur Nutzerunterweisung
 unter Berücksichtigung der [Standard-Berechtigungen](#umgebungseinstellungen)

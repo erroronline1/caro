@@ -35,9 +35,24 @@ Things are still in motion. Images may be outdated.
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
     * process returned hash file binary strings for blockchain
-* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/
+* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/ https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf
+    * Where appropriate, logs shall include:
+    * (a) relevant outbound and inbound network traffic;
+    * (b) creation, modification or deletion of users of the relevant entities’ network and information systems and extension ofthe permissions;
+    * (c) access to systems and applications;
+    * (d) authentication-related events;
+    * (e) all privileged access to systems and applications and activities performed by administrative accounts;
+    * (f) access or changes to critical configuration and backup files;
+    * (g) event logs and logs from security tools, such as antivirus, intrusion detection systems or firewalls;
+    * (h) use of system resources, as well as their performance;
+    * (i) physical access to facilities;
+    * (j) access to and use of their network equipment and devices;
+    * (k) activation, stopping and pausing of the various logs;
+    * (l) environmental events.
+    * > e.g. log requests with params and payload (but filenames instead of binaries) in separate database after login (ignore access credentials), including ip, timestamp, user id, name and permissions, http_response code adressing a - e 
 * enable multiple signatures (cpo/patient)
 * whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
+* consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 
 ## Content
 * [Aims](#aims)
@@ -97,6 +112,7 @@ Things are still in motion. Images may be outdated.
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor product lists](#importing-vendor-product-lists)
 * [Regulatory software requirements](#regulatory-software-requirements)
+    * [NIS-2 statement](#nis-2-statement)
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
     * [General](#general-1)
@@ -2590,7 +2606,18 @@ If not provided a simple import filter will be generated on export of product li
 [Content](#content)
 
 # Regulatory software requirements
-according to [OpenRegulatory](https://github.com/openregulatory/templates)
+
+## NIS-2 statement
+According to https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf there is a lot of documentation necessary to meet the NIS-2 requirements. However what has been possible to do in regards of security and integrity has been implemented (see [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)).  
+Most of the requirements are to be fulfilled by the operator of the infrastructure and end user and is not within the duties and capabilities of this software at all.
+
+What [the team](#the-team) tries to accomplish is
+* structured incident reporting within [the issue tracker](https://github.com/erroronline1/caro/issues) of the main repository
+* continuous maintenance as the team is architect, programmer, maintainer, user and scapegoat in a multiple role
+* logging what is appropriate and feasible to be reviewed
+* provide an inbuilt information on whom to report to
+* access control
+
 
 This software is not a medical device. But as this software is intended to being used in context with medical device fabrication, relevant regulatory requirements should be addressed nonetheless.
 
