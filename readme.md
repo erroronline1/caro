@@ -36,6 +36,7 @@ Things are still in motion. Images may be outdated.
     * No downloadable onscreen signatures in records
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
+    * process returned hash file binary strings for blockchain
 * NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/
 * enable multiple signatures (cpo/patient)
 * whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
@@ -2140,7 +2141,7 @@ records_search_similarity = 50 ; percent
 
 [limits]
 image[document] = 2048 ; max pixels on longer side
-image[signature] = 192 ; max pixels on longer side, crappy resolution by intent to make it more difficult to abuse
+image[signature] = 512 ; max pixels on longer side, crappy resolution by intent to make it more difficult to abuse
 image[profile] = 128 ; max pixels on longer side
 image[records] = 2048 ; max pixels on longer side
 

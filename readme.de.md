@@ -2040,7 +2040,7 @@ records_search_similarity = 50 ; Prozent
 
 [limits]
 image[document] = 2048 ; maximale Pixel für längste Seite
-image[signature] = 192 ;maximale Pixel für längste Seite, extra schlechte Auflösung  um Missbrauch zu erschweren
+image[signature] = 512 ;maximale Pixel für längste Seite, extra schlechte Auflösung um Missbrauch zu erschweren
 image[profile] = 128 ; maximale Pixel für längste Seite
 image[records] = 2048 ; maximale Pixel für längste Seite
 
