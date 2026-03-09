@@ -2481,7 +2481,7 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
 [Übersicht](#übersicht)
 
 # Regulatorische Anforderungen an die Software
-Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [NIS-2](https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf) und [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
+Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß und [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
 
 ### Empfehlungen zur Nutzerunterweisung
 unter Berücksichtigung der [Standard-Berechtigungen](#umgebungseinstellungen)
@@ -2558,6 +2558,8 @@ Eine ausführliche API-Dokumentation liegt in der englischsprachigen Beschreibun
 # Stellungnahme zu technischen Richtlinien zur Datensicherheit
 Eine Stellungnahme zu den technischen Richtlinien für Anwendungen im Gesundheitswesen liegt in der englischsprachigen Beschreibung vor.
 Basis für die Bewertung sind die Richtlinien des BSI für [Frontend](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) und [Backend](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-3.pdf?__blob=publicationFile&v=9).
+
+Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [NIS-2](https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf) liegen in der englischsprachigen Beschreibung vor.
 
 ## Nutzungsrichtlinien für die Nutzung der Anwendung
 

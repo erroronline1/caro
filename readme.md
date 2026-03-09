@@ -112,7 +112,6 @@ Things are still in motion. Images may be outdated.
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor product lists](#importing-vendor-product-lists)
 * [Regulatory software requirements](#regulatory-software-requirements)
-    * [NIS-2 statement](#nis-2-statement)
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
     * [General](#general-1)
@@ -152,6 +151,7 @@ Things are still in motion. Images may be outdated.
     * [Tool endpoints](#tool-endpoints)
     * [User endpoints](#user-endpoints)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
+    * [NIS-2 statement](#nis-2-statement)
     * [Terms of service for using the application](#terms-of-service-for-using-the-application)
     * [Web Application](#web-application)
         * [3.1.1 Objective (1): Intended use](#311-objective-1-intended-use)
@@ -2606,19 +2606,6 @@ If not provided a simple import filter will be generated on export of product li
 [Content](#content)
 
 # Regulatory software requirements
-
-## NIS-2 statement
-According to https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf there is a lot of documentation necessary to meet the NIS-2 requirements. However what has been possible to do in regards of security and integrity has been implemented (see [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)).  
-Most of the requirements are to be fulfilled by the operator of the infrastructure and end user and is not within the duties and capabilities of this software at all.
-
-What [the team](#the-team) tries to accomplish is
-* structured incident reporting within [the issue tracker](https://github.com/erroronline1/caro/issues) of the main repository
-* continuous maintenance as the team is architect, programmer, maintainer, user and scapegoat in a multiple role
-* logging what is appropriate and feasible to be reviewed
-* provide an inbuilt information on whom to report to
-* access control
-
-
 This software is not a medical device. But as this software is intended to being used in context with medical device fabrication, relevant regulatory requirements should be addressed nonetheless.
 
 ## Clinical evaluation, clinical evaluation plan, clinical evaluation report
@@ -5609,6 +5596,17 @@ Sample response
 
 # Statement on technical guidelines on data security
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
+
+## NIS-2 statement
+According to https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf there is a lot of documentation necessary to meet the NIS-2 requirements. However what has been possible to do in regards of security and integrity has been implemented.  
+Most of the requirements are to be fulfilled by the operator of the infrastructure and end user and is not within the duties and capabilities of this software at all.
+
+What [the team](#the-team) tries to accomplish is
+* structured incident reporting within [the issue tracker](https://github.com/erroronline1/caro/issues) of the main repository
+* continuous maintenance as the team is architect, programmer, maintainer, user and scapegoat in a multiple role
+* logging what is appropriate and feasible to be reviewed
+* provide an inbuilt information on whom to report to
+* access control
 
 ## Terms of service for using the application
 
