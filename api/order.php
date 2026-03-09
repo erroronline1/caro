@@ -1376,7 +1376,8 @@ class ORDER extends API {
 				elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 						'values' => [
-							':token' => $orderauth
+							':token' => $orderauth ? hash('sha256', $orderauth) : null,
+							':two_factor' => $_SESSION['user']['two_factor'] ?: null
 						]
 					]);
 					$result = $result ? $result[0] : null;
@@ -1638,7 +1639,8 @@ class ORDER extends API {
 		elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
 			$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
-					':token' => $orderauth
+					':token' => $orderauth ? hash('sha256', $orderauth) : null,
+					':two_factor' => $_SESSION['user']['two_factor'] ?: null
 				]
 			]);
 			$result = $result ? $result[0] : null;
