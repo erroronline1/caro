@@ -345,6 +345,7 @@ class CALENDAR extends API {
 					$content = json_decode($this->_payload->content, true);
 					$preset = json_decode($this->_payload->preset, true);
 					$id = $this->_payload->id ? : null;
+					$id = $id !== 'undefined' ? $id : null;
 					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')]) : null;
 					if (!$content) $this->response([], 406);
 
