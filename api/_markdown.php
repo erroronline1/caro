@@ -51,7 +51,7 @@ class MARKDOWN {
 	private $_sub = '/~{1}(.+?)~{1}/';
 	private $_sup = '/\^{1}(.+?)\^{1}/';
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
-	private $_task = '/\[(.*)\] (.+?(?:\n|\Z))/m';
+	private $_task = '/\[(\s*x{0,1}\s*)\] (.+?(?:\n|\Z))/mi';
 
 	private $headings = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
