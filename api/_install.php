@@ -340,6 +340,21 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_request_log` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`timestamp` datetime NOT NULL," .
+				"	`method` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`api` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`payload` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`user_id` int  NOT NULL," .
+				"	`user_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_ip` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`session_id` text(1024) COLLATE utf8mb4_unicode_ci NULL," .
+				"	`response_code` tinytext COLLATE utf8mb4_unicode_ci NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_user_training` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -670,6 +685,21 @@ define('DEFAULTSQL', [
 				"	span_end date NOT NULL," .
 				"	responsibility varchar(MAX) NULL DEFAULT NULL," .
 				"	description varchar(MAX) NULL DEFAULT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_request_log', N'U') IS NULL " .
+				"CREATE TABLE caro_request_log (" .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
+				"	timestamp smalldatetime NOT NULL," .
+				"	method varchar(255 NOT NULL," .
+				"	api varchar(MAX) NOT NULL," .
+				"	payload varchar(MAX) NULL," .
+				"	user_id int NOT NULL," .
+				"	user_name varchar(255) NOT NULL," .
+				"	user_permissions varchar(MAX) NOT NULL," .
+				"	user_ip varchar(255) NOT NULL," .
+				"	session_id varchar(1024) NULL," .
+				"	response_code varchar(255) NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
