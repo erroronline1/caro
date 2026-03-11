@@ -114,7 +114,6 @@ class API {
 		// check if a registered user with valid token is logged in
 		if ($this->_auth){
 			// valid user IS logged in
-
 			// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])
 				&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
@@ -148,6 +147,7 @@ class API {
 					//else $this->response([], 401);
 				} else $this->response([], 401);
 			}
+			$_SESSION['request']['id'] = $this->requestLog();
 		}
 		else {
 			// user validity failed, destroy session
@@ -257,18 +257,21 @@ class API {
 		$reAuthUser = (
 			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
 			//||
-			(isset($_SESSION['lastrequest'])
-			&& (time() - $_SESSION['lastrequest'] > ($_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
+			(isset($_SESSION['request']['time'])
+			&& (time() - $_SESSION['request']['time'] > ($_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
 			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) // on submitting a token return confirmed
 		);
 
-		// read credentials from payload
-		$token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) ?: null;
-		$two_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor', [], true)) ?: null;
-
+		$token = $two_factor = null;
+		if (REQUEST[0] === 'application' && REQUEST[1] === 'authentify') {
+			// read credentials from payload
+			$token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true)) ?: null;
+			$two_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.two_factor', [], true)) ?: null;
+		}
+		
 		// hash credentials for matching with database entries
 		$token = $token ? hash('sha256', $token) : null;
 		$two_factor = $two_factor ? hash('sha256', $two_factor) : null;
@@ -288,7 +291,7 @@ class API {
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $token,
-					':two_factor' => $two_factor
+					':two_factor' => $two_factor ?: 0
 				]
 			]);
 			$user = $user ? $user[0]: null;
@@ -304,7 +307,7 @@ class API {
 					if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 
 					// renew session timeout except for defined requests
-					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
+					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['request']['time'] = time();
 					$this->_date = $this->date();
 
 					$this->session_set();
@@ -559,6 +562,82 @@ class API {
 			$this->response([], 404); // if the method doesn't exist within this class, response would be "Page not found".
 	}
 
+
+	/**
+	 * api response and final exiting method executions
+	 * @param array|string $data what should be responded
+	 * @param int $status optional override for error cases
+	 * no return, end of api processing
+	 */
+	public function response($data, $status = 200){
+		$this->alertUserGroupSubmit();
+
+		if (is_array($data)) {
+			$data = UTILITY::json_encode($data);
+			$this->_httpResponse = $status;
+		}
+		else {
+			$data = '';
+			$this->_httpResponse = 500;
+		}
+		$this->requestLog(response: $this->_httpResponse);
+
+		SQLQUERY::CLOSE($this->_pdo);
+		$this->set_headers();
+		echo $data;
+		exit();
+	}
+
+	/**
+	 * logs all requests from validated users to the respective database, updates the response code on proper exit
+	 * @param string|int $response
+	 * 
+	 * @return int log insert id if not called with response
+	 */
+	public function requestLog($response = null){
+		//return;
+		if (empty($_SESSION['user'])) return;
+		if (!empty($_SESSION['request']['id']) && $response){
+			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
+				'values' => [
+				':id' => $_SESSION['request']['id'],
+				':response_code' => $response
+				]
+			]);
+			return;
+		}
+		$payload = $_SERVER['QUERY_STRING'] ?: null;
+		if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])
+			&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
+		){
+			$payload = (array)$this->_payload;
+			foreach ($_FILES as $input => $files){
+				$payload[$input] = $files['name'];
+			}
+			foreach($payload as $key => $value){
+				if (empty($value)) unset($payload[$key]);
+				if ($key === $this->_lang->GET('user.token')) $payload[$key] = 'REDACTED';
+			}
+
+			$payload = $payload ? UTILITY::json_encode($payload) : null;
+		}
+
+		if (SQLQUERY::EXECUTE($this->_pdo, 'application_request_log', [
+			'values' => [
+				':timestamp' => date('Y-m-d H:i:s'),
+				':method' => $_SERVER['REQUEST_METHOD'],
+				':api' => $_SERVER['PATH_INFO'],
+				':payload' => $payload ?: null,
+				':user_id' => intval($_SESSION['user']['id']),
+				':user_name' => $_SESSION['user']['name'],
+				':user_permissions' => implode(', ', $_SESSION['user']['permissions']),
+				':user_ip' => $_SERVER['REMOTE_ADDR'],
+				':response_code' => null
+			]
+		])) return $this->_pdo->lastInsertId();
+		return 0;
+	}
+
 	/**
 	 * get a session fingerprint for session user
 	 */
@@ -615,29 +694,6 @@ class API {
 	private function set_headers(){
 		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
 		header("Content-Type:application/json; charset=utf-8");
-	}
-
-	/**
-	 * api response and final exiting method executions
-	 * @param array|string $data what should be responded
-	 * @param int $status optional override for error cases
-	 * no return, end of api processing
-	 */
-	public function response($data, $status = 200){
-		$this->alertUserGroupSubmit();
-
-		if (is_array($data)) {
-			$data = UTILITY::json_encode($data);
-			$this->_httpResponse = $status;
-		}
-		else {
-			$data = '';
-			$this->_httpResponse = 500;
-		}
-		SQLQUERY::CLOSE($this->_pdo);
-		$this->set_headers();
-		echo $data;
-		exit();
 	}
 }
 

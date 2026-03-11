@@ -342,6 +342,23 @@ class SQLQUERY {
 			'mysql' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))",
 			'sqlsrv' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))"
 		],
+		'application_request_log' => [
+			'mysql' => "INSERT INTO caro_request_log (id, timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (NULL, :timestamp, :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)",
+			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (CONVERT(SMALLDATETIME, :timestamp, 120), :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)"
+		],
+		'application_request_log_update' => [
+			'mysql' => "UPDATE caro_request_log SET response_code = :response_code WHERE id =:id",
+			'sqlsrv' => "UPDATE caro_request_log SET response_code = :response_code WHERE id =:id"
+		],
+		'application_request_log_get' => [
+			'mysql' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN :from AND :until",
+			'sqlsrv' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN CONVERT(SMALLDATETIME, :from, 120) AND CONVERT(SMALLDATETIME, :until, 120)"
+		],
+		'application_delete_request_log' => [
+			'mysql' => "DELETE FROM caro_sessions WHERE timestamp < :date",
+			'sqlsrv' => "DELETE FROM caro_sessions WHERE timestamp < CONVERT(SMALLDATETIME, :date, 120)"
+		],
+
 
 
 		'application_post_manual' => [
