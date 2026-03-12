@@ -232,6 +232,7 @@ class MAINTENANCE extends API {
 			'vendorupdate',
 		];
 		if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()) $methods[] = 'productsupdate';
+		if (PERMISSION::permissionIn(['admin'])) $methods[] = 'request_log';
 
 		foreach ($methods as $category){
 				$selecttypes[$this->_lang->GET('maintenance.navigation.' . $category)] = ['value' => $category];
@@ -454,6 +455,69 @@ class MAINTENANCE extends API {
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
 					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
+		}
+		return $response;
+	}
+
+	/**
+	 * 
+	 */
+	private function request_log(){
+		$response = ['render' => ['content' => []]];
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$from = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.from'));
+				$from = $from ? $this->convertToServerTime($from . ' 00:00:00') : null;
+				$until = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.until'));
+				$until = $until ? $this->convertToServerTime($until . ' 23:59:59') : null;
+
+				if ($log = SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_get', [
+					'values' => [
+						':from' => $from,
+						':until' => $until
+					]
+				])){
+					require_once('_table.php');
+					$export = new TABLE([$log]);
+					if ($files = $export->dump('CONFIDENTIAL CARO REQUEST LOG.csv')){
+						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'CONFIDENTIAL CARO REQUEST LOG.csv'])] = [
+							'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+							'download' =>'CONFIDENTIAL CARO REQUEST LOG.csv'
+						];
+					}
+					$this->response(['links' => $downloadfiles]);
+				}
+				var_dump($log);
+			case 'GET':
+				$response['render']['form'] = [
+					'data-usecase' => 'maintenance',
+					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
+				$response['render']['content'] = [
+					[
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.request_log.warning'),
+								'class' => 'red'
+							]
+						],
+						[
+							'type' => 'date',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.request_log.from'),
+								'value' =>  UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.from')) ?: ''
+							]
+						],
+						[
+							'type' => 'date',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.request_log.until'),
+								'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.until')) ?: ''
+							]
+						]
+					]
 				];
 		}
 		return $response;

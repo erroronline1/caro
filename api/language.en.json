@@ -1185,6 +1185,7 @@
 			"maintenance": "Maintenance",
 			"productsupdate": "Product lists update",
 			"records_datalist": "Record datalist",
+			"request_log":"Request Log",
 			"riskupdate": "Update table of riskanalysis contents",
 			"vendorupdate": "Vendor update"
 		},
@@ -1198,6 +1199,11 @@
 			"update_error": "The update failed.",
 			"update_success": ":unit has been successfully updated.",
 			"upload": "Select CSV-File to overwrite database"
+		},
+		"request_log": {
+			"from": "From",
+			"until": "Until",
+			"warning": "THESE ARE VERY SENSIBLE DATA TO BE NOT BEING SPREAD BY ANY MEANS!"
 		},
 		"riskupdate": {
 			"anomalies": {

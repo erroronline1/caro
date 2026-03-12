@@ -1185,6 +1185,7 @@
 			"maintenance": "Wartung",
 			"productsupdate": "Aktualisierung der Artikellisten",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
+			"request_log":"Request Log",
 			"riskupdate": "Aktualisierung der Risikoanalyse-Inhalte",
 			"vendorupdate": "Lieferantenupdate"
 		},
@@ -1198,6 +1199,11 @@
 			"update_error": "Das Update schlug fehl.",
 			"update_success": ":unit wurde erfolgreich aktualisiert.",
 			"upload": "Wähle eine CSV-Datei um die Datenbank zu überschreiben"
+		},
+		"request_log": {
+			"from": "Von",
+			"until": "Bis",
+			"warning": "ES HANDELT SICH HIERBEI UM GANZ ERHEBLICH SENSIBLE INHALTE DEREN VERBREITUNG UM JEDEN PREIS VERMIEDEN WERDEN MUSS!"
 		},
 		"riskupdate": {
 			"anomalies": {
