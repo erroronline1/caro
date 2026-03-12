@@ -374,7 +374,8 @@ class ORDER extends API {
 				$response = ['data' => [
 					'filter' => $filter,
 					'state' => $this->_orderState ? : 'unprocessed', // preset the appropriate language key
-					'order' => [], 'approval' => [],
+					'order' => [],
+					'approval' => [],
 					'allowedstateupdates'=> [],
 					'stockfilter' => false]];
 
@@ -511,10 +512,10 @@ class ORDER extends API {
 
 					// filter
 					if (
-						(in_array('stock', $filter['etc'] ?? []) && !isset($product['stock_item']))
-						|| (in_array('stock_none', $filter['etc'] ?? []) && isset($product['stock_item']))
-						|| (in_array('returns', $filter['etc'] ?? []) && $row['ordertype'] !== 'return')
-						|| (in_array('returns_none', $filter['etc'] ?? []) && $row['ordertype'] === 'return')
+						(in_array('stock_filter', $filter['etc'] ?? []) && !isset($product['stock_item']))
+						|| (in_array('stock_filter_none', $filter['etc'] ?? []) && isset($product['stock_item']))
+						|| (in_array('return_filter', $filter['etc'] ?? []) && $row['ordertype'] !== 'return')
+						|| (in_array('return_filter_none', $filter['etc'] ?? []) && $row['ordertype'] === 'return')
 						|| ($filter['timespan'] && $row[$this->_orderState ? : 'approved'] < $filter['timespan'])
 						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
 					) continue;
@@ -819,7 +820,7 @@ class ORDER extends API {
 			foreach ($approved['data']['order'] as $order) {
 				$data[$order['commission']]['filter'] = (isset($approved['data']['filter']['term']) && $approved['data']['filter']['term'] ? $this->_lang->GET("order.order_filter_label") . ': ' . $approved['data']['filter']['term'] . "  \n" : '')
 					. (isset($approved['data']['filter']['unit']) && $approved['data']['filter']['unit'] ? $this->_lang->GET("order.organizational_unit") . ': ' . implode(', ' , array_map(Fn($v) => $this->_lang->_USER['units'][$v], $approved['data']['filter']['unit'])) . "  \n" : '')
-					. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . $approved['data']['filter']['etc'] . "  \n" : '')
+					. (isset($approved['data']['filter']['etc']) && $approved['data']['filter']['etc'] ? $this->_lang->GET("order.order_filter_etc") . ': ' . implode(',', array_map(Fn($v) => $this->_lang->_USER['order'][$v], $approved['data']['filter']['etc'])) . "  \n" : '')
 					. (isset($approved['data']['filter']['timespan']) && $approved['data']['filter']['timespan'] ? $this->_lang->GET("order.order_filter_datetime") . ': ' . $this->convertToServerTime($approved['data']['filter']['timespan']): '');
 			}
 		}

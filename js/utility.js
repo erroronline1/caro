@@ -691,10 +691,10 @@ export const _client = {
 				// construct other filters
 				const etc = {};
 				for (const [key, value] of Object.entries({
-					stock: api._lang.GET("order.stock_filter"),
-					stock_none: api._lang.GET("order.stock_filter_none"),
-					returns: api._lang.GET("order.return_filter"),
-					returns_none: api._lang.GET("order.return_filter_none"),
+					stock_filter: api._lang.GET("order.stock_filter"),
+					stock_filter_none: api._lang.GET("order.stock_filter_none"),
+					return_filter: api._lang.GET("order.return_filter"),
+					return_filter_none: api._lang.GET("order.return_filter_none"),
 				})) {
 					etc[value] = {
 						value: key,
