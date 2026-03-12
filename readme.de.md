@@ -2025,6 +2025,7 @@ records[open_reminder] = 30 ; Tage nach denen per Nachricht and nicht abgeschlos
 
 session[idle] = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
 session[records] = 93 ; Tage, nach denen Session-Fingerabdrücke gelöscht und Offline-Fallbacks für Beiträge ungültig werden
+session[request_log] = 548 ; Tage, nach denen Request-Log-Einträge gelöscht werden
 
 training[evaluation] = 62 ; Tage bis an eine Evaluierung erinnert wird
 training[renewal] = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten

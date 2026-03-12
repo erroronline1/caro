@@ -266,7 +266,7 @@ class NOTIFICATION extends API {
 									]
 								]);
 								
-								require_once('order.php');
+								require_once('./order.php');
 								$orderstatistics = new ORDER();
 								$updates = [];
 
@@ -620,6 +620,15 @@ class NOTIFICATION extends API {
 										]));
 								}
 							}
+
+							// delete request log entries older than config defined days
+							$deldate = clone ($this->_date['servertime']);
+							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
+							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
+								'values' => [
+									':timestamp' => $deldate->format('Y-m-d H:i:s')
+								]
+							]);
 
 							$execution = true;
 							break;
