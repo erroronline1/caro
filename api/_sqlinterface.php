@@ -237,6 +237,26 @@ class SQLQUERY {
 	}
 
 	/**
+	 * driver dependent binary conversion because sqlsrv is a jerk
+	 */
+	public static function storebinary($data){
+		switch(CONFIG['sql']['use']){
+			case 'mysql':
+				return $data;
+			case 'sqlsrv':
+				return bin2hex($data);
+		}
+	}
+	public static function retrievebinary($data){
+		switch(CONFIG['sql']['use']){
+			case 'mysql':
+				return $data;
+			case 'sqlsrv':
+				return hex2bin($data);
+		}
+	}
+
+	/**
 	 * 'context' => [
 	 *  	'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
 	 *  	'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"

@@ -497,7 +497,7 @@ class FILEHANDLER{
 		]);
 		foreach($files as $file){
 			// inflate and reconvert to binary again
-			$file['content'] = hex2bin($file['content']);
+			$file['content'] = SQLQUERY::retrievebinary($file['content']);
 			$tempnam = self::directory('tmp') . '/' . $file['name'];
 			if (!file_exists($tempnam)){
 				$tempfile = fopen($tempnam, 'wb');
@@ -660,7 +660,7 @@ class FILEHANDLER{
 				':context' => $destination['context'],
 				':name' => $filename,
 				':mime_type' => $mime_type,
-				':content' => bin2hex($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
+				':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
 				':expiry_date' => $destination['expiry_date'] ?? null,
 				':metadata' => $destination['metadata']
