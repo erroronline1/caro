@@ -35,24 +35,17 @@ Things are still in motion. Images may be outdated.
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
     * process returned hash file binary strings for blockchain
-* NIS-2 conformity? https://www.bsi.bund.de/DE/Das-BSI/Auftrag/Gesetze-und-Verordnungen/NIS-2-Richtlinie/nis-2-richtlinie_node.html, https://en.bitsea.de/blog/2024/08/nis2-preparation-checklist-for-open-source-software/ https://www.enisa.europa.eu/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf
-    * Where appropriate, logs shall include:
-    * (a) relevant outbound and inbound network traffic;
-    * (b) creation, modification or deletion of users of the relevant entities’ network and information systems and extension ofthe permissions;
-    * (c) access to systems and applications;
-    * (d) authentication-related events;
-    * (e) all privileged access to systems and applications and activities performed by administrative accounts;
-    * (f) access or changes to critical configuration and backup files;
-    * (g) event logs and logs from security tools, such as antivirus, intrusion detection systems or firewalls;
-    * (h) use of system resources, as well as their performance;
-    * (i) physical access to facilities;
-    * (j) access to and use of their network equipment and devices;
-    * (k) activation, stopping and pausing of the various logs;
-    * (l) environmental events.
-    * > e.g. log requests with params and payload (but filenames instead of binaries) in separate database after login (ignore access credentials), including ip, timestamp, user id, name and permissions, http_response code adressing a - e 
-* enable multiple signatures (cpo/patient)
+* enable multiple signatures (cpo/patient)?
 * whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
+* O.Auth_5 include ip in sessionfingerprint (outside of working hours)
+* consider customizable longtermplanning chunks
+* consider changing smalldatetime to datetime to avoid rounding errors https://www.sqlservercentral.com/blogs/date-rounding-tactics-and-the-tiny-devil-of-smalldatetime
+* why tf does request logging contain duplicates without response code?
+* [requirements](#rejected-requirements)
+    * Manual storage extraction from workmates: ensure purchase is aware on that to correct booking -> keep in unprocessed for purchase members
+    *QR-code calatogue for easier ordering -> consider best practice for default search phrase, include vendor, or erp number if interface is available, where to export? products irregardless of permission?
+* add process flowchart on a standard ordering process
 
 ## Content
 * [Aims](#aims)
@@ -352,7 +345,7 @@ graph TD;
     on units"))
 ```
 
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture, set individual application settings and renew their token on their own.
 
 ![user screenshot](http://toh.erroronline.one/caro/profile%20en-fullpage.png)
 
@@ -1215,6 +1208,7 @@ The application has some options to be maintained by authorized users:
 * Risk data can be imported/updated through dedicated CSV-files.
 * In case of an available product list import via the [ERP interface](#erp-interface) there is an option to update the whole product database in one go. 
 * During ERP-software maintenance the interface can be temporarily disabled.
+* The request-log can be exported by users with administrator permission. Please be aware that these contain very sensitive data!
 
 [Content](#content)
 
@@ -2140,6 +2134,7 @@ records[open_reminder] = 30 ; DAYS after unclosed records are reminded of via me
 
 session[idle] = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
 session[records] = 93 ; DAYS, after these session fingerprints will be deleted, offline fallbacks for contributing become invalid
+session[request_log] = 548 ; DAYS, after these request-log-entries will be deleted
 
 training[evaluation] = 62 ; DAYS until supervisors are reminded to evaluate
 training[renewal] = 365 ; DAYS until a training expires, warning per header colour in overviews
@@ -2812,6 +2807,8 @@ Stakeholder identification:
 | Watermarked signatures for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | CAROsignatures are now watermarked by default; 2026-03-07 |
 | Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
+| Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 |  |
+| QR-code calatogue for easier ordering | CEO | 2026-03-13 |  |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
@@ -5604,9 +5601,9 @@ Most of the requirements are to be fulfilled by the operator of the infrastructu
 What [the team](#the-team) tries to accomplish is
 * structured incident reporting within [the issue tracker](https://github.com/erroronline1/caro/issues) of the main repository
 * continuous maintenance as the team is architect, programmer, maintainer, user and scapegoat in a multiple role
-* logging what is appropriate and feasible to be reviewed
+* logging what is appropriate and feasible to be reviewed according to chapter 3.2.3 a) - e) of the aforementioned resource on application level
 * provide an inbuilt information on whom to report to
-* access control
+* access control to contents of the application
 
 ## Terms of service for using the application
 
@@ -5614,7 +5611,7 @@ What [the team](#the-team) tries to accomplish is
 This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application may be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token or compromised pin inform a user of following permission groups immediately: :permissions (*as defined within config.ini for permissions->users*)
 
 ### Your data
-This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures.
+This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures. Api requests with parameters, payload, your name and permissions are logged in accordance with guidelines and will be deleted after :request_log (*as defines within config-file*) days by default.
 
 ### Device permissions
 This application requests permission to use a camera and send notifications. Camera access may be neccessary to append photos to documentation and scan 2D-codes. Latter can be achieved by a dedicated terminal device. You may not be able to log in without this permission and limit your documentation abilities. Notifications inform about new in-app messages and support a better work condition. You may revoke the permissions through the browser settings.
@@ -5709,6 +5706,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Arch_3 The life cycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057].
 
+* The application does not use kryptographic keys.
 * [Encryption statement](#encryption-statement)
 
 > O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art. This includes the persistence of sensitive data by the browser, for example in its cache.
@@ -5748,7 +5746,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_3 Error messages and log files MUST NOT contain sensitive data (e.g. user identifiers or session IDs).
 
-* Default error messages do not contain this data.
+* Default error messages do not contain this data. The frontend does not log.
 
 > O.Source_4 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
 
@@ -5796,6 +5794,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 > O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
 
 * [List of third party software](#ressources)
+
 > O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the web application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the web application MUST NOT be offered for use.
 
 * The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
@@ -5890,7 +5889,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
 
-* This is not reasonable for the application used within a network environment not accessible from the web.
+* Connections are established exclusively via SSL
 
 > O.Auth_13 Authentication data, such as session identifiers or authentication tokens, MUST be protected as sensitive data.
 
@@ -5906,7 +5905,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_16 If the login credentials are changed, the user SHOULD be informed of the change via the last valid contact details stored. In this way, the user SHOULD be offered the option of blocking the reported change and setting new login credentials after authentication.
 
-* Login credentials are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
+* Login credentials are created and changed by authorized administrative users or the user themself only. This also enables to lock any user out if necessary.
 
 > O.Auth_17 The user MUST be made aware of the residual risk associated with the storage of login credentials in the web browser or another external application for a more comfortable login process in the terms of use of the web application.
 
@@ -5921,19 +5920,19 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
 
-* Login credentials are always generated by the system on request of an authorized administrative user.
+* Login credentials are always generated by the system on request of an authorized administrative user or the user themself.
 
 > O.Pass_3 The user MUST have the option to change their password.
 
-* Login credentials can be renewed by authorized administrative users only. Since the credentials are exportable as a physical qr-code and to prevent unwanted spread or misuse, this option is only available to authorized users. Updated credentials may be basically one phone call away if necessary.
+* Login credentials can be renewed by authorized administrative users and within the users profile settings.
 
 > O.Pass_4 The changing and resetting of passwords MUST be logged.
 
-* Login credentials can be renewed by authorized administrative users. Logging changes is not reasonable.
+* Logging changes occurs via general request logging on the backend.
 
 > O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
 
-* The frontend does not store passwords.
+* The frontend does not store passwords from the application side.
 
 [Content](#content)
 
@@ -6043,7 +6042,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
 
-* This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
+* Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
 
 > O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
 
@@ -6117,6 +6116,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Arch_3 The lifecycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057] should be used.
 
+* The application does not use kryptographic keys.
 * [Encryption statement](#encryption-statement)
 
 > O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art.
@@ -6148,12 +6148,19 @@ This application can be considered using a monolithic architecture. Yet a separa
 * The application does not provide services.
 
 > O.Arch_11 The backend system MUST have a central logging system, collecting all log-messages from any service. Protocols/logs SHOULD be collected on a dedicated system (so-called log server) to counteract any deletion or manipulation on source systems.
+* The application logs every request into the database. Part of the logging are the
+    * timestamp
+    * method,
+    * api endpoint
+    * payload
+    * user id, name, permissions and ip
+    * response http status code
 
-* The operator of the infrastructure is responsible for fulfilling these requirements.
+    The operator of the infrastructure is responsible for fulfilling other requirements outside of the possible scope of this application.
 
 > O.Arch_12 The backend system MUST inform the application of safety-related updates and prohibits the use of an outdated application after a transitional period (Grace Period).
 
-* The operator of the infrastructure is responsible for fulfilling these requirements.
+* Settings are transferred during login. In case of frontend changes there may be a need to reload or clear the web cache otherwise the behaviour may be unexpected anyway.
 
 [Content](#content)
 
@@ -6176,7 +6183,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_5 In program environments with manual memory management (i.e. the application itself can specify exactly when and where memory is read and written), the backend system MUST use secure function alternatives (e.g. printf_s instead of printf) for read and write access to memory segments.
 
-* Storage is handled by the backend exclusively.
+* not applicable, PHP does not use manual memory management.
 
 > O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
 
@@ -6184,7 +6191,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
 
-* [Record deletion](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+* [Record deletion](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.
 
 > O.Source_8 The manufacturer MUST establish a deployment process for the deployment, updating and shutdown of the backend system, so in any given time, the sensitive data is protected at any time regarding publication or manipulation.
 
@@ -6275,7 +6282,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
 
-* This is not reasonable for the application used within a network environment not accessible from the web.
+* The backend is a REST-API thet manages contents based on api endpoints and submitted payload. Generally speaking this application is a monolith that is supposed to run within a closed network.
 
 > O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
 
@@ -6343,15 +6350,15 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_19 Sensitive data MUST NOT be embedded in any authentication token.
 
-* Login credentials only include a generated partially random hash and a random integer.
+* Login credentials only include a generated partially random hash and a random integer. Valid credentials create a server session. Tokens are not used. PHPSESSID-cookies are default.
 
 > O.Auth_20 Any authentication token MUST contain only the expected fields.
 
-* Login credentials consist of a 64 byte string and minimum 5 digit integer only. PHPSESSID-cookies are default.
+* Login credentials only include a generated partially random hash and a random integer. Valid credentials create a server session. Tokens are not used. PHPSESSID-cookies are default.
 
 > O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
 
-* This is not reasonable for the application used within a network environment not accessible from the web.
+* Login credentials only include a generated partially random hash and a random integer. Valid credentials create a server session. Tokens are not used. PHPSESSID-cookies are default.
 
 [Content](#content)
 
@@ -6366,11 +6373,11 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Pass_3 The user MUST have the option to change their password.
 
-* Login credentials can be renewed by authorized administrative users only. Since the credentials are exportable as a physical qr-code and to prevent unwanted spread or misuse, this option is only available to authorized users. Updated credentials may be basically one phone call away if necessary.
+* Login credentials can be renewed by authorized administrative users and within the users profile settings.
 
 > O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
 
-* Login credentials can be renewed by authorized administrative users. Logging changes is not reasonable.
+* Logging changes occurs via general request logging on the backend.
 
 > O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
 
