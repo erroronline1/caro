@@ -2080,26 +2080,26 @@ class CONSUMABLES extends API {
 					];
 				if ($result && $result[0]){
 					array_unshift($result[0][0], $tile);
-					array_unshift($result, 
-						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('order.add_manually_warning_header'),
-								'class' => 'orange'
-							],
-							'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
-						], [
-							'type' => 'textsection',
-							'attributes' => [
-								'name' =>  $this->_lang->GET('order.add_manually_select')
-							]
-						]
-					);
 				}
 				else {
 					$result = [[[$tile]]];
 				}
-				
+				array_unshift($result, 
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('order.add_manually_warning_header'),
+							'class' => 'orange'
+						],
+						'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
+					], [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' =>  $this->_lang->GET('order.add_manually_select')
+						]
+					]
+				);
+
 				$this->response(['render' => ['content' => $result]]);
 
 				break;
