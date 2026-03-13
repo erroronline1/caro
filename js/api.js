@@ -1813,10 +1813,13 @@ export const api = {
 						payload = request[3]; // form data object passed by utility.js
 						delete request[3];
 						successFn = function (data) {
+							const options = {};
+							options[api._lang.GET("general.cancel_button")] = false;
 							new Dialog({
 								type: "input",
 								header: api._lang.GET("order.manual_match"),
 								render: data.render.content,
+								options: options
 							});
 						};
 						break;
@@ -2487,10 +2490,13 @@ export const api = {
 				// profile
 				successFn = function (data) {
 					if (data.render) {
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
+						const options = {};
+						options[api._lang.GET("general.ok_button")] = false;
+						new Dialog({
+							type: "input",
+							render: data.render,
+							options: options,
+						});
 					}
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					if (data.data) {
