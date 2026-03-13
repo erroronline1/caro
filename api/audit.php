@@ -68,7 +68,7 @@ class AUDIT extends API {
 					':id' => $audit['id'] ?? null,
 					':template' => $template['id'],
 					':unit' => $template['unit'],
-					':content' => json_decode($audit['content'] ?: '', true),
+					':content' => json_decode($audit['content'] ?? '', true),
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null,
 					':last_touch' => $audit['last_touch'] ?? null,
