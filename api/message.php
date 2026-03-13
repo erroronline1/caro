@@ -585,7 +585,7 @@ class MESSAGE extends API {
 					'data-type' => 'input',
 					'class' => 'messageto',
 					'style' => "--icon: url('" . $user['image']. "')",
-					'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) . "', '" . $user['name'] . "', '', {}, [])"
+					'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.message_to', [':user' => $user['name']]) . "', '" . $user['name'] . "', '', {}, [])"
 				];
 				switch ($group){
 					case 'name':
@@ -618,7 +618,7 @@ class MESSAGE extends API {
 							'data-type' => 'input',
 							'class' => 'messageto',
 							'style' => "--icon: url('')",
-							'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', array_column($users, 'name'))]) ."', '" . implode(', ', array_column($users, 'name')) . "', '', {}, [])"
+							'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.message_to', [':user' => implode(', ', array_column($users, 'name'))]) ."', '" . implode(', ', array_column($users, 'name')) . "', '', {}, [])"
 						]
 					];
 
@@ -628,7 +628,7 @@ class MESSAGE extends API {
 						'data-type' => 'input',
 						'class' => 'messageto',
 						'style' => "--icon: url('" . $user['image']. "')",
-						'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
+						'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.message_to', [':user' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 					];
 
 					// append panel

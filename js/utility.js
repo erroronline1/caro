@@ -1255,13 +1255,13 @@ export const _client = {
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
 					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 					links = {};
-					links[api._lang.GET("order.message_orderer", { ":orderer": api._lang.GET("permissions.purchase") })] = {
+					links[api._lang.GET("message.message.message_to", { ":user": api._lang.GET("permissions.purchase") })] = {
 						href: "javascript:void(0)",
 						"data-type": "input",
 						class: "messageto",
 						onclick: function () {
 							_client.message.newMessage(
-								api._lang.GET("order.message_orderer", { ":orderer": api._lang.GET("permissions.purchase") }),
+								api._lang.GET("message.message.message_to", { ":user": api._lang.GET("permissions.purchase") }),
 								"element.purchasemembers",
 								api._lang
 									.GET("order.message", {
