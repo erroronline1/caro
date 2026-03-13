@@ -1422,7 +1422,7 @@
 		},
 		"manual_match": "Ist der Artikel vielleicht doch in der Datenbank?",
 		"message": ":quantity :unit :number :name von :vendor :aut_idem für :commission\\n:info",
-		"message_orderer": "Mitteilung an :orderer",
+		"message_orderer": "Mitteilung an Besteller :orderer",
 		"message_to_orderer": "Mitteilung senden",
 		"navigation": {
 			"approved_orders": "Freigegebene Bestellungen",
@@ -1467,8 +1467,8 @@
 		"orderstate_description": "Änderung des Bestellstatus",
 		"ordertype": {
 			"order": "Bestellung",
-			"service": "Service / Gewährleistung",
-			"return": "Rücksendung",
+			"service": "Service von Kundeneigentum",
+			"return": "Rücksendung an Lieferanten",
 			"cancellation": "Stornierung"
 		},
 		"organizational_unit": "Bereich",
