@@ -1048,6 +1048,41 @@ graph TD;
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.  
 Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus. Berechtigte Nutzer können die Prüfung innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) und der [Artikelverwaltung](#lieferanten--und-artikelverwaltung) widerrufen.
 
+
+### Vereinfachter Bestellprozess auf Einkaufsseite
+
+```mermaid
+graph TD;
+    order((Bestellung))-->unprocessed[unbearbeitet];
+    unprocessed-->copy_order_no(Bestellnummer kopieren);
+    copy_order_no-->paste_order_no("in ERP-Software einfügen,
+    Produkt wählen");
+    paste_order_no-->copy_identifier(Bestellzuordnung kopieren);
+    copy_identifier-->paste_order_identifier("in ERP-Software einfügen,
+    in beliebiges Feld das Teil
+    des Bestellbelegs wird,
+    z.B. an Artikelbezeichnung
+    anhängen");
+    paste_order_identifier-->add_commission(Kommission wählen);
+    add_commission-->order_erp("Bestellung in
+    ERP-Software abschließen");
+    order_erp-->confirm_caro("Bestellung in
+    CARO bestätigen")
+
+    retrieval((Wareneingang))-->processed[bearbeitet];
+    processed-->filter("nach Bestellzuordnung oder
+    Bestellbelegnummer filtern,
+    gemäß Lieferschein");
+    filter-->commission("QR-Code für Kommission
+    ausdrucken");
+    commission-->retrieval_confirmed("Teillieferung oder
+    vollständige Lieferung
+    bestätigen")
+    retrieval_confirmed-->issue("Artikel an Werkstatt liefern")
+```
+
+Etwaige zusätzliche Schritte im ERP-System können hier aufgrund der Vielzahl an Softwarelösungen und individuellen Prozessen nicht abgebildet werden.
+
 [Übersicht](#übersicht)
 
 ## Werkzeuge

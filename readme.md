@@ -44,8 +44,8 @@ Things are still in motion. Images may be outdated.
 * why tf does request logging contain duplicates without response code?
 * [requirements](#rejected-requirements)
     * Manual storage extraction from workmates: ensure purchase is aware on that to correct booking -> keep in unprocessed for purchase members
-    *QR-code calatogue for easier ordering -> consider best practice for default search phrase, include vendor, or erp number if interface is available, where to export? products irregardless of permission?
-* add process flowchart on a standard ordering process
+    * QR-code calatogue for easier ordering -> consider best practice for default search phrase, include vendor, or erp number if interface is available, where to export? products irregardless of permission?
+
 
 ## Content
 * [Aims](#aims)
@@ -1155,6 +1155,39 @@ graph TD;
 ```
 Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.  
 Sample checks are added to product. New checks trigger a system message to these users. Defined authorized users can revoke the sample check from within the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and the [product editor](#vendor-and-product-management).
+
+### Simplified order process for purchase
+
+```mermaid
+graph TD;
+    order((Order))-->unprocessed[Unprocessed];
+    unprocessed-->copy_order_no(Copy order number);
+    copy_order_no-->paste_order_no("Paste into ERP-software,
+    select product");
+    paste_order_no-->copy_identifier(Copy order identifier);
+    copy_identifier-->paste_order_identifier("Paste into ERP-software,
+    any field that is part
+    of the order export,
+    eg appending to
+    product name");
+    paste_order_identifier-->add_commission(Add commission);
+    add_commission-->order_erp(Submit order in erp software);
+    order_erp-->confirm_caro(Confirm order in CARO)
+
+    retrieval((Retrieval))-->processed[processed];
+    processed-->filter("Filter by order identifier
+    or ERP order reference,
+    according to delivery note");
+    filter-->commission("Print QR code
+    for commission labels");
+    commission-->retrieval_confirmed("Confirm partial
+    or full delivery")
+    retrieval_confirmed-->issue("Hand out products with
+    commission label
+    to workshop")
+```
+
+Possible additional steps in your ERP-software can not be depicted for the amount of software solutions and individual processes.
 
 [Content](#content)
 
@@ -2808,7 +2841,7 @@ Stakeholder identification:
 | Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 |  |
-| QR-code calatogue for easier ordering | CEO | 2026-03-13 |  |
+| QR-code catalogue for easier ordering | CEO | 2026-03-13 |  |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
