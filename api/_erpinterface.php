@@ -432,8 +432,9 @@ class _ERPINTERFACE {
 		 *				'article_name' => string,
 		 *				'ordered' =>Y-m-d H:i:s,
 		 *				'delivered_partially' => Y-m-d H:i:s,
-		 *				'delivered_full' =>Y-m-d H:i:sl,
+		 *				'delivered_full' =>Y-m-d H:i:s,
 		 *				'order_reference' => string, some identifier from the erp software, may make things easier for purchase on requests
+		 *				'product_id' => int/string, erp product id for improved comparison, fallback to vendor/article_no matching otherwise
 		 *			];
 		 * 		}
 		 * }
@@ -685,7 +686,8 @@ class TEST extends _ERPINTERFACE {
 					'ordered' => '2025-09-01 21:00:00',
 					'delivered_partially' => null,
 					'delivered_full' => '2025-09-01 21:00:00',
-					'order_reference' => '12345'
+					'order_reference' => '12345',
+					'product_id' => '1010101'
 				],
 			]
 		];
@@ -2380,6 +2382,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			orders.BESTELLNUMMER,
 			orders.BEZEICHNUNG AS BESTELLTEXT,
 			article.ARTIKELBEZEICHNUNG,
+			article.ARTIKEL_REFERENZ,
 			CONVERT(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
 			orders.MENGE,
 			CONVERT(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
@@ -2442,7 +2445,8 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					'ordered' => $row['ORDER_DATUM'] ? : null,
 					'delivered_partially' => $row['WE_DATUM'] && $row['WE_MENGE'] != $row['MENGE'] ? $row['WE_DATUM'] : null,
 					'delivered_full' => $row['WE_DATUM'] && $row['WE_MENGE'] == $row['MENGE'] ? $row['WE_DATUM'] : null,
-					'order_reference' => $row['BESTELL_BELEGNUMMER']
+					'order_reference' => $row['BESTELL_BELEGNUMMER'],
+					'product_id' => $row['ARTIKEL_REFERENZ']
 				];
 			}
 		}
