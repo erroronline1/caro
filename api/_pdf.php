@@ -118,10 +118,11 @@ class PDF{
 		if (isset ($content['files'])){
 			$_lang = new LANG();
 			foreach($content['files'] as $file){
+				$fileproperty = pathinfo($file);
 				// file attachment
-				$this->_pdf->MultiCell(140, 4, $file, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				$this->_pdf->MultiCell(140, 4, $fileproperty['basename'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 				// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $file));
+				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $fileproperty['basename'], array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $file));
 			}
 		}
 

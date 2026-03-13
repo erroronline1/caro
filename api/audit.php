@@ -68,7 +68,7 @@ class AUDIT extends API {
 					':id' => $audit['id'] ?? null,
 					':template' => $template['id'],
 					':unit' => $template['unit'],
-					':content' => [],
+					':content' => json_decode($audit['content'] ?: '', true),
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null,
 					':last_touch' => $audit['last_touch'] ?? null,
@@ -79,7 +79,7 @@ class AUDIT extends API {
 					'objectives' => $template['objectives'],
 					'method' => $template['method'],
 					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
-					'questions' => []
+					'questions' => $audit[':content']['questions'] ?? []
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
 
@@ -92,16 +92,16 @@ class AUDIT extends API {
 							$fileinput
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('audit_attachments')
+							'context' => 'audit_attachments'
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])
 						]
 					)){
-						for($i = 0; $i < count($files['name']); $i++){
+						for($i = 0; $i < count($uploaded); $i++){
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
-							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
+							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = $uploaded[$i];
+							else $audit[':content']['questions'][intval($set[1])]['files'] = [$uploaded[$i]];
 						}
 					}
 				}
@@ -151,8 +151,10 @@ class AUDIT extends API {
 										case 'regulatory':
 											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 											break;
+										case 'files':
+											break;
 										default:
-										$summary .= implode("\n", $values);
+											$summary .= implode("\n", $values);
 									}
 								}
 							}
@@ -329,14 +331,13 @@ class AUDIT extends API {
 							];
 						if (isset($preset['files'])){
 							$link = [];
-							foreach ($preset['files'] as $file){
-								$fileinfo = pathinfo($file);
+							$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $preset['files']));
+							foreach ($files as $file){
 								$file = [
-									'path' => substr($file, 1),
-									'name' => $fileinfo['basename'],
-									'link' => './api/api.php/file/stream/' . substr($file, 1)
+									'name' => $file['name'],
+									'url' => './api/api.php/file/stream/' . substr($file['content'], 1)
 								];
-								$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+								$link[$file['name']] = FILEHANDLER::link(['href' => $file['url'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -529,6 +530,11 @@ class AUDIT extends API {
 						case 'regulatory':
 							$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 							break;
+						case 'files':
+							$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $values));
+							$summary['content'][$currentquestion] .= implode("  \n", array_map(Fn($v) => $v['name'], $files));
+							array_push($summary['files'], ...array_map(Fn($v) => $v['content'], $files));
+							break;
 						default:
 							$summary['content'][$currentquestion] .= implode("  \n", $values);
 					}
@@ -622,15 +628,13 @@ class AUDIT extends API {
 
 				if (isset($question['files'])){
 					$link = [];
-					foreach ($question['files'] as $file){
-						$fileinfo = pathinfo($file);
+					$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $question['files']));
+					foreach ($files as $file){
 						$file = [
-							'path' => substr($file, 1),
-							'name' => $fileinfo['basename'],
-							'link' => './api/api.php/file/stream/' . substr($file, 1)
+							'name' => $file['name'],
+							'url' => './api/api.php/file/stream/' . substr($file['content'], 1)
 						];
-
-						$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+						$link[$file['name']] = FILEHANDLER::link(['href' => $file['url'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [
