@@ -242,7 +242,7 @@ graph TD;
     Bereichen einsehen"))
 ```
 
-Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
+Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds, individuelle Anwendungeinstellungen sowie eine Zugangstoken-Erneuerung durch den Nutzer selbst können an dieser Stelle ebenfalls vorgenommen werden.
 
 ![user screenshot](http://toh.erroronline.one/caro/profile%20de-fullpage.png)
 

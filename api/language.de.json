@@ -1885,6 +1885,7 @@
 		"export_user_image": "Exportiere Profilbild",
 		"login_credentials": "Anmeldeinformationen",
 		"login_credentials_renew": "Anmeldeinformationen beim Speichern erneuern",
+		"login_credentials_renew_hint": "Dir wird im Anschluss einmalig ein Bild mit den Zugangsdaten zum Download angeboten, welches du ausdrucken kannst. Die Daten gelten ab sofort. Die Pin muss abgetrennt, gemerkt und entsorgt werden. Die heruntergeladene Datei sollte anschließend gelöscht werden.",
 		"name": "Name",
 		"order_authorization": "Bestellberechtigungs-PIN",
 		"order_authorization_current": "Aktuelle Bestellberechtigungs-PIN",

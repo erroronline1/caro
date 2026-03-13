@@ -1885,6 +1885,7 @@
 		"export_user_image": "Export user image",
 		"login_credentials": "Login credentials",
 		"login_credentials_renew": "Renew credentials on save",
+		"login_credentials_renew_hint": "Afterwards you will get a one-time download option for the image to print it out. Cresentials take effect immediately. The pin must be removed, remembered and disposed of. The downloaded file should be deleted afterwards.",
 		"name": "Name",
 		"order_authorization": "Order authorization pin",
 		"order_authorization_current": "Current order authorization pin",
