@@ -355,8 +355,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN CONVERT(SMALLDATETIME, :from, 120) AND CONVERT(SMALLDATETIME, :until, 120)"
 		],
 		'application_delete_request_log' => [
-			'mysql' => "DELETE FROM caro_sessions WHERE timestamp < :date",
-			'sqlsrv' => "DELETE FROM caro_sessions WHERE timestamp < CONVERT(SMALLDATETIME, :date, 120)"
+			'mysql' => "DELETE FROM caro_request_log WHERE timestamp < :date",
+			'sqlsrv' => "DELETE FROM caro_request_log WHERE timestamp < CONVERT(SMALLDATETIME, :date, 120)"
 		],
 
 
