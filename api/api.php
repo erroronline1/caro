@@ -381,7 +381,8 @@ class API {
 			$replacements = [
 				':issue_mail' => CONFIG['application']['issue_mail'],
 				// no use of PERMISSIONS::permissionFor, because this method required a logged in user
-				':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
+				':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])])),
+				':request_log' => CONFIG['lifespan']['session']['request_log']
 			];
 
 			// append terms-of-service slider panels
