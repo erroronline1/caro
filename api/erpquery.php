@@ -135,7 +135,8 @@ class ERPQUERY extends API {
 					$attachments = [];
 					foreach($files[$case] as $attachment){
 //						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
-						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => "javascript:void(0)", 'onclick' => "new _client.Dialog({type: 'preview', header: '".$attachment['filename']."', render: {type: 'dataurl', name: '".$attachment['filename']."', content: '".$attachment['url']."'}})"];
+//						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => "javascript:void(0)", 'onclick' => "new _client.Dialog({type: 'preview', header: '".$attachment['filename']."', render: {type: 'dataurl', name: '".$attachment['filename']."', content: '".$attachment['url']."'}})"];
+						$attachments[$attachment['description'] . ' ' . $attachment['date']] = FILEHANDLER::link(['href' => $attachment['url'], 'download' => $attachment['filename']], $attachment['filename']);
 					}
 
 					$casecontent[] = [
@@ -236,6 +237,13 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
+	/**
+	 *               _             _             
+	 *   ___ ___ ___| |_ ___ ___ _| |___ ___ ___ 
+	 *  | . | .'|_ -|  _| . |  _| . | -_|  _|_ -|
+	 *  |  _|__,|___|_| |___|_| |___|___|_| |___|
+	 *  |_| 
+	 */
 	public function pastorders(){
 		$content = $fields = [];
 		foreach(ERPINTERFACE->pastorders() as $field){
