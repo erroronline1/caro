@@ -595,8 +595,15 @@ class API {
 	 * @return int log insert id if not called with response
 	 */
 	public function requestLog($response = null){
-		//return;
+		foreach([
+			FILEHANDLER::directory('users'),
+			FILEHANDLER::directory('order_attachments'),
+			'notification/notif'
+		] as $excludePath){
+			if (stristr($_SERVER['PATH_INFO'], substr($excludePath, 3))) return 0;
+		}
 		if (empty($_SESSION['user'])) return;
+		
 		if (!empty($_SESSION['request']['id']) && $response){
 			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
 				'values' => [
@@ -626,7 +633,7 @@ class API {
 			'values' => [
 				':timestamp' => date('Y-m-d H:i:s'),
 				':method' => $_SERVER['REQUEST_METHOD'],
-				':api' => $_SERVER['PATH_INFO'],
+				':api' => mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])),
 				':payload' => $payload ?: null,
 				':user_id' => intval($_SESSION['user']['id']),
 				':user_name' => $_SESSION['user']['name'],
