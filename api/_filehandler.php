@@ -365,11 +365,31 @@ class FILEHANDLER{
 	 * unified link modifier, creating previews where applicable
 	 * 
 	 * @param array $attributes anchor attributes
+	 * @param string $dataurlname if passed a dataurl as href also pass a name since it can not be extracted
 	 * @return array modified attributes
 	 */
-	public static function link($attributes){
+	public static function link($attributes, $dataurlname = ''){
 		if ($attributes['href']){
-			$file = pathinfo($attributes['href']);
+			$file = ['basename' => '', 'extension' => ''];
+			if (!str_starts_with($attributes['href'], 'data:')) {
+				$file = pathinfo($attributes['href']);
+			}
+			else if ($dataurlname){
+				$file['basename'] = $dataurlname;
+				$mime =  substr($attributes['href'], 0, strpos($attributes['href'], ';'));
+				$mime = substr($mime, strpos($mime, ':') + 1);
+				switch ($mime){
+					// obj/stl not supported as dataurl
+					case 'image/png':
+					case 'image/jpeg':
+					case 'image/gif':
+						$file['extension'] = 'png';
+						break;
+					case 'application/pdf':
+						$file['extension'] = 'pdf';
+						break;
+				}
+			}
 			if (in_array(strtolower($file['extension']), ['stl', 'obj'])){
 				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'stl', name: '" . $file['basename'] . "', url: '" . $attributes['href'] . "'}})";
 				$attributes['data-type'] = 'stl';
@@ -377,6 +397,9 @@ class FILEHANDLER{
 			elseif (in_array(strtolower($file['extension']), ['png','jpg', 'jpeg', 'gif'])){
 				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'image', name: '" . $file['basename'] . "', content: '" . $attributes['href'] . "'}})";
 				$attributes['data-type'] = 'imagelink';
+			}
+			if (str_starts_with($attributes['href'], 'data:') && $file['extension'] === 'pdf'){
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . ($dataurlname ?: 'DATAURL') . "', render:{type: 'dataurl', name: '" . ($dataurlname ?: 'DATAURL') . "', content: '" . $attributes['href'] . "'}})";
 			}
 			else {
 				$attributes['target'] = '_blank';
@@ -449,23 +472,40 @@ class FILEHANDLER{
 	}
 
 	/**
+	 * creates temporary files from database entries to pass around the application if required
+	 * supposed to enhance caching for shortterm repetitive requests and useage in pdf attachment creation
+	 * 
 	 * @param object $_pdo an active pdo instance
 	 * @param string $context
-	 * @param string $nameprefix as start of the saved filename
+	 * @param string $nameprefix as start of the saved filename to return matching results
+	 * @param array|int $ids if available
 	 * 
 	 * @return array of files and their information
 	 */
-	public static function retrieveFromDatabase($_pdo, $context, $nameprefix = ''){
+	public static function retrieveFromDatabase($_pdo, $context = null, $nameprefix = '', $ids = null){
 		$result = [];
-		$files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
+		if ($context) $files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
 			'values' => [
-				':name' => $nameprefix . '%',
-				':context' => $context
+				':context' => $context,
+				':name' => $nameprefix . '%'
+			]
+		]);
+		elseif ($ids) $files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_ids', [
+			'replacements' => [
+				':ids' => is_array($ids) ? implode(', ', array_map(Fn($v) => intval($v), $ids)) : intval($ids),
 			]
 		]);
 		foreach($files as $file){
 			// inflate and reconvert to binary again
 			$file['content'] = gzinflate(hex2bin($file['content']));
+			$tempnam = self::directory('tmp') . '/' . $file['name'];
+			if (!file_exists($tempnam)){
+				$tempfile = fopen($tempnam, 'wb');
+				fwrite($tempfile, $file['content']);
+				fclose($tempfile);
+			}
+			$file['content'] = $tempnam;
+
 			$result[] = $file;
 		}
 		return $result;
