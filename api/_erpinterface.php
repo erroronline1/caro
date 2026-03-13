@@ -1262,14 +1262,15 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		if (
 			!($requested_name || $requested_dob || $requested_patientnumber)
 		) return [];
-		
 		$name = SEARCH::expressions($requested_name);
-		$namesearch = [];
-		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
-			foreach($name as $namepart){
-				$namesearch[] = 'pat.' . $column . ($namepart['operator'] === '-' ? ' NOT LIKE ' : ' LIKE ') . $this->_pdo->quote($namepart['sqlterm']);
-			}
+		$namesearch = '';
+		foreach($name as $namepart){
+			if (strlen($namepart['sqlterm']) > 2)
+				$namesearch .= 
+					($namepart['operator'] ? ' AND ' : '  OR ')
+					. 'CONCAT(' . implode(', ', array_map(Fn($column) => 'pat.' . $column, ['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'])) . ')'. ($namepart['operator'] === '-' ? ' NOT LIKE ' : ' LIKE ') . $this->_pdo->quote('%' . $namepart['sqlterm'] . '%');
 		}
+		$namesearch = substr($namesearch, 5);
 
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
@@ -1278,7 +1279,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					? ($requested_dob ? ' AND ' : '') . 'pat.FIBU_NUMMER = ' . $this->_pdo->quote($requested_patientnumber)
 					: '',
 				':namesearch' => $namesearch 
-					? ($requested_dob || $requested_patientnumber ? ' AND ' : '') . '(' . implode(' OR ', $namesearch) . ')'
+					? ($requested_dob || $requested_patientnumber ? ' AND ' : '') . '(' . $namesearch . ')'
 					: ''
 				]));
 			$statement->execute();	
