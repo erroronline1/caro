@@ -15,6 +15,18 @@ $_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['
 $dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 if ($dbsetup) $_pdo->exec($dbsetup);
 
+$FILEHANDLER = new FILEHANDLER($_pdo);
+$uploaded = $FILEHANDLER->saveToDatabase($_pdo, 
+	'../assets/CAROsignature.jpg',
+	'test.jpg',
+	'image/jpeg',
+	[
+		'context' => 'test'
+	]
+);
+var_dump($uploaded);
+die();
+
 $files = FILEHANDLER::retrieveFromDatabase($_pdo, 'test')[0];
 /*ob_start();
 header("Content-type: application/octet-stream");
@@ -23,7 +35,7 @@ echo $files['content'];
 ob_flush();
 // works
 */
-echo '<img src="data:' . $files['mime_type'] . ';base64,' . base64_encode($files['content']) . '" />';
+echo '<img src="' . $files['content'] . '" />';
 // also works
 
 
