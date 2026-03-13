@@ -276,17 +276,28 @@ class NOTIFICATION extends API {
 									'delivered_full'
 								];
 
+								$preProducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+								$products = [];
+								foreach ($preProducts as $product){
+									// assign id as key, unique anyway, fasten things up later
+									// reduce properties to necessities regarding memory load
+									$products[$product['id']] = $product['erp_id'];
+								}
 								foreach ($orders as $order){
 									if ($order['ordered'] && $order['delivered_full']) continue;
 									if (!isset($erpdata[trim(UTILITY::identifier(' ', $order['approved']))])) continue;
 
 									$order['order_data'] = json_decode($order['order_data'], true);
 
-									$articles = array_filter($erpdata[trim(UTILITY::identifier(' ', $order['approved']))], fn($o) => 
-										isset($order['order_data']['vendor_label']) && $o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
+									$articles = array_filter($erpdata[trim(UTILITY::identifier(' ', $order['approved']))], fn($o) =>
+										// caution, order_data product id is caro database id, $o product id is erp id
+										isset($order['order_data']['productid']) && isset($products[$order['order_data']['productid']]) && $o['product_id'] === $products[$order['order_data']['productid']] ||
 										(
-											(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
-											(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
+											isset($order['order_data']['vendor_label']) && $o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
+											(
+												(isset($order['order_data']['ordernumber_label']) && $o['article_no'] === $order['order_data']['ordernumber_label']) || // either article number matches
+												(!isset($order['order_data']['ordernumber_label']) && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
+											)
 										)
 									);
 
@@ -626,7 +637,7 @@ class NOTIFICATION extends API {
 							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
 							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
 								'values' => [
-									':timestamp' => $deldate->format('Y-m-d H:i:s')
+									':date' => $deldate->format('Y-m-d H:i:s')
 								]
 							]);
 
@@ -667,9 +678,9 @@ class NOTIFICATION extends API {
 								$units[$order['organizational_unit']]++;
 							}
 							foreach ($units as $unit => $num){
-								if ($num > CONFIG['limits']['order_approved_archived']) {
+								if ($num > CONFIG['limits']['storage']['approved_order_archive']) {
 									$subject = $this->_lang->GET('order.alert_archived_limit', [
-										':max' => CONFIG['limits']['order_approved_archived']
+										':max' => CONFIG['limits']['storage']['approved_order_archive']
 									], true);
 									$reminders = $calendar->search('"' . $subject . '"'); // literal
 									$open = false;
