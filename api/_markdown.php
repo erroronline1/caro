@@ -163,7 +163,7 @@ class MARKDOWN {
 	 * @return string as HTML
 	 */
 	public function md2html($text, $forPDF = false){
-		$text = preg_replace("/\r/", '', $text);
+		$text = preg_replace("/\r/", '', $text ?: '');
 
 		$text = $this->blockquote($text); // should come first to enable nesting
 		$text = $this->a($text);
