@@ -673,17 +673,9 @@ class API {
 	}
 
 	/**
-	 * store a valid user session, delete outdated
+	 * store a valid user session
 	 */
 	public function session_set(){
-		$deldate = clone ($this->_date['servertime']);
-		$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
-		SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
-			'values' => [
-				':date' => $deldate->format('Y-m-d H:i:s')
-			]
-		]);
-
 		// dirty error suppression
 		// the session cookie may occasionally not be deleted on automated logout, submitting a false session id, raising a duplicate key error
 		// i don't know how to handle this otherwise
