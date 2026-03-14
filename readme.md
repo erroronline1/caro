@@ -35,15 +35,8 @@ Things are still in motion. Images may be outdated.
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
     * except non critical profile pictures, sharepoint, tmp, order attachments
     * process returned hash file binary strings for blockchain
-* enable multiple signatures (cpo/patient)?
-* whiteboard drawing including erasure method (use signaturePad.toData(), signaturePad.fromData(data); NICE!)
+    * ~~longblob in mariadb~~ apache file handling 'corrupts' stl files, but not pdf, images, nor obj?
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
-* O.Auth_5 include ip in sessionfingerprint (outside of working hours)
-* consider customizable longtermplanning chunks
-* consider changing smalldatetime to datetime to avoid rounding errors https://www.sqlservercentral.com/blogs/date-rounding-tactics-and-the-tiny-devil-of-smalldatetime
-* longblob in mariadb corrupts stl files, but not pdf nor images?
-* why tf does request logging contain duplicates without response code?
-
 
 ## Content
 * [Aims](#aims)
@@ -461,6 +454,7 @@ To reduce pointless data and possible malignant spam, suggestions can be deleted
 
 ### Whiteboard
 Volatile information, brief notes or anything that otherwise would go onto a sticky note or a piece of rough paper can be noted on a custom whiteboard. The overview shows all whiteboards that are created by the current user or matching selected organizational units. Contributing is allowed for all users, editing the name, unit visibility and deleting for the owning user and admin only. The user name and editing date is appended by default.  
+Whiteboards contain a doodle canvas as well for brief sketches. These can be edited and optionally exported as an image.  
 On deleting users, whiteboards are not removed for possibly containing relevant information to others. Removal is then possible by users with administrator priviledges.
 
 [Content](#content)
@@ -475,7 +469,7 @@ Just don't do it like this. Seek help before doing this:
 
 ![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
-Documents are modular. To create tracked and versioned documents, create reusable document components and assemble documents from components. Components and documents are assigned to units. This enhances the overview within the editor and allows for reduced distraction during regular use for the user being able to filter selecteable documents unitwise.
+Documents are modular. To create tracked and versioned documents, create reusable document components and assemble documents from components. Components and documents are assigned to units. This enhances the overview within the editor and allows for reduced distraction during regular use for the user being able to filter selectable documents unitwise.
 
 #### Component editing
 Available elements for components or rather documents are:
@@ -887,15 +881,19 @@ While scheduled tasks address single cases or specified duties, work lists are s
 [Content](#content)
 
 ### Long term planning
-The calendar supports long term planning like used for assigning apprentices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
+The calendar supports long term planning like used for assigning apprentices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any other purpose as well, e.g. important weeks over the year. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
 
 Planning is easy to use:
-* assign a name, define a timespan
+* assign a name, define a timespan and periods
 * define affected names or topics
 * define colors for units or actions
 * colourize the timespan for each name/topic with a selected color using a mouse or suitable pointer
 
-Given timespans are corrected to the first day of selected starting month and last day of ending month. Colourizing is possible for half months.
+Given timespans are corrected
+* to monday of the week of the selected starting date and sunday of the week of the selected ending date in case of weekly periods
+* to the first day of selected starting month and last day of ending month in case of half- and monthly periods 
+
+Colourizing is possible for the respective selected periods.
 
 ![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20en-fullpage.png)
 
@@ -908,7 +906,7 @@ This is supposed to ensure a transparent communication, data safety and collecti
 
 Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
 
-*Warning: current impementation neither takes changes in public holidays nor change of the users location-wise state (if selecteable within user profile) into account. Currently changes will affect past timesheet entries and calculate different results. On changes it is recommended to export the most recent timesheets prior to start tracking anew.*
+*Warning: current impementation neither takes changes in public holidays nor change of the users location-wise state (if selectable within user profile) into account. Currently changes will affect past timesheet entries and calculate different results. On changes it is recommended to export the most recent timesheets prior to start tracking anew.*
 
 Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
 
@@ -2105,10 +2103,10 @@ require_record_type_selection = yes ; yes, no; require selection on records e.g.
 watermark = "media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
-timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server site; append tz time zones to your customs, selecteable within user settings
+timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server site; append tz time zones to your customs, selectable within user settings
 
 dateformats["Y-m-d"] = "Y-m-d"; according to https://www.php.net/manual/en/datetime.format.php, e.g. "d.m.Y"; empty for ISO 8601 Y-m-d; top entry is used on exports by default
-dateformats["d.m.Y"] = "d.m.Y" ; append desired options, selecteable within user settings, keys must not contain ?{}|&~![()^" - values can
+dateformats["d.m.Y"] = "d.m.Y" ; append desired options, selectable within user settings, keys must not contain ?{}|&~![()^" - values can
 
 default_due = 7 ; scheduled events are due in x days by default
 
@@ -2116,7 +2114,7 @@ hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty 
 ; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.XX.json to adhere to your company policies regarding data safety
 
 [locations]
-; top key is state, append according to your sites, selecteable within user settings
+; top key is state, append according to your sites, selectable within user settings
 D-BW[workdays] = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
 D-BW[holidays] = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"; fixed holidays, month-day
 D-BW[easter] = "-2, 1, 39, 50, 60" ; applicable offsets to easter sunday, maundy thursday -3, good friday -2, holy saturday -1, easter monday 1, ascension 39, pentecost 50, corpus christi 60
@@ -4648,6 +4646,20 @@ Sample response
 {"render":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
 ```
 
+> GET ./api/api.php/message/whiteboard/{whiteboard id}
+
+Delete whiteboard.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {whiteboard id} | path parameter | required | int id |
+
+Sample response
+```
+{"render":{"content":[[{"type":"text","attributes":{"name":"Name","value":"test"}}],[[{"type":"textarea","attributes":{"name":"Content","value":"by error on line 1 on 2026-03-14 21:46","rows":40}}],[{"type":"doodle","attributes":{"name":"Doodle"},"content":"..."}]],[{"type":"deletebutton","attributes":{"value":"Delete","onclick":"new _client.Dialog({type: 'confirm', header: 'Permanently delete Whiteboard?', options:{'No, I am not done yet': false,'Ok': {value: true, class: 'reducedCTA'}}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', 1); this.disabled = true;}})"}}],[{"type":"checkbox","attributes":{"name":"Concerns only"},"content":{"Common":[],"Orthotics I":[],"Orthotics II":[],"Prosthetics I":[],"Prosthetics II":{"checked":true},"CAD":[],"Polymer Tech":[],"Silicone Lab":[],"Office/Purchase":[],"Administration":[]}}]],"form":{"data-usecase":"message","action":"javascript:api.message('put', 'whiteboard', 1)"}}}
+```
+
 > DELETE ./api/api.php/message/whiteboard/{whiteboard id}
 
 Delete whiteboard.
@@ -4674,7 +4686,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Whiteboard saved.","type":"success"}}
+{"response":{"msg":"Whiteboard saved.","type":"success"},"links":{"test_Doodle(7).png":{"href":"./api/api.php/file/stream/./fileserver/tmp/test_Doodle(7).png","download":"test_Doodle(7).png"}}}
 ```
 
 > GET ./api/api.php/message/whiteboards
@@ -6474,6 +6486,13 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * v8.4.7
     * \> 1.8k stars
     * \> 200 forks
+    * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
+* [https://github.com/tecnickcom/tcpdf](https://github.com/tecnickcom/tcpdf)
+    * creates PDF-files on the server side, support mode only, will be fully replaced by tc-lib-pdf once it is completed
+    * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
+    * v6.10.1
+    * \> 4.5k stars
+    * \> 1.6k forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout)
     * creates CSV-, ODS- and XLSX-files on the server side
