@@ -961,6 +961,7 @@
 			"saved": ":name wurde gespeichert",
 			"search": "Suche Produkt nach Name oder Artikelnummer",
 			"search_all_vendors": "... alle Lieferanten",
+			"search_label": "QR-Code für eine schnelle Suche erstellen",
 			"search_matches": "Wähle einen Artikel aus :number Treffern",
 			"similar_count": "Es gibt :number Artikel mit einer ähnlichen Artikelnummer von diesem Lieferanten",
 			"similar_hint": "Diese Einstellungen werden auch auf die gewählten Produkte angewandt.",

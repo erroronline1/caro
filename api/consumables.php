@@ -1387,6 +1387,25 @@ class CONSUMABLES extends API {
 									]
 								];
 						}
+						
+						$labels = [];
+						foreach (CONFIG['label'] as $type => $setting){
+							$labels[] = [
+								'type' => 'button',
+								'attributes' => [
+									'onclick' => "_client.application.postLabelSheet(' " . ($product['erp_id'] ?: $product['article_no']) . " +vendor_name:\"" . $product['vendor_name']. "\"', null, {_type:'" . $type . "'});",
+									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
+								]
+							];
+						}
+						$response['render']['content'][] = [
+							[
+								'type' => 'textsection',
+								'content' => $this->_lang->GET('consumables.product.search_label')
+							],
+							...$labels
+						];
+
 						// userlist
 						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 						// get purchase member names
@@ -1603,6 +1622,26 @@ class CONSUMABLES extends API {
 					}
 					if ($checkslides) $response['render']['content'][] = [$productedit, ...$checkslides];
 					else $response['render']['content'][] = $productedit;
+
+					if ($product['id']){
+						$labels = [];
+						foreach (CONFIG['label'] as $type => $setting){
+							$labels[] = [
+								'type' => 'button',
+								'attributes' => [
+									'onclick' => "_client.application.postLabelSheet(' " . ($product['erp_id'] ?: $product['article_no']) . " +vendor_name:\"" . $product['vendor_name']. "\"', null, {_type:'" . $type . "'});",
+									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
+								]
+							];
+						}
+						$response['render']['content'][] = [
+							[
+								'type' => 'textsection',
+								'content' => $this->_lang->GET('consumables.product.search_label')
+							],
+							...$labels
+						];
+					}
 
 					// add file upload
 					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('incorporation')){

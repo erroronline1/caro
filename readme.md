@@ -41,10 +41,8 @@ Things are still in motion. Images may be outdated.
 * O.Auth_5 include ip in sessionfingerprint (outside of working hours)
 * consider customizable longtermplanning chunks
 * consider changing smalldatetime to datetime to avoid rounding errors https://www.sqlservercentral.com/blogs/date-rounding-tactics-and-the-tiny-devil-of-smalldatetime
+* longblob in mariadb corrupts stl files, but not pdf nor images?
 * why tf does request logging contain duplicates without response code?
-* [requirements](#rejected-requirements)
-    * Manual storage extraction from workmates: ensure purchase is aware on that to correct booking -> keep in unprocessed for purchase members
-    * QR-code calatogue for easier ordering -> consider best practice for default search phrase, include vendor, or erp number if interface is available, where to export? products irregardless of permission?
 
 
 ## Content
@@ -2840,8 +2838,8 @@ Stakeholder identification:
 | Watermarked signatures for PDF exports (image altering before storage respectively) | Data safety officer | 2026-03-02 | CAROsignatures are now watermarked by default; 2026-03-07 |
 | Token hashing in database | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
-| Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 |  |
-| QR-code catalogue for easier ordering | CEO | 2026-03-13 |  |
+| Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 | Does already work this way. Unprocessed orders show up irregardless of other set states; 2026-03-14 |
+| QR-code catalogue for easier ordering | CEO | 2026-03-13 | Labels can be exported from products view, combine erp-number or article number and vendor; 2026-03-14 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
