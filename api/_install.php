@@ -382,10 +382,10 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_announcements (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	author_id int NOT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
-				"	span_start smalldatetime NULL DEFAULT NULL," .
-				"	span_end smalldatetime NULL DEFAULT NULL," .
+				"	span_start datetime NULL DEFAULT NULL," .
+				"	span_end datetime NULL DEFAULT NULL," .
 				"	subject varchar(MAX) NOT NULL," .
 				"	text varchar(MAX) NULL DEFAULT NULL," .
 				"	highlight varchar(255) NOT NULL" .
@@ -397,7 +397,7 @@ define('DEFAULTSQL', [
 				"	template int NULL DEFAULT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	last_touch smalldatetime NOT NULL," .
+				"	last_touch datetime NOT NULL," .
 				"	last_user varchar(255) NOT NULL," .
 				"	closed tinyint NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL" .
@@ -409,7 +409,7 @@ define('DEFAULTSQL', [
 				"	content varchar(MAX) NOT NULL," .
 				"	objectives varchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	author varchar(MAX) NULL DEFAULT NULL," .
 				"	hint varchar(255) NULL DEFAULT NULL," .
 				"	method varchar(255) NULL DEFAULT NULL" .
@@ -419,8 +419,8 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	type varchar(255) NOT NULL," .
-				"	span_start smalldatetime NOT NULL," .
-				"	span_end smalldatetime NOT NULL," .
+				"	span_start datetime NOT NULL," .
+				"	span_end datetime NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	affected_user_id int NULL DEFAULT NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
@@ -437,13 +437,13 @@ define('DEFAULTSQL', [
 				"	order_data varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(255) NOT NULL," .
 				"	approval varchar(MAX) NOT NULL," .
-				"	approved smalldatetime NOT NULL," .
-				"	ordered smalldatetime NULL DEFAULT NULL," .
-				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
-				"	delivered_full smalldatetime NULL DEFAULT NULL," .
-				"	issued_partially smalldatetime NULL DEFAULT NULL," .
-				"	issued_full smalldatetime NULL DEFAULT NULL," .
-				"	archived smalldatetime NULL DEFAULT NULL," .
+				"	approved datetime NOT NULL," .
+				"	ordered datetime NULL DEFAULT NULL," .
+				"	delivered_partially datetime NULL DEFAULT NULL," .
+				"	delivered_full datetime NULL DEFAULT NULL," .
+				"	issued_partially datetime NULL DEFAULT NULL," .
+				"	issued_full datetime NULL DEFAULT NULL," .
+				"	archived datetime NULL DEFAULT NULL," .
 				"	ordertype varchar(255) NOT NULL," .
 				"	delivered_notified int NULL DEFAULT NULL," .
 				"	issued_notified int NULL DEFAULT NULL" .
@@ -456,10 +456,10 @@ define('DEFAULTSQL', [
 				"	order_data varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(255) NOT NULL," .
 				"	orderer_name varchar(255) NOT NULL," .
-				"	approved smalldatetime NOT NULL," .
-				"	ordered smalldatetime NULL DEFAULT NULL," .
-				"	delivered_partially smalldatetime NULL DEFAULT NULL," .
-				"	delivered_full smalldatetime NULL DEFAULT NULL," .
+				"	approved datetime NOT NULL," .
+				"	ordered datetime NULL DEFAULT NULL," .
+				"	delivered_partially datetime NULL DEFAULT NULL," .
+				"	delivered_full datetime NULL DEFAULT NULL," .
 				"	ordertype varchar(255) NOT NULL" .
 				");"
 				.
@@ -482,12 +482,12 @@ define('DEFAULTSQL', [
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	has_files tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
-				"	checked smalldatetime NULL DEFAULT NULL," .
+				"	checked datetime NULL DEFAULT NULL," .
 				"	sample_checks varchar(MAX) NULL DEFAULT NULL," .
 				"	incorporated varchar(MAX) NULL DEFAULT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL," .
 				"	special_attention tinyint NULL DEFAULT NULL," .
-				"	last_order smalldatetime NULL DEFAULT NULL," .
+				"	last_order datetime NULL DEFAULT NULL," .
 				"	stock_item tinyint NULL DEFAULT NULL," .
 				"	erp_id varchar(255) NULL DEFAULT NULL," .
 				"	document_reminder int NULL DEFAULT NULL," .
@@ -508,7 +508,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_csvfilter (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(255) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
@@ -521,8 +521,8 @@ define('DEFAULTSQL', [
 				"	path varchar(MAX) NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	regulatory_context varchar(MAX) NOT NULL," .
-				"	activated smalldatetime NULL DEFAULT NULL" .
-				"	retired smalldatetime NULL DEFAULT NULL" .
+				"	activated datetime NULL DEFAULT NULL" .
+				"	retired datetime NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_documents', N'U') IS NULL " .
@@ -532,7 +532,7 @@ define('DEFAULTSQL', [
 				"	alias varchar(MAX) NOT NULL," .
 				"	context varchar(255) NOT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
@@ -554,13 +554,13 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_measures', N'U') IS NULL " .
 				"CREATE TABLE caro_measures (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	timestamp smalldatetime NOT NULL," .
+				"	timestamp datetime NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	user_id int NULL," .
 				"	votes varchar(MAX) NULL," .
 				"	measures varchar(MAX) NULL," .
 				"	last_user varchar(255) NULL," .
-				"	last_touch smalldatetime NULL," .
+				"	last_touch datetime NULL," .
 				"	closed varchar(MAX) NULL" .
 				");"
 				.
@@ -571,8 +571,8 @@ define('DEFAULTSQL', [
 				"	name varchar(MAX) NOT NULL," .
 				"	mime_type varchar(255) NOT NULL," .
 				"	content varbinary(max) NOT NULL," .
-				"	upload_date smalldatetime NOT NULL," .
-				"	expiry_date smalldatetime NULL DEFAULT NULL," .
+				"	upload_date datetime NOT NULL," .
+				"	expiry_date datetime NULL DEFAULT NULL," .
 				"	metadata varchar(MAX) NULL" .
 				");"
 				.
@@ -583,7 +583,7 @@ define('DEFAULTSQL', [
 				"	conversation_user int NOT NULL," .
 				"	sender int NOT NULL," .
 				"	message varchar(MAX) NOT NULL," .
-				"	timestamp smalldatetime NOT NULL," .
+				"	timestamp datetime NOT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .
 				"	seen tinyint NULL DEFAULT NULL" .
 				");"
@@ -596,7 +596,7 @@ define('DEFAULTSQL', [
 				"	record_type varchar(255) NULL DEFAULT NULL," .
 				"	identifier varchar(MAX) NOT NULL," .
 				"	last_user int NOT NULL," .
-				"	last_touch smalldatetime NOT NULL," .
+				"	last_touch datetime NOT NULL," .
 				"	last_document varchar(MAX) NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
@@ -632,7 +632,7 @@ define('DEFAULTSQL', [
 				"	risk_benefit varchar(MAX) NULL," .
 				"	measure_remainder varchar(MAX) NULL," .
 				"	proof varchar(MAX) NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL" .
 				");"
@@ -641,7 +641,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_sessions (" .
 				"	id varchar(1024) NOT NULL," .
 				"	user_id int NOT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"   CONSTRAINT AK_id UNIQUE(id)" .
 				");" 
 				.
@@ -650,7 +650,7 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name varchar(255) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
+				"	date datetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	type varchar(255) NOT NULL," .
@@ -690,7 +690,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_request_log', N'U') IS NULL " .
 				"CREATE TABLE caro_request_log (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	timestamp smalldatetime NOT NULL," .
+				"	timestamp datetime NOT NULL," .
 				"	method varchar(255 NOT NULL," .
 				"	api varchar(MAX) NOT NULL," .
 				"	payload varchar(MAX) NULL," .
@@ -720,7 +720,7 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	last_touch smalldatetime NULL," .
+				"	last_touch datetime NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
 				"	content varchar(MAX) NULL DEFAULT NULL" .
 				");"
