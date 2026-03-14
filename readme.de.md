@@ -362,6 +362,7 @@ Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, k
 
 ### Whiteboard
 Kurzzeitige Informationen, Kurznotizen und alles, was sonst auf Haftnotizen oder Schmierzettel geschrieben wird kann in eigenen Whiteboards festgehalten werden. Die Übersicht zeigt alle Whiteboards des erstellenden Nutzers and und diejenigen, deren gewählten Bereiche übereinstimmen. Die Bearbeitung ist allen Nutzern erlaubt, Namensänderungen, Anpassung der Sichtbarkeit für Bereiche und die Löschung jedoch nur dem erstellenden Nutzer und Administratoren. Der Nutzername und das Änderungsdatum werden automatisch angehängt.  
+Whiteboards beinhalten zudem die mÖglichkeit Skizzen zu erstellen. Diese können bearbeitet und optional als Bild exportiert werden.  
 Whiteboards werden bei der Löschung eines Nutzers nicht entfernt, da sie für andere kurzfristig relevante Daten enthalten können. Eine Löschung ist dann nur durch Administratoren möglich.
 
 [Übersicht](#übersicht)
