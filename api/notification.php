@@ -151,11 +151,61 @@ class NOTIFICATION extends API {
 		$override = false;
 		if ($this->_cronOverride && PERMISSION::permissionFor('cronoverride')) $override = true;
 
-		foreach(CONFIG['system']['cron'] as $task => $minutes){
+		foreach(CONFIG['system']['cron'] + ['SYSTEMDAILY' => 1440] as $task => $minutes){
 			try {
 				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60 || $override) {
 					$execution = false;
 					switch($task){
+						case 'SYSTEMDAILY':
+							// delete messages for users with enabled autodeletion
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							foreach($users as $user){
+								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
+								if (isset($user['app_settings']['autodeleteMessages'])){
+									$prior_date = clone $this->_date['servertime'];
+									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
+										'values' => [
+											':user' => $user['id'],
+											':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
+										]
+									])) SQLQUERY::EXECUTE($this->_pdo, strtr(SQLQUERY::PREPARE('message_delete_messages'),[
+											':user' => $user['id'],
+											':ids' => implode(',', array_column($messages, 'id')) 
+										]));
+								}
+							}
+
+							// delete request log entries older than config defined days
+							$deldate = clone ($this->_date['servertime']);
+							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
+							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
+								'values' => [
+									':date' => $deldate->format('Y-m-d H:i:s')
+								]
+							]);
+							// delete sessions
+							$deldate = clone ($this->_date['servertime']);
+							$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
+							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
+								'values' => [
+									':date' => $deldate->format('Y-m-d H:i:s')
+								]
+							]);
+
+							// delete old delivered unarchived orders
+							require_once('./order.php');
+							$order = new ORDER;
+							$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_issued', [
+								'values' => [
+									':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
+								]
+							]);
+							foreach ($old as $row){
+								$order->delete_approved_order($row);
+							}
+							break;
+
+
 						case 'erp_interface_birthday_message':
 							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'birthdaymessage') && ERPINTERFACE->birthdaymessage()){
 								// exit if no starting point is provided or override is set to avoid duplicates
@@ -442,24 +492,10 @@ class NOTIFICATION extends API {
 													':user' => ''
 												]
 											]);
+											require_once('./order.php');
+											$order = new ORDER;
 											foreach($orders as $relatedorder){
-												// DUPLICATE OF order.php->delete_approved_order()
-												$order = json_decode($relatedorder['order_data'], true);
-												if (isset($order['attachments'])){
-													$others = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
-														'values' => [
-															':substr' => $order['attachments']
-														]
-													]);
-													if (count($others)<2){
-														$files = explode(',', $order['attachments']);
-														FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
-													}
-												}
-												$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_delete_approved_order'),
-													[
-														':id' => intval($relatedorder['id'])
-													]) . '; ');
+												$order->delete_approved_order($relatedorder);
 											}
 										}
 									}
@@ -613,33 +649,6 @@ class NOTIFICATION extends API {
 								'values' => [
 									':datetime' => $prior_date->modify('-' . CONFIG['lifespan']['order']['statistics'] . ' years')->format('Y-m-d H:i:s')
 								]]);
-
-							// delete messages for users with enabled autodeletion
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-							foreach($users as $user){
-								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-								if (isset($user['app_settings']['autodeleteMessages'])){
-									$prior_date = clone $this->_date['servertime'];
-									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
-										'values' => [
-											':user' => $user['id'],
-											':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
-										]
-									])) SQLQUERY::EXECUTE($this->_pdo, strtr(SQLQUERY::PREPARE('message_delete_messages'),[
-											':user' => $user['id'],
-											':ids' => implode(',', array_column($messages, 'id')) 
-										]));
-								}
-							}
-
-							// delete request log entries older than config defined days
-							$deldate = clone ($this->_date['servertime']);
-							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
-							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
-								'values' => [
-									':date' => $deldate->format('Y-m-d H:i:s')
-								]
-							]);
 
 							$execution = true;
 							break;

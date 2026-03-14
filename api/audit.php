@@ -92,16 +92,16 @@ class AUDIT extends API {
 							$fileinput
 						],
 						destination: [
-							'context' => 'audit_attachments'
+							'path' => FILEHANDLER::directory('audit_attachments')
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])
 						]
 					)){
-						for($i = 0; $i < count($uploaded); $i++){
+						for($i = 0; $i < count($files['name']); $i++){
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = $uploaded[$i];
-							else $audit[':content']['questions'][intval($set[1])]['files'] = [$uploaded[$i]];
+							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
+							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
 						}
 					}
 				}
@@ -151,10 +151,8 @@ class AUDIT extends API {
 										case 'regulatory':
 											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 											break;
-										case 'files':
-											break;
 										default:
-											$summary .= implode("\n", $values);
+										$summary .= implode("\n", $values);
 									}
 								}
 							}
@@ -331,13 +329,14 @@ class AUDIT extends API {
 							];
 						if (isset($preset['files'])){
 							$link = [];
-							$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $preset['files']));
-							foreach ($files as $file){
+							foreach ($preset['files'] as $file){
+								$fileinfo = pathinfo($file);
 								$file = [
-									'name' => $file['name'],
-									'url' => './api/api.php/file/stream/' . substr($file['content'], 1)
+									'path' => substr($file, 1),
+									'name' => $fileinfo['basename'],
+									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
-								$link[$file['name']] = FILEHANDLER::link(['href' => $file['url'], 'download' => $file['name']]);
+								$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -531,10 +530,7 @@ class AUDIT extends API {
 							$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 							break;
 						case 'files':
-							$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $values));
-							$summary['content'][$currentquestion] .= implode("  \n", array_map(Fn($v) => $v['name'], $files));
-							array_push($summary['files'], ...array_map(Fn($v) => $v['content'], $files));
-							break;
+							array_push($summary['files'], ...$values);
 						default:
 							$summary['content'][$currentquestion] .= implode("  \n", $values);
 					}
@@ -628,13 +624,15 @@ class AUDIT extends API {
 
 				if (isset($question['files'])){
 					$link = [];
-					$files = FILEHANDLER::retrieveFromDatabase($this->_pdo, ids: array_map(fn($v) => $v['id'], $question['files']));
-					foreach ($files as $file){
+					foreach ($question['files'] as $file){
+						$fileinfo = pathinfo($file);
 						$file = [
-							'name' => $file['name'],
-							'url' => './api/api.php/file/stream/' . substr($file['content'], 1)
+							'path' => substr($file, 1),
+							'name' => $fileinfo['basename'],
+							'link' => './api/api.php/file/stream/' . substr($file, 1)
 						];
-						$link[$file['name']] = FILEHANDLER::link(['href' => $file['url'], 'download' => $file['name']]);
+
+						$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [

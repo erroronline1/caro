@@ -761,7 +761,7 @@ class ORDER extends API {
 	 * 
 	 * also see application.php->cron() clone for record deletion
 	 */
-	private function delete_approved_order($row){
+	public function delete_approved_order($row){
 		$order = json_decode($row['order_data'], true);
 		if (isset($order['attachments'])){
 			$others = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [

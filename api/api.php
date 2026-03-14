@@ -87,8 +87,6 @@ class API {
 	 * no parameters, no response
 	 */
 	public function __construct(){
-		$this->_payload = UTILITY::parsePayload();
-		
 		$options = [
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
@@ -98,68 +96,6 @@ class API {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		$this->_lang = new LANG();
-
-		// (re)authentify session user
-		if ((REQUEST[0] === 'application' && (
-			in_array(REQUEST[1], ['menu'])
-			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
-		))){ // these requests do not need authentification or handle it on their own
-			$this->_auth = true;
-		}
-		else {
-			$this->_auth = $this->auth();
-		}
-
-		// check if a registered user with valid token is logged in
-		if ($this->_auth){
-			// valid user IS logged in
-			// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
-			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])
-				&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
-			){
-				// post and put MUST have _user_post_validation payload
-				if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
-					unset ($this->_payload->_user_post_validation);
-					// sanitation of arrays; synchronization with frontent checksum not possible
-					$payload = json_decode(json_encode($this->_payload), true);
-					foreach ($payload as $key => $value){
-						if ($value && gettype($value) === 'array') unset($payload[$key]);
-					}
-					//UTILITY::debug(json_encode($payload));
-					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-						}, json_encode($payload) );
-					$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
-					//UTILITY::debug(strlen($payload), $payload);
-
-					if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
-						//update user setting for each request
-						$_SESSION['user'] = $user;
-						$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
-						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
-						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-						$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
-						// default primary unit if only one unit is assigned
-						if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
-					}
-					else $this->response([strlen($payload), $payload], 401);
-					//else $this->response([], 401);
-				} else $this->response([], 401);
-			}
-			$_SESSION['request']['id'] = $this->requestLog();
-		}
-		else {
-			// user validity failed, destroy session
-			$params = session_get_cookie_params();
-			setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-			session_destroy();
-			session_write_close();
-			session_unset();
-		}
-
-		// set date settings according to defaults or session user settings
-		$this->_date = $this->date();
 	}
 	
 	/**
@@ -556,6 +492,72 @@ class API {
 	 * no return
 	 */
 	public function processApi(){
+		$this->_payload = UTILITY::parsePayload();
+		
+		$this->_lang = new LANG();
+
+		// (re)authentify session user
+		if ((REQUEST[0] === 'application' && (
+			in_array(REQUEST[1], ['menu'])
+			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
+		))){ // these requests do not need authentification or handle it on their own
+			$this->_auth = true;
+		}
+		else {
+			$this->_auth = $this->auth();
+		}
+
+		// check if a registered user with valid token is logged in
+		if ($this->_auth){
+			// valid user IS logged in
+			// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
+			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])
+				&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
+			){
+				// post and put MUST have _user_post_validation payload
+				if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
+					unset ($this->_payload->_user_post_validation);
+					// sanitation of arrays; synchronization with frontent checksum not possible
+					$payload = json_decode(json_encode($this->_payload), true);
+					foreach ($payload as $key => $value){
+						if ($value && gettype($value) === 'array') unset($payload[$key]);
+					}
+					//UTILITY::debug(json_encode($payload));
+					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+						}, json_encode($payload) );
+					$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
+					//UTILITY::debug(strlen($payload), $payload);
+
+					if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
+						//update user setting for each request
+						$_SESSION['user'] = $user;
+						$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
+						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
+						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
+						$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
+						// default primary unit if only one unit is assigned
+						if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
+					}
+					else $this->response([strlen($payload), $payload], 401);
+					//else $this->response([], 401);
+				} else $this->response([], 401);
+			}
+			$_SESSION['request']['id'] = $this->requestLog();
+		}
+		else {
+			// user validity failed, destroy session
+			$params = session_get_cookie_params();
+			setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+			session_destroy();
+			session_write_close();
+			session_unset();
+		}
+
+		// set date settings according to defaults or session user settings
+		$this->_date = $this->date();
+		
+
 		$func = strtolower($this->_requestedMethod);
 		if (method_exists($this, $func))
 			$this->$func();
@@ -671,17 +673,9 @@ class API {
 	}
 
 	/**
-	 * store a valid user session, delete outdated
+	 * store a valid user session
 	 */
 	public function session_set(){
-		$deldate = clone ($this->_date['servertime']);
-		$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
-		SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
-			'values' => [
-				':date' => $deldate->format('Y-m-d H:i:s')
-			]
-		]);
-
 		// dirty error suppression
 		// the session cookie may occasionally not be deleted on automated logout, submitting a false session id, raising a duplicate key error
 		// i don't know how to handle this otherwise
@@ -727,8 +721,7 @@ if (in_array(REQUEST[0], [
 	'user'])) require_once(REQUEST[0] . '.php');
 
 $call = "CARO\\API\\" . strtoupper(REQUEST[0]);
-$api = new $call();
-$api->processApi();
+$api = new $call()->processApi();
 
 exit();
 ?>

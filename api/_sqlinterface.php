@@ -276,8 +276,8 @@ class SQLQUERY {
 			'sqlsrv' => "MERGE INTO caro_announcements WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :author_id AS author_id, :date AS date, :organizational_unit AS organizational_unit, :span_start AS span_start, :span_end AS span_end, :subject AS subject, :text AS text, :highlight as highlight) AS source " .
 						"(id, author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), subject = :subject, text = :text, highlight = :highlight " .
-						"WHEN NOT MATCHED THEN INSERT (author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :subject, :text, :highlight);"
+						"WHEN MATCHED THEN UPDATE SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(datetime, :span_start, 120), span_end = CONVERT(datetime, :span_end, 120), subject = :subject, text = :text, highlight = :highlight " .
+						"WHEN NOT MATCHED THEN INSERT (author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(datetime, :span_start, 120), CONVERT(datetime, :span_end, 120), :subject, :text, :highlight);"
 		],
 		'announcement_get_all' => [
 			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC",
@@ -364,7 +364,7 @@ class SQLQUERY {
 		],
 		'application_request_log' => [
 			'mysql' => "INSERT INTO caro_request_log (id, timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (NULL, :timestamp, :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)",
-			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (CONVERT(SMALLDATETIME, :timestamp, 120), :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)"
+			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (CONVERT(datetime, :timestamp, 120), :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)"
 		],
 		'application_request_log_update' => [
 			'mysql' => "UPDATE caro_request_log SET response_code = :response_code WHERE id =:id",
@@ -372,11 +372,11 @@ class SQLQUERY {
 		],
 		'application_request_log_get' => [
 			'mysql' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN :from AND :until",
-			'sqlsrv' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN CONVERT(SMALLDATETIME, :from, 120) AND CONVERT(SMALLDATETIME, :until, 120)"
+			'sqlsrv' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN CONVERT(datetime, :from, 120) AND CONVERT(datetime, :until, 120)"
 		],
 		'application_delete_request_log' => [
 			'mysql' => "DELETE FROM caro_request_log WHERE timestamp < :date",
-			'sqlsrv' => "DELETE FROM caro_request_log WHERE timestamp < CONVERT(SMALLDATETIME, :date, 120)"
+			'sqlsrv' => "DELETE FROM caro_request_log WHERE timestamp < CONVERT(datetime, :date, 120)"
 		],
 
 
@@ -422,7 +422,7 @@ class SQLQUERY {
 		],
 		'application_delete_sessions' => [
 			'mysql' => "DELETE FROM caro_sessions WHERE date < :date",
-			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < CONVERT(SMALLDATETIME, :date, 120)"
+			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < CONVERT(datetime, :date, 120)"
 		],
 		'application_get_user_sessions' => [
 			'mysql' => "SELECT * FROM caro_sessions WHERE user_id = :user_id ORDER BY date DESC",
@@ -438,8 +438,8 @@ class SQLQUERY {
 			'sqlsrv' => "MERGE INTO caro_calendar WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :type AS type, :span_start AS span_start, :span_end AS span_end, :author_id AS author_id, :affected_user_id AS affected_user_id, :organizational_unit AS organizational_unit, :subject AS subject, :misc AS misc, :closed AS closed, :alert AS alert, :autodelete AS autodelete) AS source " .
 						"(id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete " .
-						"WHEN NOT MATCHED THEN INSERT (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (:type, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete);"
+						"WHEN MATCHED THEN UPDATE SET span_start = CONVERT(datetime, :span_start, 120), span_end = CONVERT(datetime, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete " .
+						"WHEN NOT MATCHED THEN INSERT (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (:type, CONVERT(datetime, :span_start, 120), CONVERT(datetime, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete);"
 		],
 		'calendar_complete' => [
 			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
@@ -459,7 +459,7 @@ class SQLQUERY {
 		],
 		'calendar_get_within_date_range' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_end BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_end BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(datetime, :earlier, 120) AND CONVERT(datetime, :later, 120) OR caro_calendar.span_end BETWEEN CONVERT(datetime, :earlier, 120) AND CONVERT(datetime, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE (caro_calendar.subject LIKE :SEARCH) OR (c_u2.name LIKE :SEARCH) ORDER BY caro_calendar.span_end ASC",
@@ -504,19 +504,19 @@ class SQLQUERY {
 		// also micro-updates
 		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder, thirdparty_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, :last_order, :stock_item, :erp_id, NULL, :thirdparty_order)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder, thirdparty_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, CONVERT(SMALLDATETIME, :last_order, 120), :stock_item, :erp_id, NULL, :thirdparty_order)"
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder, thirdparty_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, CONVERT(datetime, :last_order, 120), :stock_item, :erp_id, NULL, :thirdparty_order)"
 		],
 		'consumables_put_product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = :last_order, thirdparty_order = :thirdparty_order WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(SMALLDATETIME, :last_order, 120), thirdparty_order = :thirdparty_order WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(datetime, :last_order, 120), thirdparty_order = :thirdparty_order WHERE id = :id"
 		],
 		'consumables_put_product_productlist_import' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = :last_order WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(SMALLDATETIME, :last_order, 120) WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(datetime, :last_order, 120) WHERE id = :id"
 		],
 		'consumables_put_product_productlist_erp_amendment' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_unit = IF(article_unit IS NULL, :article_unit, article_unit), article_ean = IF(article_ean IS NULL, :article_ean, article_ean), trading_good = IF(trading_good IS NULL, :trading_good, trading_good), incorporated = IF(incorporated IS NULL, :incorporated, incorporated), has_expiry_date = IF(has_expiry_date IS  NULL, :has_expiry_date, has_expiry_date), special_attention = IF(special_attention IS NULL, :special_attention, special_attention), stock_item = :stock_item, erp_id = :erp_id, last_order = IF(last_order IS NULL, :last_order, last_order), thirdparty_order = :thirdparty_order WHERE vendor_id = :vendor_id AND article_no = :article_no",
-			'sqlsrv' => "UPDATE caro_consumables_products SET article_unit = (CASE WHEN article_unit IS NULL THEN :article_unit ELSE article_unit END), article_ean = (CASE WHEN article_ean IS NULL THEN :article_ean ELSE article_ean END), trading_good = (CASE WHEN trading_good IS NULL THEN :trading_good ELSE trading_good END), incorporated = (CASE WHEN incorporated IS NULL THEN :incorporated ELSE incorporated END), has_expiry_date = (CASE WHEN has_expiry_date IS NULL THEN :has_expiry_date ELSE has_expiry_date END), special_attention = (CASE WHEN special_attention IS NULL THEN :special_attention ELSE special_attention END), stock_item = :stock_item, erp_id = :erp_id, last_order = (CASE WHEN last_order IS NULL THEN CONVERT(SMALLDATETIME, :last_order, 120) ELSE last_order END), thirdparty_order = :thirdparty_order WHERE vendor_id = :vendor_id AND article_no = :article_no"
+			'sqlsrv' => "UPDATE caro_consumables_products SET article_unit = (CASE WHEN article_unit IS NULL THEN :article_unit ELSE article_unit END), article_ean = (CASE WHEN article_ean IS NULL THEN :article_ean ELSE article_ean END), trading_good = (CASE WHEN trading_good IS NULL THEN :trading_good ELSE trading_good END), incorporated = (CASE WHEN incorporated IS NULL THEN :incorporated ELSE incorporated END), has_expiry_date = (CASE WHEN has_expiry_date IS NULL THEN :has_expiry_date ELSE has_expiry_date END), special_attention = (CASE WHEN special_attention IS NULL THEN :special_attention ELSE special_attention END), stock_item = :stock_item, erp_id = :erp_id, last_order = (CASE WHEN last_order IS NULL THEN CONVERT(datetime, :last_order, 120) ELSE last_order END), thirdparty_order = :thirdparty_order WHERE vendor_id = :vendor_id AND article_no = :article_no"
 		],
 		'consumables_put_batch' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
@@ -713,11 +713,11 @@ class SQLQUERY {
 
 		'media_post' => [
 			'mysql' => "INSERT INTO caro_media (id, context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (NULL, :context, :name, :mime_type, :content, :upload_date, :expiry_date, :metadata)",
-			'sqlsrv' => "INSERT INTO caro_media (context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (:context, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(SMALLDATETIME, :upload_date, 120), CONVERT(SMALLDATETIME, :expiry_date, 120), :metadata)"
+			'sqlsrv' => "INSERT INTO caro_media (context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (:context, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(datetime, :upload_date, 120), CONVERT(datetime, :expiry_date, 120), :metadata)"
 		],
 		'media_put' => [
 			'mysql' => "UPDATE caro_media SET expiry_date = :expiry_date, metadata = :metadata WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_media SET expiry_date = CONVERT(SMALLDATETIME, :expiry_date, 120), metadata = :metadata WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_media SET expiry_date = CONVERT(datetime, :expiry_date, 120), metadata = :metadata WHERE id = :id"
 		],
 		'media_get_info_by_name_and_context' => [
 			'mysql' => "SELECT id, name, metadata FROM caro_media WHERE name LIKE CONCAT(:name, '%', :extension) AND context = :context",
@@ -772,7 +772,7 @@ class SQLQUERY {
 		],
 		'message_get_messages_prior_date' => [
 			'mysql' => "SELECT id FROM caro_messages WHERE user_id = :user AND timestamp < :timestamp",
-			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND timestamp < CONVERT(SMALLDATETIME, :timestamp, 120)"
+			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND timestamp < CONVERT(datetime, :timestamp, 120)"
 		],
 		'message_delete_messages' => [
 			'mysql' => "DELETE FROM caro_messages WHERE user_id = :user AND id in (:ids)",
@@ -816,7 +816,7 @@ class SQLQUERY {
 		],
 		'order_put_approved_order_state' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id IN (:id)",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(SMALLDATETIME, :date, 120) WHERE id IN (:id)"
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(datetime, :date, 120) WHERE id IN (:id)"
 		],
 		'order_put_approved_order_addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",
@@ -836,7 +836,7 @@ class SQLQUERY {
 		],
 		'order_get_approved_order_by_issued' => [ // preselection for safe deletion
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full < :date_time AND archived IS NULL",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full < CONVERT(datetime, :date_time, 120) AND archived IS NULL"
 		],		
 		'order_get_approved_order_by_substr' => [ // CASE SENSITIVE JUST TO BE SURE, compares order data to detect reused attachments in case of deletion
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
@@ -852,7 +852,7 @@ class SQLQUERY {
 		],
 		'order_get_approved_unprocessed_alert' => [ // for notifications
 			'mysql' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered > :timestamp",
-			'sqlsrv' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered > CONVERT(SMALLDATETIME, :timestamp, 120)"
+			'sqlsrv' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered > CONVERT(datetime, :timestamp, 120)"
 		],
 		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) AS num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
@@ -879,15 +879,15 @@ class SQLQUERY {
 						"VALUES (:order_id, :order_data, :organizational_unit, :orderer_name, :approved, :ordered, :delivered_partially, :delivered_full, :ordertype) " .
 						"ON DUPLICATE KEY UPDATE order_data = :order_data, delivered_partially = :delivered_partially, delivered_full = :delivered_full, ordertype = :ordertype",
 			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :order_id AS order_id, :order_data AS order_data, :organizational_unit as organizational_unit, :orderer_name as orderer_name, CONVERT(SMALLDATETIME, :approved, 120) AS approved, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :delivered_partially, 120) AS delivered_partially, CONVERT(SMALLDATETIME, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
+						"(SELECT :order_id AS order_id, :order_data AS order_data, :organizational_unit as organizational_unit, :orderer_name as orderer_name, CONVERT(datetime, :approved, 120) AS approved, CONVERT(datetime, :ordered, 120) AS ordered, CONVERT(datetime, :delivered_partially, 120) AS delivered_partially, CONVERT(datetime, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
 						"(order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) ON (target.order_id = source.order_id) " .
-						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, delivered_partially = CONVERT(SMALLDATETIME, :delivered_partially, 120), delivered_full = CONVERT(SMALLDATETIME, :delivered_full, 120), ordertype = :ordertype " .
-						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, :order_data, :organizational_unit, :orderer_name, CONVERT(SMALLDATETIME, :approved, 120), CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :delivered_partially, 120), CONVERT(SMALLDATETIME, :delivered_full, 120), :ordertype);"
+						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, delivered_partially = CONVERT(datetime, :delivered_partially, 120), delivered_full = CONVERT(datetime, :delivered_full, 120), ordertype = :ordertype " .
+						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, :order_data, :organizational_unit, :orderer_name, CONVERT(datetime, :approved, 120), CONVERT(datetime, :ordered, 120), CONVERT(datetime, :delivered_partially, 120), CONVERT(datetime, :delivered_full, 120), :ordertype);"
 													// ^^^^^^^^ insert id here as opposed to other merged queries because most other tables have id as auto increment, but this is primary only	
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics WHERE ordered BETWEEN :start AND :end ORDER BY order_id",
-			'sqlsrv' => "SELECT * FROM caro_consumables_order_statistics WHERE ordered BETWEEN CONVERT(SMALLDATETIME, :start, 120) AND CONVERT(SMALLDATETIME, :end, 120) ORDER BY order_id"
+			'sqlsrv' => "SELECT * FROM caro_consumables_order_statistics WHERE ordered BETWEEN CONVERT(datetime, :start, 120) AND CONVERT(datetime, :end, 120) ORDER BY order_id"
 		],
 		'order_delete_order_statistics' => [
 			'mysql' => "DELETE FROM caro_consumables_order_statistics WHERE order_id = :order_id",
@@ -895,7 +895,7 @@ class SQLQUERY {
 		],
 		'order_truncate_order_statistics' => [
 			'mysql' => "DELETE FROM caro_consumables_order_statistics WHERE ordered < :datetime",
-			'sqlsrv' => "DELETE FROM caro_consumables_order_statistics WHERE ordered < CONVERT(SMALLDATETIME, :datetime, 120)"
+			'sqlsrv' => "DELETE FROM caro_consumables_order_statistics WHERE ordered < CONVERT(datetime, :datetime, 120)"
 		],
 
 
