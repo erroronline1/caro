@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_14_sqlsrv'] as $update){
+		foreach (['_2026_03_14'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -562,7 +562,7 @@ class UPDATE{
 		];
 	}
 
-		private function _2026_03_14_sqlsrv(){
+	private function _2026_03_14_sqlsrv(){
 		echo '<br /><br />[!] This update just creates a backup of all current tables. you\'ll have to chnge all smalldatetime colums to datetime manually for sqlqrv creates unpredictable (for me) dependencies. quite sorry, but at this stage probably no one is affected anyway...<br />';
 		$sqlsrv = [];
 		foreach([
@@ -599,6 +599,21 @@ class UPDATE{
 			'mysql' => [
 			],
 			'sqlsrv' => $sqlsrv
+		];
+	}
+
+	private function _2026_03_14(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_whiteboard ADD COLUMN IF NOT EXISTS doodle text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_whiteboard', 'doodle') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_whiteboard" .
+				"    ADD doodle varchar(MAX) NULL DEFAULT NULL" .
+				" END; "
+			]
 		];
 	}
 

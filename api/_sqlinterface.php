@@ -1107,14 +1107,14 @@ class SQLQUERY {
 
 
 		'whiteboard_post' => [
-			'mysql' => "INSERT INTO caro_whiteboard (id, user_id, name, last_touch, organizational_unit, content) " .
-						"VALUES (:id, :user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content) " .
-						"ON DUPLICATE KEY UPDATE name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content ",
+			'mysql' => "INSERT INTO caro_whiteboard (id, user_id, name, last_touch, organizational_unit, content, doodle) " .
+						"VALUES (:id, :user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content, :doodle) " .
+						"ON DUPLICATE KEY UPDATE name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content, doodle = :doodle",
 			'sqlsrv' => "MERGE INTO caro_whiteboard WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :user_id AS user_id, :name AS name, CURRENT_TIMESTAMP AS last_touch, :organizational_unit AS organizational_unit, :content AS content) AS source " .
-						"(id, user_id, name, last_touch, organizational_unit, content) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content " .
-						"WHEN NOT MATCHED THEN INSERT (user_id, name, last_touch, organizational_unit, content) VALUES (:user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content);",
+						"(SELECT :id AS id, :user_id AS user_id, :name AS name, CURRENT_TIMESTAMP AS last_touch, :organizational_unit AS organizational_unit, :content AS content, :doodle AS doodle) AS source " .
+						"(id, user_id, name, last_touch, organizational_unit, content, doodle) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content, doodle = :doodle " .
+						"WHEN NOT MATCHED THEN INSERT (user_id, name, last_touch, organizational_unit, content, doodle) VALUES (:user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content, :doodle);",
 		],
 		'whiteboard_get_all' => [
 			'mysql' => "SELECT caro_whiteboard.*, caro_user.name as user_name FROM caro_whiteboard LEFT JOIN caro_user ON caro_whiteboard.user_id = caro_user.id",

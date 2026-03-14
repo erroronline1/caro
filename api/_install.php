@@ -375,6 +375,7 @@ define('DEFAULTSQL', [
 				"	`last_touch` datetime NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`doodle` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
@@ -722,7 +723,8 @@ define('DEFAULTSQL', [
 				"	name varchar(MAX) NOT NULL," .
 				"	last_touch datetime NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
-				"	content varchar(MAX) NULL DEFAULT NULL" .
+				"	content varchar(MAX) NULL DEFAULT NULL," .
+				"	doodle varchar(MAX) NULL DEFAULT NULL" .
 				");"
 		],
 
