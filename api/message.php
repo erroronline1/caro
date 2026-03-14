@@ -664,7 +664,8 @@ class MESSAGE extends API {
 					':user_id' => $_SESSION['user']['id'],
 					':name' => null,
 					':organizational_unit' => null,
-					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.content')) ? : ''
+					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.content')) ? : '',
+					':doodle' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle')) ? : null
 				];
 				$whiteboard[':content'] .= "\n" . $this->_lang->GET('message.whiteboard.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
 
@@ -694,11 +695,41 @@ class MESSAGE extends API {
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_post', [
 					'values' => $whiteboard
-				])) $this->response([
+				])) {
+					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle_export')) && $_FILES["_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')]){
+						$FILEHANDLER = new FILEHANDLER($this->_pdo);
+						$paths = [];
+						foreach ($FILEHANDLER->storeUploadedFiles(
+							input: [
+								"_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')
+							],
+							destination: [
+								'path' => FILEHANDLER::directory('tmp')
+							],
+							naming: [
+								'prefix' => $whiteboard[':name']
+							]
+						) as $file){
+							$paths[pathinfo($file)['basename']] = [
+								'href' => './api/api.php/file/stream/' . substr($file, 1),
+								'download' => pathinfo($file)['basename']
+							];
+						}
+						$this->response([
+							'response' => [
+								'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
+								'type' => 'success'
+							],
+							'links' => $paths
+						]);
+					}
+
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.whiteboard.saved_error'),
@@ -723,13 +754,26 @@ class MESSAGE extends API {
 							'name' => $this->_lang->GET('message.whiteboard.name'),
 							'value' => $whiteboard ? $whiteboard['name'] : ''
 						]
+					]
+				];
+				$response['render']['content'][] = [
+					[
+						[
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->GET('message.whiteboard.content'),
+								'value' => $whiteboard ? $whiteboard['content'] : '',
+								'rows' => 40
+							]
+						]
 					],
 					[
-						'type' => 'textarea',
-						'attributes' => [
-							'name' => $this->_lang->GET('message.whiteboard.content'),
-							'value' => $whiteboard ? $whiteboard['content'] : '',
-							'rows' => 40
+						[
+							'type' => 'doodle',
+							'attributes' => [
+								'name' => $this->_lang->GET('message.whiteboard.doodle'),
+							],
+							'content' => $whiteboard ? $whiteboard['doodle'] : null
 						]
 					]
 				];
@@ -739,14 +783,16 @@ class MESSAGE extends API {
 						$response['render']['content'][count($response['render']['content']) - 1][0]['attributes']['readonly'] = true;
 					}
 					else {
-						$response['render']['content'][count($response['render']['content']) - 1][] = [
-							'type' => 'deletebutton',
-							'attributes' => [
-								'value' => $this->_lang->GET('message.whiteboard.delete'),
-							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.whiteboard.delete_confirm') ."', options:{".
-								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
-								"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
-							"}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', " . $whiteboard['id'] . "); this.disabled = true;}})"
+						$response['render']['content'][] = [
+							[
+								'type' => 'deletebutton',
+								'attributes' => [
+									'value' => $this->_lang->GET('message.whiteboard.delete'),
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.whiteboard.delete_confirm') ."', options:{".
+									"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+									"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', " . $whiteboard['id'] . "); this.disabled = true;}})"
+								]
 							]
 						];
 					}
