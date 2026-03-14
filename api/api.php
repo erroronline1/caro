@@ -96,6 +96,10 @@ class API {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
+		$this->_lang = new LANG();
+		// set date settings according to defaults or session user settings will be updated after successfull authentification, but is needed here for subimporting of modules
+		$this->_date = $this->date();
+
 	}
 	
 	/**
@@ -494,8 +498,6 @@ class API {
 	public function processApi(){
 		$this->_payload = UTILITY::parsePayload();
 		
-		$this->_lang = new LANG();
-
 		// (re)authentify session user
 		if ((REQUEST[0] === 'application' && (
 			in_array(REQUEST[1], ['menu'])
