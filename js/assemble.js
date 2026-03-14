@@ -1162,6 +1162,7 @@ export class Assemble {
 		this.names = setup.names || {};
 		this.composer = setup.composer;
 		this.signaturePads = [];
+		this.doodledata = {};
 	}
 
 	/**
@@ -1222,7 +1223,7 @@ export class Assemble {
 	 * @param {domNode} eventListenerTarget
 	 * @event scroll events to process number of sections
 	 * @event add trash drag events
-	 * @event initialize signature pad
+	 * @event initialize signature and doodle pads
 	 * @event populate canvases for barcodes, qr-codes or images if applicable
 	 */
 	processAfterInsertion(eventListenerTarget = window) {
@@ -1238,6 +1239,10 @@ export class Assemble {
 
 		if (this.signaturePads) {
 			this.initialize_SignaturePad();
+			for (const [key, data] of Object.entries(this.doodledata)) {
+				console.log(key, data);
+				if (document.getElementById(key)) window.signaturePads[key].fromData(data);
+			}
 		}
 
 		const lazyload = new ImageHandler({
@@ -1465,27 +1470,47 @@ export class Assemble {
 	prepareForm(event) {
 		const signatures = document.querySelectorAll(".signaturecanvas"),
 			requiredsignature = document.querySelectorAll("[data-required=required]"),
-			required = document.querySelectorAll("[required]");
+			required = document.querySelectorAll("[required]"),
+			doodles = document.querySelectorAll(".doodlecanvas");
 		let missing_required = false;
 
 		// check signature
 		if (signatures) {
 			for (const [key, signature] of Object.entries(signatures)) {
-				if (!window.signaturePad[signature.id]) continue;
-				if (window.signaturePad[signature.id].isEmpty()) {
+				if (!window.signaturePads[signature.id]) continue;
+				if (window.signaturePads[signature.id].isEmpty()) {
 					if (signature == requiredsignature) {
 						signature.classList.add("input_required_alert");
 						missing_required = true;
 					}
 					document.getElementById("_SIGNATURE" + signature.id).value = null;
 				} else {
-					let file = new File([this.dataURLToBlob(window.signaturePad[signature.id].toDataURL())], "CAROsignature.png", {
+					let file = new File([this.dataURLToBlob(window.signaturePads[signature.id].toDataURL())], "CAROsignature.png", {
 						type: "image/png",
 						lastModified: new Date().getTime(),
 					});
 					let section = new DataTransfer();
 					section.items.add(file);
 					document.getElementById("_SIGNATURE" + signature.id).files = section.files;
+				}
+			}
+		}
+
+		if (doodles) {
+			for (const [key, doodle] of Object.entries(doodles)) {
+				if (!window.signaturePads[doodle.id]) continue;
+				if (window.signaturePads[doodle.id].isEmpty()) {
+					document.getElementById("_DOODLE" + doodle.id).value = null;
+					document.getElementById("_DOODLEDATA" + doodle.id).value = "";
+				} else {
+					let file = new File([this.dataURLToBlob(window.signaturePads[doodle.id].toDataURL())], api._lang.GET("message.whiteboard.doodle") + ".png", {
+						type: "image/png",
+						lastModified: new Date().getTime(),
+					});
+					let section = new DataTransfer();
+					section.items.add(file);
+					document.getElementById("_DOODLE" + doodle.id).files = section.files;
+					document.getElementById("_DOODLEDATA" + doodle.id).value = JSON.stringify(window.signaturePads[doodle.id].toData());
 				}
 			}
 		}
@@ -1532,10 +1557,9 @@ export class Assemble {
 	 */
 
 	initialize_SignaturePad() {
-		if (!window.signaturePad) window.signaturePad = {};
+		if (!window.signaturePads) window.signaturePads = {};
 		for (const id of this.signaturePads) {
-			api._settings.session.signatureCanvas.push(document.getElementById(id));
-			window.signaturePad[id] = new SignaturePad(document.getElementById(id), {
+			window.signaturePads[id] = new SignaturePad(document.getElementById(id), {
 				// It's Necessary to use an opaque color when saving image as JPEG;
 				// this option can be omitted if only saving as PNG or SVG
 				//backgroundColor: 'rgb(236, 239, 244)',
@@ -1555,20 +1579,18 @@ export class Assemble {
 		// some browsers report devicePixelRatio as less than 1
 		// and only part of the canvas is cleared then.
 		const ratio = Math.max(window.devicePixelRatio || 1, 1);
-		// This part causes the canvas to be cleared
-		for (const pad of api._settings.session.signatureCanvas) {
-			pad.width = pad.offsetWidth * ratio;
-			pad.height = pad.offsetHeight * ratio;
-			pad.getContext("2d").scale(ratio, ratio);
-		}
-		// This library does not listen for canvas changes, so after the canvas is automatically
-		// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
-		// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
-		// that the state of this library is consistent with visual state of the canvas, you
-		// have to clear it manually.
-		//signaturePad.clear();
-		// If you want to keep the drawing on resize instead of clearing it you can reset the data.
-		for (const [key, pad] of Object.entries(window.signaturePad)) {
+		for (const [key, pad] of Object.entries(window.signaturePads)) {
+			// This part causes the canvas to be cleared
+			pad.canvas.width = pad.canvas.offsetWidth * ratio;
+			pad.canvas.height = pad.canvas.offsetHeight * ratio;
+			pad.canvas.getContext("2d").scale(ratio, ratio);
+			// This library does not listen for canvas changes, so after the canvas is automatically
+			// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+			// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+			// that the state of this library is consistent with visual state of the canvas, you
+			// have to clear it manually.
+			//signaturePad.clear();
+			// If you want to keep the drawing on resize instead of clearing it you can reset the data.
 			pad.fromData(pad.toData());
 		}
 	}
@@ -2058,6 +2080,70 @@ export class Assemble {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "deletebutton";
 		return this.button();
+	}
+
+	/**
+	 * creates a doodle area (utilizing signaturePad)
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "doodle",
+	 * 		"attributes": {
+	 * 			"name": "doodle",
+	 * 		},
+	 * 		"content": signaturePad data either as object or json
+	 * 		"hint": "this doodle is highly dependent of signaturepad data structure thus not necessarily suitable for long term documentation..."
+	 * 	}
+	 * ```
+	 */
+	doodle() {
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		let result = [...this.header()];
+		const canvas = document.createElement("canvas");
+		canvas.classList.add("doodlecanvas");
+		canvas.id = getNextElementID();
+		canvas.title = api._lang.GET("assemble.render.aria.doodle");
+		result.push(canvas);
+
+		if (this.currentElement.content) this.doodledata[canvas.id] = typeof this.currentElement.content === "string" ? JSON.parse(this.currentElement.content) : this.currentElement.content;
+
+		const exportinput = document.createElement("input");
+		exportinput.type = "file";
+		exportinput.id = "_DOODLE" + canvas.id;
+		exportinput.name = "_DOODLE" + this.currentElement.attributes.name;
+		exportinput.hidden = true;
+		exportinput.tabIndex = -1;
+		exportinput.role = "none";
+		exportinput.setAttribute("aria-hidden", true);
+
+		const datapoints = document.createElement("input");
+		datapoints.type = "hidden";
+		datapoints.id = "_DOODLEDATA" + canvas.id;
+		datapoints.name = this.currentElement.attributes.name;
+
+		result.push(exportinput, datapoints);
+
+		result = result.concat(this.hint());
+		delete this.currentElement.hint;
+		
+		this.currentElement.attributes = {};
+		this.currentElement.content = {};
+		this.currentElement.content[api._lang.GET("message.whiteboard.doodle_draw")] = { checked: true, onchange: `if (this.checked) window.signaturePads['${canvas.id}'].compositeOperation="source-over";` };
+		this.currentElement.content[api._lang.GET("message.whiteboard.doodle_erase")] = { onchange: `if (this.checked) window.signaturePads['${canvas.id}'].compositeOperation="destination-out";`, class: "red" };
+		result = result.concat(this.checkbox("radio"));
+
+		this.currentElement.content = {};
+		this.currentElement.content[api._lang.GET("message.whiteboard.doodle_export")] = {};
+		result = result.concat(this.checkbox());
+
+		this.currentElement.attributes = {
+			value: api._lang.GET("message.whiteboard.doodle_clear"),
+			onclick: `new _client.Dialog({ type: "confirm", header: api._lang.GET("message.whiteboard.doodle_clear_confirm"), options:{'${api._lang.GET("general.cancel_button")}': false, '${api._lang.GET("general.ok_button")}': {'value': true, class: 'reducedCTA'}}}).then((confirmation) => {if (confirmation) window.signaturePads['${canvas.id}'].clear();})`,
+		};
+		result = result.concat(this.deletebutton());
+		this.signaturePads.push(canvas.id);
+		return result;
 	}
 
 	/**
@@ -3479,7 +3565,7 @@ export class Assemble {
 		result.push(input);
 		this.currentElement.attributes = {
 			value: api._lang.GET("assemble.render.clear_signature"),
-			onclick: "signaturePad['" + canvas.id + "'].clear()",
+			onclick: "window.signaturePads['" + canvas.id + "'].clear()",
 		};
 		result = result.concat(this.hint());
 		delete this.currentElement.hint;
