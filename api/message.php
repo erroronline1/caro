@@ -780,7 +780,7 @@ class MESSAGE extends API {
 
 				if ($whiteboard){
 					if ($whiteboard['user_id'] !== $_SESSION['user']['id'] && !array_intersect(['admin'], $_SESSION['user']['permissions'])) {
-						$response['render']['content'][count($response['render']['content']) - 1][0]['attributes']['readonly'] = true;
+						$response['render']['content'][count($response['render']['content']) - 2][0]['attributes']['readonly'] = true;
 					}
 					else {
 						$response['render']['content'][] = [
