@@ -776,15 +776,19 @@ Während Aufgaben einzelne Fälle oder spezifische Angelegenheiten adressieren, 
 [Übersicht](#übersicht)
 
 ### Langzeitplanung
-Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann für beliebige Zwecke verwendet werden. Planungen sind von jedem Nutzer einsehbar sobald die Planung als abgeschlossen markiert wurde, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
+Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann auch für beliebige andere Zwecke verwendet werden, beispielsweise wichtige Wochen im Jahresverlauf. Planungen sind von jedem Nutzer einsehbar sobald die Planung als abgeschlossen markiert wurde, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
 
 Die Planung ist einfach zu nutzen:
-* Bezeichnung und Zeitraum definieren
+* Bezeichnung, Zeitraum und Zeitabschnitte definieren
 * betroffene Personen oder Themen benennen
 * Farben für Bereiche oder Aufgaben definieren
 * den Zeitraum für Namen/Themen mit einer gewählten Farbe einfärben, mit der Maus oder einem geeigneten Zeiger
 
-Gewählte Zeiträume werden auf den ersten Tag des Startmonats und den letzten Tag des Endmonats korrigiert. Die Einfärbung erfolgt für halbe Monate.
+Gewählte Zeiträume werden
+* für wöchentliche Abschnitte auf den Montag der Woche des Startdatums und den Sonntag der Woche des Enddatums
+* für halb- und monatliche Abschnitte auf den ersten Tag des Monats des Startdatums und den letzten Tag des Monats des Enddatums
+
+korrigiert. Die Einfärbung erfolgt für die jeweils gewählten Zeitabschnitte.
 
 ![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20de-fullpage.png)
 

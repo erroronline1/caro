@@ -267,12 +267,31 @@ class CALENDAR extends API {
 
 				// new planning
 				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
+					$period = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.period'));
+					$period = array_search($period, $this->_lang->_USER['calendar']['longtermplanning']['periods']) ?: 'halfmonthly';
+
 					$start = new \DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')));
-					$start->modify('first day of this month');
+					switch($period){
+						case 'weekly':
+						case 'biweekly':
+							$start->modify('monday this week');
+							break;
+						default: // case 'monthly': case 'halfmontly':
+							$start->modify('first day of this month');
+					}
+
 					$end = new \DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')));
-					$end->modify('last day of this month');
+					switch($period){
+						case 'weekly':
+						case 'biweekly':
+							$end->modify('monday next week')->modify('-1 day');
+							break;
+						default: // case 'monthly': case 'halfmontly':
+							$end->modify('last day of this month');
+					}
+
 					$span = $end->diff($start);
-					$span = ($span->m + 12 * $span->y) *2;
+					$span = ($span->m + 12 * $span->y) * 2;
 					if ($span < 2) $this->response([], 406);
 
 					// import if requested
@@ -288,9 +307,25 @@ class CALENDAR extends API {
 					$defaulttimeunits = [];
 					while ($start < $end){
 						$defaulttimeunits[$start->format('y-m-d')] = null;
-						$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
+						switch($period){
+							case 'weekly':
+								$start->modify('+7 day');
+								break;
+							case 'biweekly':
+								$start->modify('+14 day');
+								break;
+							case 'monthly':
+								$start->modify('+1 month');
+								break;
+							default: // case 'halfmontly':
+								$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
+						}
 						$defaulttimeunits[$start->format('y-m-d')] = null;
-						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
+						switch($period){
+							case 'halfmontly':
+								$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month
+								break;
+						}
 					}
 					
 					$content = [];
@@ -298,8 +333,15 @@ class CALENDAR extends API {
 					if (isset($schedule['misc']['content'])){
 						foreach ($schedule['misc']['content'] as $name => $importtimeunit){
 							$imports = [];
-							foreach ($defaulttimeunits as $label => $color){
-								$imports[$label] = $importtimeunit[$label] ?? $color;
+							foreach ($defaulttimeunits as $label => $color){ // iterate over prepared time periods
+								$label = new \DateTime($label); // convert period label to actual date
+								foreach($importtimeunit as $importdate => $importcolor){ // iterate over imported names periods 
+									$importdate = new \DateTime($importdate); // convert imported lable to actual date
+									if ($importdate < $label) continue;
+									$imports[$label->format('Y-m-d')] = $importcolor ?? $color; // colourize with colour of the next fitting date
+									break; // exit import after colouring
+								}
+								if (!isset($imports[$label->format('Y-m-d')])) $imports[$label->format('Y-m-d')] = $color; // continue setting up periods if not already done
 							}
 							$content[$name] = $imports;
 						}
@@ -480,6 +522,10 @@ class CALENDAR extends API {
 				}
 				else {
 					if (PERMISSION::permissionFor('longtermplanning')){
+						$periods = [];
+						foreach($this->_lang->_USER['calendar']['longtermplanning']['periods'] as $period){
+							$periods[$period] = [];
+						}
 						$response['render']['content'][] = [
 							[
 								'type' => 'text',
@@ -502,6 +548,12 @@ class CALENDAR extends API {
 									'required' => true
 								],
 								'hint' => $this->_lang->GET('calendar.longtermplanning.new_hint')
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.period'),
+								],
+								'content' => $periods
 							], [
 								'type' => 'text',
 								'attributes' => [
