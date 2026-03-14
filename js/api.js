@@ -19,7 +19,6 @@ export const api = {
 		config: {},
 		session: {
 			elementId: 0,
-			signatureCanvas: [],
 			textareaAutocompleteIndex: null,
 			textareaAutocompleteSwipe: null,
 			orderTilesGroupBy: "commission",
@@ -1559,6 +1558,15 @@ export const api = {
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
 				if (data.response !== undefined && data.response.redirect) api.message("get", ...data.response.redirect);
+				if (data.links) {
+					new Dialog({
+						type: "input",
+						render: [
+							{ type: "textsection", content: api._lang.GET("maintenance.record_datalist.download") },
+							{ type: "links", content: data.links },
+						],
+					});
+				}
 			},
 			title = {
 				announcements: api._lang.GET("message.navigation.announcements"),
@@ -1572,6 +1580,7 @@ export const api = {
 				switch (request[1]) {
 					case "announcement":
 					case "announcements":
+					case "whiteboard":
 					case "whiteboards":
 						successFn = async function (data) {
 							if (data.render) {
