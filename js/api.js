@@ -19,7 +19,7 @@ export const api = {
 		config: {},
 		session: {
 			elementId: 0,
-			signatureCanvas: null,
+			signatureCanvas: [],
 			textareaAutocompleteIndex: null,
 			textareaAutocompleteSwipe: null,
 			orderTilesGroupBy: "commission",
@@ -1819,7 +1819,7 @@ export const api = {
 								type: "input",
 								header: api._lang.GET("order.manual_match"),
 								render: data.render.content,
-								options: options
+								options: options,
 							});
 						};
 						break;

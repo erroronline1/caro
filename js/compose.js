@@ -1,10 +1,10 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -20,7 +20,6 @@ export class Composer {
 		this.newDocumentElements = new Set();
 		this.newTextElements = {};
 		this.componentIdentify = 0;
-		this.componentSignature = 0;
 		this.stopParentDropEvent = false;
 	}
 
@@ -155,15 +154,6 @@ export class Composer {
 					element.type = "identify";
 					document.getElementById("setIdentify").disabled = true;
 					document.getElementById("setIdentify").checked = false;
-				}
-				if (element.type === "signature") {
-					const signatureform = document.querySelector("form>label[data-type=signature").parentNode;
-					for (const node of signatureform) {
-						if (node.dataset.type === "addblock") {
-							node.disabled = true;
-							this.componentSignature++;
-						}
-					}
 				}
 			} else if (["textsection"].includes(element.type)) {
 				if (siblingName === api._lang.GET("assemble.compose.component.textsection_description")) {
@@ -612,9 +602,9 @@ export class Composer {
 	 */
 	importDocument(content) {
 		/**
-		 * recursively count identify and signaturepad widgets within components
+		 * recursively count identify widgets within components
 		 * @param {domNode} element domNode
-		 * @event update this.componentIdentify, this.componentSignature
+		 * @event update this.componentIdentify
 		 */
 		function lookupIdentify(element) {
 			for (const container of element) {
@@ -622,7 +612,6 @@ export class Composer {
 					lookupIdentify.call(this, container);
 				} else {
 					if (container.type === "identify") this.componentIdentify++;
-					if (container.type === "signature") this.componentSignature++;
 				}
 			}
 		}
@@ -639,7 +628,6 @@ export class Composer {
 
 		// alert on forbidden widget count per document
 		if (this.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.multiple_identify"), "error");
-		if (this.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.multiple_signature"), "error");
 	}
 
 	/**
@@ -832,10 +820,13 @@ export class Composer {
 
 		// determine target:
 		// target is element
-		if (evnt.target.classList.contains("draggableDocumentElement")) target = evnt.target; // draggable element container
-		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) target = evnt.target.parentNode; // draggable element container content
+		if (evnt.target.classList.contains("draggableDocumentElement"))
+			target = evnt.target; // draggable element container
+		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement"))
+			target = evnt.target.parentNode; // draggable element container content
 		// target is container
-		else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
+		else if (["main", "section"].includes(evnt.target.parentNode.localName))
+			target = evnt.target; // draggable div container
 		else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
 
 		// style context menu and position relative to pointer
@@ -936,7 +927,7 @@ export class Composer {
 		button.classList.add("discreetButton");
 		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.delete")));
 		let options = {};
-		(options[api._lang.GET("general.cancel_button")] = false),
+		((options[api._lang.GET("general.cancel_button")] = false),
 			(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
 			(button.onclick = () => {
 				new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context.delete"), options: options }).then((confirmation) => {
@@ -945,7 +936,7 @@ export class Composer {
 					}
 					div.remove();
 				});
-			});
+			}));
 		div.append(button);
 
 		// append context menu
@@ -971,7 +962,8 @@ export class Composer {
 		if (!draggedElement) return;
 		// determine target:
 		// target is element
-		if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content
+		if (draggedElement.parentNode.classList.contains("draggableDocumentElement"))
+			draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content
 		else if (draggedElement.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode.parentNode; // convert dragged input to draggable element container content
 
 		const draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
@@ -1066,7 +1058,7 @@ export class Composer {
 	 * deletes widget or section if dropped on deletion area or confirmed context menu deletion
 	 * @param {event} evnt
 	 * @event removes event target
-	 * @event updates this.componentIdentify and this.componentSignature count
+	 * @event updates this.componentIdentify count
 	 */
 	drop_delete(evnt) {
 		let draggedElement = evnt.dataTransfer.getData("text")
@@ -1074,11 +1066,15 @@ export class Composer {
 			: evnt.target; // context menu deletion
 		// determine target:
 		// target is element
-		if (draggedElement.classList.contains("draggableDocumentElement")) draggedElement = draggedElement; // draggable element container
-		else if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // draggable element container content
+		if (draggedElement.classList.contains("draggableDocumentElement"))
+			draggedElement = draggedElement; // draggable element container
+		else if (draggedElement.parentNode.classList.contains("draggableDocumentElement"))
+			draggedElement = draggedElement.parentNode; // draggable element container content
 		// target is container
-		else if (["main", "section"].includes(draggedElement.parentNode.localName)) draggedElement = draggedElement; // draggable div container
-		else if (["main", "section"].includes(draggedElement.parentNode.parentNode.localName)) draggedElement = draggedElement.parentNode; // draggable div container content
+		else if (["main", "section"].includes(draggedElement.parentNode.localName))
+			draggedElement = draggedElement; // draggable div container
+		else if (["main", "section"].includes(draggedElement.parentNode.parentNode.localName))
+			draggedElement = draggedElement.parentNode; // draggable div container content
 		else draggedElement = null; // otherwise forbidden element
 
 		if (!draggedElement) {
@@ -1093,9 +1089,9 @@ export class Composer {
 		}
 
 		/**
-		 * recursively count deleted identifiers or signaturepads within component/document to eventually reenable adding
+		 * recursively count deleted identifiers within component/document to eventually reenable adding
 		 * @param {domNode} parent domNode
-		 * @event updates this.componentIdentify and this.componentSignature count
+		 * @event updates this.componentIdentify count
 		 */
 		function nodechildren(parent) {
 			[...parent.childNodes].forEach((node) => {
@@ -1106,14 +1102,6 @@ export class Composer {
 					if (node.dataset && node.dataset.type === "identify") {
 						if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
 						this.componentIdentify--;
-					}
-					if (node.id && node.id === "signaturecanvas") {
-						const signatureformsibling = document.querySelector("form>label[data-type=signature");
-						if (signatureformsibling)
-							for (const node of signatureformsibling.parentNode) {
-								if (node.dataset.type === "addblock") node.disabled = false;
-							}
-						this.componentSignature--;
 					}
 				}
 			});
@@ -1547,7 +1535,7 @@ export class Compose extends Assemble {
 			options[api._lang.GET("assemble.compose.edit_available")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
-				  }
+					}
 				: {};
 			options[api._lang.GET("assemble.compose.edit_hidden")] =
 				hidden && Object.keys(hidden).length
@@ -1555,21 +1543,21 @@ export class Compose extends Assemble {
 							checked: true,
 							"data-hiddenradio": "ComponentHidden",
 							class: "red",
-					  }
+						}
 					: {
 							"data-hiddenradio": "ComponentHidden",
 							class: "red",
-					  };
+						};
 			this.currentElement = {
 				type: "radio",
 				hint:
 					std.hidden.hint +
 					(hidden && Object.keys(hidden).length
 						? " " +
-						  api._lang.GET("assemble.compose.edit_hidden_set", {
+							api._lang.GET("assemble.compose.edit_hidden_set", {
 								":name": hidden.name,
 								":date": hidden.date,
-						  })
+							})
 						: ""),
 				attributes: {
 					name: std.hidden.name,

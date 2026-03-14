@@ -301,7 +301,9 @@ dialog[open] {
 	aspect-ratio: 1;
 	border-radius: 50%;
 	border: 8px solid #5e81ac;
-	animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
+	animation:
+		l20-1 0.8s infinite linear alternate,
+		l20-2 1.6s infinite linear;
 }
 
 @keyframes l20-1 {
@@ -465,7 +467,7 @@ nav {
 }
 
 html[data-useragent*="safari"] nav {
-	height:5rem;
+	height: 5rem;
 }
 
 /*************************** main with breakpoints for bigger screen masonry ******************************/
@@ -643,7 +645,7 @@ canvas {
 .dataurl {
 	display: block;
 	margin-bottom: 2em;
-	width:100%;
+	width: 100%;
 	height: calc(75vh - 6em);
 	margin: 0 auto;
 	overflow: auto; /* Enable scrolling for overflow content */
@@ -1013,7 +1015,7 @@ a.inline {
 input,
 textarea,
 select,
-#signaturecanvas,
+.signaturecanvas,
 .scanner,
 .rangedatalist,
 .editor {
@@ -1179,7 +1181,6 @@ input:checked + .radio.orange {
 	border-color: var(--article);
 }
 
-
 input[type="checkbox"]:disabled + label,
 input[type="radio"]:disabled + label {
 	color: var(--darkshadow);
@@ -1192,8 +1193,7 @@ html[data-useragent*="safari"] body {
 	}
 	input[type="date"],
 	input[type="time"],
-	input[type="datetime-local"]
-	 {
+	input[type="datetime-local"] {
 		width: calc(100% - 3.125rem);
 		-webkit-logical-height: 3em;
 	}
@@ -1350,17 +1350,17 @@ button:active {
 	background-color: var(--cta_active);
 }
 
-#signaturecanvas {
+.signaturecanvas {
 	border-bottom: 1px solid var(--foreground);
 	height: 15em;
 	margin-bottom: 1rem;
-	border-radius: .2rem;
+	border-radius: 0.2rem;
 }
 
 input:invalid.input_required_alert,
 input:invalid + button.input_required_alert,
 input:invalid + label.input_required_alert,
-#signaturecanvas.input_required_alert,
+.signaturecanvas.input_required_alert,
 .hiddencomponent {
 	border: 2px solid var(--red) !important;
 }
@@ -1395,7 +1395,7 @@ header[data-type] {
 }
 
 /* e.g. checkboxes*/
-.markdown{
+.markdown {
 	width: auto !important;
 	height: auto !important;
 	appearance: auto !important;

@@ -1161,6 +1161,7 @@ export class Assemble {
 		this.codeEditor = [];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
+		this.signaturePads = [];
 	}
 
 	/**
@@ -1235,7 +1236,7 @@ export class Assemble {
 		const trash = document.querySelector("[data-type=trash");
 		if (trash) Composer.composer_add_trash(trash.parentNode);
 
-		if (this.signaturePad) {
+		if (this.signaturePads) {
 			this.initialize_SignaturePad();
 		}
 
@@ -1462,27 +1463,30 @@ export class Assemble {
 	 * @returns none after submit event or content update
 	 */
 	prepareForm(event) {
-		const signature = document.getElementById("signaturecanvas"),
-			requiredsignature = document.querySelector("[data-required=required]"),
+		const signatures = document.querySelectorAll(".signaturecanvas"),
+			requiredsignature = document.querySelectorAll("[data-required=required]"),
 			required = document.querySelectorAll("[required]");
 		let missing_required = false;
 
 		// check signature
-		if (signature) {
-			if (signaturePad.isEmpty()) {
-				if (signature == requiredsignature) {
-					signature.classList.add("input_required_alert");
-					missing_required = true;
+		if (signatures) {
+			for (const [key, signature] of Object.entries(signatures)) {
+				if (!window.signaturePad[signature.id]) continue;
+				if (window.signaturePad[signature.id].isEmpty()) {
+					if (signature == requiredsignature) {
+						signature.classList.add("input_required_alert");
+						missing_required = true;
+					}
+					document.getElementById("_SIGNATURE" + signature.id).value = null;
+				} else {
+					let file = new File([this.dataURLToBlob(window.signaturePad[signature.id].toDataURL())], "CAROsignature.png", {
+						type: "image/png",
+						lastModified: new Date().getTime(),
+					});
+					let section = new DataTransfer();
+					section.items.add(file);
+					document.getElementById("_SIGNATURE" + signature.id).files = section.files;
 				}
-				document.getElementById("SIGNATURE").value = null;
-			} else {
-				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "CAROsignature.png", {
-					type: "image/png",
-					lastModified: new Date().getTime(),
-				});
-				let section = new DataTransfer();
-				section.items.add(file);
-				document.getElementById("SIGNATURE").files = section.files;
 			}
 		}
 
@@ -1528,13 +1532,16 @@ export class Assemble {
 	 */
 
 	initialize_SignaturePad() {
-		api._settings.session.signatureCanvas = document.getElementById("signaturecanvas");
-		window.signaturePad = new SignaturePad(api._settings.session.signatureCanvas, {
-			// It's Necessary to use an opaque color when saving image as JPEG;
-			// this option can be omitted if only saving as PNG or SVG
-			//backgroundColor: 'rgb(236, 239, 244)',
-			penColor: "rgb(46, 52, 64)",
-		});
+		if (!window.signaturePad) window.signaturePad = {};
+		for (const id of this.signaturePads) {
+			api._settings.session.signatureCanvas.push(document.getElementById(id));
+			window.signaturePad[id] = new SignaturePad(document.getElementById(id), {
+				// It's Necessary to use an opaque color when saving image as JPEG;
+				// this option can be omitted if only saving as PNG or SVG
+				//backgroundColor: 'rgb(236, 239, 244)',
+				penColor: "rgb(46, 52, 64)",
+			});
+		}
 		// On mobile devices it might make more sense to listen to orientation change,
 		// rather than window resize events.
 		window.onresize = this.resizeSignatureCanvas;
@@ -1549,9 +1556,11 @@ export class Assemble {
 		// and only part of the canvas is cleared then.
 		const ratio = Math.max(window.devicePixelRatio || 1, 1);
 		// This part causes the canvas to be cleared
-		api._settings.session.signatureCanvas.width = api._settings.session.signatureCanvas.offsetWidth * ratio;
-		api._settings.session.signatureCanvas.height = api._settings.session.signatureCanvas.offsetHeight * ratio;
-		api._settings.session.signatureCanvas.getContext("2d").scale(ratio, ratio);
+		for (const pad of api._settings.session.signatureCanvas) {
+			pad.width = pad.offsetWidth * ratio;
+			pad.height = pad.offsetHeight * ratio;
+			pad.getContext("2d").scale(ratio, ratio);
+		}
 		// This library does not listen for canvas changes, so after the canvas is automatically
 		// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
 		// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
@@ -1559,7 +1568,9 @@ export class Assemble {
 		// have to clear it manually.
 		//signaturePad.clear();
 		// If you want to keep the drawing on resize instead of clearing it you can reset the data.
-		signaturePad.fromData(signaturePad.toData());
+		for (const [key, pad] of Object.entries(window.signaturePad)) {
+			pad.fromData(pad.toData());
+		}
 	}
 	// One could simply use Canvas#toBlob method instead, but it's just to show
 	// that it can be done using result of SignaturePad#toDataURL.
@@ -2118,8 +2129,8 @@ export class Assemble {
 					? Array.from(this.files)
 							.map((x) => x.name)
 							.join(", ") +
-					  " " +
-					  api._lang.GET("assemble.render.files_rechoose")
+						" " +
+						api._lang.GET("assemble.render.files_rechoose")
 					: api._lang.GET("assemble.render.files_choose");
 			};
 		else
@@ -2132,8 +2143,8 @@ export class Assemble {
 					? Array.from(this.files)
 							.map((x) => x.name)
 							.join(", ") +
-					  " " +
-					  api._lang.GET("assemble.render.file_rechoose")
+						" " +
+						api._lang.GET("assemble.render.file_rechoose")
 					: api._lang.GET("assemble.render.file_choose");
 			};
 		label.onclick = () => {
@@ -2230,7 +2241,8 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
 		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 
-		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		if (!this.currentElement.hint)
+			hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
 		else hint = [...this.hint()];
 
 		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
@@ -2573,7 +2585,7 @@ export class Assemble {
 
 		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 
-		label.dataset.type = this.currentElement.attributes['data-type'] || this.currentElement.type;
+		label.dataset.type = this.currentElement.attributes["data-type"] || this.currentElement.type;
 		label.append(span, input);
 
 		if (["search", "filter"].includes(type)) {
@@ -2837,7 +2849,8 @@ export class Assemble {
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
 		}
-		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		if (!this.currentElement.hint)
+			hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
 		else hint = [...this.hint()];
 
 		function forbiddenName(files) {
@@ -2859,8 +2872,8 @@ export class Assemble {
 				? Array.from(this.files)
 						.map((x) => x.name)
 						.join(", ") +
-				  " " +
-				  api._lang.GET("assemble.render.photo_rechoose")
+					" " +
+					api._lang.GET("assemble.render.photo_rechoose")
 				: api._lang.GET("assemble.render.photo_choose");
 			if (this.files.length) {
 				this.nextSibling.src = URL.createObjectURL(this.files[0]);
@@ -2949,7 +2962,8 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
 		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 
-		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		if (!this.currentElement.hint)
+			hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
 		else hint = [...this.hint()];
 
 		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
@@ -3449,13 +3463,14 @@ export class Assemble {
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		let result = [...this.header()];
 		const canvas = document.createElement("canvas");
-		canvas.id = "signaturecanvas";
+		canvas.classList.add("signaturecanvas");
+		canvas.id = getNextElementID();
 		if (this.currentElement.attributes.required) canvas.setAttribute("data-required", "required");
 		canvas.title = api._lang.GET("assemble.render.aria.signature");
 		result.push(canvas);
 		const input = document.createElement("input");
 		input.type = "file";
-		input.id = "SIGNATURE";
+		input.id = "_SIGNATURE" + canvas.id;
 		input.name = this.currentElement.attributes.name;
 		input.hidden = true;
 		input.tabIndex = -1;
@@ -3464,12 +3479,12 @@ export class Assemble {
 		result.push(input);
 		this.currentElement.attributes = {
 			value: api._lang.GET("assemble.render.clear_signature"),
-			onclick: "signaturePad.clear()",
+			onclick: "signaturePad['" + canvas.id + "'].clear()",
 		};
 		result = result.concat(this.hint());
 		delete this.currentElement.hint;
 		result = result.concat(this.deletebutton()); // hint would be added here as well
-		this.signaturePad = true;
+		this.signaturePads.push(canvas.id);
 		return result;
 	}
 
