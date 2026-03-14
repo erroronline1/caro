@@ -15,6 +15,22 @@ $_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['
 $dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 if ($dbsetup) $_pdo->exec($dbsetup);
 
+
+$fname= '../assets/eggsterminate.stl';
+$fileHandle = fopen($fname, 'rb');
+$fileContents = fread($fileHandle, filesize($fname));
+fclose($fileHandle);
+
+var_dump(gettype($fileContents));
+$fileContents=bin2hex($fileContents);
+$fileContents=hex2bin($fileContents);
+
+$tempfile = fopen('../assets/eggsterminate2.stl', 'wb');
+fwrite($tempfile, $fileContents);
+fclose($tempfile);
+
+
+die();
 $FILEHANDLER = new FILEHANDLER($_pdo);
 $uploaded = $FILEHANDLER->saveToDatabase($_pdo, 
 	'../assets/CAROsignature.jpg',
