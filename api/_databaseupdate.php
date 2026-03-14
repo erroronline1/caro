@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_08'] as $update){
+		foreach (['_2026_03_14_sqlsrv'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -59,10 +59,10 @@ class UPDATE{
 		if (!isset($table[1]) || !$table[1]) return false;
 		return [
 			'mysql' => [
-				"DROP TABLE IF EXISTS BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
+				"DROP TABLE IF EXISTS BACKUP_" . $table[1] . "; CREATE TABLE BACKUP_" . $table[1] . " LIKE " . $table[1] . "; INSERT INTO BACKUP_" . $table[1] . " SELECT * FROM " . $table[1] . ";"
 			],
 			'sqlsrv' => [
-				"IF OBJECT_ID(N'dbo.BACKUP_" . $table[1]. "', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1]. "; SELECT * INTO BACKUP_" . $table[1]. " FROM " . $table[1] . ";"
+				"IF OBJECT_ID(N'dbo.BACKUP_" . $table[1] . "', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1] . "; SELECT * INTO BACKUP_" . $table[1] . " FROM " . $table[1] . ";"
 			]
 		];
 	}
@@ -559,6 +559,46 @@ class UPDATE{
 				"	response_code varchar(255) NULL" .
 				");"
 			]
+		];
+	}
+
+		private function _2026_03_14_sqlsrv(){
+		echo '<br /><br />[!] This update just creates a backup of all current tables. you\'ll have to chnge all smalldatetime colums to datetime manually for sqlqrv creates unpredictable (for me) dependencies. quite sorry, but at this stage probably no one is affected anyway...<br />';
+		$sqlsrv = [];
+		foreach([
+			'caro_announcements',
+			'caro_audit_and_management',
+			'caro_audit_templates',
+			'caro_calendar',
+			'caro_consumables_approved_orders',
+			'caro_consumables_order_statistics',
+			'caro_consumables_prepared_orders',
+			'caro_consumables_products',
+			'caro_consumables_vendors',
+			'caro_csvfilter',
+			'caro_documents',
+			'caro_file_external_documents',
+			'caro_manual',
+			'caro_measures',
+			'caro_media',
+			'caro_messages',
+			'caro_records',
+			'caro_records_datalist',
+			'caro_request_log',
+			'caro_risks',
+			'caro_sessions',
+			'caro_texttemplates',
+			'caro_user',
+			'caro_user_responsibility',
+			'caro_user_training',
+			'caro_whiteboard'
+		] as $table)
+			$sqlsrv[] =	"IF OBJECT_ID(N'dbo.BACKUP_" . $table . "', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table . "; SELECT * INTO BACKUP_" . $table . " FROM " . $table . ";";
+
+		return [
+			'mysql' => [
+			],
+			'sqlsrv' => $sqlsrv
 		];
 	}
 
