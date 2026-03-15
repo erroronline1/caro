@@ -720,20 +720,16 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_media SET expiry_date = CONVERT(datetime, :expiry_date, 120), metadata = :metadata WHERE id = :id"
 		],
 		'media_get_info_by_name_and_context' => [
-			'mysql' => "SELECT id, name, metadata FROM caro_media WHERE name LIKE CONCAT(:name, '%', :extension) AND context = :context",
-			'sqlsrv' => "SELECT id, name, metadata FROM caro_media WHERE name LIKE CONCAT(:name, '%', :extension) AND context = :context"
+			'mysql' => "SELECT id, name, metadata FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%', :extension)",
+			'sqlsrv' => "SELECT id, name, metadata FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%', :extension)"
 		],
 		'media_get_by_name_and_context' => [
-			'mysql' => "SELECT * FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%')",
-			'sqlsrv' => "SELECT * FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%')"
-		],
-		'media_get_by_ids' => [
-			'mysql' => "SELECT * FROM caro_media WHERE id in (:ids)",
-			'sqlsrv' => "SELECT * FROM caro_media WHERE  id in (:ids)"
+			'mysql' => "SELECT * FROM caro_media WHERE context = :context AND name IN (:names)",
+			'sqlsrv' => "SELECT * FROM caro_media WHERE context = :context AND name IN (:names)"
 		],
 		'media_delete' => [
-			'mysql' => "DELETE FROM caro_media WHERE id IN (:ids)",
-			'sqlsrv' => "DELETE FROM caro_media WHERE id IN (:ids)"
+			'mysql' => "DELETE FROM caro_media WHERE context = :context AND name IN (:names)",
+			'sqlsrv' => "DELETE FROM caro_media WHERE context = :context AND name IN (:names)"
 		],
 
 

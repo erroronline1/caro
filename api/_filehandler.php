@@ -472,41 +472,47 @@ class FILEHANDLER{
 	}
 
 	/**
-	 * creates temporary files from database entries to pass around the application if required
+	 * checks if files exist or creates files from database entries to pass around the application if required
+	 * based on fileserver strategy
 	 * supposed to enhance caching for shortterm repetitive requests and useage in pdf attachment creation
+	 * to avoid bloating the filesystem in case of database strategy the cron job is supposed to clean up regularly
 	 * 
 	 * @param object $_pdo an active pdo instance
 	 * @param string $context
-	 * @param string $nameprefix as start of the saved filename to return matching results
-	 * @param array|int $ids if available
+	 * @param array $names stored filenames
 	 * 
-	 * @return array of files and their information
+	 * @return array of filepaths
 	 */
-	public static function retrieveFromDatabase($_pdo, $context = null, $nameprefix = '', $ids = null){
+	public static function paths($_pdo, $context, $names){
+		if (!$context || !$names) return []; 
 		$result = [];
-		if ($context) $files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
-			'values' => [
+
+		foreach($names as $index => $name){
+			$tempnam = self::directory($context) . '/' . $name;
+			if (file_exists($tempnam)){
+				$result[] = $tempnam;
+				unset($names[$index]);
+			}
+		}
+		if (CONFIG['fileserver']['strategy'] !== 'database') return $result;
+
+		$files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
+			'replace' => [
 				':context' => $context,
-				':name' => $nameprefix . '%'
-			]
-		]);
-		elseif ($ids) $files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_ids', [
-			'replacements' => [
-				':ids' => is_array($ids) ? implode(', ', array_map(Fn($v) => intval($v), $ids)) : intval($ids),
+				':names' => implode(',', array_map(Fn($v) => $_pdo->quote($v), $names))
 			]
 		]);
 		foreach($files as $file){
-			// inflate and reconvert to binary again
-			$file['content'] = SQLQUERY::retrievebinary($file['content']);
-			$tempnam = self::directory('tmp') . '/' . $file['name'];
+			$tempnam = self::directory($context) . '/' . $file['name'];
 			if (!file_exists($tempnam)){
+				if (!file_exists(self::directory($context))) self::createDirectory(self::directory($context));
+				// inflate and reconvert to binary again
+				$file['content'] = SQLQUERY::retrievebinary($file['content']);
 				$tempfile = fopen($tempnam, 'wb');
 				fwrite($tempfile, $file['content']);
 				fclose($tempfile);
 			}
-			$file['content'] = $tempnam;
-
-			$result[] = $file;
+			$result[] = $tempnam;
 		}
 		return $result;
 	}
@@ -541,12 +547,28 @@ class FILEHANDLER{
 	 *     'watermark' => bool, add a watermark in lower right corner according to config-file  
 	 * ]
 	 * 
-	 * @return array paths of stored files or media-table ids
+	 * @return array paths of stored files
 	*/
 	public function storeUploadedFiles($input = [], $destination = [], $naming = [], $imageoptions = []){
 		if (!$input || (empty($destination['path']) && empty($destination['context']))) return [];
 		$targets = [];
 
+		/*
+		TODO: consider contexts not requiring database strategy (profile pictures, sharepoint, tmp, order attachments, files_documents)
+		consider vendor_documents = "fileserver/vendors/:id/documents" vendor_products = "fileserver/vendors/:id/products"
+		consider currently stored full path in records, so what about database currently only storing filename?
+
+		implement context into this methods calls
+		implement general verification of paths through above method
+		implement cleaning up in cron in case of database strategy
+
+		check file hashing for record validation
+		
+		
+		if (CONFIG['fileserver']['strategy'] === 'fileserver') {
+			if (!file_exists(self::directory($destination['path']))) self::createDirectory($destination['path']);
+		}
+		*/
 		if (isset($destination['path']) && !file_exists($destination['path'])) self::createDirectory($destination['path']);
 
 		// iterate over $_FILE input names
@@ -578,6 +600,7 @@ class FILEHANDLER{
 
 				// process current file and expect a path or database id
 				$targets[] = 
+					//CONFIG['fileserver']['strategy'] === 'fileserver'
 					isset($destination['path'])
 					? $this->saveToFilesystem(
 						$_FILES[$inputname]['tmp_name'][$j],
@@ -665,7 +688,7 @@ class FILEHANDLER{
 				':expiry_date' => $destination['expiry_date'] ?? null,
 				':metadata' => $destination['metadata']
 			]
-		])) return ['id' => $_pdo->lastInsertId(), 'name' => $filename, 'hash' => hash('sha256', $fileContents)];
+		])) return $filename;
 	}
 	/**
 	 * @param string $target filename to be appenden a number if found in
