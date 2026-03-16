@@ -69,7 +69,7 @@ class LANG {
 			}
 			return preg_replace($patterns, $replacements, $chunk);
 		}
-		return 'undefined language';
+		return implode('.', $request) . ' undefined';
 	}
 	/**
 	 * recursively find the language chunk independent of nesting depth

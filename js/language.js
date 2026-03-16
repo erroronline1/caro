@@ -36,7 +36,7 @@ export class Lang {
 			}
 			return chunk;
 		}
-		return "undefined or not provided for client";
+		return `${request.join(".")} undefined or not provided for client`;
 	}
 	/**
 	 * recursively find the language chunk independent of nesting depth
