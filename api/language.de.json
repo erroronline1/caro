@@ -1338,6 +1338,7 @@
 			"deleted_error": "Whiteboard konnte nicht gelöscht werden. Bitte versuche es erneut.",
 			"deleted_success": "Whiteboard gelöscht.",
 			"doodle":"Skizze",
+			"doodle_accuracy_warning":"Exporte sind nicht notwendigerweise maßstabsgetreu",
 			"doodle_clear":"Skizze löschen",
 			"doodle_clear_confirm":"Skizze wirklich löschen?",
 			"doodle_draw":"Zeichnen",

@@ -1338,6 +1338,7 @@
 			"deleted_error": "Whiteboard could not be deleted. Please try again.",
 			"deleted_success": "Whiteboard deleted.",
 			"doodle":"Doodle",
+			"doodle_accuracy_warning":"Exports are not necessarily true to scale",
 			"doodle_clear":"Clear",
 			"doodle_clear_confirm":"Delete doole?",
 			"doodle_draw":"Draw",

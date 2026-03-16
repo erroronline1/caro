@@ -773,7 +773,8 @@ class MESSAGE extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('message.whiteboard.doodle'),
 							],
-							'content' => $whiteboard ? $whiteboard['doodle'] : null
+							'content' => $whiteboard ? $whiteboard['doodle'] : null,
+							'hint' => $this->_lang->GET('message.whiteboard.doodle_accuracy_warning')
 						]
 					]
 				];
