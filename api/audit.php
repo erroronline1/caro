@@ -33,8 +33,8 @@ class AUDIT extends API {
 	/**
 	 * init parent class and set private requests
 	 */
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!PERMISSION::permissionFor('regulatory') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = $this->_requestedTemplate = REQUEST[2] ?? null;
@@ -2175,8 +2175,8 @@ class AUDIT extends API {
 	private function orderstatistics(){
 		$content = [];
 
-		require_once('order.php');
-		$orderstatistics = new ORDER();
+		require_once('./order.php');
+		$orderstatistics = new ORDER(get_class_vars(get_class($this)));
 		$orders = $orderstatistics->statistics_get();
 
 		$from = $until = '-';
@@ -2245,8 +2245,8 @@ class AUDIT extends API {
 	 * export is an xlsx file with orders grouped by vendor sheets
 	 */
 	private function exportorderstatistics(){
-		require_once('order.php');
-		$orderstatistics = new ORDER();
+		require_once('./order.php');
+		$orderstatistics = new ORDER(get_class_vars(get_class($this)));
 
 		$start = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.start_date'));
 		$start = $start ? $this->convertToServerTime($start . ':00') : null;
@@ -3071,7 +3071,7 @@ class AUDIT extends API {
 
 			$tempFile = $summary['filename'] . '_' . time() . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
 
-			require_once('_table.php');
+			require_once('./_table.php');
 			$export = new TABLE($result);
 			
 			if ($files = $export->dump($tempFile, null, $format)){
@@ -3174,8 +3174,8 @@ class AUDIT extends API {
 			],
 			'content' => $options
 		];
-		require_once('document.php');
-		$document = new DOCUMENT();
+		require_once('./document.php');
+		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_document'

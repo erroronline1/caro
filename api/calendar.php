@@ -25,8 +25,8 @@ class CALENDAR extends API {
 	private $_requestedComplete = null;
 	private $_requestedCalendarType = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedTimespan = $this->_requestedId = REQUEST[2] ?? null;
@@ -220,8 +220,8 @@ class CALENDAR extends API {
 		if ($this->_requestedCalendarType === 'tasks') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
 
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		require_once('notification.php');
-		$notifications = new NOTIFICATION;
+		require_once('./notification.php');
+		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
 			'response' => [
 				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
@@ -941,8 +941,8 @@ class CALENDAR extends API {
 	 */
 	public function tasks(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		require_once('notification.php');
-		$notifications = new NOTIFICATION;
+		require_once('./notification.php');
+		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		$markdown = new MARKDOWN();
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -1824,8 +1824,8 @@ class CALENDAR extends API {
 		api endpoint description
 		*/
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		require_once('notification.php');
-		$notifications = new NOTIFICATION;
+		require_once('./notification.php');
+		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		$markdown = new MARKDOWN();
 
 		switch ($_SERVER['REQUEST_METHOD']){

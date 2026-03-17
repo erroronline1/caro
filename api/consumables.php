@@ -129,8 +129,8 @@ class CONSUMABLES extends API {
 	/**
 	 * init parent class and set private requests
 	 */
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = $this->_usecase = REQUEST[2] ?? null;
@@ -181,7 +181,7 @@ class CONSUMABLES extends API {
 		}
 		// add required array nesting for TABLE
 		$result = [$result];
-		require_once('_table.php');
+		require_once('./_table.php');
 		$export = new TABLE($result);
 
 		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
@@ -227,8 +227,8 @@ class CONSUMABLES extends API {
 	 * incorporation denial is detected by pattern matching $this->_lang->GET('order.incorporation.denied')
 	 */
 	public function incorporation(){
-		require_once('document.php');
-		$document = new DOCUMENT();
+		require_once('./document.php');
+		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// retrieve ids from possible multiple selected products for inforporation
@@ -577,8 +577,8 @@ class CONSUMABLES extends API {
 	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
 	 */
 	public function mdrsamplecheck(){
-		require_once('document.php');
-		$document = new DOCUMENT();
+		require_once('./document.php');
+		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -1130,8 +1130,8 @@ class CONSUMABLES extends API {
 					}
 				}
 
-				require_once('notification.php');
-				$notifications = new NOTIFICATION;
+				require_once('./notification.php');
+				$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
 				// update product
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_product', [
@@ -2464,8 +2464,8 @@ class CONSUMABLES extends API {
 		];
 
 		// retrieve vendor evaluation document
-		require_once('document.php');
-		$document = new DOCUMENT();
+		require_once('./document.php');
+		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'vendor_evaluation_document'
@@ -2538,7 +2538,7 @@ class CONSUMABLES extends API {
 						if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 
 						// read data from file and set primary source
-						require_once('_table.php');
+						require_once('./_table.php');
 						$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['name'][0]);
 						$source = new TABLE($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0], $sourceproperties['extension'], ['headerrow' => $vendor[':products']['filefilter']['filesetting']['headerrow'] ?? 0]);
 						$source = $source->dump([]);

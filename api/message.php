@@ -19,8 +19,8 @@ class MESSAGE extends API {
 	private $_announcement = null;
 	private $_requestedID = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_conversation = $this->_announcement = $this->_requestedID = REQUEST[2] ?? null;
@@ -381,8 +381,8 @@ class MESSAGE extends API {
 							'action' => "javascript:api.message('post', 'message', '_')"
 						];
 					}
-					require_once('notification.php');
-					$notifications = new NOTIFICATION;
+					require_once('./notification.php');
+					$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 					$response['data'] = ['message_unseen' => $notifications->messageunseen()];
 				}
 				else {

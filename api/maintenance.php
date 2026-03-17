@@ -69,8 +69,8 @@ class MAINTENANCE extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!PERMISSION::permissionFor('maintenance') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = REQUEST[2] ?? null;
@@ -273,7 +273,7 @@ class MAINTENANCE extends API {
 		}
 
 		require_once('./erpquery.php');
-		$ERPQUERY = new ERPQUERY();
+		$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
 
 		$response = ['render' => ['content' => $ERPQUERY->productsupdate()]];
 		$response['render']['form'] = [
@@ -300,7 +300,7 @@ class MAINTENANCE extends API {
 			case 'POST':
 				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
 
-				require_once('_table.php');
+				require_once('./_table.php');
 				
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]) && $_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name']) {
 					$data = [];
@@ -478,7 +478,7 @@ class MAINTENANCE extends API {
 						':until' => $until
 					]
 				])){
-					require_once('_table.php');
+					require_once('./_table.php');
 					$export = new TABLE([$log]);
 					if ($files = $export->dump('CONFIDENTIAL CARO REQUEST LOG.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'CONFIDENTIAL CARO REQUEST LOG.csv'])] = [
@@ -605,7 +605,7 @@ class MAINTENANCE extends API {
 
 				$content = $filter[$type];
 
-				require_once('_table.php');
+				require_once('./_table.php');
 				$source = new TABLE($_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0], 'csv', ['headerrow' => 3]);
 				$source = $source->dump([]);
 				$content['filesetting']['source'] = $source[array_key_first($source)];

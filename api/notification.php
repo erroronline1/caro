@@ -22,8 +22,8 @@ class NOTIFICATION extends API {
 	public $_requestedMethod = REQUEST[1];
 	public $_cronOverride = REQUEST[2] ?? false;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 	}
 
@@ -194,7 +194,7 @@ class NOTIFICATION extends API {
 
 							// delete old delivered unarchived orders
 							require_once('./order.php');
-							$order = new ORDER;
+							$order = new ORDER(get_class_vars(get_class($this)));
 							$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_issued', [
 								'values' => [
 									':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
@@ -317,7 +317,7 @@ class NOTIFICATION extends API {
 								]);
 								
 								require_once('./order.php');
-								$orderstatistics = new ORDER();
+								$orderstatistics = new ORDER(get_class_vars(get_class($this)));
 								$updates = [];
 
 								$states = [
@@ -493,7 +493,7 @@ class NOTIFICATION extends API {
 												]
 											]);
 											require_once('./order.php');
-											$order = new ORDER;
+											$order = new ORDER(get_class_vars(get_class($this)));
 											foreach($orders as $relatedorder){
 												$order->delete_approved_order($relatedorder);
 											}

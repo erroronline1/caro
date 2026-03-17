@@ -12,8 +12,8 @@
 namespace CARO\API;
 
 // authentify endpoint handling, menu and landing page methods
-require_once('_calendarutility.php');
-require_once('notification.php');
+require_once('./_calendarutility.php');
+require_once('./notification.php');
 
 class APPLICATION extends API {
     // processed parameters for readability
@@ -24,8 +24,8 @@ class APPLICATION extends API {
 	/**
 	 * init parent class and set private requests
 	 */
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		$this->_requestedManual = $this->_search = REQUEST[2] ?? null;
 	}
 
@@ -505,8 +505,8 @@ class APPLICATION extends API {
 			// also see document.php documents()
 			$documentdatalist = $displayeddocuments = [];
 			// get all documents or these fitting the search
-			require_once('document.php');
-			$search = new DOCUMENT();
+			require_once('./document.php');
+			$search = new DOCUMENT(get_class_vars(get_class($this)));
 			$documents = $search->documentsearch(['search' => null]);
 			// prepare existing documents lists grouped by context
 			foreach ($documents as $row) {
@@ -612,7 +612,7 @@ class APPLICATION extends API {
 
 			// set up dashboard notifications
 			$tiles = [];
-			$notifications = new NOTIFICATION;
+			$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
 			// messages
 			$unseen = $notifications->messageunseen();
@@ -877,8 +877,8 @@ class APPLICATION extends API {
 			];
 
 			if ($this->_search) {
-				require_once('record.php');
-				$search = new RECORD();
+				require_once('./record.php');
+				$search = new RECORD(get_class_vars(get_class($this)));
 
 				// search records
 				if ($records = $search->recordsearch(['search' => $this->_search])){
@@ -908,8 +908,8 @@ class APPLICATION extends API {
 				}
 
 				// search documents
-				include_once('document.php');
-				$search = new DOCUMENT(); 
+				include_once('./document.php');
+				$search = new DOCUMENT(get_class_vars(get_class($this))); 
 				if ($documents = $search->documentsearch(['search' => $this->_search])){
 					$matches = [];
 					foreach ($documents as $document){
@@ -923,8 +923,8 @@ class APPLICATION extends API {
 				}
 
 				// search files
-				include_once('file.php');
-				$search = new FILE(); 
+				include_once('./file.php');
+				$search = new FILE(get_class_vars(get_class($this))); 
 				if ($files = $search->filesearch(['search' => $this->_search])){
 					$matches = [];
 					foreach ($files as $file){

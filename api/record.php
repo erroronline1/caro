@@ -26,8 +26,8 @@ class RECORD extends API {
 	private $_caseState = null;
 	private $_caseStateValue = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
 			!in_array(REQUEST[1], ['document', 'record'])
@@ -577,7 +577,7 @@ class RECORD extends API {
 		}
 
 		require_once('./erpquery.php');
-		$ERPQUERY = new ERPQUERY();
+		$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
 
 		$this->response([
 			'render' => $ERPQUERY->casedata()
@@ -785,7 +785,7 @@ class RECORD extends API {
 		if (array_values((array)$this->_payload)){
 			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata')){
 				require_once('./erpquery.php');
-				$ERPQUERY = new ERPQUERY();
+				$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
 				if ($options = $ERPQUERY->patientlookup('radio'))
 				$this->response([
 					'response' => [
@@ -938,8 +938,8 @@ class RECORD extends API {
 				if ($restricted_groups = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_units'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_units')});
 				if ($restricted_users = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_users'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.restricted_access_users')});
 
-				require_once('document.php');
-				$documentfinder = new DOCUMENT();
+				require_once('./document.php');
+				$documentfinder = new DOCUMENT(get_class_vars(get_class($this)));
 				$useddocument = $documentfinder->recentdocument('document_get', [
 					'values' => [
 						':id' => $document_id
@@ -2383,8 +2383,8 @@ class RECORD extends API {
 
 		if ($export) {
 			// reiterate over document, add textsections and empty document fields
-			require_once('document.php');
-			$documentfinder = new DOCUMENT();
+			require_once('./document.php');
+			$documentfinder = new DOCUMENT(get_class_vars(get_class($this)));
 
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;

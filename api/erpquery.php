@@ -19,8 +19,8 @@ class ERPQUERY extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 		if (!(ERPINTERFACE && ERPINTERFACE->_instatiated)) $this->response([], 405);
 
@@ -402,7 +402,7 @@ class ERPQUERY extends API {
 		}
 
 		include('./consumables.php');
-		$consumables = new CONSUMABLES();
+		$consumables = new CONSUMABLES(get_class_vars(get_class($this)));
 		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 		$content = [];

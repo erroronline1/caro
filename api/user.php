@@ -20,8 +20,8 @@ class USER extends API {
 	private $_requestedID = null;
 	private $_prefilledTrainingUser = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
 			!in_array(REQUEST[1], ['profile'])

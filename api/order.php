@@ -20,8 +20,8 @@ class ORDER extends API {
 	private $_orderState = null;
 	private $_stateSet = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = $this->_filterTerm = isset(REQUEST[2]) ? (!in_array(REQUEST[2], ['false', 'null']) ? REQUEST[2]: null) : null;
@@ -38,9 +38,9 @@ class ORDER extends API {
 	 * handle approved orders, set states and alert userGroups
 	 */
 	public function approved($export = false){
-		require_once('notification.php');
+		require_once('./notification.php');
 		require_once('./_calendarutility.php');
-		$notifications = new NOTIFICATION;
+		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -866,8 +866,8 @@ class ORDER extends API {
 	 * create a new order or edit a prepared one
 	 */
 	public function order(){
-		require_once('notification.php');
-		$notifications = new NOTIFICATION;
+		require_once('./notification.php');
+		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
@@ -997,8 +997,8 @@ class ORDER extends API {
 				];
 
 				// render search and selection
-				require_once('consumables.php');
-				$search = new CONSUMABLES();
+				require_once('./consumables.php');
+				$search = new CONSUMABLES(get_class_vars(get_class($this)));
 				$return_reasons = ['...' => []];
 				if ($this->_lang->_USER['orderreturns']['critical']) {
 					foreach ($this->_lang->_USER['orderreturns']['critical'] as $key => $value) {
@@ -1432,8 +1432,8 @@ class ORDER extends API {
 							':id' => implode(",", $success)
 						]
 					]);
-					require_once('notification.php');
-					$notifications = new NOTIFICATION;
+					require_once('./notification.php');
+					$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;

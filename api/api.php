@@ -21,16 +21,16 @@ session_set_cookie_params([
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-require_once('_config.php');
+require_once('./_config.php');
 define ('REQUEST',
 	array_map(
 		fn($param) => $param,//str_replace('%2B', '+', $param),
 		explode("/", substr(rawurldecode(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1']))), 1))
 	)
 );
-require_once('_utility.php'); // general utilities
-require_once('_sqlinterface.php');
-require_once('_language.php');
+require_once('./_utility.php'); // general utilities
+require_once('./_sqlinterface.php');
+require_once('./_language.php');
 // import to determine if interface is present
 require_once("./_erpinterface.php");
 
@@ -86,20 +86,36 @@ class API {
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
-	public function __construct(){
-		$options = [
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-			//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
-		];
-		$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
-		if ($dbsetup) $this->_pdo->exec($dbsetup);
-
-		$this->_lang = new LANG();
-		// set date settings according to defaults or session user settings will be updated after successfull authentification, but is needed here for subimporting of modules
-		$this->_date = $this->date();
-
+	public function __construct($_class_vars  = []){
+		// import passed class_vars to avoid duplicate calls and processing
+		foreach(array_keys(get_class_vars(get_class($this))) as $var){
+			switch($var){
+				case '_pdo':
+					$options = [
+						\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+						\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+						//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
+					];
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
+					if (empty($_class_vars[$var])) {
+						$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+						if ($dbsetup) $this->_pdo->exec($dbsetup);
+					}
+					break;
+				case '_lang':
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new LANG();
+					break;
+				case '_payload':
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : UTILITY::parsePayload();
+					break;
+				case '_date':
+					// will be updated based on user settings after successful authentification
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : $this->date();
+					break;
+				default:
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : $this->{$var};
+			}
+		}
 	}
 	
 	/**
@@ -495,9 +511,7 @@ class API {
 	 * executes the called api method
 	 * no return
 	 */
-	public function processApi(){
-		$this->_payload = UTILITY::parsePayload();
-		
+	public function processApi(){	
 		// (re)authentify session user
 		if ((REQUEST[0] === 'application' && (
 			in_array(REQUEST[1], ['menu'])

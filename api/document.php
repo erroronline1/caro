@@ -20,8 +20,8 @@ class DOCUMENT extends API {
 	private $_requestedID = null;
 	private $_unit = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = REQUEST[2] ?? null;
@@ -67,8 +67,8 @@ class DOCUMENT extends API {
 						];
 					}
 				}
-				require_once('notification.php');
-				$notifications = new NOTIFICATION;
+				require_once('./notification.php');
+				$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
 				// update document approval 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [

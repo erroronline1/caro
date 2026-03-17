@@ -20,8 +20,8 @@ class CSVFILTER extends API {
     public $_requestedMethod = REQUEST[1];
     private $_requestedID = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = REQUEST[2] ?? null;
@@ -72,7 +72,7 @@ class CSVFILTER extends API {
 				if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 				$content['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
 				*/
-				require_once('_table.php');
+				require_once('./_table.php');
 				$sourceproperties = pathinfo($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['name'][0]);
 				$source = new TABLE($inputfile, $sourceproperties['extension']);
 				$source = $source->dump([]);
@@ -107,7 +107,7 @@ class CSVFILTER extends API {
 
 				// create and write to file
 				$downloadfiles = [];
-				require_once('_table.php');
+				require_once('./_table.php');
 				$export = new TABLE($datalist->_list);
 
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){

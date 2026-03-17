@@ -19,8 +19,8 @@ class TEXTTEMPLATE extends API {
 	private $_modal = null;
 	private $_clientimport = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = REQUEST[2] ?? null;
@@ -378,7 +378,7 @@ class TEXTTEMPLATE extends API {
 	public function template(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		require_once('./file.php');
-		$file = new FILE();
+		$file = new FILE(get_class_vars(get_class($this)));
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -926,7 +926,7 @@ class TEXTTEMPLATE extends API {
 			$response['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
 
 			require_once('./file.php');
-			$file = new FILE();
+			$file = new FILE(get_class_vars(get_class($this)));
 
 			$template['linked_files'] = explode(',', $template['linked_files'] ?: '');
 			$template['linked_files'] = array_intersect($template['linked_files'], $file->activeexternalfiles());
