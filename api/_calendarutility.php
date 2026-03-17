@@ -861,7 +861,8 @@ class CALENDARUTILITY {
 		// prepare all users eligible for timetracking due to average weekly hours set
 		foreach ($users as $row => $user){
 			$user['app_settings'] = $users[$row]['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-			if (!$user['app_settings'] || !isset($user['app_settings']['weeklyhours']) || !$user['app_settings']['weeklyhours']){
+			if (!$user['app_settings'] || 
+				(empty($user['app_settings']['weeklyhours']) && empty($user['app_settings']['annualvacation']))){
 				unset ($users[$row]);
 				continue;
 			}
@@ -883,7 +884,7 @@ class CALENDARUTILITY {
 			foreach (['weeklyhours', 'annualvacation'] as $setting){
 				$hours_vacation = [];
 				if (isset($user['app_settings'][$setting])){
-					$settingentries = explode('\n', $user['app_settings'][$setting]);
+					$settingentries = explode("\n", $user['app_settings'][$setting]);
 					natsort($settingentries);
 					foreach ($settingentries as $line){
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
