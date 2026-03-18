@@ -162,6 +162,10 @@ body > header {
 		}
 	}
 }
+.is_development{
+	background-color: var(--orange);
+}
+
 
 dialog {
 	position: fixed;

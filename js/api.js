@@ -163,6 +163,12 @@ export const api = {
 					api.loadindicator(request, false);
 					clearInterval(_serviceWorker.notif.interval);
 					_serviceWorker.notif.interval = null;
+
+					// add class. without being logged in the entry point always returns this error
+					if (api._settings.config.application && api._settings.config.application.is_development){
+						document.querySelector("body>header").classList.add("is_development");
+					}
+
 					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
 					const options = {};
 					options[api._lang.GET("general.ok_button")] = true;
@@ -735,6 +741,11 @@ export const api = {
 					// override css properties with user settings
 					if (api._settings.user.app_settings) {
 						api.update_user_settings();
+					}
+
+					// ensure proper flagging in case of window refreshs
+					if (api._settings.config.application && api._settings.config.application.is_development){
+						document.querySelector("body>header").classList.add("is_development");
 					}
 
 					const render = new Assemble(data.render);
