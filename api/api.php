@@ -211,8 +211,6 @@ class API {
 	 */
 	public function auth(){
 		$reAuthUser = (
-			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
-			//||
 			(isset($_SESSION['request']['time'])
 			&& (time() - $_SESSION['request']['time'] > ($_SESSION['user']['app_settings']['idle'] ?? min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
 		);
@@ -271,7 +269,7 @@ class API {
 				}
 			}
 			if ($valid) {
-				$this->_lang = new LANG(); // reinstatiate for proper language return
+				$this->_lang = new LANG(); // reinstatiate for proper language return according to user settings
 				return [
 					'user' => [
 						'name' => $_SESSION['user']['name'],
@@ -286,8 +284,9 @@ class API {
 					'config' => [
 						'application' => [
 							'defaultlanguage' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
-							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'],
-							'debugging' => CONFIG['application']['debugging'],
+							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'] ?? false,
+							'debugging' => CONFIG['application']['debugging'] ?? false,
+							'is_development' => CONFIG['application']['is_development'] ?? false,
 						],
 						'lifespan' => [
 							'session' => [
@@ -328,7 +327,14 @@ class API {
 					]
 				]
 			],
-			'language' => $this->_lang->GETALL()
+			'config' => [
+				'application' => [
+					'defaultlanguage' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
+					'debugging' => CONFIG['application']['debugging'] ?? false,
+					'is_development' => CONFIG['application']['is_development'] ?? false,
+				],
+			],
+			'language' => $this->_lang->GETALL(),
 		];
 
 		if (!$reAuthUser){
@@ -362,6 +368,7 @@ class API {
 					]
 				]
 			];
+			
 			// linux style delay of login form wrong attempts
 			if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token', [], true))) sleep(2);
 		}
@@ -517,7 +524,7 @@ class API {
 			in_array(REQUEST[1], ['menu'])
 			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
 		))){ // these requests do not need authentification or handle it on their own
-			$this->_auth = true;
+			$this->_auth = [[]];
 		}
 		else {
 			$this->_auth = $this->auth();
@@ -642,7 +649,10 @@ class API {
 			}
 			foreach($payload as $key => $value){
 				if (empty($value)) unset($payload[$key]);
-				if ($key === $this->_lang->GET('user.token')) $payload[$key] = 'REDACTED';
+				if (in_array($key, [
+					$this->_lang->GET('user.token'),
+					$this->_lang->GET('user.two_factor')
+				])) $payload[$key] = 'REDACTED';
 			}
 
 			$payload = $payload ? UTILITY::json_encode($payload) : null;
