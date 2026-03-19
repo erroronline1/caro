@@ -533,7 +533,7 @@ export const _client = {
 								type: "number",
 								attributes: {
 									name: api._lang.GET("order.quantity_label") + "[]",
-									value: data.quantity || '',
+									value: data.quantity || "",
 									min: "1",
 									max: "99999",
 									required: true,
@@ -544,10 +544,10 @@ export const _client = {
 								type: "textsection",
 								attributes: {
 									name: api._lang.GET("order.added_product", {
-										":unit": data.unit || '',
-										":number": data.ordernumber || '',
-										":name": data.productname || '',
-										":vendor": data.vendor || '',
+										":unit": data.unit || "",
+										":number": data.ordernumber || "",
+										":name": data.productname || "",
+										":vendor": data.vendor || "",
 									}),
 								},
 							},
@@ -569,7 +569,7 @@ export const _client = {
 								type: "hidden",
 								attributes: {
 									name: api._lang.GET("order.productname_label") + "[]",
-									value: data.productname || '',
+									value: data.productname || "",
 								},
 							},
 							{
@@ -904,11 +904,12 @@ export const _client = {
 										":commission": "element.commission",
 										":aut_idem": "element.aut_idem",
 									})
-									.replace("\\n", "\n"),
+									.replaceAll(/\\n/g, "\n"),
 								buttons
 							);
 						}
 							.toString()
+							.replace(/\r|\t/g, "")
 							._replaceArray(
 								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
 								[
@@ -1274,13 +1275,14 @@ export const _client = {
 										":commission": "element.commission",
 										":aut_idem": "element.aut_idem",
 									})
-									.replace("\\n", "\n") +
-									"element.ordertext".replace("\\n", "\n") +
-									"element.identifier".replace("\\n", "\n"),
+									.replace(/\\n/g, "\n") +
+									"element.ordertext".replace(/\\n/g, "\n") +
+									"element.identifier".replace(/\\n/g, "\n"),
 								buttons
 							);
 						}
 							.toString()
+							.replace(/\r|\t/g, "")
 							._replaceArray(
 								["element.purchasemembers", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "element.ordertext", "element.identifier", "buttons"],
 								[
@@ -2020,7 +2022,7 @@ export const _client = {
 
 				records.forEach((record) => {
 					context.content.push([
-						{ c: record.identifier, a: { "data-type": record.restricted_access ? "password": "record", class: record.closed ? "green" : record.complaint ? "orange" : "" } },
+						{ c: record.identifier, a: { "data-type": record.restricted_access ? "password" : "record", class: record.closed ? "green" : record.complaint ? "orange" : "" } },
 						{
 							c: api._lang.GET("record.list_touched", {
 								":date": record.last_touch,
@@ -2068,7 +2070,7 @@ export const _client = {
 							{
 								type: "textsection",
 								attributes: {
-									"data-type": record.restricted_access ? "password": "record",
+									"data-type": record.restricted_access ? "password" : "record",
 									name: record.identifier,
 									class: record.closed ? "green" : record.complaint ? "orange" : "",
 								},

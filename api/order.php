@@ -190,7 +190,7 @@ class ORDER extends API {
 									'vendor' => 'vendor_label',
 									'aut_idem' => 'aut_idem',
 									'commission' => 'commission'] as $key => $value){
-									$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
+									$messagepayload[':' . $key] = $decoded_order_data[$value] ?? '';
 								}
 								$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
 								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
@@ -247,7 +247,7 @@ class ORDER extends API {
 										'vendor' => 'vendor_label',
 										'aut_idem' => 'aut_idem',
 										'commission' => 'commission'] as $key => $value){
-										$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
+										$messagepayload[':' . $key] = $decoded_order_data[$value] ?? '';
 									}
 									$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
 
@@ -605,7 +605,7 @@ class ORDER extends API {
 
 					// add additional info
 					if ($additional_information = UTILITY::propertySet($decoded_order_data, 'additional_info')){
-						$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
+						$data['information'] = preg_replace(['/\r/', '/\\\\n|\\n/'], ['', "\n"], $additional_information);
 					}
 
 					// add order reference if provided by erp interface
@@ -1076,7 +1076,7 @@ class ORDER extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.additional_info'),
-								'value' => isset($order['additional_info']) ? preg_replace('/\\\\n/', "\n", $order['additional_info']) : '',
+								'value' => $order['additional_info'] ?? '',
 								'data-loss' => 'prevent'
 							]
 						]
@@ -1412,12 +1412,12 @@ class ORDER extends API {
 						if (is_array($items)){ // actual items
 							foreach ($items as $item){
 								foreach ($item as $key => $subvalue){
-									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
+									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $subvalue));
 								}
 								$index++;
 							}
 						} else { // common order info
-							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $items));
+							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $items));
 						}
 					}
 					if (!count($order_data['items'])) continue;
@@ -1716,11 +1716,11 @@ class ORDER extends API {
 				foreach ($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
 						if (!isset($order_data['items'][intval($index)])) $order_data['items'][] = [];
-						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
+						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $subvalue));
 					}
 				}
 			} else {
-				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
+				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $value));
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['id'];
@@ -1773,7 +1773,7 @@ class ORDER extends API {
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
 						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
-						. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true)
+						. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n", $decoded_order_data['additional_info'])], true)
 					);
 				}
 			}
