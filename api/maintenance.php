@@ -461,7 +461,11 @@ class MAINTENANCE extends API {
 	}
 
 	/**
-	 * 
+	 *                           _         _
+	 *   ___ ___ ___ _ _ ___ ___| |_      | |___ ___
+	 *  |  _| -_| . | | | -_|_ -|  _|     | | . | . |
+	 *  |_| |___|_  |___|___|___|_|  _____|_|___|_  |
+	 *            |_|               |_____|     |___|
 	 */
 	private function request_log(){
 		$response = ['render' => ['content' => []]];
