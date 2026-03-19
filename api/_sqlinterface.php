@@ -74,7 +74,7 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
-
+//var_dump($query);
 		// execute query
 		try {
 			$statement = $_pdo->prepare($query);
@@ -543,8 +543,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
 		],
 		'consumables_get_product_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_vendors.name LIKE :vendor",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_vendors.name LIKE :vendor"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR (caro_consumables_products.erp_id LIKE :SEARCH) OR (caro_consumables_products.article_ean LIKE :SEARCH)) AND caro_consumables_vendors.name LIKE :vendor",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR (caro_consumables_products.erp_id LIKE :SEARCH) OR (caro_consumables_products.article_ean LIKE :SEARCH)) AND caro_consumables_vendors.name LIKE :vendor"
 		],
 		'consumables_get_last_checked' => [
 			'mysql' => "SELECT caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
@@ -778,8 +778,8 @@ class SQLQUERY {
 
 
 		'order_get_product_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_vendors.name LIKE :vendor AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_vendors.name LIKE :vendor AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR (caro_consumables_products.erp_id LIKE :SEARCH) OR (caro_consumables_products.article_ean LIKE :SEARCH)) AND caro_consumables_vendors.name LIKE :vendor AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR (caro_consumables_products.erp_id LIKE :SEARCH) OR (caro_consumables_products.article_ean LIKE :SEARCH)) AND caro_consumables_vendors.name LIKE :vendor AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
 		],
 
 		'order_post_prepared_order' => [
