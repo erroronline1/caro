@@ -594,7 +594,7 @@ class SEARCH{
 	 *
 	 * apply column conditions if applicable, sort by weighted column matching
 	 * @param string $search search string
-	 * @param array $result initial result from sql-queries and whatnot
+	 * @param array $results initial result from sql-queries and whatnot
 	 * @param array $weighted columns to observe for the most terms matched, sorts most matches to top
 
 	 * @return array
