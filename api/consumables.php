@@ -1393,15 +1393,19 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "_client.application.postLabelSheet(' " . ($product['erp_id'] ?: $product['article_no']) . " +vendor_name:\"" . $product['vendor_name']. "\"', null, {_type:'" . $type . "'});",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value; if (_searchlabel) _client.application.postLabelSheet(_searchlabel, null, {_type:'" . $type . "'});",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
 						}
 						$response['render']['content'][] = [
 							[
-								'type' => 'textsection',
-								'content' => $this->_lang->GET('consumables.product.search_label')
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.search_label'),
+									'id' => '_searchlabel',
+									'value' => ($product['article_no'] ?: ($product['erp_id'] ?: $product['article_name'])) . ' +vendor_name:"' . $product['vendor_name'] . '"'
+								]
 							],
 							...$labels
 						];
@@ -1629,15 +1633,19 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "_client.application.postLabelSheet(' " . ($product['erp_id'] ?: $product['article_no']) . " +vendor_name:\"" . $product['vendor_name']. "\"', null, {_type:'" . $type . "'});",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value; if (_searchlabel) _client.application.postLabelSheet(_searchlabel, null, {_type:'" . $type . "'});",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
 						}
 						$response['render']['content'][] = [
 							[
-								'type' => 'textsection',
-								'content' => $this->_lang->GET('consumables.product.search_label')
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.search_label'),
+									'id' => '_searchlabel',
+									'value' => ($product['article_no'] ?: ($product['erp_id'] ?: $product['article_name'])) . ' +vendor_name:"' . $product['vendor_name'] . '"'
+								]
 							],
 							...$labels
 						];
@@ -1730,7 +1738,7 @@ class CONSUMABLES extends API {
 
 					// add last order info
 					if ($product['last_order']){
-						$response['render']['content'][2][] = [
+						$response['render']['content'][1][0][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))])
@@ -1740,10 +1748,10 @@ class CONSUMABLES extends API {
 
 					// append documents if applicable
 					if ($documents) {
-						if (isset($response['render']['content'][2])){
+						if (isset($response['render']['content'][3])){
 							if ($documents['valid'])
-								$response['render']['content'][2] = [
-									...$response['render']['content'][2],
+								$response['render']['content'][3] = [
+									...$response['render']['content'][3],
 									[
 										'type' => 'links',
 										'description' => $this->_lang->GET('consumables.product.documents_valid'),
@@ -1751,8 +1759,8 @@ class CONSUMABLES extends API {
 									]
 								];
 							if ($documents['expired'])
-								$response['render']['content'][2] = [
-									$response['render']['content'][2],
+								$response['render']['content'][3] = [
+									$response['render']['content'][3],
 									[
 										'type' => 'links',
 										'description' => $this->_lang->GET('consumables.product.documents_expired'),
@@ -1833,12 +1841,27 @@ class CONSUMABLES extends API {
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 		$parameter['vendor'] = isset($parameter['vendor']) ? trim($parameter['vendor']) : null;
 
+		// extract mandatory vendor name from search expression, to speed things up
+		// takes the last occurence ignoring previous mandatory vendor requests
+		$expressions = SEARCH::expressions($parameter['search']);
+		$reassemble = false;
+		foreach($expressions as $i => $expression) {
+			if ($expression['column'] === 'vendor_name' && $expression['operator'] === '+'){
+				$parameter['vendor'] = $expression['sqlterm'];
+				unset ($expressions[$i]);
+				$reassemble = true;
+			}
+		}
+		if ($reassemble) {
+			$parameter['search'] = implode(' ', array_map(Fn($v) => ($v['operator'] ?: '') . ($v['column'] ? ':' . $v['column'] : '') . (strstr($v['term'], ' ') ? '"' . $v['term'] . '"' : $v['term']), $expressions));
+		}
+
+
 		if ($parameter['search']) {
 			// get matches
 			$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? 'consumables_get_product_search' : 'order_get_product_search', [
 				'values' => [
 					':SEARCH' => $parameter['search'],
-					':search' => $parameter['search'],
 				],
 				'wildcards' => 'all',
 				'replacements' => [
