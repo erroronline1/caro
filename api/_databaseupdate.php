@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_14'] as $update){
+		foreach (['_2026_03_19'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -617,6 +617,20 @@ class UPDATE{
 		];
 	}
 
+	private function _2026_03_19(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_request_log ADD COLUMN IF NOT EXISTS execution_time tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_request_log', 'execution_time') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_request_log" .
+				"    ADD execution_time varchar(255) NULL DEFAULT NULL" .
+				" END; "
+			]
+		];
+	}
 }
 
 $db = new UPDATE();

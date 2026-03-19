@@ -74,7 +74,7 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
-//var_dump($query);
+
 		// execute query
 		try {
 			$statement = $_pdo->prepare($query);
@@ -363,12 +363,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))"
 		],
 		'application_request_log' => [
-			'mysql' => "INSERT INTO caro_request_log (id, timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (NULL, :timestamp, :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)",
-			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code) VALUES (CONVERT(datetime, :timestamp, 120), :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code)"
+			'mysql' => "INSERT INTO caro_request_log (id, timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code, execution_time) VALUES (NULL, :timestamp, :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code, :execution_time)",
+			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code, execution_time) VALUES (CONVERT(datetime, :timestamp, 120), :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code, :execution_time)"
 		],
 		'application_request_log_update' => [
-			'mysql' => "UPDATE caro_request_log SET response_code = :response_code WHERE id =:id",
-			'sqlsrv' => "UPDATE caro_request_log SET response_code = :response_code WHERE id =:id"
+			'mysql' => "UPDATE caro_request_log SET response_code = :response_code, execution_time = :execution_time WHERE id =:id",
+			'sqlsrv' => "UPDATE caro_request_log SET response_code = :response_code, execution_time = :execution_time WHERE id =:id"
 		],
 		'application_request_log_get' => [
 			'mysql' => "SELECT * FROM  caro_request_log WHERE timestamp BETWEEN :from AND :until",

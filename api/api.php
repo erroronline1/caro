@@ -11,6 +11,7 @@
 
 namespace CARO\API;
 
+DEFINE ('REQUESTSTART', microtime(true));
 session_set_cookie_params([
 	'domain' => $_SERVER['HTTP_HOST'],
 	'secure' => true,
@@ -634,7 +635,8 @@ class API {
 			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
 				'values' => [
 				':id' => $_SESSION['request']['id'],
-				':response_code' => $response
+				':response_code' => $response,
+				':execution_time' => microtime(true) - REQUESTSTART
 				]
 			]);
 			return;
@@ -668,7 +670,8 @@ class API {
 				':user_name' => $_SESSION['user']['name'],
 				':user_permissions' => implode(', ', $_SESSION['user']['permissions']),
 				':user_ip' => $_SERVER['REMOTE_ADDR'],
-				':response_code' => null
+				':response_code' => null,
+				':execution_time' => null
 			]
 		])) return $this->_pdo->lastInsertId();
 		return 0;
