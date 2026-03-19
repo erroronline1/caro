@@ -200,7 +200,7 @@ Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte 
 
 Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern.
 
-Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht veknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben.
+Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht verknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben.
 
 Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden. Ist das Datum erreicht wird ein neuer Token generiert und macht alle laufenden Anmeldungen ungültig. Nutzer sind dann noch nicht gelöscht, können aber die Anwendung nicht ohne Weiteres nutzen.
 
@@ -362,7 +362,7 @@ Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, k
 
 ### Whiteboard
 Kurzzeitige Informationen, Kurznotizen und alles, was sonst auf Haftnotizen oder Schmierzettel geschrieben wird kann in eigenen Whiteboards festgehalten werden. Die Übersicht zeigt alle Whiteboards des erstellenden Nutzers and und diejenigen, deren gewählten Bereiche übereinstimmen. Die Bearbeitung ist allen Nutzern erlaubt, Namensänderungen, Anpassung der Sichtbarkeit für Bereiche und die Löschung jedoch nur dem erstellenden Nutzer und Administratoren. Der Nutzername und das Änderungsdatum werden automatisch angehängt.  
-Whiteboards beinhalten zudem die mÖglichkeit Skizzen zu erstellen. Diese können bearbeitet und optional als Bild exportiert werden.  
+Whiteboards beinhalten zudem die Möglichkeit Skizzen zu erstellen. Diese können bearbeitet und optional als Bild exportiert werden.  
 Whiteboards werden bei der Löschung eines Nutzers nicht entfernt, da sie für andere kurzfristig relevante Daten enthalten können. Eine Löschung ist dann nur durch Administratoren möglich.
 
 [Übersicht](#übersicht)
@@ -410,7 +410,7 @@ Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporte
 
 Vorschläge vorheriger Eingaben werden in der Datenbank mit Verweis auf den zugewiesenen Bereich des Dokuments abgelegt um eine thematische Relevanz sicherzustellen. Die Datenbank für Vorschläge kann über das [Wartungsmodul](#wartung) aktualisiert werden.
 
-> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
+> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
 
 #### *Caveat:*
 Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
@@ -522,7 +522,7 @@ Versorgungsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie gen
 Die Ergänzung einer Vorgangsnummer aus dem ERP-System erlaubt den Abgleich bei verfügbarer [ERP Anbindung](#erp-anbindung), mehrere Nummern sind möglich im Falle von Gepflogenheiten eines kalkulatorischen und repräsentativen Vorgangs.  
 Die Auswahl der Aufbewahrungsfrist ermöglicht die [automatische Löschung](#cron) von Aufzeichnungen zur Erfüllung der [Anforderungen an die Datensparsamkeit](#löschung-von-aufzeichnungen).
 
-Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.  
+Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen den Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.  
 Aufzeichnungen können ein neues Kennzeichen erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sofern das neue Kennzeichen bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Kennzeichens werden ebenfalls dokumentiert.
 
 Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Dokumenten enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Dokumente hat. Es ist Ermessenssache ob Dokumentenpakete so sinnvoll eingesetzt werden können:
@@ -640,7 +640,7 @@ graph LR;
 ```
 
 Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen. Die [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) bieten eine detailliertere Darstellung der Integritätsprüfung.  
-Die Blockchain ist zwar privat und kein verteiltes Hauptbuch, exportierte PDF-Aufzeichnungen enthalten aber den jweils neuesten verfügbaren Hash. Bei der Ausgabe von Informationen an Dritte, wie beispielsweise Patienten oder Kostenträger, werden auch kleine Teile der Ketteninformation verteilt, die sich dann in der detaillierten Integritätsprüfung unveränderter valider Aufzeichnungen wiederfinden lassen.  
+Die Blockchain ist zwar privat und kein verteiltes Hauptbuch, exportierte PDF-Aufzeichnungen enthalten aber den jeweils neuesten verfügbaren Hash. Bei der Ausgabe von Informationen an Dritte, wie beispielsweise Patienten oder Kostenträger, werden auch kleine Teile der Ketteninformation verteilt, die sich dann in der detaillierten Integritätsprüfung unveränderter valider Aufzeichnungen wiederfinden lassen.  
 Zusammengeführte Aufzeichnungen beinhalten die zuvor verifizierten Blockchain-Informationen. Diese können aktuell noch nicht automatisiert verifiziert werden, verbleiben aber als gesicherte Information bestehen.
 
 [Übersicht](#übersicht)
@@ -674,9 +674,9 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten 
 [Übersicht](#übersicht)
 
 ### Managementbericht
-Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umgewandelt werden. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichte können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
+Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umgewandelt werden. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) umgesetzt. Abgeschlossene Managementberichte können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
-Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittels [Markdown](#markdown)-Syntax möglich.  
+Der Großteil der CARO App ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittels [Markdown](#markdown)-Syntax möglich.  
 
 [Übersicht](#übersicht)
 
@@ -828,7 +828,7 @@ STL/OBJ- und Bild-Dateien haben eine automatische Vorschau.
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
-Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden. Externe Dokumente die in den [Textvorschlägen](#textvorschläge) verknüpft sind erhalten einen Hinweis für die Berücksichtigung hinsichtlich der Verfügbarkeit. Datein mit gleichem Namen werden aufsteigend nummeriert. Dies gilt nicht für Netzwerkressourcen.
+Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden. Externe Dokumente die in den [Textvorschlägen](#textvorschläge) verknüpft sind erhalten einen Hinweis für die Berücksichtigung hinsichtlich der Verfügbarkeit. Dateien mit gleichem Namen werden aufsteigend nummeriert. Dies gilt nicht für Netzwerkressourcen.
 
 ![files screenshot](http://toh.erroronline.one/caro/files%20de.png)
 
@@ -943,11 +943,11 @@ Manchmal weiß der Einkauf besser über Lieferkonditionen bescheid. Falls es dem
 
 Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN, Zugangstoken, Unterschrift, je nach [Konfiguration](#laufzeitvariablen)) gesammelt freigegeben werden.
 
-Freigegebene Bestellungen können als *bestellt*, *teilweise erhalten*, *vollständig erhalten*, *teilweise ausgeliefert*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen.  
+Freigegebene Bestellungen können als *bestellt/bearbeitet*, *teilgeliefert*, *vollständig geliefert*, *teilweise an Bereich übergeben*, *vollständig an Bereich übergeben* und *archiviert* markiert werden. Vollständig übergebene Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen.  
 Falls der Einkauf auch ein ähnliches Produkt bestellen kann, wird daran erinnert gegebenenfalls die Bestellung zu korrigieren um das System in Bezug auf Produkteinführungen, Stichprobenprüfungen und Rückverfolgung nicht durcheinanderzubringen.
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
-Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.  
+Bestellte aber noch nicht gelieferte Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "geliefert" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.  
 Es muss ein Rücksendegrund angegeben werden. Kritische Rücksendegründe lösen eine Mitteilung an für die Einführung authorisierte Mitarbeitenden aus und initiieren eine Neubewertung der Produkteinführung.  
 Alle Maßnahmen bieten an eine Nachricht beizufügen.  
 Aus der in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen erzeugt werden um bei der internen Auslieferung eine Zuordnung zu unterstützen.
@@ -1023,7 +1023,7 @@ graph TD;
     order_type==>|Rücksendung|auto_delete;
     order_type==>|Service|auto_delete;
     order_type==>|Storno|order_deleted(Bestellung gelöscht)
-    mark==>|ausgehändigt|auto_delete;
+    mark==>|übergeben|auto_delete;
     mark==>|archiviert|delete[manuelle Löschung];
     auto_delete==>order_deleted;
     
@@ -1099,7 +1099,7 @@ Falls verfügbar, werden hier auch Funktionen der [ERP-Anbindung](#erp-anbindung
 ### CSV-Filter
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
-Da einige vorausgesehende Nutzungen regulatorische Themen betreffen können sollen die Filter von entsprechend berechtigten Nutzern freigegeben werden und sind bei vollständiger Freigabe nicht mehr löschbar. Da die Konstruktion eines Filters eine komplizierte Aufgabe sein kann, können berechtigte Nutzer auch nicht freigegebene Filter erreichen um diese testen zu können.
+Da einige vorausgesehene Nutzungen regulatorische Themen betreffen können, sollen die Filter von entsprechend berechtigten Nutzern freigegeben werden und sind bei vollständiger Freigabe nicht mehr löschbar. Da die Konstruktion eines Filters eine komplizierte Aufgabe sein kann, können berechtigte Nutzer auch nicht freigegebene Filter erreichen um diese testen zu können.
 
 Mögliche Nutzungen sind:
 * Fallistenfilterung für die Nachbeobachtung nach der Inverkehrbringung,
@@ -1198,7 +1198,7 @@ Aufzeichnungen können aus Gründen der Revisionssicherheit nicht anders gelösc
 [Übersicht](#übersicht)
 
 ## Schulungen
-Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
+Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulungen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
 
 Schulungen können geplant werden, wenn kein konkretes Datum eingetragen wurde und später in die tatsächlich stattgefundene Schulung umgewandelt und durch Angaben eines Ablaufdatums, Erfahrungspunkten und einer Datei, z.B. des Zertifikats ergänzt werden.
 
@@ -1214,7 +1214,7 @@ Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
 
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden. Verfügbare Optionen sind alphabetisch sortiert.
-* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systemen bekannt ist.
+* Die Dateisuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systemen bekannt ist.
 * Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder *Klettband*, *blau* oder *20mm* als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".  
 Die Suche kann weiterhin nach Datenbankenspalten eingegrenzt werden indem einem Suchbegriff der Spaltenname mit : vorangestellt wird. -, ?, * und "" sind auch hier für den Suchbegriff nutzbar. Ergebnisse ohne den Spaltennamen werden herausgefiltert. Mögliche Spaltennamen sind:
     * für die Artikelsuche z.B.: vendor_name, article_name, article_no, article_alias
@@ -1607,7 +1607,7 @@ Ein beliebiges Beispiel:
 
 RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl(?:ä|Ä)ngerung` lauten. Die Zeichencodierung löst dies zu `verl(?:Ã¤|Ã„)ngerung` auf und verfehlt daher die Gruppierung `[äÄ]` die zu `[Ã¤Ã„]` aufgelöst wird.
 
-Sofern die Ausgabe eines verarbeiteten Filters (z.B. for einen CSV-Filter) in einer XLSX-Datei (oder derezti noch eingeschränkt formatierbaren ODS-Datei) erfolgen soll (festgelegt durch die Dateinamenerweiterung in [filesetting][destination]), sind einige Formatierungsoptionen durch die zusätzliche `xslxformat`-Eigenschaft verfügbar:
+Sofern die Ausgabe eines verarbeiteten Filters (z.B. für einen CSV-Filter) in einer XLSX-Datei (oder derzeit noch eingeschränkt formatierbaren ODS-Datei) erfolgen soll (festgelegt durch die Dateinamenerweiterung in [filesetting][destination]), sind einige Formatierungsoptionen durch die zusätzliche `xslxformat`-Eigenschaft verfügbar:
 
 ```javascript
 "xslxformat": {
@@ -1697,7 +1697,7 @@ Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabel
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `erpquery.casedata.casepositions` passen.
 
 ### Vorgangsmedien
-Vorgangsmedien werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
+Vorgangsmedien werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Dateien aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden.
 
 ### Vergange Bestellungen
@@ -1889,7 +1889,7 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser sowie Safari haben f�
 
 Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist die Verwendung auf einem öffentlich zugänglichen Server ausdrücklich **nicht empfohlen**.
 
-Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um Änderungen und CSV-Filter testen zu können und sicherzustellen, dass die Anwendung in der Produktivumgebung stabil bleibt!
+Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um Änderungen und CSV-Filter testen zu können und sicherzustellen, dass die Anwendung in der Produktivumgebung stabil bleibt! Die Entwicklungsumgebung kann in der [config.ini](#laufzeitvariablen) ausgewiesen werden, die Kopfzeile wird dann in einem auffälligen Orange angezeigt um die Entwicklungsumgebung von der Produktivumgebung abzugrenzen, sofern die Nutzer Zugriff haben dürfen (für Vorschau oder Rückmeldungen zu Funktionen), aber das Risiko reduziert werden soll, dass diese versehentlich die falsche Datenbank nutzen.
 
 [Übersicht](#übersicht)
 
@@ -1998,6 +1998,7 @@ Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Date
 [application]
 debugging = no ; yes: ja, no: nein; erlaubt oder unterbindet Fehlerbenachrichtigungen
 defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.XX.json-Dateien; Nutzer können im Profil individuell wählen
+is_development = no ; yes, no; via config.env überschreibbar, markiert die Anwendung als Entwicklungsumgebung
 issue_mail = "issues@companymail.tld" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
 order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
