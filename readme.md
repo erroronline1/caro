@@ -1987,7 +1987,7 @@ Firefox, Edge and most probably any chromium browser, as well as Safari have pre
 
 Technically the application is being usable on any webserver but the use on a public accessible server is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
-It is strongly recommended to create an additional development environment to test changes and CSV-filters to ensure the application in production environment remaining stable!
+It is strongly recommended to create an additional development environment to test changes and CSV-filters to ensure the application in production environment remaining stable! You can flag this within the [config.ini](#runtime-variables), the header will be displayed in bright orange to distinguish it from the production environment in case you want users having access (peek previews, feature feedback) but reduce the risk of them accidentally misusing the wrong database.
 
 [Content](#content)
 
@@ -2096,6 +2096,7 @@ By default following permissions/roles are defined within the language.XX.json-f
 [application]
 debugging = no ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
+is_development = no ; yes, no; overloadable in config.env, highlights the application on yes as development environment
 issue_mail = "issues@companymail.tld" ; address for application and security issues
 order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
@@ -3191,7 +3192,7 @@ Parameters
 
 Sample response
 ```
-{"user":[],"config":{"application":{"defaultlanguage":"en"}}}
+{"user":[],"config":{"application":{"defaultlanguage":"en", "debugging": true, "is_development": false}, "language": {....}}}
 ```
 
 > GET ./api/api.php/application/info
