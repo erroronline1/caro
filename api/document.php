@@ -605,8 +605,7 @@ class DOCUMENT extends API {
 							if (!$document['hidden']) $bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
 						}
 						elseif (in_array($documentname, $externaldocuments)){
-							$documentname = substr($documentname, 1);
-							$bundles[$row['name']][$documentname] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $documentname, 'data-filtered' => $row['id']]);
+							$bundles[$row['name']][$documentname] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($documentname), 'data-filtered' => $row['id']]);
 						}
 					}
 				}
@@ -709,7 +708,6 @@ class DOCUMENT extends API {
 				 * 
 				 * @return array $content altered
 				 */
-				$FILEHANDLER = new FILEHANDLER($this->_pdo);
 				function fileupload($FILEHANDLER, $content, $component_name, $timestamp){
 					// recursively replace images with actual $_FILES content according to content nesting
 					if (isset($_FILES['composedComponent_files'])){
@@ -718,7 +716,7 @@ class DOCUMENT extends API {
 								'composedComponent_files'
 							],
 							destination: [
-								'path' => FILEHANDLER::directory('component_attachments')
+								'path' => $FILEHANDLER->directory('component_attachments')
 							],
 							naming: [
 								'prefix' => $component_name . '_' . $timestamp
@@ -732,20 +730,20 @@ class DOCUMENT extends API {
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
-							$uploaded_files[$filename] = substr($path, 1);
+							$uploaded_files[$filename] = $path;
 						}
-						function replace_images($element, $uploaded_filearray){
+						function replace_images($FILEHANDLER, $element, $uploaded_filearray){
 							$result = [];
 							foreach ($element as $sub){
 								if (array_is_list($sub)){
-									$result[] = replace_images($sub, $uploaded_filearray);
+									$result[] = replace_images($FILEHANDLER, $sub, $uploaded_filearray);
 								} else {
 									if ($sub['type'] === 'image'){
 										preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
 										$filename = $fakefilename[0][count($fakefilename[0])-1];
 										if ($filename && isset($uploaded_filearray[$filename])){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
 											$sub['attributes']['name'] = $filename;
-											$sub['attributes']['url'] = './api/api.php/file/stream/' . $uploaded_filearray[$filename];
+											$sub['attributes']['url'] = $FILEHANDLER->getFileLink($uploaded_filearray[$filename]);
 										}
 									}
 									$result[] = $sub;
@@ -753,7 +751,7 @@ class DOCUMENT extends API {
 							}
 							return $result;
 						}
-						$content = replace_images($content, $uploaded_files);
+						$content = replace_images($FILEHANDLER, $content, $uploaded_files);
 					}
 					return $content;
 				}
@@ -800,11 +798,11 @@ class DOCUMENT extends API {
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
 						$exists_date = new \DateTime($exists['date']);
-						$component['content'] = fileupload($FILEHANDLER, $component['content'], $exists['name'], $exists_date->format('YmdHis'));
+						$component['content'] = fileupload($this->_filehandler, $component['content'], $exists['name'], $exists_date->format('YmdHis'));
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
 						$new_images = array_unique(usedImages($component['content']));
-						foreach (array_diff($former_images, $new_images) as $path) FILEHANDLER::delete($path);
+						foreach (array_diff($former_images, $new_images) as $path) $this->_filehandler->delete($path);
 
 						$document_component[':id'] = $exists['id'];
 						$document_component[':content'] = UTILITY::json_encode($component);
@@ -843,7 +841,7 @@ class DOCUMENT extends API {
 				// check for forbidden name
 				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
-				$component['content'] = fileupload($FILEHANDLER, $component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
+				$component['content'] = fileupload($this->_filehandler, $component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
 
 				$document_component[':content'] = UTILITY::json_encode($component);
 
@@ -900,17 +898,17 @@ class DOCUMENT extends API {
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.delete_failure'), 'type' => 'error']]); //early exit
 				// recursively delete images
-				function deleteImages($element){
+				function deleteImages($FILEHANDLER, $element){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
-							deleteImages($sub);
+							deleteImages($FILEHANDLER, $sub);
 						} else {
 							if (isset($sub['type']) && $sub['type'] === 'image')
-								FILEHANDLER::delete('.' . $sub['attributes']['url']);
+								$FILEHANDLER->delete('.' . $sub['attributes']['url']);
 						}
 					}
 				}
-				deleteImages(json_decode($component['content'], true)['content']);
+				deleteImages($this->_filehandler, json_decode($component['content'], true)['content']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
 					'values' => [
 						':id' => $this->_requestedID
@@ -2190,9 +2188,9 @@ class DOCUMENT extends API {
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
 
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$downloadfiles[$this->_lang->GET('assemble.render.export')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->documentsPDF($summary)
+			'href' => $this->_filehandler->getFileLink($PDF->documentsPDF($summary))
 		];
 		$this->response([
 			'render' => [

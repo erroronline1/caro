@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_19'] as $update){
+		foreach (['_2026_03_20'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -563,7 +563,7 @@ class UPDATE{
 	}
 
 	private function _2026_03_14_sqlsrv(){
-		echo '<br /><br />[!] This update just creates a backup of all current tables. you\'ll have to chnge all smalldatetime colums to datetime manually for sqlqrv creates unpredictable (for me) dependencies. quite sorry, but at this stage probably no one is affected anyway...<br />';
+		echo '<br /><br />[!] This update just creates a backup of all current tables. you\'ll have to change all smalldatetime colums to datetime manually for sqlqrv creates unpredictable (for me) dependencies. quite sorry, but at this stage probably no one is affected anyway...<br />';
 		$sqlsrv = [];
 		foreach([
 			'caro_announcements',
@@ -631,6 +631,22 @@ class UPDATE{
 			]
 		];
 	}
+
+	private function _2026_03_20(){
+		echo '<br /><br />[!] This update drops columns and is supposed to rename caro_media context to path. Fucked up in sqlsrv, so you\'ll have to rename it yourself for sqlqrv creates unpredictable (for me) dependencies. quite sorry, but at this stage probably no one is affected anyway...<br />';
+
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_media DROP `expiry_date`, DROP `metadata`; ALTER TABLE `caro_media` CHANGE `context` `path` TINYTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;",
+				"UPDATE caro_user SET image = CONCAT('../', image) WHERE SUBSTRING(image, 1, 3) != '../'"
+			],
+			'sqlsrv' => [
+				"ALTER TABLE caro_media DROP COLUMN expiry_date, metadata; ",
+				"UPDATE caro_user SET image = CONCAT('../', image) WHERE SUBSTRING(image, 1, 3) != '../'"
+			]
+		];
+	}
+
 }
 
 $db = new UPDATE();

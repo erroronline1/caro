@@ -221,13 +221,11 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_media` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`path` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`mime_type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` longblob NOT NULL," .
 				"	`upload_date` datetime NOT NULL," .
-				"	`expiry_date` datetime NULL DEFAULT NULL," .
-				"	`metadata` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -568,13 +566,11 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_media', N'U') IS NULL " .
 				"CREATE TABLE caro_media (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
-				"	context varchar(255) NOT NULL," .
+				"	path varchar(255) NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	mime_type varchar(255) NOT NULL," .
 				"	content varbinary(max) NOT NULL," .
-				"	upload_date datetime NOT NULL," .
-				"	expiry_date datetime NULL DEFAULT NULL," .
-				"	metadata varchar(MAX) NULL" .
+				"	upload_date datetime NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
@@ -747,6 +743,11 @@ class INSTALL {
 	 */
 	public $_lang = null;
 
+	/**
+	 * make filehandler FILEHANDLER class and its methods available
+	 */
+	public $_filehandler = null;
+
 	public $_payload = [];
 
 	/**
@@ -768,6 +769,8 @@ class INSTALL {
 		$this->_currentdate = new \DateTime('now');
 
 		$this->_lang = new LANG();
+
+		$this->_filehandler = new FILEHANDLER($this->_pdo);
 
 		switch($_SERVER['REQUEST_METHOD']){
 			case "GET":
@@ -963,7 +966,7 @@ class INSTALL {
 	 */
 	public function installDatabase(){
 		//secure fileserver by default
-		FILEHANDLER::createDirectory('../fileserver');
+		$this->_filehandler->createDirectory('../fileserver');
 
 		if (SQLQUERY::EXECUTE($this->_pdo, DEFAULTSQL['installed'][$this->_pdoDriver])){
 			return $this->printWarning('Databases already installed.');
@@ -982,7 +985,7 @@ class INSTALL {
 				':units' => '',
 				':token' => REQUEST[1],
 				':orderauth' => '',
-				':image' => 'media/favicon/icon192.png',
+				':image' => '../media/favicon/icon192.png',
 				':app_settings' => '',
 				':skills' => '',
 				':invalidation_date' => null,
@@ -1338,7 +1341,6 @@ class INSTALL {
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
 		];
-		$FILEHANDLER = new FILEHANDLER();
 		$sqlchunks = $names = $orderauths = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
@@ -1379,12 +1381,12 @@ class INSTALL {
 					'type' => 'image/png',
 					'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 				];
-				$entry['image'] = $FILEHANDLER->storeUploadedFiles(
+				$entry['image'] = $this->_filehandler->storeUploadedFiles(
 					input: [
 						$this->_lang->PROPERTY('user.take_photo')
 					],
 					destination: [
-						'path' => FILEHANDLER::directory('users'),
+						'path' => $this->_filehandler->directory('users'),
 						'replace' => true
 					],
 					naming: [

@@ -101,18 +101,18 @@ class CALENDAR extends API {
 					];
 					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
-						'href' => './api/api.php/file/stream/' . $file,
+						'href' => $this->_filehandler->getFileLink($file),
 						'download' => pathinfo($file)['basename']
 					];
 
 					// add ics file to send by mail
-					$tempFile = FILEHANDLER::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics';
+					$tempFile = $this->_filehandler->directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
-						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'href' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($tempFile)['basename']),
 						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics'
 					];
 
@@ -749,7 +749,7 @@ class CALENDAR extends API {
 		$PDF = new PDF(CONFIG['pdf']['record']);
 		$file = $PDF->timesheetPDF($summary);
 		$downloadfiles[$this->_lang->GET('calendar.navigation.timesheet', [], true)] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 		$body = [];
@@ -1785,10 +1785,10 @@ class CALENDAR extends API {
 		];
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('calendar.timesheet.yearly_summary', [], true)] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 		$body = [];

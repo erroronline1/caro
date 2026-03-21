@@ -12,10 +12,12 @@
 namespace CARO\API;
 
 require(__DIR__ . '/../vendor/autoload.php');
+require_once('./_filehandler.php');
 
 CLASS TABLE{
 	private $content = [];
 	private $unstructuredDataAboveHeader = [];
+	private $_filehandler = null;
 
 	/**
 	 * imports data from a file or a named array
@@ -26,6 +28,7 @@ CLASS TABLE{
 	 * @return bool
 	 */
 	public function __construct($src, $type = null, $options = []){
+		$this->_filehandler = new FILEHANDLER ();
 		if (gettype($src) === 'string'){
 			// url
 			$file = pathinfo($src);
@@ -40,7 +43,7 @@ CLASS TABLE{
 				case 'xlsx':
 					$reader = new \OpenSpout\Reader\XLSX\Reader(
 						new \OpenSpout\Reader\XLSX\Options(
-							tempFolder: FILEHANDLER::directory('tmp'),
+							tempFolder: $this->_filehandler->directory('tmp'),
 						)
 					);
 					break;
@@ -152,7 +155,7 @@ CLASS TABLE{
 	
 			if ($recentSheet !== $sheetName){
 				// add a new file
-				@$tmp_name = tempnam(FILEHANDLER::directory('tmp'), mt_rand(0, 100000));
+				@$tmp_name = tempnam($this->_filehandler->directory('tmp'), mt_rand(0, 100000));
 				$writer->openToFile($tmp_name);
 				$recentSheet = $sheetName;
 			}
@@ -189,7 +192,7 @@ CLASS TABLE{
 		}
 
 		foreach($response as &$path){
-			$path = FILEHANDLER::saveToFilesystem($path, FILEHANDLER::directory('tmp') . '/' . $dst);
+			$path = $this->_filehandler->saveToFilesystem($path, $this->_filehandler->directory('tmp') . '/' . $dst);
 		}
 		return $response;
 	}
@@ -220,7 +223,7 @@ CLASS TABLE{
 						null, // public ?string $backgroundColor = null,
 						null, // public ?string $format = null,
 					),
-					tempFolder: FILEHANDLER::directory('tmp')
+					tempFolder: $this->_filehandler->directory('tmp')
 					// no page options available yet
 				);
 				$writer = new \OpenSpout\Writer\ODS\Writer($celloptions);
@@ -228,7 +231,7 @@ CLASS TABLE{
 				break;
 			case 'xlsx':
 				$celloptions = new \OpenSpout\Writer\XLSX\Options(
-					tempFolder: FILEHANDLER::directory('tmp'),
+					tempFolder: $this->_filehandler->directory('tmp'),
 					pageSetup: new \OpenSpout\Writer\XLSX\Options\PageSetup(
 						!empty($options['orientation']) ? \OpenSpout\Writer\XLSX\Options\PageOrientation::{strtoupper($options['orientation'])} : null,
 						!empty($options['size']) ? \OpenSpout\Writer\XLSX\Options\PaperSize::{strtoupper($options['size'])} : \OpenSpout\Writer\XLSX\Options\PaperSize::A4,
@@ -254,7 +257,7 @@ CLASS TABLE{
 				break;
 		}
 
-		@$tmp_name = tempnam(FILEHANDLER::directory('tmp'), mt_rand(0, 100000));
+		@$tmp_name = tempnam($this->_filehandler->directory('tmp'), mt_rand(0, 100000));
 		$writer->openToFile($tmp_name);
 
 		// determine defined row heights for data rows
@@ -384,7 +387,7 @@ CLASS TABLE{
 			}
 		}
 		$writer->close();
-		$path = FILEHANDLER::saveToFilesystem($tmp_name, FILEHANDLER::directory('tmp') . '/' . $dst);
+		$path = $this->_filehandler->saveToFilesystem($tmp_name, $this->_filehandler->directory('tmp') . '/' . $dst);
 
 		return [$path];
 	}

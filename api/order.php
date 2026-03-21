@@ -485,7 +485,7 @@ class ORDER extends API {
 				foreach ($preUsers as $user){
 					$user['permissions'] = explode(',', $user['permissions'] ? : '');
 					if (array_intersect(['purchase', 'admin'], $user['permissions'])) $permission['purchasemembers'][] = $user['name'];
-					$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image'], 'units' => $user['units']];
+					$users[$user['id']] = ['name' => $user['name'], 'image' => $this->_filehandler->getFileLink($user['image']), 'units' => $user['units']];
 				}
 
 				$erp_interface_available = (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata());
@@ -670,7 +670,7 @@ class ORDER extends API {
 					// order attachments
 					if (isset($decoded_order_data['attachments'])){
 						foreach (explode(',', $decoded_order_data['attachments']) as $file){
-							$data['attachments'][pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
+							$data['attachments'][pathinfo($file)['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($file)]);
 						}
 					}
 
@@ -771,7 +771,7 @@ class ORDER extends API {
 			]);
 			if (count($others)<2){
 				$files = explode(',', $order['attachments']);
-				FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
+				$this->_filehandler->delete(array_map(fn($value) => $value, $files));
 			}
 		}
 		return SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
@@ -840,7 +840,7 @@ class ORDER extends API {
 		$PDF = new PDF(CONFIG['pdf']['record']);
 		$file = $PDF->orderPDF($summary);
 		$downloadfiles[$this->_lang->GET('order.export')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -1120,7 +1120,7 @@ class ORDER extends API {
 				// append existing attachments
 				if (isset($order['attachments'])){
 					foreach (explode(',', $order['attachments']) as $file){
-						$files[pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
+						$files[pathinfo($file)['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($file)]);
 					}
 					array_splice($response['render']['content'], 3, 0, [
 						[
@@ -1257,7 +1257,7 @@ class ORDER extends API {
 				// delete attachments
 				if (isset($order['attachments'])){
 					$files = explode(',', $order['attachments']);
-					FILEHANDLER::delete(array_map(fn($value) => '.' . $value, $files));
+					$this->_filehandler->delete(array_map(fn($value) => $value, $files));
 				}
 
 				// delete prepared order
@@ -1388,7 +1388,7 @@ class ORDER extends API {
 				}
 				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png', null, null, true));
+					$approval = 'data:image/png;base64,' . base64_encode($this->_filehandler->alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png', null, null, true));
 				}
 				if (!$approval) $this->response([], 401);
 
@@ -1548,7 +1548,7 @@ class ORDER extends API {
 						if (isset($processedOrderData['attachments'])){
 							$files = [];
 							foreach (explode(',', $processedOrderData['attachments']) as $file){
-								$files[pathinfo($file)['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . $file]);
+								$files[pathinfo($file)['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($file)]);
 							}
 							array_splice($response['render']['content'][count($response['render']['content']) - 1], 2, 0, [
 								[
@@ -1654,7 +1654,7 @@ class ORDER extends API {
 
 		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(FILEHANDLER::alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png', null, null, true));
+			$approval = 'data:image/png;base64,' . base64_encode($this->_filehandler->alterImage($signature, CONFIG['limits']['image']['signature'], FILEHANDLER_IMAGE_RESOURCE, 'png', null, null, true));
 		}
 
 		// initiate data
@@ -1662,14 +1662,13 @@ class ORDER extends API {
 		
 		// handle attachments
 		$attachments = [];
-		$FILEHANDLER = new FILEHANDLER();
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles(
+			$attachments = array_merge($attachments, $this->_filehandler->storeUploadedFiles(
 				input: [
 					$this->_lang->PROPERTY('order.attach_photo')
 				],
 				destination: [
-					'path' => FILEHANDLER::directory('order_attachments')
+					'path' => $this->_filehandler->directory('order_attachments')
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
@@ -1677,12 +1676,12 @@ class ORDER extends API {
 			));
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, $FILEHANDLER->storeUploadedFiles(
+			$attachments = array_merge($attachments, $this->_filehandler->storeUploadedFiles(
 				input: [
 					$this->_lang->PROPERTY('order.attach_file')
 				],
 				destination: [
-					'path' => FILEHANDLER::directory('order_attachments')
+					'path' => $this->_filehandler->directory('order_attachments')
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
@@ -1691,8 +1690,7 @@ class ORDER extends API {
 		}
 		// sanitize array for empty values
 		foreach ($attachments as $key => $value){
-			if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
-			else unset($attachments[$key]);
+			if (!$value) unset($attachments[$key]);
 		}
 		$existingattachments = UTILITY::propertySet($this->_payload, 'existingattachments') ? : '';
 		if ($attachments || $existingattachments) {

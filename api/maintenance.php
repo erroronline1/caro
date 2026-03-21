@@ -416,7 +416,7 @@ class MAINTENANCE extends API {
 
 					if ($files = $export->dump(preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'])] = [
-							'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+							'href' => $this->_filehandler->getFileLink($files[0]),
 							'download' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'
 						];
 					}
@@ -486,7 +486,7 @@ class MAINTENANCE extends API {
 					$export = new TABLE([$log]);
 					if ($files = $export->dump('CONFIDENTIAL CARO REQUEST LOG.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'CONFIDENTIAL CARO REQUEST LOG.csv'])] = [
-							'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+							'href' => $this->_filehandler->getFileLink($files[0]),
 							'download' =>'CONFIDENTIAL CARO REQUEST LOG.csv'
 						];
 					}
@@ -783,13 +783,12 @@ class MAINTENANCE extends API {
 			case 'POST':
 				// store within temp to remain for put action, display matches and selection
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]) && $_FILES[$this->_lang->PROPERTY('maintenance.vendorupdate.file')]['tmp_name']) {
-					$FILEHANDLER = new FILEHANDLER;
-					$file = $FILEHANDLER->storeUploadedFiles(
+					$file = $this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('maintenance.vendorupdate.file')
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('tmp'),
+							'path' => $this->_filehandler->directory('tmp'),
 							'replace' => true
 						], 
 						naming: [
@@ -858,7 +857,7 @@ class MAINTENANCE extends API {
 				// actual update vendors as per selection
 
 				// no exception handling, since the file validity has been checked upon upload already
-				$json = file_get_contents(FILEHANDLER::directory('tmp') . '/' . $_SESSION['user']['id'] . 'vendorupdate.json');
+				$json = file_get_contents($this->_filehandler->directory('tmp') . '/' . $_SESSION['user']['id'] . 'vendorupdate.json');
 				$json = json_decode($json, true);
 				$DBall = [
 					...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),

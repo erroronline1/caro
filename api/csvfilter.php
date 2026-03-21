@@ -122,7 +122,7 @@ class CSVFILTER extends API {
 							])){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
-									'href' => './api/api.php/file/stream/' . substr($file, 1),
+									'href' => $this->_filehandler->getFileLink($file),
 									'download' => pathinfo($file)['basename']
 								];
 							}
@@ -157,7 +157,7 @@ class CSVFILTER extends API {
 							$format)){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
-									'href' => './api/api.php/file/stream/' . substr($file, 1),
+									'href' => $this->_filehandler->getFileLink($file),
 									'download' => pathinfo($file)['basename']
 								];
 							}
@@ -175,7 +175,7 @@ class CSVFILTER extends API {
 						];
 						$file = $PDF->tablePDF($pdfcontent);
 						if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
-							'href' => './api/api.php/file/stream/' . substr($file, 1),
+							'href' => $this->_filehandler->getFileLink($file),
 							'download' => pathinfo($file)['basename']
 						];
 						break;

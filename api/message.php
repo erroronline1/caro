@@ -311,7 +311,7 @@ class MESSAGE extends API {
 						$conversation_content[] = [
 							'type' => 'message',
 							'content' => [
-								'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
+								'img' => $this->_filehandler->getFileLink($conversation['image']),
 								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
 								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
 								'date' => $this->convertFromServerTime($conversation['timestamp']),
@@ -421,7 +421,7 @@ class MESSAGE extends API {
 								[
 									'type' => 'message',
 									'content' => [
-										'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
+										'img' => $this->_filehandler->getFileLink($conversation['image']),
 										'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
 										'text' => (strlen($conversation['message']) > 128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $this->convertFromServerTime($conversation['timestamp']),
@@ -560,16 +560,16 @@ class MESSAGE extends API {
 			if (PERMISSION::filteredUser($user)) continue;
 
 			// sort to groups, units, etc.
-			$groups['name'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
-			if ($user['orderauth']) $groups['orderauth'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
+			$groups['name'][] = ['name' => $user['name'], 'image' => $this->_filehandler->getFileLink($user['image'])];
+			if ($user['orderauth']) $groups['orderauth'][] = ['name' => $user['name'], 'image' => $this->_filehandler->getFileLink($user['image'])];
 			if ($user['units'])
 				foreach (explode(',', $user['units']) as $unit){
-					$groups['units'][$unit][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
+					$groups['units'][$unit][] = ['name' => $user['name'], 'image' => $this->_filehandler->getFileLink($user['image'])];
 				}
 			if ($user['permissions'])
 				foreach (explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
-					$groups['permissions'][$permission][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
+					$groups['permissions'][$permission][] = ['name' => $user['name'], 'image' => $this->_filehandler->getFileLink($user['image'])];
 				}
 		}
 
@@ -697,21 +697,20 @@ class MESSAGE extends API {
 					'values' => $whiteboard
 				])) {
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle_export')) && $_FILES["_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')]){
-						$FILEHANDLER = new FILEHANDLER($this->_pdo);
 						$paths = [];
-						foreach ($FILEHANDLER->storeUploadedFiles(
+						foreach ($this->_filehandler->storeUploadedFiles(
 							input: [
 								"_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')
 							],
 							destination: [
-								'path' => FILEHANDLER::directory('tmp')
+								'path' => $this->_filehandler->directory('tmp')
 							],
 							naming: [
 								'prefix' => $whiteboard[':name']
 							]
 						) as $file){
 							$paths[pathinfo($file)['basename']] = [
-								'href' => './api/api.php/file/stream/' . substr($file, 1),
+								'href' => $this->_filehandler->getFileLink($file),
 								'download' => pathinfo($file)['basename']
 							];
 						}

@@ -600,10 +600,10 @@ class RECORD extends API {
 		$content = $this->summarizeRecord($summarize, true);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->recordsPDF($content);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -656,7 +656,7 @@ class RECORD extends API {
 					];
 					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => './api/api.php/file/stream/' . $file,
+						'href' => $this->_filehandler->getFileLink($file),
 						'download' => pathinfo($file)['basename']
 					];
 					$body = [
@@ -984,16 +984,15 @@ class RECORD extends API {
 				$entry_datetime .= ':00'; // append seconds for database format
 
 				// handle attachments and images
-				if (!file_exists(FILEHANDLER::directory('record_attachments'))) mkdir(FILEHANDLER::directory('record_attachments'), 0777, true);
+				if (!file_exists($this->_filehandler->directory('record_attachments'))) mkdir($this->_filehandler->directory('record_attachments'), 0777, true);
 				$attachments = [];
-				$FILEHANDLER = new FILEHANDLER($this->_pdo);
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = $FILEHANDLER->storeUploadedFiles(
+					if ($uploaded = $this->_filehandler->storeUploadedFiles(
 						input: [
 							$fileinput
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('record_attachments')
+							'path' => $this->_filehandler->directory('record_attachments')
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)
@@ -1425,7 +1424,7 @@ class RECORD extends API {
 					if (isset($content['attachments'][$document])){
 						foreach($content['attachments'][$document] as $path){
 							$file = pathinfo($path);
-							$files[$file['basename']] = FILEHANDLER::link(['href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('record_attachments'), 1) . '/'. $path]);
+							$files[$file['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($this->_filehandler->directory('record_attachments') . '/'. $path)]);
 						}
 						array_push($body[count($body) -1][0]['content'], [
 							'type' => 'links',
@@ -2354,7 +2353,7 @@ class RECORD extends API {
 						$displayvalue = $entry['value'];
 						// populate file image and attachments based on values containing respective paths and extensions
 						// guess file url; special regex delimiter
-						if (stripos($entry['value'], substr(FILEHANDLER::directory('record_attachments'), 1)) !== false) {
+						if (stripos($entry['value'], substr($this->_filehandler->directory('record_attachments'), 1)) !== false) {
 							$displayvalue = '';
 							$files = [];
 							foreach (explode(', ', $entry['value']) as $file){

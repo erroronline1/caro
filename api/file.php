@@ -64,15 +64,14 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// $_FILES is submitted always even if empty
-				$FILEHANDLER = new FILEHANDLER($this->_pdo);
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name']) {
 					// process provided files 
-					$files = $FILEHANDLER->storeUploadedFiles(
+					$files = $this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('file.manager.new_file')
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('external_documents')
+							'path' => $this->_filehandler->directory('external_documents')
 						]
 					);
 					$insertions = [];
@@ -214,7 +213,7 @@ class FILE extends API {
 
 							if (preg_match('/^\.\.\//', $file['path'])){
 								$file['name'] = $fileinfo['basename'];
-								$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
+								$file['path'] = $this->_filehandler->getFileLink($file['path']);
 							}
 							else $file['name'] = $file['path'];
 							// resolve regulatory context
@@ -226,7 +225,7 @@ class FILE extends API {
 							}
 
 							$link = [];
-							$link[$file['name']] = FILEHANDLER::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
+							$link[$file['name']] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 
 							// append file, link and options
 							array_push($response['render']['content'][1],
@@ -309,10 +308,10 @@ class FILE extends API {
 	 */
 	public function filemanager(){
 		if (!PERMISSION::permissionFor('files')) $this->response([], 401);
+		$this->_filehandler = new FILEHANDLER();
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// overview allows only to create new folder or upload files to a previously selected one
-				$FILEHANDLER = new FILEHANDLER();
 				// sanitize new folder name
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('file.manager.new_folder')));
 				if ($new_folder){
@@ -320,8 +319,8 @@ class FILE extends API {
 					if (UTILITY::forbiddenName($new_folder)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 
 					// create new folder if not present
-					$new_folder = FILEHANDLER::directory('files_documents', [':category' => $new_folder]);
-					if (!is_dir($new_folder)) FILEHANDLER::createDirectory($new_folder);
+					$new_folder = $this->_filehandler->directory('files_documents', [':dir' => $new_folder]);
+					if (!is_dir($new_folder)) $this->_filehandler->createDirectory($new_folder);
 
 					$this->response(['response' => [
 						'msg' => $this->_lang->GET('file.manager.new_folder_created', [':name' => $new_folder]),
@@ -333,12 +332,12 @@ class FILE extends API {
 				// store uploaded files to reqested folder
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name'] && $destination) {
-					$FILEHANDLER->storeUploadedFiles(
+					$this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('file.manager.new_file')
 						], 
 						destination: [
-							'path' => FILEHANDLER::directory('files_documents', [':category' => $destination])
+							'path' => $this->_filehandler->directory('files_documents', [':dir' => $destination])
 						]
 					);
 					$this->response(['response' => [
@@ -364,11 +363,11 @@ class FILE extends API {
 				// default view lists available custom directories within files_documents
 				if (!$this->_requestedFolder){
 					$response['render']['content'][] = [];
-					$folders = FILEHANDLER::listDirectories(FILEHANDLER::directory('files_documents'),'asc');
+					$folders = $this->_filehandler->listDirectories($this->_filehandler->directory('files_documents'), 'asc');
 					if ($folders){
 						foreach ($folders as $folder){
 							// prepare each folders properties
-							$foldername = str_replace(FILEHANDLER::directory('files_documents') . '/', '', $folder);
+							$foldername = str_replace($this->_filehandler->directory('files_documents') . '/', '', $folder);
 							$filedate = new \DateTime('@' . filemtime($folder), new \DateTimeZone($this->_date['timezone']));
 							// append folder link and delete button
 							array_push($response['render']['content'][0],
@@ -418,8 +417,8 @@ class FILE extends API {
 				}
 				else {
 					// gather files for requested directory
-					if ($this->_requestedFolder === 'sharepoint') $files = FILEHANDLER::listFiles(FILEHANDLER::directory('sharepoint') ,'asc');
-					else $files = FILEHANDLER::listFiles(FILEHANDLER::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+					if ($this->_requestedFolder === 'sharepoint') $files = $this->_filehandler->listFiles($this->_filehandler->directory('sharepoint') ,'asc');
+					else $files = $this->_filehandler->listFiles($this->_filehandler->directory('files_documents', [':dir' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						// append file filter
 						$response['render']['content'][] = [
@@ -435,18 +434,15 @@ class FILE extends API {
 						$response['render']['content'][] = [];
 						foreach ($files as $file){
 							if ($file) {
-								// set up file properties
-								$fileinfo = pathinfo($file);
-
 								$file = [
-									'path' => substr($file, 1),
-									'name' => $fileinfo['basename'],
-									'link' => './api/api.php/file/stream/' . substr($file, 1)
+									'path' => $file,
+									'name' => pathinfo($file)['basename'],
+									'link' => $this->_filehandler->getFileLink($file)
 								];
-								$filedate = new \DateTime('@' . filemtime('.' . $file['path']), new \DateTimeZone($this->_date['timezone']));
+								$filedate = new \DateTime('@' . filemtime($file['path']), new \DateTimeZone($this->_date['timezone']));
 
 								$link = [];
-								$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path']]);
+								$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'data-filtered' => $file['path']]);
 	
 								// append file options
 								array_push($response['render']['content'][1],
@@ -508,8 +504,8 @@ class FILE extends API {
 				$this->response($response);
 				break;
 			case 'DELETE':
-				if (in_array($this->_requestedFolder, ['sharepoint'])) $success = FILEHANDLER::delete(FILEHANDLER::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
-				else $success = FILEHANDLER::delete(FILEHANDLER::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
+				if (in_array($this->_requestedFolder, ['sharepoint'])) $success = $this->_filehandler->delete($this->_filehandler->directory($this->_requestedFolder) . '/' . $this->_requestedFile);
+				else $success = $this->_filehandler->delete($this->_filehandler->directory('files_documents', [':dir' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
 				if ($success) $this->response(['response' => [
 					'msg' => $this->_lang->GET('file.manager.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
 					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null],
@@ -533,6 +529,7 @@ class FILE extends API {
 	 */
 	public function files(){
 		// append file filter
+		$this->_filehandler = new FILEHANDLER();
 		$response['render'] = [
 		'content' => [
 				[
@@ -553,7 +550,7 @@ class FILE extends API {
 			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', 'files', 'external_documents')"],
 
 		];
-		foreach (FILEHANDLER::listDirectories(FILEHANDLER::directory('files_documents') ,'asc') as $folder){
+		foreach ($this->_filehandler->listDirectories($this->_filehandler->directory('files_documents') ,'asc') as $folder){
 			$folder = pathinfo($folder)['basename'];
 			$options[$folder] = $this->_requestedFolder === $folder ? ['checked' => true] : [];
 			$options[$folder]['onchange'] = "api.file('get', 'files', '" . $folder . "')";
@@ -573,18 +570,18 @@ class FILE extends API {
 			case null:
 			case 'null':
 				// add external files by default if no folder is requested
-				if ($external = $this->activeexternalfiles()) $files[FILEHANDLER::directory('external_documents')] = $external;
-				$folders = FILEHANDLER::listDirectories(FILEHANDLER::directory('files_documents') ,'asc');
+				if ($external = $this->activeexternalfiles()) $files[$this->_filehandler->directory('external_documents')] = $external;
+				$folders = $this->_filehandler->listDirectories($this->_filehandler->directory('files_documents') ,'asc');
 				foreach ($folders as $folder) {
-					$files[$folder] = FILEHANDLER::listFiles($folder ,'asc');
+					$files[$folder] = $this->_filehandler->listFiles($folder ,'asc');
 				}
 				break;
 			case 'external_documents':
-				if ($external = $this->activeexternalfiles()) $files[FILEHANDLER::directory('external_documents')] = $external;
+				if ($external = $this->activeexternalfiles()) $files[$this->_filehandler->directory('external_documents')] = $external;
 				break;
 			default:
-				$folder = FILEHANDLER::directory('files_documents', [':category' => $this->_requestedFolder]);
-				$files[$folder] = FILEHANDLER::listFiles($folder ,'asc');
+				$folder = $this->_filehandler->directory('files_documents', [':dir' => $this->_requestedFolder]);
+				$files[$folder] = $this->_filehandler->listFiles($folder ,'asc');
 		}
 
 		if ($files){
@@ -594,14 +591,14 @@ class FILE extends API {
 				foreach ($content as $file){
 					// distinguish between uploaded files and linked ressources
 					$fileinfo = pathinfo($file);
-					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
+					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => $this->_filehandler->getFileLink($file)];
 					else $file = ['name' => $file, 'path' => $file];
 
-					$matches[$file['name']] = FILEHANDLER::link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+					$matches[$file['name']] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 				}
 
 				// reassign displayed folder name
-				$folder = $folder === FILEHANDLER::directory('external_documents') ? $this->_lang->GET('file.external_file.folder') : pathinfo($folder)['filename'];
+				$folder = $folder === $this->_filehandler->directory('external_documents') ? $this->_lang->GET('file.external_file.folder') : pathinfo($folder)['filename'];
 				// append folder
 				$response['render']['content'][] =
 				[
@@ -655,16 +652,17 @@ class FILE extends API {
 	 * this is a cross-module method this class may be instatiated for
 	 */
 	public function filesearch($parameter = []){
+		$this->_filehandler = new FILEHANDLER();
 		$files = [];
-		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, FILEHANDLER::listFiles(FILEHANDLER::directory('sharepoint') ,'asc')); // sharepoint specified or all
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, $this->_filehandler->listFiles($this->_filehandler->directory('sharepoint') ,'asc')); // sharepoint specified or all
 		if (!isset($parameter['folder']) || !$parameter['folder'] || !in_array($parameter['folder'], ['sharepoint', 'external_documents'])){ // all if not specified
-			$folders = FILEHANDLER::listDirectories(FILEHANDLER::directory('files_documents') ,'asc');
+			$folders = $this->_filehandler->listDirectories($this->_filehandler->directory('files_documents') ,'asc');
 			foreach ($folders as $folder) {
-				$files = array_merge($files, FILEHANDLER::listFiles($folder ,'asc'));
+				$files = array_merge($files, $this->_filehandler->listFiles($folder ,'asc'));
 			}
 		}
 		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path')); // all
-		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = FILEHANDLER::listFiles(FILEHANDLER::directory('external_documents') ,'asc'); // external_document specified
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = $this->_filehandler->listFiles($this->_filehandler->directory('external_documents') ,'asc'); // external_document specified
 		
 		// return based on similarity if search is provided
 		// also converting the path
@@ -673,7 +671,7 @@ class FILE extends API {
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		foreach ($files as $file){
-			if (!$parameter['search'] || fnmatch('*' . $parameter['search'] . '*', pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
+			if (!$parameter['search'] || fnmatch('*' . $parameter['search'] . '*', pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = $this->_filehandler->getFileLink($file);
 		}
 		return $matches;
 	}
@@ -714,13 +712,12 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('file.sharepoint_upload_header')]) && $_FILES[$this->_lang->PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
-					$FILEHANDLER->storeUploadedFiles(
+					$this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('file.sharepoint_upload_header')
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('sharepoint')
+							'path' => $this->_filehandler->directory('sharepoint')
 						],
 						naming: [
 							'prefix' => $_SESSION['user']['name']
@@ -747,7 +744,7 @@ class FILE extends API {
 				]];
 
 				// gather sharepoint files
-				$files = FILEHANDLER::listFiles(FILEHANDLER::directory('sharepoint'),'asc');
+				$files = $this->_filehandler->listFiles($this->_filehandler->directory('sharepoint'),'asc');
 				$display = [];
 				if ($files){
 					foreach ($files as $file){
@@ -758,14 +755,14 @@ class FILE extends API {
 						// delete expired files
 						// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
 						if ((time() - $filetime) / 3600 > CONFIG['lifespan']['files']['sharepoint']) {
-							FILEHANDLER::delete($file['path']);
+							$this->_filehandler->delete($file['path']);
 						}
 						// add remaining files
 						else {
-							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
+							$file['path'] = $this->_filehandler->getFileLink($file['path']);
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['files']['sharepoint']*3600 - time()) / 3600, 1)]);
 
-							$display[$name] = FILEHANDLER::link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $name]);
+							$display[$name] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $name]);
 						}
 					}
 				}
@@ -817,35 +814,15 @@ class FILE extends API {
 	 * ensuring a requested file is accessed by a valid user since directories are restricted by default
 	 */
 	public function stream(){
-		$file = realpath('../' . implode('/', array_slice(REQUEST, 2)));
+		$file = '../' . implode('/', array_slice(REQUEST, 2));
 		if ($file){
 			// filter inactive external files
-			if (stristr($file, CONFIG['fileserver']['external_documents']) && !in_array('../' . substr($file, stripos($file, CONFIG['fileserver']['external_documents'])), $this->activeexternalfiles())) {
+			if (stristr($file, CONFIG['fileserver']['external_documents']) && !in_array(substr($file, stripos($file, CONFIG['fileserver']['external_documents'])), $this->activeexternalfiles())) {
 				http_response_code(410);
 				echo $this->_lang->GET('file.external_file.retired_success');
 				die();
 			}
-			switch (pathinfo($file)['extension']){
-				case 'stl':
-					$mime_type = 'model/stl';
-					break;
-				case 'obj':
-					$mime_type = 'model/obj';
-					break;
-				default:
-					$mime_type = mime_content_type($file);
-			}
-
-			header('Content-Type: '. $mime_type);
-			header('Content-Disposition: inline; filename=' . pathinfo($file)['basename']);
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Length: '.filesize($file));
-			ob_clean();
-			flush();
-			readfile($file);
-			exit;
+			$this->_filehandler->serve(($file));
 		}
 		http_response_code(410);
 		echo $this->_lang->GET('file.external_file.retired_success');

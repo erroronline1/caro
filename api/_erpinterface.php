@@ -304,7 +304,8 @@ class _ERPINTERFACE {
 					return $PDF->tablePDF($content);
 					break;
 				default:
-					$tempFile = FILEHANDLER::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+					$_filehandler = new FILEHANDLER();
+					$tempFile = $_filehandler->directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 					fputcsv($file, array_keys($result),
@@ -318,7 +319,7 @@ class _ERPINTERFACE {
 						CONFIG['csv']['dialect']['escape']);
 					}
 					fclose($file);
-					return (substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+					return ($_filehandlerdirectory('tmp') . '/' . pathinfo($tempFile)['basename']);
 
 					// OR USE INBUILT FUNCTION
 
@@ -646,7 +647,8 @@ class TEST extends _ERPINTERFACE {
 		if (!isset($queries[$key])) return null;
 		if ($params === null) return [];
 
-		return substr(FILEHANDLER::directory('tmp'), 1) . '/' . $queries[$key];
+		$_filehandler = new FILEHANDLER();
+		return substr($_filehandler->directory('tmp'), 1) . '/' . $queries[$key];
 		return [];
 	}
 

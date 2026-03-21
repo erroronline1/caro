@@ -43,7 +43,7 @@ $uploaded = $FILEHANDLER->saveToDatabase($_pdo,
 var_dump($uploaded);
 die();
 
-$files = FILEHANDLER::retrieveFromDatabase($_pdo, 'test')[0];
+$files = $FILEHANDLER->retrieveFromDatabase($_pdo, 'test')[0];
 /*ob_start();
 header("Content-type: application/octet-stream");
 header("Content-Disposition: attachment; filename=" . $files['name']);

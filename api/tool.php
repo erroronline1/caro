@@ -546,14 +546,13 @@ class TOOL extends API {
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.image.source')]) && $_FILES[$this->_lang->PROPERTY('tool.image.source')]['tmp_name'][0]) {
 					$response['render']['content'][] = [];
-					$FILEHANDLER = new FILEHANDLER();
 					$maxsize = explode(' x ', $size);
-					$images = $FILEHANDLER->storeUploadedFiles(
+					$images = $this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('tool.image.source')
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('tmp')
+							'path' => $this->_filehandler->directory('tmp')
 							// no overwriting of present files within temp dir
 						],
 						naming: [
@@ -562,7 +561,7 @@ class TOOL extends API {
 						imageoptions: [
 							'size' => isset ($maxsize[1]) ? max(intval($maxsize[0]), intval($maxsize[1])) : null,
 							'label' => $label ?: null,
-							'watermark' => $watermark ? '../' . CONFIG['application']['watermark'] : null
+							'watermark' => $watermark ? CONFIG['application']['watermark'] : null
 						]
 					);
 					foreach ($images as $image){
@@ -572,7 +571,7 @@ class TOOL extends API {
 							'description' => pathinfo($image)['basename'],
 							'attributes' => [
 								'name' => pathinfo($image)['basename'],
-								'url' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($image)['basename']
+								'url' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($image)['basename'])
 							],
 							'dimensions' => [
 								'width' => $dimensions[0],
@@ -641,11 +640,11 @@ class TOOL extends API {
 						$this->response($response);
 					}
 
-					$tempFile = FILEHANDLER::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
+					$tempFile = $this->_filehandler->directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
 					rename( $result['tmpfile'], $tempFile);
 					// provide downloadfile
 					$csv[pathinfo($tempFile)['basename']] = [
-						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'href' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($tempFile)['basename']),
 						'download' => pathinfo($tempFile)['basename']
 					];
 				}
@@ -801,9 +800,9 @@ class TOOL extends API {
 						for($i = 0; $i < $zip->numFiles; $i++) {
 							$filename = $zip->getNameIndex($i);
 							$fileinfo = pathinfo($filename);
-							copy('zip://' . $file . '#' . $filename, FILEHANDLER::directory('tmp') . '/' . $fileinfo['basename']);
+							copy('zip://' . $file . '#' . $filename, $this->_filehandler->directory('tmp') . '/' . $fileinfo['basename']);
 							$downloadfiles[$filename] = [
-								'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 3) . '/' . $fileinfo['basename'],
+								'href' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . $fileinfo['basename']),
 								'download' => $fileinfo['basename']
 							];
 						}							
@@ -820,14 +819,14 @@ class TOOL extends API {
 					$zipname = substr(preg_replace('/[^\w\.]/', '', $zipname), 0, 240);
 					// create zip
 					$zip = new \ZipArchive();
-					$zip->open(FILEHANDLER::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+					$zip->open($this->_filehandler->directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 					foreach ($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
 						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'][$index]);
 					}
 					$zip->close();
 
 					$downloadfiles[$zipname .'.zip'] = [
-						'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 3) . '/' . $zipname .'.zip',
+						'href' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . $zipname .'.zip'),
 						'download' => $zipname .'.zip'
 					];
 				}

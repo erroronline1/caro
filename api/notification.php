@@ -465,14 +465,14 @@ class NOTIFICATION extends API {
 									}
 									elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
 										// delete record attachments that begin with the identifier
-										if (file_exists(FILEHANDLER::directory('record_attachments'))){
+										if (file_exists($this->_filehandler->directory('record_attachments'))){
 											$delete = [];
 											$fileidentifier = preg_replace('/[^\w\d]/m', '', $row['identifier']);
-											foreach (glob(FILEHANDLER::directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
+											foreach (glob($this->_filehandler->directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
 												if($file == '.' || $file == '..') continue;
 												$delete[] = $file;
 											}
-											FILEHANDLER::delete($delete);
+											$this->_filehandler->delete($delete);
 										}
 										// prepare deletion
 										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
@@ -639,8 +639,8 @@ class NOTIFICATION extends API {
 						case 'delete_files_and_calendar':
 							// clear up folders with limited files lifespan
 							// clear up calendar entries marked as closed and for autodeletion
-							FILEHANDLER::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
-							FILEHANDLER::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
+							$this->_filehandler->tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
+							$this->_filehandler->tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
 
 							// delete order statistics
@@ -723,7 +723,7 @@ class NOTIFICATION extends API {
 							foreach ($vendors as $vendor){
 								if ($vendor['hidden']) continue;
 								// process vendor-documents
-								if ($docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_documents', [':id' => $vendor['id']]))) {
+								if ($docfiles = $this->_filehandler->listFiles($this->_filehandler->directory('vendor_documents', [':id' => $vendor['id']]))) {
 									$documents = [];
 									$considered = [];
 									foreach ($docfiles as $path){
@@ -765,7 +765,7 @@ class NOTIFICATION extends API {
 									}
 								}
 								// process product-documents
-								if ($docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_products', [':id' => $vendor['id']]))) {
+								if ($docfiles = $this->_filehandler->listFiles($this->_filehandler->directory('vendor_products', [':id' => $vendor['id']]))) {
 									$documents = [];
 									$considered = [];
 									foreach ($docfiles as $path){
@@ -1129,9 +1129,8 @@ class NOTIFICATION extends API {
 		$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$users = [];
 		foreach ($preUsers as $user){
-			$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image'], 'units' => $user['units']];
+			$users[$user['id']] = ['name' => $user['name'], 'units' => $user['units']];
 		}
-
 
 		foreach ($orders as $row) {
 			$order_data = json_decode($row['order_data'], true);

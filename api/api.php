@@ -68,6 +68,11 @@ class API {
 	public $_lang = null;
 
 	/**
+	 * make filehandler FILEHANDLER class and its methods available
+	 */
+	public $_filehandler = null;
+
+	/**
 	 * public preset of descendant classes property to ececute requested method as per REQUEST[1]
 	 */
 	public $_requestedMethod = null;
@@ -102,6 +107,9 @@ class API {
 						$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 						if ($dbsetup) $this->_pdo->exec($dbsetup);
 					}
+					break;
+				case '_filehandler':
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new FILEHANDLER($this->_pdo);
 					break;
 				case '_lang':
 					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new LANG();
@@ -257,7 +265,7 @@ class API {
 					$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
 					$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-					$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
+					$_SESSION['user']['image'] = $user['id'] > 1 ? $this->_filehandler->getFileLink($user['image']) : $user['image'];
 					// default primary unit if only one unit is assigned
 					if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 
@@ -559,7 +567,7 @@ class API {
 						$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
 						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-						$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
+						$_SESSION['user']['image'] = $user['id'] > 1 ? $this->_filehandler->getFileLink($user['image']) : $user['image'];
 						// default primary unit if only one unit is assigned
 						if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 					}
@@ -623,8 +631,8 @@ class API {
 	 */
 	public function requestLog($response = null){
 		foreach([
-			FILEHANDLER::directory('users'),
-			FILEHANDLER::directory('order_attachments'),
+			substr($this->_filehandler->directory('users'), 3),
+			substr($this->_filehandler->directory('order_attachments'), 3),
 			'notification/notif'
 		] as $excludePath){
 			if (stristr($_SERVER['PATH_INFO'], substr($excludePath, 3))) return 0;

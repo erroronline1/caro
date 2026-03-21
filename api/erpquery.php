@@ -136,7 +136,7 @@ class ERPQUERY extends API {
 					foreach($files[$case] as $attachment){
 //						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
 //						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => "javascript:void(0)", 'onclick' => "new _client.Dialog({type: 'preview', header: '".$attachment['filename']."', render: {type: 'dataurl', name: '".$attachment['filename']."', content: '".$attachment['url']."'}})"];
-						$attachments[$attachment['description'] . ' ' . $attachment['date']] = FILEHANDLER::link(['href' => $attachment['url'], 'download' => $attachment['filename']], $attachment['filename']);
+						$attachments[$attachment['description'] . ' ' . $attachment['date']] = $this->_filehandler->link(['href' => $attachment['url'], 'download' => $attachment['filename']], $attachment['filename']);
 					}
 
 					$casecontent[] = [
@@ -482,7 +482,7 @@ class ERPQUERY extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$result = ERPINTERFACE->customcsvdump($this->_requestedType, (array) $this->_payload);
-				if ($result === null ||  !$result) $this->response([
+				if ($result === null || !$result) $this->response([
 					'response' => [
 						'name' => false,
 						'msg' => $this->_lang->GET('erpquery.null'),
@@ -491,7 +491,7 @@ class ERPQUERY extends API {
 				
 				$resultinfo = pathinfo($result);
 				$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $resultinfo['basename']])] = [
-						'href' => './api/api.php/file/stream/' . substr($result, 1),
+						'href' => $this->_filehandler->getFileLink($result),
 						'download' => $resultinfo['basename']
 					];				
 				$this->response([
@@ -594,13 +594,12 @@ class ERPQUERY extends API {
 			case 'POST':
 				$upload = null;
 				$rename = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.upload.select'));
-				$FILEHANDLER = new FILEHANDLER();
-				if ($rename) $upload = $FILEHANDLER->storeUploadedFiles(
+				if ($rename) $upload = $this->_filehandler->storeUploadedFiles(
 					input: [
 						$this->_lang->PROPERTY('erpquery.upload.file')
 					],
 					destination: [
-						'path' => FILEHANDLER::directory('erp_documents')
+						'path' => $this->_filehandler->directory('erp_documents')
 					],
 					naming: [
 						'rename' => $rename

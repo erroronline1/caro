@@ -86,13 +86,12 @@ class AUDIT extends API {
 				// process content
 				// process files
 				foreach ($_FILES as $fileinput => $files){
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
-					if ($uploaded = $FILEHANDLER->storeUploadedFiles(
+					if ($uploaded = $this->_filehandler->storeUploadedFiles(
 						input: [
 							$fileinput
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('audit_attachments')
+							'path' => $this->_filehandler->directory('audit_attachments')
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])
@@ -100,8 +99,8 @@ class AUDIT extends API {
 					)){
 						for($i = 0; $i < count($files['name']); $i++){
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
-							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
+							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = $uploaded[$i];
+							else $audit[':content']['questions'][intval($set[1])]['files'] = [$uploaded[$i]];
 						}
 					}
 				}
@@ -332,11 +331,11 @@ class AUDIT extends API {
 							foreach ($preset['files'] as $file){
 								$fileinfo = pathinfo($file);
 								$file = [
-									'path' => substr($file, 1),
+									'path' => $file,
 									'name' => $fileinfo['basename'],
-									'link' => './api/api.php/file/stream/' . substr($file, 1)
+									'link' => $this->_filehandler->getFileLink($file)
 								];
-								$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+								$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -541,10 +540,10 @@ class AUDIT extends API {
 		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary') . '*';
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.checks_type.audits')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -627,12 +626,12 @@ class AUDIT extends API {
 					foreach ($question['files'] as $file){
 						$fileinfo = pathinfo($file);
 						$file = [
-							'path' => substr($file, 1),
+							'path' => $file,
 							'name' => $fileinfo['basename'],
-							'link' => './api/api.php/file/stream/' . substr($file, 1)
+							'link' => $this->_filehandler->getFileLink($file)
 						];
 
-						$link[$file['name']] = FILEHANDLER::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+						$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [
@@ -1313,7 +1312,7 @@ class AUDIT extends API {
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
 				if (preg_match('/^\.\.\//', $file['path'])){
-					$file['url'] = './api/api.php/file/stream/' . substr($file['path'], 1);
+					$file['url'] = $this->_filehandler->getFileLink($file['path']);
 				}
 				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $this->convertFromServerTime($file['activated'], true)]);
 				foreach (explode(',', $file['regulatory_context'] ? : '') as $context){
@@ -1375,10 +1374,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 
 		];
@@ -1657,10 +1656,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -1900,10 +1899,10 @@ class AUDIT extends API {
 		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary') . '*';
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.navigation.management_review')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -2144,10 +2143,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -2312,7 +2311,7 @@ class AUDIT extends API {
 		if ($files = $export->dump($tempFile, null, $format)){
 			foreach($files as $file){
 				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-					'href' => './api/api.php/file/stream/' . substr($file, 1),
+					'href' => $this->_filehandler->getFileLink($file),
 					'download' => pathinfo($file)['basename']
 				];
 			}
@@ -2529,7 +2528,7 @@ class AUDIT extends API {
 		$filename = $this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
 		if ($files = $export->dump($filename)){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $filename])] = [
-				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+				'href' => $this->_filehandler->getFileLink($files[0]),
 				'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
 			];
 		}
@@ -2597,7 +2596,7 @@ class AUDIT extends API {
 				foreach($recordcontent as $block){
 					if (isset($block['attachments'])) {
 						$block['attachments'] = json_decode($block['attachments'], true);
-						$files = array_merge($files, array_combine(array_map(Fn($f) => substr($f ,1), array_keys($block['attachments'])), array_map(Fn($f) => ['href' => './api/api.php/file/stream/' . substr($f ,1)], array_keys($block['attachments']))));
+						$files = array_merge($files, array_combine(array_map(Fn($f) => $f, array_keys($block['attachments'])), array_map(Fn($f) => ['href' => $this->_filehandler->getFileLink($f)], array_keys($block['attachments']))));
 					}
 				}
 
@@ -2680,10 +2679,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -2733,7 +2732,7 @@ class AUDIT extends API {
 			foreach ($files as $file){
 				foreach (explode(',', $file['regulatory_context']) as $context){
 					if (preg_match('/^\.\.\//', $file['path'])){
-						$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
+						$file['path'] = $this->_filehandler->getFileLink($file['path']);
 					}
 					$regulatory[$context][$file['path'] . ' (' . $file['activated'] . ')'] = ['href' => $file['path']];
 				}
@@ -2798,10 +2797,10 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -2977,10 +2976,10 @@ class AUDIT extends API {
 			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['htmlcontent']) ? $issue['htmlcontent'] : ' ';	
 		}
 		if (count($summary['content']) > 1){
-			$PDF = new PDF(CONFIG['pdf']['record']);
+			$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 			$file = $PDF->auditPDF($summary);
 			$downloadfiles[$this->_lang->GET('audit.risk_issues_none')] = [
-				'href' => './api/api.php/file/stream/' . $file,
+				'href' => $this->_filehandler->getFileLink($file),
 				'download' => pathinfo($file)['basename']
 			];
 		}
@@ -3077,7 +3076,7 @@ class AUDIT extends API {
 			if ($files = $export->dump($tempFile, null, $format)){
 				foreach($files as $file){
 					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-						'href' => './api/api.php/file/stream/' . substr($file, 1),
+						'href' => $this->_filehandler->getFileLink($file),
 						'download' => pathinfo($file)['basename']
 					];
 				}
@@ -3244,7 +3243,7 @@ class AUDIT extends API {
 					if ($row['file_path']) $content[count($content) - 1][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
+							$row['file_path'] => ['href' => $this->_filehandler->getFileLink($row['file_path'])]
 						]
 					];
 
@@ -3318,7 +3317,7 @@ class AUDIT extends API {
 					if ($row['experience_points']){
 						if (!isset($years[$year])) $years[$year] = ['xp' => 0, 'paths' => []];
 						$years[$year]['xp'] += $row['experience_points'];
-						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $this->convertFromServerTime($row['date'], true)] = ['href' => './api/api.php/file/stream/' . $row['file_path']];
+						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $this->convertFromServerTime($row['date'], true)] = ['href' => $this->_filehandler->getFileLink($row['file_path'])];
 					}
 				}
 				if ($years){
@@ -3374,10 +3373,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -3531,7 +3530,7 @@ class AUDIT extends API {
 					if ($row['file_path']) $content[count($content) - 1][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
+							$row['file_path'] => ['href' => $this->_filehandler->getFileLink($row['file_path'])]
 						]
 					];
 
@@ -3674,10 +3673,10 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 
@@ -3760,15 +3759,15 @@ class AUDIT extends API {
 			// gather documents
 			$documents = ['valid' => [], 'expired' => []];
 			if ($vendor['id']) {
-				$docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_documents', [':id' => $vendor['id']]));
+				$docfiles = $this->_filehandler->listFiles($this->_filehandler->directory('vendor_documents', [':id' => $vendor['id']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension
 					preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
 					if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
-						$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 					} else {
-						$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 					}
 				}
 			}
@@ -3824,10 +3823,10 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record']);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $file,
+			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
 		$body = [];

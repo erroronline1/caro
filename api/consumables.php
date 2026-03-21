@@ -186,7 +186,7 @@ class CONSUMABLES extends API {
 
 		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'])] = [
-				'href' => './api/api.php/file/stream/' . substr($files[0], 1),
+				'href' => $this->_filehandler->getFileLink($files[0]),
 				'download' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'
 			];
 		}
@@ -199,12 +199,12 @@ class CONSUMABLES extends API {
 				'columns' => $columns
 			]
 		];
-		$tempFile = FILEHANDLER::directory('tmp') . '/' . time() . $vendor['name'] . 'productlist_filefilter.txt';
+		$tempFile = $this->_filehandler->directory('tmp') . '/' . time() . $vendor['name'] . 'productlist_filefilter.txt';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, UTILITY::json_encode($filter, JSON_PRETTY_PRINT));
 		fclose($file);
 		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-			'href' => './api/api.php/file/stream/' . substr(FILEHANDLER::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+			'href' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($tempFile)['basename']),
 			'download' => pathinfo($tempFile)['basename']
 		];
 		$this->response([
@@ -371,14 +371,13 @@ class CONSUMABLES extends API {
 				// upload files for requested product if part of the documents
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
 					foreach ($_FILES as $input => $files){
-						$FILEHANDLER->storeUploadedFiles(
+						$this->_filehandler->storeUploadedFiles(
 							input: [
 								$input
 							],
 							destination: [
-								'path' => FILEHANDLER::directory('vendor_products', [':id' => $currentproduct['vendor_id']])
+								'path' => $this->_filehandler->directory('vendor_products', [':id' => $currentproduct['vendor_id']])
 							],
 							naming: [
 								'prefix' => $currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']
@@ -656,14 +655,13 @@ class CONSUMABLES extends API {
 				// upload files for requested product if part of the documents
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
 					foreach ($_FILES as $input => $files){
-						$FILEHANDLER->storeUploadedFiles(
+						$this->_filehandler->storeUploadedFiles(
 							input:[
 								$input
 							],
 							destination: [
-								FILEHANDLER::directory('vendor_products', [':id' => $currentproduct['vendor_id']])
+								$this->_filehandler->directory('vendor_products', [':id' => $currentproduct['vendor_id']])
 							],
 							naming: [
 								'prefix' => $currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']
@@ -897,13 +895,12 @@ class CONSUMABLES extends API {
 						$oneYearFromNow->modify('+1 year');
 						$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 						$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-						$FILEHANDLER = new FILEHANDLER($this->_pdo);
-						$FILEHANDLER->storeUploadedFiles(
+						$this->_filehandler->storeUploadedFiles(
 							input: [
 								$this->_lang->PROPERTY('consumables.product.documents_update')
 							],
 							destination: [
-								'path' => FILEHANDLER::directory('vendor_products', [':id' => $vendor['id']])
+								'path' => $this->_filehandler->directory('vendor_products', [':id' => $vendor['id']])
 							],
 							naming: [ 
 								'prefix' => $vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']
@@ -1008,13 +1005,12 @@ class CONSUMABLES extends API {
 					$oneYearFromNow->modify('+1 year');
 					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
-					$FILEHANDLER->storeUploadedFiles(
+					$this->_filehandler->storeUploadedFiles(
 						input: [
 							$this->_lang->PROPERTY('consumables.product.documents_update')
 						],
 						destination: [
-							'path' => FILEHANDLER::directory('vendor_products', [':id' => $vendor['id']])
+							'path' => $this->_filehandler->directory('vendor_products', [':id' => $vendor['id']])
 						],
 						naming: [
 							'prefix' => $vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']
@@ -1213,7 +1209,7 @@ class CONSUMABLES extends API {
 
 				// gather documents
 				$documents = ['valid' => [], 'expired' => []];
-				$docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_products', [':id' => $product['vendor_id']]));
+				$docfiles = $this->_filehandler->listFiles($this->_filehandler->directory('vendor_products', [':id' => $product['vendor_id']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
@@ -1222,9 +1218,9 @@ class CONSUMABLES extends API {
 						// match expiry date in Vendor_{uploaddate}-{expirydate}_articlenumber_filename.extension
  						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file['basename'], $fileNameComponents);
 						if (isset($fileNameComponents[3]) && $fileNameComponents[3] > $this->_date['servertime']->format('Ymd')) {
-							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 						} else {
-							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 						}
 					}
 				}
@@ -2711,14 +2707,13 @@ class CONSUMABLES extends API {
 					}
 
 					// save documents after creating database entry providing id
-					$FILEHANDLER = new FILEHANDLER($this->_pdo);
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-						$FILEHANDLER->storeUploadedFiles(
+						$this->_filehandler->storeUploadedFiles(
 							input: [
 								$this->_lang->PROPERTY('consumables.vendor.documents_update')
 							],
 							destination: [
-								'path' => FILEHANDLER::directory('vendor_documents', [':id' => $vendor[':id']])
+								'path' => $this->_filehandler->directory('vendor_documents', [':id' => $vendor[':id']])
 							], 
 							naming: [
 								'prefix' => $vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry
@@ -2729,12 +2724,12 @@ class CONSUMABLES extends API {
 					// remaining files are possibly from evaluation
 					if ($_FILES) {
 						foreach ($_FILES as $input => $files){
-							$FILEHANDLER->storeUploadedFiles(
+							$this->_filehandler->storeUploadedFiles(
 								input: [
 									$input
 								],
 								destination: [
-									'path' => FILEHANDLER::directory('vendor_documents', [':id' => $vendor[':id']])
+									'path' => $this->_filehandler->directory('vendor_documents', [':id' => $vendor[':id']])
 								],
 								naming: [
 									'prefix' => $vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry
@@ -2806,15 +2801,15 @@ class CONSUMABLES extends API {
 				$documents = ['valid' => [], 'expired' => []];
 				$considered = [];
 				if ($vendor['id']) {
-					$docfiles = FILEHANDLER::listFiles(FILEHANDLER::directory('vendor_documents', [':id' => $vendor['id']]));
+					$docfiles = $this->_filehandler->listFiles($this->_filehandler->directory('vendor_documents', [':id' => $vendor['id']]));
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
 						// match expiry date in {vendor}_{uploaddate}-{expirydate}_{filename_with_extension}
 						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file['basename'], $fileNameComponents);
 						if (isset($fileNameComponents[3]) && $fileNameComponents[3] > $this->_date['servertime']->format('Ymd')) {
-							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 						} else {
-							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => $this->_filehandler->getFileLink($path)];
 							if (isset($fileNameComponents[4]) && !in_array($fileNameComponents[4], $considered)) $considered[] = $fileNameComponents[4];
 						}
 					}

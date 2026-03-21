@@ -11,13 +11,15 @@
 
 namespace CARO\API;
 require_once('../vendor/TCPDF/tcpdf.php');
+require_once('./_filehandler.php');
 
 class PDF{
 	private $_setup = [];
 	private $_pdf = null;
+	public $_pdo = null;
 
-	public function __construct($setup){
-		error_reporting(0);
+	public function __construct($setup, $pdo = null){
+		error_reporting(E_ALL ^ E_DEPRECATED);
 		$this->_setup = [
 			'format' => $setup['format'] ?? 'A4',
 			'unit' => $setup['unit'] ?? PDF_UNIT,
@@ -42,6 +44,7 @@ class PDF{
 		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
 			$this->_setup['format'] = [$customsetup[0], $customsetup[1]];
 		}
+		$this->_pdo = $pdo;
 	}
 
 	private function init($content){
@@ -82,8 +85,9 @@ class PDF{
 		$this->_pdf->lastPage();
 		$this->_pdf->setProtection(['modify'], '', null, 1);
 
-		$this->_pdf->Output(__DIR__ . '/' . FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		$_filehandler = new FILEHANDLER();
+		$this->_pdf->Output(__DIR__ . '/' . $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf';
 	}
 
 	public function auditPDF($content){
@@ -91,7 +95,8 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN();
+		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		
@@ -109,7 +114,7 @@ class PDF{
 			}
 
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value, true), 0, 1, 0, true, '', true);
+			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
 			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -119,9 +124,11 @@ class PDF{
 			$_lang = new LANG();
 			foreach($content['files'] as $file){
 				// file attachment
+				$_filehandler->serve($file, false);
+
 				$this->_pdf->MultiCell(140, 4, $file, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 				// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $file));
+				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $file));
 			}
 		}
 
@@ -133,7 +140,8 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN();
+		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
 
@@ -186,14 +194,16 @@ class PDF{
 						break;
 					case 'markdown':
 						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value['value'], true), 0, 1, 0, true, '', true);
+						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value['value'], true), 0, 1, 0, true, '', true);
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
 						if (isset($content['images'][$document]) && in_array($value['value'], $content['images'][$document])) {
-							$value['value'] = str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
+							$value['value'] = '.' . str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
+							$_filehandler->serve($value['value']); // make available
+							
 							$imagedata = pathinfo($value['value']);
-							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
+							list($img_width, $img_height, $img_type, $img_attr) = getimagesize($value['value']);
 							$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
 							$outputsize = [
 								'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
@@ -201,7 +211,7 @@ class PDF{
 							];
 							$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 							$this->_pdf->MultiCell(50, $this->_setup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, $this->_pdf->GetY() + $nameLines * 5, true, 0, false, true, 0, 'T', false);
-							$this->_pdf->Image('.' . $value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+							$this->_pdf->Image($value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
 							$this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
 						}
 						break;
@@ -273,7 +283,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 1, 5, 1);
-		$markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN();
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
@@ -295,7 +305,7 @@ class PDF{
 				}
 
 				// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value, true), 0, 1, 0, true, '', true);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
 				//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -342,10 +352,18 @@ class PDF{
 
 	public function recordsPDF($content){
 		$_lang = new LANG();
+		$_filehandler = new FILEHANDLER($this->_pdo);
 		// create a pdf for a record summary
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
+
+		// prepare files
+		foreach($content['attachments'] as $document => $attachments){
+			foreach ($attachments as $file){
+				$_filehandler->serve($file, false);
+			}
+		}
 
 		if ($content['erp_case_number']){
 			// name column
@@ -386,25 +404,25 @@ class PDF{
 						$possibleFiles = explode(', ', $link[1]);
 						if (isset($content['attachments'][$document]) && array_intersect($possibleFiles, $content['attachments'][$document])){
 							foreach($possibleFiles as $filename){
-								$path = substr(FILEHANDLER::directory('record_attachments'), 1) . '/' . $filename;
+								$path = $_filehandler->directory('record_attachments') . '/' . $filename;
 								$file = pathinfo($path);
 								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 									// inline image embedding
 									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-									list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $path);
+									list($img_width, $img_height, $img_type, $img_attr) = getimagesize($path);
 									$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
 									$outputsize = [
 										'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
 										'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
 									];
-									$this->_pdf->Image('.' . $path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+									$this->_pdf->Image($path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
 									$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
 								}
 								else {
 									// file attachment
 									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 									// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-									$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $path));
+									$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $path));
 								}	
 							}
 						}
@@ -414,8 +432,8 @@ class PDF{
 				}
 				elseif (str_starts_with($values, '::MARKDOWN::')){
 					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
-					$markdown = new MARKDOWN();
-					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->md2html(substr($values, 12), true), 0, 1, 0, true, '', true);
+					$_markdown = new MARKDOWN();
+					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html(substr($values, 12), true), 0, 1, 0, true, '', true);
 				}
 				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
@@ -533,11 +551,11 @@ class RECORDTCPDF extends \TCPDF {
 		$right_margin = 0;
 		if ($image = $this->_setup['header_image']){
 			// given the image will always be 20mm high
-			list($width, $height, $type, $attr) = getimagesize('../' . $image);
+			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				$right_margin = $width * 20 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageWidth() - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$this->Image($image, $this->getPageWidth() - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
 				$right_margin += 5;
 			}
 		}
@@ -570,12 +588,12 @@ class RECORDTCPDF extends \TCPDF {
 		$this->SetY(-15);
 		$imageMargin = 0;
 		if ($image = $this->_setup['footer_image']){
-			list($width, $height, $type, $attr) = getimagesize('../' . $image);
+			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
 				$imageMargin = $width * 10 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageWidth() - 10 - $imageMargin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$this->Image($image, $this->getPageWidth() - 10 - $imageMargin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
 				$imageMargin += 5;
 			}
 		}
