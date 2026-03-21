@@ -712,24 +712,24 @@ class SQLQUERY {
 
 
 		'media_post' => [
-			'mysql' => "INSERT INTO caro_media (id, context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (NULL, :context, :name, :mime_type, :content, :upload_date, :expiry_date, :metadata)",
-			'sqlsrv' => "INSERT INTO caro_media (context, name, mime_type, content, upload_date, expiry_date, metadata) VALUES (:context, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(datetime, :upload_date, 120), CONVERT(datetime, :expiry_date, 120), :metadata)"
+			'mysql' => "INSERT INTO caro_media (id, path, name, mime_type, content, upload_date) VALUES (NULL, :path, :name, :mime_type, :content, :upload_date)",
+			'sqlsrv' => "INSERT INTO caro_media (path, name, mime_type, content, upload_date) VALUES (:path, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(datetime, :upload_date, 120))"
 		],
-		'media_put' => [
-			'mysql' => "UPDATE caro_media SET expiry_date = :expiry_date, metadata = :metadata WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_media SET expiry_date = CONVERT(datetime, :expiry_date, 120), metadata = :metadata WHERE id = :id"
+		'media_get_path_contents' => [
+			'mysql' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE path = :path",
+			'sqlsrv' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE path = :path"
 		],
-		'media_get_info_by_name_and_context' => [
-			'mysql' => "SELECT id, name, metadata FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%', :extension)",
-			'sqlsrv' => "SELECT id, name, metadata FROM caro_media WHERE context = :context AND name LIKE CONCAT(:name, '%', :extension)"
+		'media_get_file_info' => [
+			'mysql' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE CONCAT(path, '/', name) = :path",
+			'sqlsrv' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE CONCAT(path, '/', name) = :path"
 		],
-		'media_get_by_name_and_context' => [
-			'mysql' => "SELECT * FROM caro_media WHERE context = :context AND name IN (:names)",
-			'sqlsrv' => "SELECT * FROM caro_media WHERE context = :context AND name IN (:names)"
+		'media_get_file' => [
+			'mysql' => "SELECT * FROM caro_media WHERE CONCAT(path, '/', name) = :path",
+			'sqlsrv' => "SELECT * FROM caro_media WHERE CONCAT(path, '/', name) = :path"
 		],
 		'media_delete' => [
-			'mysql' => "DELETE FROM caro_media WHERE context = :context AND name IN (:names)",
-			'sqlsrv' => "DELETE FROM caro_media WHERE context = :context AND name IN (:names)"
+			'mysql' => "DELETE FROM caro_media WHERE path = :path AND name IN (:names)",
+			'sqlsrv' => "DELETE FROM caro_media WHERE path = :path AND name IN (:names)"
 		],
 
 
