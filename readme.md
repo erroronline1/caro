@@ -33,9 +33,9 @@ Things are still in motion. Images may be outdated.
 * records
     * assignable unit to override automatic "detection"
 * reconsider storing files in media database for backup reasons? performance may be not that important after all
-    * except non critical profile pictures, sharepoint, tmp, order attachments
-    * process returned hash file binary strings for blockchain
     * ~~longblob in mariadb~~ apache file handling 'corrupts' stl files, but not pdf, images, nor obj?
+	* implement cleaning up in cron in case of database strategy
+    * check file hashing for record validation
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 
 ## Content
@@ -1821,7 +1821,7 @@ If provided, the query returns employees having birthday in a passed timespan, t
 * if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor)
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
-* provided data dumps are accessible via `FILEHANDLER::directory('erp_documents') . '/intended_name.csv'`
+* provided data dumps are accessible via `new FILEHANDLER()->directory('erp_documents') . '/intended_name.csv'`
 * custom csv dumps are recommended to be created with the `TABLE`-class (api/_table.php) and `PDF(CONFIG['pdf']['table'])`
 
 `UTILITY`-methods can be found in api/_utility.php.
@@ -2045,6 +2045,7 @@ If you are going to prepare the deployment you are free to create multiple files
 
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
+* Decide for a fileserver strategy. Available options are `database` or `fileserver`, depending on availability of storage solutions.
 * [Customize](#customisation) your appropriate language-files (language.XX.env/.json and manual templates)
 * *optional:* provide and customize icons to be displayed on [response-popups](#user-acceptance-considerations).
 * Select an installation password for the system user.
@@ -2101,7 +2102,7 @@ issue_mail = "issues@companymail.tld" ; address for application and security iss
 order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 require_record_type_selection = yes ; yes, no; require selection on records e.g. if this is related to a complaint 
-watermark = "media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
+watermark = "../media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo, leading ../ for relative position to api directory, or rather application root 
 
 [calendar]
 timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server site; append tz time zones to your customs, selectable within user settings
@@ -2268,19 +2269,19 @@ label[footer] = no
 ; page settings for record pdf
 [pdf]
 record[format] = 'A4'
-record[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
-record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
+record[header_image] = "../media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo, leading ../ for relative position to api directory, or rather application root 
+record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo, leading ../ for relative position to api directory, or rather application root 
 record[exportimage_maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 
 table[format] = 'A4'
-table[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
-table[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
+table[header_image] = "../media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo, leading ../ for relative position to api directory, or rather application root 
+table[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo, leading ../ for relative position to api directory, or rather application root 
 table[orientation] = "landscape" ; portrait or landscape
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
-appointment[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
-appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
+appointment[header_image] = "../media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo, leading ../ for relative position to api directory, or rather application root 
+appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo, leading ../ for relative position to api directory, or rather application root 
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10
 ```
@@ -2335,6 +2336,10 @@ There may be the need for a somewhat advanced computer enthusiast for:
 * setting up one-time automated approvals within the [_stresstest](#stress-test-and-performance)
 
 You can try to get your hands dirty on diving into the sourcecode as well, most of the other functions should work out of the box though.
+
+### Fileserver strategy
+Depending on available storage solutions and backup strategies you can decide whether to store record files in the filesystem or the database. The strategy has to be chosen on installation and should not be changed afterwards to avoid data loss.  
+The directory structure within the `fileserver`-directory stays the same, for database stored files will be converted into local files temporarily to improve caching.
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.

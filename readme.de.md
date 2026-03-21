@@ -1723,7 +1723,7 @@ Sofern verfügbar, beantwortet diese Methode mit einer Liste von Mitarbeitern di
 * für die Verarbeitung von regelmäßig breitgestellten CSV-Exporte kann der [CSV Prozessor](#csv-prozessor) hilfreich sein
 * falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
 * für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
-* bereitgestellte Datendateien finden sich unter `FILEHANDLER::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
+* bereitgestellte Datendateien finden sich unter ` new FILEHANDLER()->directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
 * angepasste Datenbankauszüge sollten bevorzugt mit der `TABLE`-Klasse (api/_table.php) und `PDF(CONFIG['pdf']['table'])` erstellt werden
 
 `UTILITY`-Methoden finden sich in api/_utility.php.
@@ -1947,6 +1947,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
+* Entscheidung über die Speicherstrategie. Verfügbare Optionen sind `database` oder `fileserver`, abhängig von der Verfügbarkeit von Speicherlösungen.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und Manual-Vorlagen)
 * Bereitstellung und Anpassung von Bildern, die auf [Antwort-PopUps](#erwägungen-zur-nutzerakzeptanz) angezeigt werden.
 * Auswahl eines Installationskennworts für die Systemnutzerin.
@@ -2003,7 +2004,7 @@ issue_mail = "issues@companymail.tld" ; Kontaktadresse für Meldungen in Bezug a
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
 order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
 require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
-watermark = "media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
+watermark = "../media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
 
 [calendar]
 timezones[europeberlin] = "Europe/Berlin" ; der erste Eintrag muss der Serverstandort sein; um weitere tz Zeitzonen je nach Standorten ergänzen, in den Profileinstellungen wählbar
@@ -2170,19 +2171,19 @@ label[footer] = no
 ; Seiteneinstellungen für PDF-Aufzeichnungen
 [pdf]
 record[format] = 'A4'
-record[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
-record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+record[header_image] = "../media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
+record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
 record[exportimage_maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
 
 table[format] = 'A4'
-table[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
-table[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+table[header_image] = "../media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
+table[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
 table[orientation] = "landscape" ; portrait or landscape
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
-appointment[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
-appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+appointment[header_image] = "../media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
+appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo, angeführt von ../ für eine relative Platzierung zum API-Verzeichnis, beziehungsweise im Stammverzeichnis
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10
 ```
@@ -2237,6 +2238,10 @@ Es benötigt vermutlich eine einigermaßen fortgeschrittene computerbegeisterte 
 * die Konfiguration von einmalig automatisierten Freigaben innerhalb des _stresstest-Werkzeugs (siehe englischsprachige Anleitung)
 
 Man kann sich auch die Hände beim Eintauchen in den Quelltext schmutzig machen, aber alle anderen Funktionen sollten direkt funktionieren.
+
+### Speicherstrategie
+Abhängig von verfügbaren Speicherlösungen und Backup-Strategien kann entschieden werden, ob Dateien von Aufzeichnungen im Dateisystem oder der Datenbank gespeichert werden sollen. Die Strategie muss bei der Installation festgelegt werden und sollte anschließend nicht geändert werden um Datenverlust zu vermeiden.  
+Die Verzeichnisstruktur innerhalb des `fileserver`-Verzeichnisses bleibt die gleiche, da Daten aus der Datenbank vorübergehend in lokale Dateien verwandelt werden im Caching zu verbessern.
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
