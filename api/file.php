@@ -78,7 +78,7 @@ class FILE extends API {
 					foreach ($files as $file){
 						$insertions[] = [
 							':author' => $_SESSION['user']['name'],
-							':path' => $file
+							':path' => $file['path']
 						];
 					}
 

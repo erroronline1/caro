@@ -1690,11 +1690,11 @@ class ORDER extends API {
 		}
 		// sanitize array for empty values
 		foreach ($attachments as $key => $value){
-			if (!$value) unset($attachments[$key]);
+			if (!$value['path']) unset($attachments[$key]);
 		}
 		$existingattachments = UTILITY::propertySet($this->_payload, 'existingattachments') ? : '';
 		if ($attachments || $existingattachments) {
-			$order_data['attachments'] = trim(implode(',', array_merge($attachments, explode(',', $existingattachments))), ',');
+			$order_data['attachments'] = trim(implode(',', array_merge(array_column($attachments, 'path'), explode(',', $existingattachments))), ',');
 			unset ($this->_payload->existingattachments);
 		}
 

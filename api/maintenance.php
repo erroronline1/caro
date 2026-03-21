@@ -795,7 +795,7 @@ class MAINTENANCE extends API {
 							'rename' => $_SESSION['user']['id'] . 'vendorupdate'
 						]
 					);
-					$json = file_get_contents($file[0]);
+					$json = file_get_contents($file[0]['path']);
 					$json = json_decode($json, true);
 					if (!$json)	{
 						$response['response'] = [

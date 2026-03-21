@@ -128,7 +128,7 @@ class USER extends API {
 						imageoptions: [
 							'size' => CONFIG['limits']['image']['profile']
 						]
-					)[0];
+					)[0]['path'];
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
 					if ($user[':image'] && $user[':id'] > 1) $this->_filehandler->delete($user[':image']);
@@ -146,7 +146,7 @@ class USER extends API {
 						imageoptions: [
 							'size' => CONFIG['limits']['image']['profile']
 						]
-					)[0];
+					)[0]['path'];
 				}
 				// process settings
 				$user[':app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.force_desktop'));
@@ -858,7 +858,7 @@ class USER extends API {
 						imageoptions: [
 							'size' => CONFIG['limits']['image']['profile']
 						]
-					)[0];
+					)[0]['path'];
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_image')]) && $_FILES[$this->_lang->PROPERTY('user.take_image')]['tmp_name']) {
 					if ($user[':image'] && $user[':id'] > 1) $this->_filehandler->delete($user[':image']);
@@ -875,7 +875,7 @@ class USER extends API {
 						imageoptions: [
 							'size' => CONFIG['limits']['image']['profile']
 						]
-					)[0];
+					)[0]['path'];
 				}
 
 				// insert user into database
@@ -1457,7 +1457,7 @@ class USER extends API {
 						$training[':user_id'] = $user['id'];
 						// upload files only if date is set
 						if ($training[':date'] && isset($_FILES[$this->_lang->PROPERTY('user.training.add_document')]) && $_FILES[$this->_lang->PROPERTY('user.training.add_document')]['tmp_name']) {
-							$training[':file_path'] = substr($this->_filehandler->storeUploadedFiles(
+							$training[':file_path'] = $this->_filehandler->storeUploadedFiles(
 								input: [
 									$this->_lang->PROPERTY('user.training.add_document')
 								],
@@ -1468,7 +1468,7 @@ class USER extends API {
 									'prefix' => $user['id'] . '_' . $user['name'],
 									'rename' => $training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']
 								]
-							)[0], 1);
+							)[0]['path'];
 						}
 						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 							'values' => $training

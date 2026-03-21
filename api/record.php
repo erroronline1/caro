@@ -1003,23 +1003,23 @@ class RECORD extends API {
 					)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
-								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = substr($uploaded[$i], 1);
-								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
+								if (isset($attachments[$fileinput])) $attachments[$fileinput][] = $uploaded[$i];
+								else $attachments[$fileinput] = [$uploaded[$i]];
 							}
 						}
 						else {
-							$attachments[$fileinput] = [substr($uploaded[0], 1)];
+							$attachments[$fileinput] = [$uploaded[0]];
 						}
 					}
 				}
 				$secureattachments = [];
 				foreach ($attachments as $input => $files){
 					// store file paths to input as value 
-					$this->_payload->$input = implode(', ', $files);
+					$this->_payload->$input = implode(', ', array_column($files, 'path'));
 					
 					// create array of files with hash to hamper tampering, appended to record for verification
 					foreach($files as $file){
-						$secureattachments['.' . $file] = hash_file('sha256', '.' . $file);
+						$secureattachments[$file['path']] = $file['hash'];
 					}
 				}
 				

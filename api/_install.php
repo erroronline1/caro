@@ -1394,8 +1394,7 @@ class INSTALL {
 					],
 					imageoptions: [
 						'size' => CONFIG['limits']['image']['profile'] 
-					])[0];
-				$entry['image'] = substr($entry['image'], 3);
+					])[0]['path'];
 
 				// gather timesheet setup
 				$entry['app_settings']['annualvacation'] = $this->_currentdate->format('Y-m-d'). '; 30';

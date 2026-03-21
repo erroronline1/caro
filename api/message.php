@@ -710,8 +710,8 @@ class MESSAGE extends API {
 							]
 						) as $file){
 							$paths[pathinfo($file)['basename']] = [
-								'href' => $this->_filehandler->getFileLink($file),
-								'download' => pathinfo($file)['basename']
+								'href' => $this->_filehandler->getFileLink($file['path']),
+								'download' => pathinfo($file['path'])['basename']
 							];
 						}
 						$this->response([

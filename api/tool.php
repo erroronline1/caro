@@ -565,13 +565,13 @@ class TOOL extends API {
 						]
 					);
 					foreach ($images as $image){
-						$dimensions = getimagesize($image);
+						$dimensions = getimagesize($image['path']);
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',
-							'description' => pathinfo($image)['basename'],
+							'description' => pathinfo($image['path'])['basename'],
 							'attributes' => [
-								'name' => pathinfo($image)['basename'],
-								'url' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($image)['basename'])
+								'name' => pathinfo($image['path'])['basename'],
+								'url' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($image['path'])['basename'])
 							],
 							'dimensions' => [
 								'width' => $dimensions[0],

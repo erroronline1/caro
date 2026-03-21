@@ -726,11 +726,11 @@ class DOCUMENT extends API {
 							]
 						);
 						$uploaded_files = [];
-						foreach ($uploads as $path){
+						foreach ($uploads as $file){
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
-							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
-							$uploaded_files[$filename] = $path;
+							$filename = implode('_', array_slice(explode('_', pathinfo($file)['path']['basename']) , 2));
+							$uploaded_files[$filename] = $file['path'];
 						}
 						function replace_images($FILEHANDLER, $element, $uploaded_filearray){
 							$result = [];

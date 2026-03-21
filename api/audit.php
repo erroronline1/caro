@@ -99,8 +99,8 @@ class AUDIT extends API {
 					)){
 						for($i = 0; $i < count($files['name']); $i++){
 							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = $uploaded[$i];
-							else $audit[':content']['questions'][intval($set[1])]['files'] = [$uploaded[$i]];
+							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = $uploaded[$i]['path'];
+							else $audit[':content']['questions'][intval($set[1])]['files'] = [$uploaded[$i]['path']];
 						}
 					}
 				}
