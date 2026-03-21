@@ -2584,7 +2584,7 @@ class AUDIT extends API {
 			else {
 				$report = '';
 				$recordcontent = json_decode($case['content'], true);
-				foreach(BLOCKCHAIN::verified($recordcontent, true) as $block){
+				foreach(BLOCKCHAIN::verified($this->_pdo, $recordcontent, true) as $block){
 					foreach($block as $key => $value){
 						if ($key === 'verification') continue;
 						$report .= $key . ': ' . $value . "  \n";
@@ -2601,10 +2601,50 @@ class AUDIT extends API {
 				}
 
 				// include code for verification into output
+				$code = '';
+				// first upload and initial hashing
+				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\FILEHANDLER::storeUploadedFiles');
+				$reflector_start = $reflector->getStartLine() - 1;
+				$reflector_end = $reflector->getEndLine() - 1;
+				$code .= $reflector->__toString() . "\n";
+				foreach(file('_filehandler.php') as $line => $codeline){
+					if ($line < $reflector_start) continue;
+					if ($line > $reflector_end) break;
+					$code .= substr($codeline, 1); // strip initial tab
+				}
+				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\FILEHANDLER::saveToFilesystem');
+				$reflector_start = $reflector->getStartLine() - 1;
+				$reflector_end = $reflector->getEndLine() - 1;
+				$code .= $reflector->__toString() . "\n";
+				foreach(file('_filehandler.php') as $line => $codeline){
+					if ($line < $reflector_start) continue;
+					if ($line > $reflector_end) break;
+					$code .= substr($codeline, 1); // strip initial tab
+				}
+				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\FILEHANDLER::saveToDatabase');
+				$reflector_start = $reflector->getStartLine() - 1;
+				$reflector_end = $reflector->getEndLine() - 1;
+				$code .= $reflector->__toString() . "\n";
+				foreach(file('_filehandler.php') as $line => $codeline){
+					if ($line < $reflector_start) continue;
+					if ($line > $reflector_end) break;
+					$code .= substr($codeline, 1); // strip initial tab
+				}
+				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\FILEHANDLER::enumerate');
+				$reflector_start = $reflector->getStartLine() - 1;
+				$reflector_end = $reflector->getEndLine() - 1;
+				$code .= $reflector->__toString() . "\n";
+				foreach(file('_filehandler.php') as $line => $codeline){
+					if ($line < $reflector_start) continue;
+					if ($line > $reflector_end) break;
+					$code .= substr($codeline, 1); // strip initial tab
+				}
+
+				// then blockchain verification
 				$reflector = \ReflectionMethod::createFromMethodName('CARO\API\BLOCKCHAIN::verified');
 				$reflector_start = $reflector->getStartLine() - 1;
 				$reflector_end = $reflector->getEndLine() - 1;
-				$code = $reflector->__toString() . "\n";
+				$code .= $reflector->__toString() . "\n";
 
 				foreach(file('_utility.php') as $line => $codeline){
 					if ($line < $reflector_start) continue;
@@ -2617,7 +2657,7 @@ class AUDIT extends API {
 						'type' => 'textsection',
 						'attributes' => [
 							'data-type' => 'certificate',
-							'name' => BLOCKCHAIN::verified($recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
+							'name' => BLOCKCHAIN::verified($this->_pdo, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
 						],
 						'htmlcontent' => $this->_markdown->md2html($report)
 					]
@@ -2674,7 +2714,7 @@ class AUDIT extends API {
 					$summary['files'] = array_keys($item['content']);
 					break;
 				case 'code':
-					$summary['content'][$item['attributes']['name']] = $item['attributes']['value'];	
+					$summary['content'][$item['attributes']['name']] = '::CODE::' . $item['attributes']['value'];	
 					break;
 			}
 		}
