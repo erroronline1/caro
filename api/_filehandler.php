@@ -689,24 +689,20 @@ class FILEHANDLER{
 				// resanitze filename just to be sure
 				$file['filename'] = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $file['filename']);
 
-				// process current file and expect a full path
-				$targets[] = [
-					'hash' => hash_file('sha256', $_FILES[$inputname]['tmp_name'][$j]),
-					// MUST BE HASHED BEFORE, OTHERWISE TEMPFILE IS CONSUMED
-					'path' => self::isInFilesystem($destination['path'])
-						? $this->saveToFilesystem(
-							tmpname: $_FILES[$inputname]['tmp_name'][$j],
-							destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
-							replace: $destination['replace'] ?? null,
-							imageoptions: $imageoptions)
-						: $this->saveToDatabase(
-							$this->_pdo,
-							tmpname: $_FILES[$inputname]['tmp_name'][$j],
-							destination: $destination['path'],
-							filename: $file['filename'] . '.' . $file['extension'],
-							mime_type: $_FILES[$inputname]['type'][$j],
-							imageoptions: $imageoptions)
-				];
+				// process current file and expect a full path and hash
+				$targets[] = self::isInFilesystem($destination['path'])
+					? $this->saveToFilesystem(
+						tmpname: $_FILES[$inputname]['tmp_name'][$j],
+						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						replace: $destination['replace'] ?? null,
+						imageoptions: $imageoptions)
+					: $this->saveToDatabase(
+						$this->_pdo,
+						tmpname: $_FILES[$inputname]['tmp_name'][$j],
+						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						mime_type: $_FILES[$inputname]['type'][$j],
+						imageoptions: $imageoptions)
+				;
 			}
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
@@ -734,7 +730,10 @@ class FILEHANDLER{
 				if (stristr($file['filename'], 'CAROsignature')) $imageoptions['size'] = CONFIG['limits']['image']['signature']; 
 				self::alterImage($destination, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_REPLACE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')));
 			}
-			return $destination;
+			return [
+				'path' => $destination,
+				'hash' => hash_file('sha256', $destination)
+			];
 		}
 	}
 	/**
@@ -747,15 +746,15 @@ class FILEHANDLER{
 	 * 
 	 * @return string filename, occasionally enumerated
 	 */
-	public function saveToDatabase($_pdo, $tmpname, $destination, $filename, $mime_type, $imageoptions = []){
-		$file = pathinfo($filename);
+	public function saveToDatabase($_pdo, $tmpname, $destination, $mime_type, $imageoptions = []){
+		$file = pathinfo($destination);
 		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_path_contents', [
 			'values' => [
 				':path' => $destination
 			]
 		]);
 		
-		$filename = self::enumerate($filename, array_column($present, 'name'));
+		$filename = self::enumerate($file['basename'], array_column($present, 'name'));
 		$fileHandle = fopen($tmpname, 'rb');
 		$fileContents = fread($fileHandle, filesize($tmpname));
     	fclose($fileHandle);
@@ -769,13 +768,16 @@ class FILEHANDLER{
 
 		if (SQLQUERY::EXECUTE($_pdo, 'media_post', [
 			'values' => [
-				':path' => $destination,
+				':path' => $file['dirname'],
 				':name' => $filename,
 				':mime_type' => $mime_type,
 				':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
 			]
-		])) return $destination . '/'. $filename;
+		])) return [
+			'path' => $file['dirname'] . '/' . $filename,
+			'hash' => hash('sha256', $fileContents)
+		];
 	}
 	/**
 	 * @param string $target filename to be appenden a number if found in
