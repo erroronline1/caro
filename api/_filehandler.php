@@ -317,7 +317,7 @@ class FILEHANDLER{
 			}
 			if (!$allowed) return false;
 
-			if (self::isInFilesystem($pathinfo['dirname'])){
+			if (self::isInFilesystem($path)){
 				// delete files and directories recursively
 				if (is_file($path)){
 					$result = unlink($path);
@@ -334,8 +334,8 @@ class FILEHANDLER{
 				// delete database entries (records exceeding lifespan)
 				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
 					'values' => [
-						':path' => $pathinfo['path'],
-						':names' => implode(',', $this->_pdo->quote($pathinfo['basename']))
+						':path' => $pathinfo['dirname'],
+						':names' => $this->_pdo->quote($pathinfo['basename'])
 					]
 				]);
 			}
@@ -406,25 +406,37 @@ class FILEHANDLER{
 
 	/**
 	 *   _     _     ___ _ _                 _             
-	 *  |_|___|_|___|  _|_| |___ ___ _ _ ___| |_ ___ _____ 
-	 *  | |_ -| |   |  _| | | -_|_ -| | |_ -|  _| -_|     |
-	 *  |_|___|_|_|_|_| |_|_|___|___|_  |___|_| |___|_|_|_|
-	 *                              |___|
-	 * tell methods where to store or search files
+	 *  |_|___|_|___|  _|_| |___ ___ _ _ ___| |_ ___ _____   
+	 *  | |_ -| |   |  _| | | -_|_ -| | |_ -|  _| -_|     |  
+	 *  |_|___|_|_|_|_| |_|_|___|___|_  |___|_| |___|_|_|_|  
+	 *                              |___|  
+	 * tell methods where to store or search files  
+	 * 
 	 * @param string $path
 	 * @return bool
 	 */
 	public function isInFilesystem($path){
+		// convert to directory if full path with file has been requested
 		$pathinfo = pathinfo($path);
-		return CONFIG['fileserver']['strategy'] !== 'database'
-			|| in_array($pathinfo['dirname'], [
+		$path = $pathinfo['extension'] ? $pathinfo['dirname'] : $path;
+
+		if (CONFIG['fileserver']['strategy'] !== 'database') return true; // filesystem anyway
+		if (in_array($path, [ // directories match literally
 				self::directory('erp_documents'),
 				self::directory('files_documents'),
 				self::directory('order_attachments'),
 				self::directory('sharepoint'),
 				self::directory('tmp'),
 				self::directory('users'),
-			]);
+			])) return true;
+		foreach (CONFIG['fileserver'] as $key => $value){ // max 1 replacement token to be taken into account
+			if (in_array($key, ['strategy'])) continue;
+			$d1 = explode('/', $value);
+			$d2 = explode('/', $path);
+			if (count($d1) !== count($d2)) continue;
+			if (count(array_diff($d1, $d2)) < 2) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -641,7 +653,13 @@ class FILEHANDLER{
 	 *     'watermark' => bool, add a watermark in lower right corner according to config-file  
 	 * ]
 	 * 
-	 * @return array paths of stored files
+	 * @return array [  
+	 *     [  
+	 *         'path' => string,  
+	 *         'hash' => string
+	 *     ],  
+	 *     ...
+	 * ]
 	*/
 	public function storeUploadedFiles($input = [], $destination = [], $naming = [], $imageoptions = []){
 		if (!$input || empty($destination['path'])) return [];
@@ -676,22 +694,24 @@ class FILEHANDLER{
 				// resanitze filename just to be sure
 				$file['filename'] = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $file['filename']);
 
-				// process current file and expect a filename; path is handled by the requesting modules themself
-				$targets[] = 
-					self::isInFilesystem($destination['path'])
-					? $this->saveToFilesystem(
-						tmpname: $_FILES[$inputname]['tmp_name'][$j],
-						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
-						replace: $destination['replace'] ?? null,
-						imageoptions: $imageoptions)
-					: $this->saveToDatabase(
-						$this->_pdo,
-						tmpname: $_FILES[$inputname]['tmp_name'][$j],
-						destination: $destination['path'],
-						filename: $file['filename'] . '.' . $file['extension'],
-						mime_type: $_FILES[$inputname]['type'][$j],
-						imageoptions: $imageoptions)
-				;
+				// process current file and expect a full path
+				$targets[] = [
+					'hash' => hash_file('sha256', $_FILES[$inputname]['tmp_name'][$j]),
+					// MUST BE HASHED BEFORE, OTHERWISE TEMPFILE IS CONSUMED
+					'path' => self::isInFilesystem($destination['path'])
+						? $this->saveToFilesystem(
+							tmpname: $_FILES[$inputname]['tmp_name'][$j],
+							destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+							replace: $destination['replace'] ?? null,
+							imageoptions: $imageoptions)
+						: $this->saveToDatabase(
+							$this->_pdo,
+							tmpname: $_FILES[$inputname]['tmp_name'][$j],
+							destination: $destination['path'],
+							filename: $file['filename'] . '.' . $file['extension'],
+							mime_type: $_FILES[$inputname]['type'][$j],
+							imageoptions: $imageoptions)
+				];
 			}
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
@@ -760,7 +780,7 @@ class FILEHANDLER{
 				':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
 			]
-		])) return $filename;
+		])) return $destination . '/'. $filename;
 	}
 	/**
 	 * @param string $target filename to be appenden a number if found in
