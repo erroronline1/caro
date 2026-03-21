@@ -114,12 +114,18 @@ class PDF{
 			}
 
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
-			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			if (str_starts_with($value, '::CODE::')) {
+				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] - 4);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), '<pre>' . substr($value, 8) . '</pre>', 0, 1, 0, true, '', true);
+			}
+			else {
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
+			}
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 			$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
 		}
+		$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
 		if (isset ($content['files'])){
 			$_lang = new LANG();
 			foreach($content['files'] as $file){
@@ -358,13 +364,6 @@ class PDF{
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
 
-		// prepare files
-		foreach($content['attachments'] as $document => $attachments){
-			foreach ($attachments as $file){
-				$_filehandler->serve($file, false);
-			}
-		}
-
 		if ($content['erp_case_number']){
 			// name column
 			$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
@@ -405,11 +404,12 @@ class PDF{
 						if (isset($content['attachments'][$document]) && array_intersect($possibleFiles, $content['attachments'][$document])){
 							foreach($possibleFiles as $filename){
 								$path = $_filehandler->directory('record_attachments') . '/' . $filename;
+								$_filehandler->serve($path, false);
 								$file = pathinfo($path);
 								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 									// inline image embedding
 									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-									list($img_width, $img_height, $img_type, $img_attr) = getimagesize($path);
+									list($img_width, $img_height, $img_type, $img_attr) = getimagesize($path); 
 									$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
 									$outputsize = [
 										'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
