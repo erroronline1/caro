@@ -817,7 +817,7 @@ class FILE extends API {
 		$file = '../' . implode('/', array_slice(REQUEST, 2));
 		if ($file){
 			// filter inactive external files
-			if (stristr($file, CONFIG['fileserver']['external_documents']) && !in_array(substr($file, stripos($file, CONFIG['fileserver']['external_documents'])), $this->activeexternalfiles())) {
+			if (stristr($file, CONFIG['fileserver']['external_documents']) && !in_array(substr($file, stripos($file, CONFIG['fileserver']['external_documents'])), $this->activeexternalfiles()) && !PERMISSION::permissionIn(['ceo', 'qmo', 'prrc'])) {
 				http_response_code(410);
 				echo $this->_lang->GET('file.external_file.retired_success');
 				die();
