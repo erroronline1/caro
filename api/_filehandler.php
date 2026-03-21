@@ -297,19 +297,17 @@ class FILEHANDLER{
 	 *
 	 * deletes files and directories recursively regardless of content!
 	 * 
-	 * @param string|array $paths 
+	 * @param string|array $paths
+	 * @param string $fromDatabase with distinct value for records exceeding lifespan
 	 * 
 	 * @return bool about success
 	 */
-	public function delete($paths = []){
+	public function delete($paths = [], $fromDatabase = false){
 		$result = false;
-
 		if (gettype($paths) === 'string') $paths = [$paths];
 		foreach ($paths as $path) {
 			$pathinfo = pathinfo($path);
-			if (!self::isInFilesystem($path, array_keys(CONFIG['fileserver']))) return false;
-
-			if (self::isInFilesystem($path)){
+			if (self::isInFilesystem($path, array_keys(CONFIG['fileserver']))){
 				// delete files and directories recursively
 				if (is_file($path)){
 					$result = unlink($path);
@@ -322,7 +320,7 @@ class FILEHANDLER{
 					$result = rmdir($path);
 				}
 			}
-			else {
+			if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
 				// delete database entries (records exceeding lifespan)
 				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
 					'values' => [
@@ -409,7 +407,7 @@ class FILEHANDLER{
 	 * @param array $tokenized config keys
 	 * @return bool
 	 */
-	public function isInFilesystem($path, $tokenized = ['files_documents']){
+	public function isInFilesystem($path, $tokenized = []){
 		// convert to directory if full path with file has been requested
 		$pathinfo = pathinfo($path);
 		$path = !empty($pathinfo['extension']) ? $pathinfo['dirname'] : $path;
@@ -424,6 +422,7 @@ class FILEHANDLER{
 			])) return true;
 		
 		// consider replacement tokenized directories that permanently reside within the filesystem or use a non standard parameter to return the validity of a path
+		if (!$tokenized) $tokenized = ['files_documents'];
 		foreach ($tokenized as $key){
 			if (in_array($key, ['strategy'])) continue;
 			$d1 = explode('/', CONFIG['fileserver'][$key]);
@@ -529,9 +528,9 @@ class FILEHANDLER{
 	 * 
 	 * @return array file list 
 	 */
-	public function listFiles($directory, $order = 'desc'){
+	public function listFiles($directory, $order = 'desc', $temp = []){
 		$result = [];
-		if (self::isInFilesystem($directory)){
+		if (self::isInFilesystem($directory, $temp)){
 			if (!file_exists($directory)) return $result;
 			switch ($order){
 				case 'desc':
@@ -807,16 +806,20 @@ class FILEHANDLER{
 	 * 
 	 * @return bool if 
 	 */
-	public function tidydir($dir = '', $lifespan = null){
+	public function tidydir($dir = '', $replace = [], $lifespan = null){
 		if (!$dir) return false;
-		$success = !file_exists(self::directory($dir)) ? self::createDirectory(self::directory($dir)) : true;
-		if ($lifespan && file_exists(self::directory($dir))){
-			$files = self::listFiles(self::directory($dir), 'asc');
+		$dir = self::directory($dir, $replace);
+		$success = !file_exists($dir) ? self::createDirectory($dir) : true;
+		if ($lifespan && file_exists($dir)){
+			$files = self::listFiles($dir, 'asc', array_keys(CONFIG['fileserver'])); // pass valid config dirs in case of temp cleanup
+			$toDelete = [];
 			foreach ($files as $file){
-				if ((time() - filemtime($file)) / 3600 > $lifespan) {
-					self::delete($file);
+				// consider real files only, no possible database entries
+				if (file_exists($file) && (time() - filemtime($file)) / 3600 > $lifespan) {
+					$toDelete[] = $file;
 				}
 			}
+			if ($toDelete) self::delete($toDelete);
 		}
 		return $success;
 	}
