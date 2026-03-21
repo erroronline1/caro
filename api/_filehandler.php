@@ -303,19 +303,11 @@ class FILEHANDLER{
 	 */
 	public function delete($paths = []){
 		$result = false;
-		$allowed = false;
+
 		if (gettype($paths) === 'string') $paths = [$paths];
 		foreach ($paths as $path) {
 			$pathinfo = pathinfo($path);
-
-			// paths outside of config defined scopes are forbidden
-			foreach (array_keys(CONFIG['fileserver']) as $fileserver){
-				if ($pathinfo['dirname'] === self::directory($fileserver)) {
-					$allowed = true;
-					break;
-				}
-			}
-			if (!$allowed) return false;
+			if (!self::isInFilesystem($path, array_keys(CONFIG['fileserver']))) return false;
 
 			if (self::isInFilesystem($path)){
 				// delete files and directories recursively
@@ -410,28 +402,31 @@ class FILEHANDLER{
 	 *  | |_ -| |   |  _| | | -_|_ -| | |_ -|  _| -_|     |  
 	 *  |_|___|_|_|_|_| |_|_|___|___|_  |___|_| |___|_|_|_|  
 	 *                              |___|  
-	 * tell methods where to store or search files  
+	 * tell methods where to store or search files or
+	 * validate directories according to config with custom tokenized parameter
 	 * 
 	 * @param string $path
+	 * @param array $tokenized config keys
 	 * @return bool
 	 */
-	public function isInFilesystem($path){
+	public function isInFilesystem($path, $tokenized = ['files_documents']){
 		// convert to directory if full path with file has been requested
 		$pathinfo = pathinfo($path);
-		$path = $pathinfo['extension'] ? $pathinfo['dirname'] : $path;
+		$path = !empty($pathinfo['extension']) ? $pathinfo['dirname'] : $path;
 
 		if (CONFIG['fileserver']['strategy'] !== 'database') return true; // filesystem anyway
 		if (in_array($path, [ // directories match literally
 				self::directory('erp_documents'),
-				self::directory('files_documents'),
 				self::directory('order_attachments'),
 				self::directory('sharepoint'),
 				self::directory('tmp'),
 				self::directory('users'),
 			])) return true;
-		foreach (CONFIG['fileserver'] as $key => $value){ // max 1 replacement token to be taken into account
+		
+		// consider replacement tokenized directories that permanently reside within the filesystem or use a non standard parameter to return the validity of a path
+		foreach ($tokenized as $key){
 			if (in_array($key, ['strategy'])) continue;
-			$d1 = explode('/', $value);
+			$d1 = explode('/', CONFIG['fileserver'][$key]);
 			$d2 = explode('/', $path);
 			if (count($d1) !== count($d2)) continue;
 			if (count(array_diff($d1, $d2)) < 2) return true;
