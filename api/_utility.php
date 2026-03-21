@@ -803,15 +803,24 @@ class BLOCKCHAIN {
 	}
 
 	/**
+	 *   _   _         _       _       _     _ _             _ ___ _       _ 
+	 *  | |_| |___ ___| |_ ___| |_ ___|_|___|_|_|_ _ ___ ___|_|  _|_|___ _| |
+	 *  | . | | . |  _| '_|  _|   | .'| |   |_ _| | | -_|  _| |  _| | -_| . |
+	 *  |___|_|___|___|_,_|___|_|_|__,|_|_|_|_|_|\_/|___|_| |_|_| |_|___|___|
+	 * 
 	 * verify chain by validating hashes. if $details is set to true the chain is returned with raw data and additional verification information
+	 * @param object $_pdo established connection
 	 * @param array $chain
 	 * @param bool $details to return details on checks
 	 * @return bool|array
 	 */
-	public static function verified($chain = [], $details = false){
+	public static function verified($_pdo, $chain = [], $details = false){
+		$_filehandler = new FILEHANDLER($_pdo);
 		$report = [];
 		if (!$chain) return false;
+		// initiate report with genesis block
 		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* " . (isset($chain[0]['hash']) ? "Randomized hash" : "**This block is not secured!**")];
+		// iterate through available blocks
 		for($i = 1; $i < count($chain); $i++){
 			$block = $chain[$i];
 			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
@@ -835,7 +844,10 @@ class BLOCKCHAIN {
 				if (isset($block['attachments'])){
 					$attachments = gettype($block['attachments']) === 'string' ? json_decode($block['attachments'], true) : $block['attachments'];
 					foreach ($attachments as $file => $hash){
-						$filehash = hash_file('sha256', $file); 
+						// provide file, write from database if this fileserver strategy is selected per config
+						$_filehandler->serve(path: $file, stream: false);
+						// verify file hash
+						$filehash = hash_file('sha256', $file);
 						if (is_file($file)){
 							if ($filehash !== $hash){
 								if (!$details) return false;

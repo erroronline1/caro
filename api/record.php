@@ -2474,7 +2474,7 @@ class RECORD extends API {
 			]
 		]);
 		$case = $case ? $case[0] : null;
-		if (!$case || ! BLOCKCHAIN::verified(json_decode($case['content'], true))) $this->response([
+		if (!$case || ! BLOCKCHAIN::verified($this->_pdo, json_decode($case['content'], true))) $this->response([
 			'response' => [
 				'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $this->_requestedID]),
 				'type' => 'error'
