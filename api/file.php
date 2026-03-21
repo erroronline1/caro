@@ -743,7 +743,11 @@ class FILE extends API {
 					'content' => []
 				]];
 
-				// gather sharepoint files
+				// delete expired files
+				// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
+				$this->_filehandler->tidydir('sharepoint', null, CONFIG['lifespan']['files']['sharepoint']);
+
+				// gather (remaining) sharepoint files
 				$files = $this->_filehandler->listFiles($this->_filehandler->directory('sharepoint'),'asc');
 				$display = [];
 				if ($files){
@@ -752,18 +756,10 @@ class FILE extends API {
 						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime = filemtime($file['path']);
 
-						// delete expired files
-						// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
-						if ((time() - $filetime) / 3600 > CONFIG['lifespan']['files']['sharepoint']) {
-							$this->_filehandler->delete($file['path']);
-						}
-						// add remaining files
-						else {
-							$file['path'] = $this->_filehandler->getFileLink($file['path']);
-							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['files']['sharepoint']*3600 - time()) / 3600, 1)]);
+						$file['path'] = $this->_filehandler->getFileLink($file['path']);
+						$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['files']['sharepoint']*3600 - time()) / 3600, 1)]);
 
-							$display[$name] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $name]);
-						}
+						$display[$name] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $name]);
 					}
 				}
 				if ($display){
