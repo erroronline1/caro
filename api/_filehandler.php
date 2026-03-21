@@ -42,7 +42,7 @@ class FILEHANDLER{
 	 * 
 	 * @return string|object|null a GdImage ressource or no return
 	 */
-	public static function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false, $resourceExtension = null){
+	public function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false, $resourceExtension = null){
 		if (is_file($file)){
 			$filetype = getimagesize($file)[2];
 			switch($filetype){
@@ -267,20 +267,20 @@ class FILEHANDLER{
 	 *  |  _|  _| -_| .'|  _| -_| . | |  _| -_|  _|  _| . |  _| | |
 	 *  |___|_| |___|__,|_| |___|___|_|_| |___|___|_| |___|_| |_  |
 	 *                                                        |___|
-	 * creates a directory and secures by default (even if parent directory might already be inaccessible)
-	 * @param string $dir path
+	 * creates a directory within the filesystem and secures by default (even if parent directory might already be inaccessible)
+	 * @param string $directory path
 	 * 
 	 * @return bool on success
 	 */
-	public static function createDirectory($dir){
-		if (!file_exists($dir) && mkdir($dir, 0777, true)) {
-			if (!file_exists($dir . '/.htaccess')) {
-				$file = fopen($dir . '/.htaccess', 'w');
+	public function createDirectory($directory){
+		if (!file_exists($directory) && mkdir($directory, 0777, true)) {
+			if (!file_exists($directory . '/.htaccess')) {
+				$file = fopen($directory . '/.htaccess', 'w');
 				fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
 				fclose($file);
 			}
-			if (!file_exists($dir . '/web.config')) {
-				$file = fopen($dir . '/web.config', 'w');
+			if (!file_exists($directory . '/web.config')) {
+				$file = fopen($directory . '/web.config', 'w');
 				fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
 				fclose($file);
 			}
@@ -295,30 +295,49 @@ class FILEHANDLER{
 	 *  | . | -_| | -_|  _| -_|
 	 *  |___|___|_|___|_| |___|
 	 *
-	 * deletes files and folders recursively unregarding of content!
+	 * deletes files and directories recursively regardless of content!
 	 * 
 	 * @param string|array $paths 
 	 * 
 	 * @return bool about success
 	 */
-	public static function delete($paths = []){
+	public function delete($paths = []){
 		$result = false;
 		$allowed = false;
-		if (gettype($paths) === 'string') $paths=[$paths];
+		if (gettype($paths) === 'string') $paths = [$paths];
 		foreach ($paths as $path) {
+			$pathinfo = pathinfo($path);
+
+			// paths outside of config defined scopes are forbidden
 			foreach (array_keys(CONFIG['fileserver']) as $fileserver){
-				if (stristr($path, self::directory($fileserver))) $allowed = true;
+				if ($pathinfo['dirname'] === self::directory($fileserver)) {
+					$allowed = true;
+					break;
+				}
 			}
 			if (!$allowed) return false;
-			if (is_file($path)){
-				$result = unlink($path);
-			}
-			elseif (is_dir($path)){
-				foreach (scandir($path) as $subdir){
-					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
-					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
+
+			if (self::isInFilesystem($pathinfo['dirname'])){
+				// delete files and directories recursively
+				if (is_file($path)){
+					$result = unlink($path);
 				}
-				$result = rmdir($path);
+				elseif (is_dir($path)){
+					foreach (scandir($path) as $subdir){
+						if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
+						if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
+					}
+					$result = rmdir($path);
+				}
+			}
+			else {
+				// delete database entries (records exceeding lifespan)
+				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
+					'values' => [
+						':path' => $pathinfo['path'],
+						':names' => implode(',', $this->_pdo->quote($pathinfo['basename']))
+					]
+				]);
 			}
 		}
 		return $result;
@@ -330,14 +349,14 @@ class FILEHANDLER{
 	 *  | . | |  _| -_|  _|  _| . |  _| | |
 	 *  |___|_|_| |___|___|_| |___|_| |_  |
 	 *                                |___|
-	 * returns folders defined in config.ini
+	 * returns directories defined in config.ini
 	 * 
 	 * @param string $request key
 	 * @param array $replace optional named array with replacements
 	 * 
-	 * @return string directory
+	 * @return string directory relative to root
 	 */
-	public static function directory($request, $replace = []){
+	public function directory($request, $replace = []){
 		if (!isset(CONFIG['fileserver'][$request])){
 			return '../fileserver';
 		}
@@ -353,7 +372,59 @@ class FILEHANDLER{
 			$patterns[] = '/\/:\w{1,}/';
 			$replacements[] = '';
 		}
-		return '../' . preg_replace($patterns, $replacements, CONFIG['fileserver'][$request]);
+		return preg_replace($patterns, $replacements, CONFIG['fileserver'][$request]);
+	}
+
+	/**
+	 *           _   ___ _ _     _ _     _    
+	 *   ___ ___| |_|  _|_| |___| |_|___| |_   
+	 *  | . | -_|  _|  _| | | -_| | |   | '_|  
+	 *  |_  |___|_| |_| |_|_|___|_|_|_|_|_,_|  
+	 *  |___|  
+	 * checks if file exists or creates file from database entries to pass around the application if required
+	 * based on fileserver strategy
+	 * supposed to enhance caching for shortterm repetitive requests and useage in pdf attachment creation
+	 * to avoid bloating the filesystem in case of database strategy the cron job is supposed to clean up regularly
+	 * 
+	 * @param string $path
+	 * 
+	 * @return string filepaths
+	 */
+	public function getFileLink($path){
+		if (file_exists($path)) return './api/api.php/file/stream/' . substr($path, 1);
+		if (self::isInFilesystem($path)) return '';
+		
+		$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [
+			'values' => [
+				':path' => $path
+			]
+		]);
+		$file = $file ? $file[0] : null;
+		if (!$file) return '';
+		return './api/api.php/file/stream/' . substr($path, 1);;
+	}
+
+	/**
+	 *   _     _     ___ _ _                 _             
+	 *  |_|___|_|___|  _|_| |___ ___ _ _ ___| |_ ___ _____ 
+	 *  | |_ -| |   |  _| | | -_|_ -| | |_ -|  _| -_|     |
+	 *  |_|___|_|_|_|_| |_|_|___|___|_  |___|_| |___|_|_|_|
+	 *                              |___|
+	 * tell methods where to store or search files
+	 * @param string $path
+	 * @return bool
+	 */
+	public function isInFilesystem($path){
+		$pathinfo = pathinfo($path);
+		return CONFIG['fileserver']['strategy'] !== 'database'
+			|| in_array($pathinfo['dirname'], [
+				self::directory('erp_documents'),
+				self::directory('files_documents'),
+				self::directory('order_attachments'),
+				self::directory('sharepoint'),
+				self::directory('tmp'),
+				self::directory('users'),
+			]);
 	}
 
 	/**
@@ -368,7 +439,7 @@ class FILEHANDLER{
 	 * @param string $dataurlname if passed a dataurl as href also pass a name since it can not be extracted
 	 * @return array modified attributes
 	 */
-	public static function link($attributes, $dataurlname = ''){
+	public function link($attributes, $dataurlname = ''){
 		if ($attributes['href']){
 			$file = ['basename' => '', 'extension' => ''];
 			if (!str_starts_with($attributes['href'], 'data:')) {
@@ -414,26 +485,26 @@ class FILEHANDLER{
 	 *  | | |_ -|  _| . | |  _| -_|  _|  _| . |  _| | -_|_ -|
 	 *  |_|_|___|_| |___|_|_| |___|___|_| |___|_| |_|___|___|
 	 *
-	 * scans a directory and returns contained subdirectories
+	 * scans a directory and returns contained subdirectories, used for file management that are not external documents or sharepoint 
 	 * 
-	 * @param string $folder folder to scan
+	 * @param string $directory to scan
 	 * @param string $order asc|desc by default
 	 * 
 	 * @return array file list 
 	 */
-	public static function listDirectories($folder, $order = 'desc'){
+	public function listDirectories($directory, $order = 'desc'){
 		$result = [];
-		if (!file_exists($folder)) return $result;
+		if (!file_exists($directory)) return $result;
 		switch ($order){
 			case 'desc':
-				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
 				break;
 			case 'asc':
-				$dir = scandir($folder);
+				$dir = scandir($directory);
 				break;
 		}
 		foreach ($dir as $file){
-			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
+			if (is_dir($directory . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $directory . '/' . $file;
 		}
 		return $result;
 	}
@@ -444,77 +515,106 @@ class FILEHANDLER{
 	 *  | | |_ -|  _|  _| | | -_|_ -|
 	 *  |_|_|___|_| |_| |_|_|___|___|
 	 *
-	 * scans a directory and returns contained files
+	 * scans a directory and returns contained files or assembled paths from database entries
 	 * 
-	 * @param string $folder folder to scan
+	 * @param string $directory directory to scan
 	 * @param string $order asc|desc by default
 	 * 
 	 * @return array file list 
 	 */
-	public static function listFiles($folder, $order = 'desc'){
+	public function listFiles($directory, $order = 'desc'){
 		$result = [];
-		if (!file_exists($folder)) return $result;
+		if (self::isInFilesystem($directory)){
+			if (!file_exists($directory)) return $result;
+			switch ($order){
+				case 'desc':
+					$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
+					break;
+				case 'asc':
+					$dir = scandir($directory);
+					break;
+			}
+			foreach ($dir as $file){
+				if (is_file($directory . '/' . $file) && !in_array($file, [
+					'.htaccess',
+					'web.config'
+				])) $result[] = $directory . '/' . $file;
+			}
+			return $result;
+		}
+		//else database
+		$files = SQLQUERY::EXECUTE($this->_pdo, 'media_get_path_contents', [
+			'values' => [
+				':path' => $directory
+			]
+		]);
+		$result = array_map(Fn($v) => $v['path'] . '/' . $v['name'], $files);
 		switch ($order){
 			case 'desc':
-				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				rsort($result, SORT_STRING);
 				break;
 			case 'asc':
-				$dir = scandir($folder);
+				sort($result, SORT_STRING);
 				break;
 		}
-		foreach ($dir as $file){
-			if (is_file($folder . '/' . $file) && !in_array($file, [
-				'.htaccess',
-				'web.config'
-			])) $result[] = $folder . '/' . $file;
-		}
-		return $result;
+		return $result;		
 	}
 
 	/**
-	 * checks if files exist or creates files from database entries to pass around the application if required
-	 * based on fileserver strategy
-	 * supposed to enhance caching for shortterm repetitive requests and useage in pdf attachment creation
-	 * to avoid bloating the filesystem in case of database strategy the cron job is supposed to clean up regularly
-	 * 
-	 * @param object $_pdo an active pdo instance
-	 * @param string $context
-	 * @param array $names stored filenames
-	 * 
-	 * @return array of filepaths
+	 *                       
+	 *   ___ ___ ___ _ _ ___   
+	 *  |_ -| -_|  _| | | -_|  
+	 *  |___|___|_|  \_/|___|  
+	 *   
+	 * make a file available either as stream or just writing from database
 	 */
-	public static function paths($_pdo, $context, $names){
-		if (!$context || !$names) return []; 
-		$result = [];
+	public function serve($path, $stream = true){		
+		if (!file_exists($path)){
+			if (self::isInFilesystem($path)) return null; // does not exist, but should be there
 
-		foreach($names as $index => $name){
-			$tempnam = self::directory($context) . '/' . $name;
-			if (file_exists($tempnam)){
-				$result[] = $tempnam;
-				unset($names[$index]);
-			}
-		}
-		if (CONFIG['fileserver']['strategy'] !== 'database') return $result;
+			// else recreate from database
+			$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file', [
+				'values' => [
+					':path' => $path
+				]
+			]);
+			$file = $file ? $file[0] : null;
+			if (!$file) return null;
 
-		$files = SQLQUERY::EXECUTE($_pdo, 'media_get_by_name_and_context', [
-			'replace' => [
-				':context' => $context,
-				':names' => implode(',', array_map(Fn($v) => $_pdo->quote($v), $names))
-			]
-		]);
-		foreach($files as $file){
-			$tempnam = self::directory($context) . '/' . $file['name'];
-			if (!file_exists($tempnam)){
-				if (!file_exists(self::directory($context))) self::createDirectory(self::directory($context));
-				// inflate and reconvert to binary again
-				$file['content'] = SQLQUERY::retrievebinary($file['content']);
-				$tempfile = fopen($tempnam, 'wb');
-				fwrite($tempfile, $file['content']);
-				fclose($tempfile);
-			}
-			$result[] = $tempnam;
+			self::createDirectory($file['path']);
+			// inflate and reconvert to binary again
+			$file['content'] = SQLQUERY::retrievebinary($file['content']);
+			$tempfile = fopen($path, 'wb');
+			fwrite($tempfile, $file['content']);
+			fclose($tempfile);
 		}
-		return $result;
+		
+		// once more, with feeling
+		if (!file_exists($path)) return false;
+
+		if (!$stream) return true;
+
+		switch (pathinfo($path)['extension']){
+			case 'stl':
+				$mime_type = 'model/stl';
+				break;
+			case 'obj':
+				$mime_type = 'model/obj';
+				break;
+			default:
+				$mime_type = mime_content_type($path);
+		}
+
+		header('Content-Type: '. $mime_type);
+		header('Content-Disposition: inline; filename=' . pathinfo($path)['basename']);
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+		header('Content-Length: '.filesize($path));
+		ob_clean();
+		flush();
+		readfile($path);
+		exit;
 	}
 
 	/**
@@ -526,13 +626,7 @@ class FILEHANDLER{
 	 * routes the uploaded files to the destination handler
 	 * 
 	 * @param array $input mandatory array of input names
-	 * @param array $destination  
-	 * **either database:** [  
-	 *     'context' => string, mandatory
-	 *     'expiration_date' => string Y-m-d H:i:s,  
-	 *     'metadata' => array|string named array or stringified json  
-	 * ]  
-	 * **or filesystem:** [  
+	 * @param array $destination [  
 	 *     'path' => string, mandatory  
 	 *     'replace' => bool, to replace files, otherwise enumerated if applicable  
 	 * ]
@@ -550,25 +644,9 @@ class FILEHANDLER{
 	 * @return array paths of stored files
 	*/
 	public function storeUploadedFiles($input = [], $destination = [], $naming = [], $imageoptions = []){
-		if (!$input || (empty($destination['path']) && empty($destination['context']))) return [];
+		if (!$input || empty($destination['path'])) return [];
 		$targets = [];
 
-		/*
-		TODO: consider contexts not requiring database strategy (profile pictures, sharepoint, tmp, order attachments, files_documents)
-		consider vendor_documents = "fileserver/vendors/:id/documents" vendor_products = "fileserver/vendors/:id/products"
-		consider currently stored full path in records, so what about database currently only storing filename?
-
-		implement context into this methods calls
-		implement general verification of paths through above method
-		implement cleaning up in cron in case of database strategy
-
-		check file hashing for record validation
-		
-		
-		if (CONFIG['fileserver']['strategy'] === 'fileserver') {
-			if (!file_exists(self::directory($destination['path']))) self::createDirectory($destination['path']);
-		}
-		*/
 		if (isset($destination['path']) && !file_exists($destination['path'])) self::createDirectory($destination['path']);
 
 		// iterate over $_FILE input names
@@ -598,22 +676,21 @@ class FILEHANDLER{
 				// resanitze filename just to be sure
 				$file['filename'] = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $file['filename']);
 
-				// process current file and expect a path or database id
+				// process current file and expect a filename; path is handled by the requesting modules themself
 				$targets[] = 
-					//CONFIG['fileserver']['strategy'] === 'fileserver'
-					isset($destination['path'])
+					self::isInFilesystem($destination['path'])
 					? $this->saveToFilesystem(
-						$_FILES[$inputname]['tmp_name'][$j],
-						$destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
-						$destination['replace'] ?? null,
-						$imageoptions)
+						tmpname: $_FILES[$inputname]['tmp_name'][$j],
+						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						replace: $destination['replace'] ?? null,
+						imageoptions: $imageoptions)
 					: $this->saveToDatabase(
 						$this->_pdo,
-						$_FILES[$inputname]['tmp_name'][$j],
-						$file['filename'] . '.' . $file['extension'],
-						$_FILES[$inputname]['type'][$j],
-						$destination,
-						$imageoptions)
+						tmpname: $_FILES[$inputname]['tmp_name'][$j],
+						destination: $destination['path'],
+						filename: $file['filename'] . '.' . $file['extension'],
+						mime_type: $_FILES[$inputname]['type'][$j],
+						imageoptions: $imageoptions)
 				;
 			}
 		}
@@ -625,9 +702,9 @@ class FILEHANDLER{
 	 * @param bool $replace overwrite existing file or enumerate if already present
 	 * @param array $imageoptions
 	 * 
-	 * @return string destination path, occasionally enumerated 
+	 * @return string filename, occasionally enumerated
 	 */
-	public static function saveToFilesystem($tmpname, $destination, $replace = false, $imageoptions = []){
+	public function saveToFilesystem($tmpname, $destination, $replace = false, $imageoptions = []){
 		$file = pathinfo($destination);
 		if (!$replace){
 			$extension = '.' . $file['extension'];
@@ -648,19 +725,18 @@ class FILEHANDLER{
 	/**
 	 * @param object $_pdo an active pdo instance
 	 * @param string $tmpname temporary file
-	 * @param string destination expected path with full filename and extension
-	 * @param bool $replace overwrite existing file or enumerate if already present
+	 * @param string $destination expected path
+	 * @param string $filename
+	 * @param string $mime_type
 	 * @param array $imageoptions
 	 * 
-	 * @return int destination database id 
+	 * @return string filename, occasionally enumerated
 	 */
-	public static function saveToDatabase($_pdo, $tmpname, $filename, $mime_type, $destination, $imageoptions = []){
+	public function saveToDatabase($_pdo, $tmpname, $destination, $filename, $mime_type, $imageoptions = []){
 		$file = pathinfo($filename);
-		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_info_by_name_and_context', [
+		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_path_contents', [
 			'values' => [
-				':name' => $file['filename'],
-				':extension' => '.' . $file['extension'],
-				':context' => $destination['context']
+				':path' => $destination
 			]
 		]);
 		
@@ -676,17 +752,13 @@ class FILEHANDLER{
 			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')), strtolower($file['extension']));
 		}
 
-		$destination['metadata'] = $destination['metadata'] ?? null;
-		if (gettype($destination['metadata']) === 'array') $destination['metadata'] = UTILITY::json_encode($destination['metadata']);
 		if (SQLQUERY::EXECUTE($_pdo, 'media_post', [
 			'values' => [
-				':context' => $destination['context'],
+				':path' => $destination,
 				':name' => $filename,
 				':mime_type' => $mime_type,
 				':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 				':upload_date' => date('Y-m-d H:i:s'),
-				':expiry_date' => $destination['expiry_date'] ?? null,
-				':metadata' => $destination['metadata']
 			]
 		])) return $filename;
 	}
@@ -694,7 +766,7 @@ class FILEHANDLER{
 	 * @param string $target filename to be appenden a number if found in
 	 * @param array $withinfiles as list of filenames
 	 */
-	private static function enumerate($target, $withinfiles){
+	private function enumerate($target, $withinfiles){
 		if (in_array($target, $withinfiles)){
 			$pi_target = pathinfo($target);
 			preg_match('/\((\d+)\)$/m', $pi_target['filename'], $matches, PREG_OFFSET_CAPTURE, 0);
@@ -711,14 +783,14 @@ class FILEHANDLER{
 	 *  |  _| | . | | | . | |  _|
 	 *  |_| |_|___|_  |___|_|_|
 	 *            |___|
-	 * prepares a folder according to config.ini and deletes files if lifespan is set
+	 * prepares a directory according to config.ini and deletes files if lifespan is set
 	 * 
 	 * @param string $dir one of the fileserver keys
 	 * @param int $lifespan in hours
 	 * 
 	 * @return bool if 
 	 */
-	public static function tidydir($dir = '', $lifespan = null){
+	public function tidydir($dir = '', $lifespan = null){
 		if (!$dir) return false;
 		$success = !file_exists(self::directory($dir)) ? self::createDirectory(self::directory($dir)) : true;
 		if ($lifespan && file_exists(self::directory($dir))){
