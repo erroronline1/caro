@@ -288,14 +288,14 @@ class RECORD extends API {
 			'content' => []
 		]];
 
-		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, parse markdown if applicable
+		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, parse markdown if applicable, make images available on fileserver database strategy
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
-		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
+		function setidentifier($element, $identify, $calendar, $_lang, $_filehandler, $datalists){
 			$content = [];
 			foreach ($element as $subs){
 				if (!isset($subs['type'])){
-					$content[] = setidentifier($subs, $identify, $calendar, $_lang, $datalists);
+					$content[] = setidentifier($subs, $identify, $calendar, $_lang, $_filehandler, $datalists);
 				}
 				else {
 					if ($subs['type'] === 'identify'){
@@ -308,6 +308,9 @@ class RECORD extends API {
 					if ($subs['type'] === 'calendarbutton'){
 						$subs['attributes']['value'] = $_lang->GET('calendar.tasks.new');
 						$subs['attributes']['onclick'] = $calendar->dialog([':type' => 'tasks']);
+					}
+					if ($subs['type'] === 'image' && !empty($subs['attributes']['url'])){
+						$_filehandler->serve($subs['attributes']['url'], false);
 					}
 					if (isset($subs['autocomplete'])){
 						if (($index = array_search($subs['attributes']['name'], array_column($datalists, 'issue'))) !== false){
@@ -356,7 +359,7 @@ class RECORD extends API {
 			if ($component){
 				$has_components = true;
 				$component['content'] = json_decode($component['content'], true);
-				array_push($response['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang, $datalists));
+				array_push($response['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang, $this->_filehandler, $datalists));
 			}
 		}
 		if (!$has_components) array_push($response['render']['content'], [[
