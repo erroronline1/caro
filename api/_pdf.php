@@ -206,7 +206,7 @@ class PDF{
 					case 'image':
 						if (isset($content['images'][$document]) && in_array($value['value'], $content['images'][$document])) {
 							$value['value'] = '.' . str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
-							$_filehandler->serve($value['value']); // make available
+							$_filehandler->serve($value['value'], false); // make available
 							
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize($value['value']);
