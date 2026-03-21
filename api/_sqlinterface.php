@@ -716,8 +716,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_media (path, name, mime_type, content, upload_date) VALUES (:path, :name, :mime_type, CONVERT(VARBINARY(MAX), :content), CONVERT(datetime, :upload_date, 120))"
 		],
 		'media_get_path_contents' => [
-			'mysql' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE path = :path",
-			'sqlsrv' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE path = :path"
+			'mysql' => "SELECT id, path, name, mime_type, upload_date FROM caro_media WHERE path = :path",
+			'sqlsrv' => "SELECT id, path, name, mime_type, upload_date FROM caro_media WHERE path = :path"
 		],
 		'media_get_file_info' => [
 			'mysql' => "SELECT id, name, mime_type, upload_date FROM caro_media WHERE CONCAT(path, '/', name) = :path",
