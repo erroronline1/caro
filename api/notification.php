@@ -203,6 +203,7 @@ class NOTIFICATION extends API {
 							foreach ($old as $row){
 								$order->delete_approved_order($row);
 							}
+
 							break;
 
 
@@ -472,7 +473,7 @@ class NOTIFICATION extends API {
 												if($file == '.' || $file == '..') continue;
 												$delete[] = $file;
 											}
-											$this->_filehandler->delete($delete);
+											$this->_filehandler->delete($delete, 'thisIsOnlySupposedToBeAbleFromTheCronJob');
 										}
 										// prepare deletion
 										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
@@ -639,9 +640,29 @@ class NOTIFICATION extends API {
 						case 'delete_files_and_calendar':
 							// clear up folders with limited files lifespan
 							// clear up calendar entries marked as closed and for autodeletion
-							$this->_filehandler->tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
-							$this->_filehandler->tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
+							$this->_filehandler->tidydir('tmp', null, CONFIG['lifespan']['files']['tmp']);
+							$this->_filehandler->tidydir('sharepoint', null, CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
+
+							// clear folders in case of fileserver database strategy
+							if (CONFIG['fileserver']['strategy'] === 'database'){
+								$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+								foreach(CONFIG['fileserver'] as $key => $directory){
+									if ($key =='strategy') continue;
+									// if files reside in filesystem they will not be deleted
+									if ($this->_filehandler->isInFilesystem($directory)) continue;
+									switch ($key){
+										case 'vendor_documents':
+										case 'vendor_products':
+											foreach($vendors as $vendor){
+												$this->_filehandler->tidydir($key, [':id' => $vendor['id']], CONFIG['lifespan']['files']['tmp']);
+											}
+											break;
+										default:
+											$this->_filehandler->tidydir($key, null, CONFIG['lifespan']['files']['tmp']);
+									}
+								}
+							}
 
 							// delete order statistics
 							$prior_date = clone $this->_date['servertime'];
