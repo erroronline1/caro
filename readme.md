@@ -9,9 +9,12 @@ see also [Usability test plan](#usability-test-plan) and [Usability test](#usabi
 ```mermaid
 graph LR;
     Prototyping-->test[Test environment];
-    test-->alpha["Alpha testing with selected users"];
-    alpha-.->it{{IT and data safety approval}};
-    it-.->network{{Network environment and infrastructure}};
+    test-->alpha["Alpha testing
+    with selected users"];
+    alpha-->datasafety[Data safety approval];
+    datasafety-.->it{{IT approval}};
+    it-.->network{{"Network environment
+    and infrastructure"}};
     network-.->beta{{"Beta testing"}};
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
@@ -23,20 +26,16 @@ Things are still in motion. Images may be outdated.
 * post-market surveillance
 * post-market evaluation
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
-* data transfer/import from production to testserver for real data testing?
-    * https://stackoverflow.com/questions/1280705/set-start-value-for-column-with-autoincrement, https://medium.com/@mk.muhammadkhoirudin/how-to-retrieve-auto-increment-values-in-sql-server-a-guide-to-common-methods-comparing-4-f054f9ff8a6b#a3a6, https://databaseblogs.com/turn-off-identity-column-in-sql-server/
-    * https://databasefaqs.com/mariadb-set-auto-increment-value/, https://stackoverflow.com/questions/15821532/get-current-auto-increment-value-for-any-table
 
 ## to do
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
 * records
     * assignable unit to override automatic "detection"
-* reconsider storing files in media database for backup reasons? performance may be not that important after all
-    * ~~longblob in mariadb~~ apache file handling 'corrupts' stl files, but not pdf, images, nor obj?
-	* implement cleaning up in cron in case of database strategy
-    * check file hashing for record validation
+* apache file handling 'corrupts' stl files, but not pdf, images, nor obj?
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
+* enable markdown for more (messages, records, etc.), regular users not parsing anchors to avoid malicious scripts
+    * can it replace htmlcontent?
 
 ## Content
 * [Aims](#aims)
@@ -2402,6 +2401,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 		* footnotes
 		* emojis
 * Timetracking makes use of time inputs for working hours and breaks which may be confusing if your browsers locale settings forces a 12h-layout. Please speak to your systems operator for a decent locale setting.
+* For an unknown reason STL-files are 'corrupted' but repairable after redownload on the Apache development environment. For the moment you should stick with OBJ-files for digital models.
 
 [Content](#content)
 
