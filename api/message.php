@@ -282,10 +282,14 @@ class MESSAGE extends API {
 				$response = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$nonAdminUser = [];
 				foreach ($user as $row) {
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient']])) continue;
 					$datalist[] = $row['name'];
+					if (PERMISSION::filteredUser($row, ['permission' => ['admin', 'ceo', 'qmo', 'prrc']])) $nonAdminUser[] = $row['id'];
 				}
+
+				$markdown = new MARKDOWN();
 
 				if ($this->_conversation){
 					// select conversation
@@ -313,7 +317,8 @@ class MESSAGE extends API {
 							'content' => [
 								'img' => $this->_filehandler->getFileLink($conversation['image']),
 								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
-								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
+//								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
+								'text' => in_array($conversation['sender'], $nonAdminUser) ? $markdown->md2html(strip_tags($conversation['message']), false, true) : $markdown->md2html($conversation['message']),
 								'date' => $this->convertFromServerTime($conversation['timestamp']),
 							],
 							'attributes' =>  [
@@ -367,14 +372,21 @@ class MESSAGE extends API {
 									'name' => $this->_lang->GET('message.message.to'),
 									'value' => $conversation_user['name']
 								]
-							],
-							[
+							], [
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('message.message.message_to', [':user' => $conversation_user['name']]),
 								],
 								'hint' => $this->_lang->GET('message.message.forward_hint')
+							], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('tool.markdown.button'),
+								'data-type' => 'markdown',
+								'class' => 'floatright',
+								'onclick' => 'api.tool("get", "markdown")'
 							]
+						]
 						];
 						$response['render']['form'] = [
 							'data-usecase' => 'message',
