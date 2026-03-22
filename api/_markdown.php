@@ -47,9 +47,9 @@ class MARKDOWN {
 	private $_mark = '/==(.+?)==/';
 	private $_p = '/(?:^$\n|\A)((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)(?:\n^$|\Z)/mi';
 	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
-		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_sub = '/~{1}(.+?)~{1}/';
-	private $_sup = '/\^{1}(.+?)\^{1}/';
+		private $_s = '/(?<!\\)~{2}([^\n]+?)(?<!\\| |\n)~{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_sub = '/(?<!\\)~{1}([^\n]+?)(?<!\\| |\n)~{1}/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_sup = '/(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/';
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 	private $_task = '/\[(\s*x{0,1}\s*)\] (.+?(?:\n|\Z))/mi';
 
@@ -63,7 +63,9 @@ class MARKDOWN {
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
-		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~~([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~~/';
+		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
+		$this->_sub = '/(?<!' . preg_quote('\\', '/') . ')~{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{1}/';
+		$this->_sup = '/(?<!' . preg_quote('\\', '/') . ')\^{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{1}/';
 	}
 
 	/**
@@ -162,11 +164,11 @@ class MARKDOWN {
 	 * @param string $text Markdown styled
 	 * @return string as HTML
 	 */
-	public function md2html($text, $forPDF = false){
+	public function md2html($text, $forPDF = false, $nonAdminUser = false){
 		$text = preg_replace("/\r/", '', $text ?: '');
 
 		$text = $this->blockquote($text); // should come first to enable nesting
-		$text = $this->a($text);
+		$text = $this->a($text, $nonAdminUser); // nonAdminUser-content can not render anchors to avoid malicious scripts
 		$text = $this->code($text);
 		$text = $this->headings($text); // before hr avoiding conversion of ----
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
@@ -188,7 +190,8 @@ class MARKDOWN {
 		return $text;
 	}
 
-	private function a($content){
+	private function a($content, $nonAdminUser = false){
+		if ($nonAdminUser) return $content;
 		// replace links in this order
 		$content = preg_replace($this->_a_auto,
 			'<a href="$1" target="_blank" class="inline">$1</a>',
