@@ -265,7 +265,7 @@ class API {
 					$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
 					$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-					$_SESSION['user']['image'] = $user['id'] > 1 ? $this->_filehandler->getFileLink($user['image']) : $user['image'];
+					$_SESSION['user']['image'] = $this->_filehandler->getFileLink($user['image']);
 					// default primary unit if only one unit is assigned
 					if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 
