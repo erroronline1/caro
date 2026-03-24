@@ -1860,7 +1860,7 @@
 			"md2csv_error": "Conversion has been aborted. Failed to identify Markdown table format:\n \n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Column 1 | Column 2 | Column 3 |\n \nSee manual for more information",
 			"playground": "Markdown playground",
 			"preview": "Preview",
-			"quick_reference": "#### #### Header\n> \\> Quote\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, \\~~sub~\\~, ^^sup^^\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n \nStyling will be processed by server after saving.  \nSee manual for more information",
+			"quick_reference": "#### #### Header\n> \\> Quote\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, ~\\~sub\\~~, ^\\^sup\\^^\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n \nStyling will be processed by server after saving.  \nSee manual for more information.",
 			"quick_reference_header": "Quick reference"
 		},
 		"navigation": {

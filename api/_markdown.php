@@ -29,13 +29,13 @@ class MARKDOWN {
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
-	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)]|$)/m'; // regular md links
+		private $_a_md = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/m'; // regular md links
 	private $_blockquote = '/(^>{1,} .*(?:\n|$|\Z))+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3}.*?)\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_escape = '/\\(\*|-|~|`|\.|@|>|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_escape = '/\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
@@ -59,9 +59,10 @@ class MARKDOWN {
 	public function __construct()
 	{
 		// rewrite working regex101.com expression on construction for correct escaping of \
+		$this->_a_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))([^\)]|$)/m'; // regular md links
 		$this->_code_inline = '/(?<!' . preg_quote('\\', '/') . ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1/';
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
-		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\|)/';
+		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
 		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
 		$this->_sub = '/(?<!' . preg_quote('\\', '/') . ')~{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{1}/';

@@ -1860,7 +1860,7 @@
 			"md2csv_error": "Die Konvertierung wurde abgebrochen. Es wurde kein gültiges Markdown-Tabellenformat gefunden:\n \n| Kopf 1 | Kopf 2 | Kopf 3 |\n| -------- | -------- | -------- |\n| Spalte 1 | Spalte 2 | Spalte 3 |\n \nFür mehr Informationen siehe Handbuch",
 			"playground": "Markdown Spielplatz",
 			"preview": "Vorschau",
-			"quick_reference": "#### #### Überschrift\n> \\> Zitat\n\n* \\**kursiv*\\*, \\*\\***fett**\\*\\*, \\~\\~~~durchgestrichen~~\\~\\~, \\~~tief~\\~, ^^hoch^^\n* Zeilenumbrüche innerhalb von Absätzen enden mit zwei oder mehr Leerzeichen\n* Geordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\n* Verschachtelte Listen werden mit vier Leerzeichen eingerückt\n \nDie Darstellung wird nach dem Speichern serverseitig überarbeitet.  \nFür mehr Informationen siehe Handbuch",
+			"quick_reference": "#### #### Überschrift\n> \\> Zitat\n\n* \\**kursiv*\\*, \\*\\***fett**\\*\\*, \\~\\~~~durchgestrichen~~\\~\\~, ~\\~tief\\~~, ^\\^hoch\\^^\n* Zeilenumbrüche innerhalb von Absätzen enden mit zwei oder mehr Leerzeichen\n* Geordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\n* Verschachtelte Listen werden mit vier Leerzeichen eingerückt\n \nDie Darstellung wird nach dem Speichern serverseitig überarbeitet.  \nFür mehr Informationen siehe Handbuch.",
 			"quick_reference_header": "Kurzübersicht"
 		},
 		"navigation": {
