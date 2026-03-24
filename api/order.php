@@ -578,7 +578,7 @@ class ORDER extends API {
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
 						'identifier' => $erp_interface_available && $permission['orderdisplayall'] ? UTILITY::identifier(' ', $row['approved']) : null,
-						'calendar' => $row['delivered_full'] ? $calendar->dialog([
+						'calendar' =>( $row['delivered_full'] || $row['issued_full']) ? $calendar->dialog([
 							':type' => 'tasks',
 							':subject' => (UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '') . ' ' .
 										(UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '') . ' ' .
