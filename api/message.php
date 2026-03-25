@@ -282,11 +282,11 @@ class MESSAGE extends API {
 				$response = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				$nonAdminUser = [];
+				$administrativeUser = [];
 				foreach ($user as $row) {
+					if (PERMISSION::filteredUser($row, ['permission' => ['admin', 'ceo', 'qmo', 'prrc']])) $administrativeUser[] = $row['id'];
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient']])) continue;
 					$datalist[] = $row['name'];
-					if (PERMISSION::filteredUser($row, ['permission' => ['admin', 'ceo', 'qmo', 'prrc']])) $nonAdminUser[] = $row['id'];
 				}
 
 				$markdown = new MARKDOWN();
@@ -317,15 +317,14 @@ class MESSAGE extends API {
 							'content' => [
 								'img' => $this->_filehandler->getFileLink($conversation['image']),
 								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
-//								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
-								'text' => in_array($conversation['sender'], $nonAdminUser) ? $markdown->md2html(strip_tags($conversation['message']), false, true) : $markdown->md2html($conversation['message']),
+								'text' => !in_array($conversation['sender'], $administrativeUser) ? $markdown->md2html(strip_tags($conversation['message']), false, true) : $markdown->md2html($conversation['message']),
 								'date' => $this->convertFromServerTime($conversation['timestamp']),
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise, therefore this property exists for conversation threads
 								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.forward', [':user' => $conversation['conversation_user_name']]) ."', '', '" . 
-									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.message.forward_message', [':message' => preg_replace(["/^/m"], ["> "], strip_tags($conversation['message'])), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')",
 								'id' => $conversation['id']
 							]
