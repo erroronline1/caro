@@ -904,12 +904,13 @@ export const _client = {
 										":commission": "element.commission",
 										":aut_idem": "element.aut_idem",
 									})
-									.replaceAll(/\\n/g, "\n"),
+									.replaceAll(/\\n/g, "\n")
+									.replaceAll(/^/gm, "> "),
 								buttons
 							);
 						}
 							.toString()
-							.replace(/\r|\t/g, "")
+							.replaceAll(/\r|\t/g, "")
 							._replaceArray(
 								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
 								[
@@ -919,7 +920,7 @@ export const _client = {
 									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
 									element.name ? element.name.replaceAll('"', '\\"') : "",
 									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
-									element.information ? element.information.replaceAll('"', '\\"') : "",
+									element.information ? element.information.replaceAll('"', '\\"').replaceAll(/\n/g, "\\n") : "", // escape linebreaks for .toString() removes these
 									element.commission ? element.commission.replaceAll('"', '\\"') : "",
 									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
 									JSON.stringify(buttons),
@@ -1261,11 +1262,12 @@ export const _client = {
 						"data-type": "input",
 						class: "messageto",
 						onclick: function () {
+							console.log("element.information");
 							_client.message.newMessage(
 								api._lang.GET("message.message.message_to", { ":user": api._lang.GET("permissions.purchase") }),
 								"element.purchasemembers",
-								api._lang
-									.GET("order.message", {
+								(
+									api._lang.GET("order.message", {
 										":quantity": "element.quantity",
 										":unit": "element.unit",
 										":number": "element.ordernumber",
@@ -1274,15 +1276,17 @@ export const _client = {
 										":info": "element.information" || "",
 										":commission": "element.commission",
 										":aut_idem": "element.aut_idem",
-									})
-									.replace(/\\n/g, "\n") +
-									"element.ordertext".replace(/\\n/g, "\n") +
-									"element.identifier".replace(/\\n/g, "\n"),
+									}) +
+									"element.ordertext" +
+									"element.identifier"
+								)
+									.replaceAll(/\\n/g, "\n")
+									.replaceAll(/^/gm, "> "),
 								buttons
 							);
 						}
 							.toString()
-							.replace(/\r|\t/g, "")
+							.replaceAll(/\r|\t/g, "")
 							._replaceArray(
 								["element.purchasemembers", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "element.ordertext", "element.identifier", "buttons"],
 								[
@@ -1292,7 +1296,7 @@ export const _client = {
 									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
 									element.name ? element.name.replaceAll('"', '\\"') : "",
 									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
-									element.information ? element.information.replaceAll('"', '\\"') : "",
+									element.information ? element.information.replaceAll('"', '\\"').replaceAll(/\n/g, "\\n") : "", // escape linebreaks for .toString() removes these
 									element.commission ? element.commission.replaceAll('"', '\\"') : "",
 									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
 									element.ordertext ? "\\n" + element.ordertext.replaceAll('"', '\\"') : "",
