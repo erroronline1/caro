@@ -196,7 +196,7 @@ class ORDER extends API {
 								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
 									], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								// userlist to decode orderer
 								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -212,7 +212,7 @@ class ORDER extends API {
 									':author_id' => $_SESSION['user']['id'],
 									':affected_user_id' => null,
 									':organizational_unit' => $prepared['organizational_unit'],
-									':subject' => preg_replace("/\n/", ' ', strip_tags($message)),
+									':subject' => preg_replace("/\n|\r/", ' ', strip_tags($message)),
 									':misc' => null,
 									':closed' => null,
 									':alert' => null,
@@ -260,7 +260,7 @@ class ORDER extends API {
 									$this->alertUserGroup(['unit' => [$organizational_unit]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
 										':order' => $this->_lang->GET('order.message', $messagepayload, true),
 										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 									])));
 								}
 								break;
@@ -1771,7 +1771,7 @@ class ORDER extends API {
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
 						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
-						. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n", $decoded_order_data['additional_info'])], true)
+						. "\n  ". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", $decoded_order_data['additional_info'])], true)
 					);
 				}
 			}
