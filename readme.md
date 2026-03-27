@@ -37,6 +37,10 @@ Things are still in motion. Images may be outdated.
     * can it replace htmlcontent? alertUserGroup and depending language chunks
     * not record inputs though, might affect statistics
 * validate csvprocessor on complex filters (terminerinnerung)
+* convert varchar to nvarchar columns, consider unicode
+    * see https://stackoverflow.com/questions/144283/what-is-the-difference-between-varchar-and-nvarchar and https://stackoverflow.com/questions/4144767/unicode-characters-in-sql-table
+* file drag and drop, to and from the application
+
 
 ## Content
 * [Aims](#aims)
