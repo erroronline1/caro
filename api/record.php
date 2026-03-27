@@ -1792,14 +1792,13 @@ class RECORD extends API {
 		foreach($users as $user){
 			$last_user[$user['id']] = $user['name'];
 		}
-
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $available_units = [];
 		foreach ($data as $contextkey => $context){
 			foreach ($context as $record){
-				// append units of available records 
-				if ($record['units']) array_push($available_units, ...$record['units']);
-				if ($record['unit']) array_push($available_units, $record['unit']);
+				// append units of available records
+				$currentunits = array_filter([...$record['units'], $record['unit']]);
+				if ($currentunits) array_push($available_units, ...$currentunits);
 				else $available_units[] = null;
 
 				// filters not within recordsearch to get all available units and states
@@ -1807,11 +1806,11 @@ class RECORD extends API {
 				// filter results by selected unit
 				if (
 					(!$this->_payload->_unit && !array_intersect(array_filter($record['units'] ?? [], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
-					|| ($this->_payload->_unit === '_unassigned' && ($record['unit'] || $record['units'])
-					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' && (
-						!$record['unit'] || $this->_payload->_unit !== $record['unit'])
-						||
-						!$record['units'] || !in_array($this->_payload->_unit, $record['units'])
+					|| ($this->_payload->_unit === '_unassigned' && ($record['unit'] || $record['units']))
+					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned'
+						&& (
+							!($record['unit'] && $this->_payload->_unit === $record['unit'])
+							xor !($record['units'] && in_array($this->_payload->_unit, $record['units']))
 						)
 					)
 				) continue;
