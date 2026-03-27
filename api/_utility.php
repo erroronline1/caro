@@ -247,6 +247,9 @@ class UTILITY {
 							// apache
 							list($raw_headers, $type, $body) = explode($linebreak . $linebreak, $part, 3);
 						}
+						// strip trailing newline this way, because trim would strip NULL-characters in binary files as well
+						$body = substr($body, 0, strlen($body) - 2);
+
 						// retrieve type like Content-Type: application/pdf or '' if not file
 						$type = explode(': ', $type);
 						$type = isset($type[1]) ? $type[1] : '';
@@ -305,10 +308,10 @@ class UTILITY {
 							else {
 								if (substr($name, -2) == '[]') { // is array
 									$name = substr($name, 0, strlen($name) - 2);
-									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
-									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
+									if (isset($data[$name])) $data[$name][] = $body;
+									else $data[$name] = [$body];
 								}
-								else $data[$name] = substr($body, 0, strlen($body) - 2);
+								else $data[$name] = $body;
 							}
 						}
 					}
