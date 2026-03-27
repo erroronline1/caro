@@ -32,10 +32,12 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * records
     * assignable unit to override automatic "detection"
-* apache file handling 'corrupts' stl files, but not pdf, images, nor obj?
+* ~~apache~~ file handling 'corrupts' stl files, but not pdf, images, nor obj?
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
-* enable markdown for more (messages, records, etc.), regular users not parsing anchors to avoid malicious scripts
-    * can it replace htmlcontent?
+* enable markdown for more (messages, etc.), regular users not parsing anchors to avoid malicious scripts
+    * can it replace htmlcontent? alertUserGroup and depending language chunks
+    * not record inputs though, might affect statistics
+* validate csvprocessor on complex filters (terminerinnerung)
 
 ## Content
 * [Aims](#aims)
@@ -348,7 +350,7 @@ Set up the manual according to your users comprehension. While editing single en
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)
 
 ### Conversations
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
+This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable. [Markdown](#markdown) is available, anchors and direct html is displayed in messages from administrative users only though.
 
 ![conversation screenshot](http://toh.erroronline.one/caro/conversation%20en.png)
 
@@ -2915,6 +2917,7 @@ This has been interpreted merely as a recommendation than a requirement to avoid
 | Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
 | Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain | This is the safest to get to work without keys and should likely meet the criteria for a advanced electronic signature. Validity can be checked and a report exported in case of judicial disputes |
 | Malicious use of signatures by exporting | Low | High (loss of trust) | Watermarking and adapting file resolution to a just about recognizable quality does make it cumbersome to retrace the signature properly | none |
+| Malicious inputs on using Markdown | Low | High (application unstable, corrupted data) | Full availability of Markdown for administrative users only, where available for regular users (conversations) anchors will not be parsed, tags stripped by default | none |
 
 [Content](#content)
 
