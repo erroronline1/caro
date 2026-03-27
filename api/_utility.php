@@ -241,14 +241,13 @@ class UTILITY {
 						if ($linebreak === "\n"){
 							// iis
 							list(, $raw_headers, $type, $body) = explode($linebreak, $part, 4);
-							$body = ltrim($body);
 						}
 						else {
 							// apache
 							list($raw_headers, $type, $body) = explode($linebreak . $linebreak, $part, 3);
 						}
-						// strip trailing newline this way, because trim would strip NULL-characters in binary files as well
-						$body = substr($body, 0, strlen($body) - 2);
+						// trim linebreaks
+						$body = trim($body, "\r\n");
 
 						// retrieve type like Content-Type: application/pdf or '' if not file
 						$type = explode(': ', $type);
