@@ -355,7 +355,7 @@ class Listprocessor {
 	 */
 	public function filter_by_comparison_file($rule){
 		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_originallist;
-		if (!isset($rule['filesetting']['source']) || !$rule['filesetting']['source'] || !is_file($rule['filesetting']['source'])){
+		if (empty($rule['filesetting']['source']) || (gettype($rule['filesetting']['source']) === 'string' && !is_file($rule['filesetting']['source']))){
 			$this->_log[] = '[X] no comparison file provided';
 			return;
 		}
@@ -585,10 +585,11 @@ class Listprocessor {
 	*/
 	public function filter_by_monthdiff($rule){
 		foreach ($this->_list as $i => $row){
-			if (!$row) continue;
+			if (!$row || !$row[$rule['date']['column']]) continue;
 
 			// format dates to iso
-			$entrydate = \DateTime::createFromFormat($rule['date']['format'], $row[$rule['date']['column']])->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			$entrydate = \DateTime::createFromFormat($rule['date']['format'], $row[$rule['date']['column']]);
+			$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
 			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
 			$thismonth = $thismonth->format('Y-m-d');
 
@@ -627,10 +628,11 @@ class Listprocessor {
 	 */
 	public function filter_by_monthinterval($rule){
 		foreach ($this->_list as $i => $row){
-			if (!$row) continue;
+			if (!$row || !$row[$rule['interval']['column']]) continue;
 
 			// format dates to iso
-			$entrydate = \DateTime::createFromFormat($rule['interval']['format'], $row[$rule['interval']['column']])->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			$entrydate = \DateTime::createFromFormat($rule['interval']['format'], $row[$rule['interval']['column']]);
+			$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
 			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
 			$thismonth = $thismonth->format('Y-m-d');
 
