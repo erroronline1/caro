@@ -1409,7 +1409,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			
 					WHERE vorgaenge.GELIEFERT_DATUM IS NOT NULL
 					AND vorgaenge.AUFTRAGSWERT_BRUTTO > 10
-					AND [sys].GENEHMIGT NOT IN ('Storno')
+					AND [sys].GENEHMIGT NOT IN ('Storno', 'verstorben','abgelehnt')
 
 					AND vorgaenge.ANLAGEDATUM BETWEEN ':anlagedatumvon' AND ':anlagedatumbis'
 					order by vorgaenge.REFERENZ ASC
@@ -2193,7 +2193,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					require_once('_table.php');
 					$fileexport = new TABLE([$result]);
 					if ($files = $fileexport->dump($key . date(' Y-m-d H-i-s') . '.' .  $export)){
-						return substr($files[0], 1);
+						return $files[0]['path'];
 					}
 			}
 		}
