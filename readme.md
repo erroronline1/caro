@@ -30,8 +30,6 @@ Things are still in motion. Images may be outdated.
 ## to do
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
-* records
-    * assignable unit to override automatic "detection"
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 * enable markdown for more (messages, etc.), regular users not parsing anchors to avoid malicious scripts
     * can it replace htmlcontent? alertUserGroup and depending language chunks
@@ -40,7 +38,9 @@ Things are still in motion. Images may be outdated.
 * convert varchar to nvarchar columns, consider unicode
     * see https://stackoverflow.com/questions/144283/what-is-the-difference-between-varchar-and-nvarchar and https://stackoverflow.com/questions/4144767/unicode-characters-in-sql-table
 * file drag and drop, to and from the application
-
+* one message per reminder of open orders, unissued etc
+* https://web.dev/patterns/files/drag-and-drop-files?hl=de
+* css paper theme
 
 ## Content
 * [Aims](#aims)
@@ -620,10 +620,10 @@ The identifier is always a QR-code with additional readable content that will ap
 
 ![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code%20en.png)
 
-On display of any record recommendations appear to complete records according to bundles that match the last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
+On display of any record recommendations appear to complete records according to bundles that match the set unit for the record or last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.  
-Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
+Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of either the set unit or the most recent recording users organisational units.
 
 Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states. Users changing the state have the option to inform other users, units or respective supervisors via message. There is also an option to message an inquiry to anybody with a direct link embedded for quick access.  
 Adding a ERP-case-number can match in case of an available [ERP interface](#erp-interface), multiple numbers are possible in case of customs having a calculatory and representative case.  

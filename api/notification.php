@@ -284,7 +284,8 @@ class NOTIFICATION extends API {
 												':erp_case_number' => $this->_pdo->quote($case['erp_case_number']),
 												':note' => $this->_pdo->quote($case['note'] ? : ''),
 												':restricted_access' => $this->_pdo->quote($case['restricted_access'] ? : 'NULL'),
-												':id' => $case['id'] // must come after :identifier, otherwise replacements fail
+												':id' => $case['id'], // must come after :identifier, otherwise replacements fail
+												':unit' => null
 											]) . '; ');
 									}
 								}
@@ -421,7 +422,7 @@ class NOTIFICATION extends API {
 										$this->alertUserGroup(
 											[
 												// limit recipients to specialized workforce only, exclude admin, office and common
-												'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
+												'unit' => $row['unit'] ? [$row['units']] : array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
 											],
 											$this->_lang->GET('record.reminder_message', [
 												':days' => $last->diff($this->_date['servertime'])->days,
@@ -451,7 +452,7 @@ class NOTIFICATION extends API {
 											[
 												// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
 												'permission' => PERMISSION::permissionFor('recordscasestate', true),
-												'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin']))
+												'unit' => array_filter([$row['unit'], ...explode(',', $row['units'] ? : '')], fn($u) => !in_array($u, ['common', 'admin']))
 											],
 											$this->_lang->GET('record.lifespan.reminder_message', [
 												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
@@ -1187,10 +1188,21 @@ class NOTIFICATION extends API {
 			if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
 				|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 				// rise counter for unit member
-				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(
-					array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
-					$_SESSION['user']['units']
-				)) $number++;
+				if (in_array($row['context'], ['casedocumentation', 'incident']) && 
+					(
+						(
+							$row['unit'] &&
+							in_array($row['unit'], $_SESSION['user']['units'])
+						)
+						|| (
+							!$row['unit'] && $row['units'] &&
+							array_intersect(
+								array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
+								$_SESSION['user']['units']
+							)
+						)
+					)
+				) $number++;
 			}
 		}
 		return $number;

@@ -1065,7 +1065,7 @@ class AUDIT extends API {
 			if ($row['record_type'] === 'complaint'){
 				$year = substr($row['last_touch'], 0, 4);
 				if (!isset($entries[$year])) $entries[$year] = [];
-				$entries[$year][$row['identifier']] = ['closed' => json_decode($row['closed'] ? : '', true), 'units' => $row['units']];
+				$entries[$year][$row['identifier']] = ['closed' => json_decode($row['closed'] ? : '', true), 'units' => $row['unit'] ?: $row['units']];
 			}
 		}
 		//order by year descending
@@ -2439,6 +2439,7 @@ class AUDIT extends API {
 		foreach ($records as $row){
 			if (!in_array($row['context'], $contexts)) continue;
 			$row['units'] = explode(',', $row['units']);
+			if ($row['unit'] && !in_array($row['unit'], $units)) continue;
 			if (!array_intersect($row['units'], $units)) continue;
 
 			$line = [];
@@ -2489,8 +2490,8 @@ class AUDIT extends API {
 			// complete default columns and append to result
 			$line[$defaultColumn['identifier']] = $row['identifier'];
 			$line[$defaultColumn['erp_case_number']] = $row['erp_case_number'] ? : '';
-			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, $row['units']));
-			$line[$defaultColumn['type']] = isset($this->_lang->_DEFAULT['record']['type'][$row['record_type']]) ? $this->_lang->_DEFAULT['record']['type'][$row['record_type']] : '';
+			$line[$defaultColumn['units']] = $row['unit'] && isset($this->_lang->_DEFAULT['units'][$row['unit']]) ? $this->_lang->_DEFAULT['units'][$row['unit']] : implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, $row['units']));
+			$line[$defaultColumn['type']] = $row['record_type'] && isset($this->_lang->_DEFAULT['record']['type'][$row['record_type']]) ? $this->_lang->_DEFAULT['record']['type'][$row['record_type']] : '';
 			$result[] = $line;
 		}
 
@@ -2528,7 +2529,7 @@ class AUDIT extends API {
 		$filename = $this->_date['usertime']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.' . strtolower(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.export_type') ?: 'csv'));
 		if ($files = $export->dump($filename)){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $filename])] = [
-				'href' => $this->_filehandler->getFileLink($files[0]),
+				'href' => $this->_filehandler->getFileLink($files[0]['path']),
 				'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
 			];
 		}

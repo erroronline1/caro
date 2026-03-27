@@ -84,6 +84,7 @@ class RECORD extends API {
 						':erp_case_number' => $case['erp_case_number'],
 						':note' => $case['note'],
 						':restricted_access' => $case['restricted_access'],
+						':unit' => $case['unit']
 					];
 
 					if ($this->_caseState === 'lifespan'){
@@ -114,6 +115,10 @@ class RECORD extends API {
 						if ($this->_caseStateValue) $this->_caseStateValue .= "\n" . $this->_lang->GET('record.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
 						$case[':note'] = $this->_caseStateValue;
 						$successMsg = $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['note']]);
+					}
+					elseif ($this->_caseState === 'unit'){
+						$case[':unit'] = $this->_caseStateValue;
+						$successMsg = $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['casestate_change_recipient_unit']]);
 					}
 					else {
 						$case[':last_document'] = null;
@@ -1128,7 +1133,8 @@ class RECORD extends API {
 							':lifespan' => $case['lifespan'],
 							':erp_case_number' => $case['erp_case_number'],
 							':note' => $case['note'],
-							':restricted_access' => $restricted_access ? json_encode($restricted_access) : $case['restricted_access']
+							':restricted_access' => $restricted_access ? json_encode($restricted_access) : $case['restricted_access'],
+							':unit' => $case['unit']
 						];
 					}
 					else {
@@ -1144,7 +1150,8 @@ class RECORD extends API {
 							':lifespan' => null,
 							':erp_case_number' => null,
 							':note' => null,
-							':restricted_access' => $restricted_access ? json_encode($restricted_access) : null
+							':restricted_access' => $restricted_access ? json_encode($restricted_access) : null,
+							':unit' => null
 						];
 					}
 					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
@@ -1157,7 +1164,11 @@ class RECORD extends API {
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
 						foreach ($bd as $key => $row) {
-							if ($row['hidden'] || !(in_array($row['unit'], $_SESSION['user']['units']) || $row['unit'] === 'common')) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+							if ($row['hidden']
+								|| ($case[':unit'] && $case[':unit'] !== $row['unit'])
+								|| !(in_array($row['unit'], $_SESSION['user']['units']) || $row['unit'] === 'common')
+							) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+							
 							if (!in_array($row['name'], $hidden)) {
 								$necessarydocuments = $row['content'] ? explode(',', $row['content']) : [];
 								if ($necessarydocuments && ($documentindex = array_search($document_name, $necessarydocuments)) !== false) { // position of the current document within bundle
@@ -1302,6 +1313,15 @@ class RECORD extends API {
 					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, response); }});"
 					], $content['case_state'])){
 
+					// forced unit
+					$unit = [];
+					foreach($this->_lang->_USER['units'] as $key => $value){
+						$unit[$value] = [
+							'value' => $key,
+							'onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'unit', this.value);"
+						];
+						if ($content['unit'] === $key) $unit[$value]['checked'] = true;
+					}
 					// retention period selection
 					$retention = [];
 					foreach($this->_lang->_USER['record']['lifespan']['years'] as $years => $description){
@@ -1328,8 +1348,15 @@ class RECORD extends API {
 						$erp_case_number['attributes']['readonly'] = true;
 					}
 
-					array_push($general, $casestate,
+					array_push($general,
+						$casestate,
 						[
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $this->_lang->GET('record.casestate_change_recipient_unit')
+							],
+							'content' => $unit,
+						], [
 							'type' => 'radio',
 							'attributes' => [
 								'name' => $this->_lang->GET('record.lifespan.description')
@@ -1466,7 +1493,15 @@ class RECORD extends API {
 				$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = $bundles = [];
 				foreach ($bd as $key => $row) {
-					if ($row['hidden'] || !((in_array($row['unit'], $content['units']) && array_intersect($_SESSION['user']['units'], $content['units'])) || $row['unit'] === 'common')) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if ($row['hidden']
+						|| ($content['unit'] && $content['unit'] !== $row['unit'] 
+						|| !(
+							(
+								in_array($row['unit'], $content['units'])
+								&& array_intersect($_SESSION['user']['units'], $content['units'])
+							) || 
+							$row['unit'] === 'common'))
+					) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden) && !isset($bundles[$row['name']]))
 						$bundles[$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
 				}
@@ -1764,6 +1799,7 @@ class RECORD extends API {
 			foreach ($context as $record){
 				// append units of available records 
 				if ($record['units']) array_push($available_units, ...$record['units']);
+				if ($record['unit']) array_push($available_units, $record['unit']);
 				else $available_units[] = null;
 
 				// filters not within recordsearch to get all available units and states
@@ -1771,8 +1807,13 @@ class RECORD extends API {
 				// filter results by selected unit
 				if (
 					(!$this->_payload->_unit && !array_intersect(array_filter($record['units'] ?? [], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
-					|| ($this->_payload->_unit === '_unassigned' && $record['units'])
-					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_payload->_unit, $record['units'])))
+					|| ($this->_payload->_unit === '_unassigned' && ($record['unit'] || $record['units'])
+					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' && (
+						!$record['unit'] || $this->_payload->_unit !== $record['unit'])
+						||
+						!$record['units'] || !in_array($this->_payload->_unit, $record['units'])
+						)
+					)
 				) continue;
 
 				// prefilter record datalist for performance reasons of reasonable selected units
@@ -1975,6 +2016,7 @@ class RECORD extends API {
 				'last_user' => $row['last_user'],
 				'last_user_name' => $row['name'],
 				'restricted_access' => !empty($row['restricted_access']),
+				'unit' => $row['unit']
 			];
 		}
 		return $contexts;
@@ -2096,6 +2138,7 @@ class RECORD extends API {
 					':note' => $merge['note'],
 					':restricted_access' => $merge['restricted_access'],
 					':id' => $merge['id'],
+					':unit' => $merge['unit']
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
@@ -2127,6 +2170,7 @@ class RECORD extends API {
 					':note' => $original['note'],
 					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
+					':unit' => $original['unit']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
 					':id' => $merge['id']
@@ -2190,6 +2234,7 @@ class RECORD extends API {
 					':note' => $original['note'],
 					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
+					':unit' => $original['unit']
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.saved'),
@@ -2276,7 +2321,8 @@ class RECORD extends API {
 			'lifespan' => $data['lifespan'],
 			'erp_case_number' => $data['erp_case_number'],
 			'note' => $data['note'],
-			'recenthash' => ''
+			'recenthash' => '',
+			'unit' => $data['unit']
 		];
 		$accumulatedcontent = [];
 
