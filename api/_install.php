@@ -170,16 +170,6 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
-				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`activated` datetime NULL DEFAULT NULL," .
-				"	`retired` datetime NULL DEFAULT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				.
 				"CREATE TABLE IF NOT EXISTS `caro_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -197,6 +187,16 @@ define('DEFAULTSQL', [
 				"	`patient_access` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`activated` datetime NULL DEFAULT NULL," .
+				"	`retired` datetime NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
@@ -221,7 +221,7 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_media` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`path` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`mime_type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` longblob NOT NULL," .
@@ -269,6 +269,21 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_request_log` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`timestamp` datetime NOT NULL," .
+				"	`method` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`api` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`payload` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`user_id` int  NOT NULL," .
+				"	`user_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_ip` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`session_id` text(1024) COLLATE utf8mb4_unicode_ci NULL," .
+				"	`response_code` tinytext COLLATE utf8mb4_unicode_ci NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -286,7 +301,7 @@ define('DEFAULTSQL', [
 				"	`measure_remainder` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`proof` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -296,7 +311,7 @@ define('DEFAULTSQL', [
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"   `hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -313,7 +328,7 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`units` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`token` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -339,21 +354,6 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
-				"CREATE TABLE IF NOT EXISTS `caro_request_log` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`timestamp` datetime NOT NULL," .
-				"	`method` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`api` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`payload` text COLLATE utf8mb4_unicode_ci NULL," .
-				"	`user_id` int  NOT NULL," .
-				"	`user_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`user_permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`user_ip` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`session_id` text(1024) COLLATE utf8mb4_unicode_ci NULL," .
-				"	`response_code` tinytext COLLATE utf8mb4_unicode_ci NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				.
 				"CREATE TABLE IF NOT EXISTS `caro_user_training` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -363,7 +363,7 @@ define('DEFAULTSQL', [
 				"	`experience_points` int NULL," .
 				"	`file_path` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`planned` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`planned` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -386,8 +386,8 @@ define('DEFAULTSQL', [
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
 				"	span_start datetime NULL DEFAULT NULL," .
 				"	span_end datetime NULL DEFAULT NULL," .
-				"	subject varchar(MAX) NOT NULL," .
-				"	text varchar(MAX) NULL DEFAULT NULL," .
+				"	subject nvarchar(MAX) NOT NULL," .
+				"	text nvarchar(MAX) NULL DEFAULT NULL," .
 				"	highlight varchar(255) NOT NULL" .
 				");"
 				.
@@ -396,9 +396,9 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	template int NULL DEFAULT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
-				"	content varchar(MAX) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
 				"	last_touch datetime NOT NULL," .
-				"	last_user varchar(255) NOT NULL," .
+				"	last_user nvarchar(255) NOT NULL," .
 				"	closed tinyint NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL" .
 				");"
@@ -406,12 +406,12 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_templates (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	content varchar(MAX) NOT NULL," .
-				"	objectives varchar(MAX) NOT NULL," .
+				"	content vnarchar(MAX) NOT NULL," .
+				"	objectives nvarchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	date datetime NOT NULL," .
-				"	author varchar(MAX) NULL DEFAULT NULL," .
-				"	hint varchar(255) NULL DEFAULT NULL," .
+				"	author nvarchar(255) NULL DEFAULT NULL," .
+				"	hint nvarchar(255) NULL DEFAULT NULL," .
 				"	method varchar(255) NULL DEFAULT NULL" .
 				");"
 				.
@@ -424,9 +424,9 @@ define('DEFAULTSQL', [
 				"	author_id int NOT NULL," .
 				"	affected_user_id int NULL DEFAULT NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
-				"	subject varchar(MAX) NULL DEFAULT NULL," .
-				"	misc varchar(MAX) NULL DEFAULT NULL," .
-				"	closed varchar(MAX) NULL DEFAULT NULL," .
+				"	subject nvarchar(MAX) NULL DEFAULT NULL," .
+				"	misc nvarchar(MAX) NULL DEFAULT NULL," .
+				"	closed nvarchar(MAX) NULL DEFAULT NULL," .
 				"	alert tinyint NULL," .
 				"	autodelete tinyint NULL" .
 				");"
@@ -434,9 +434,9 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_approved_orders (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	order_data varchar(MAX) NOT NULL," .
+				"	order_data nvarchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(255) NOT NULL," .
-				"	approval varchar(MAX) NOT NULL," .
+				"	approval nvarchar(MAX) NOT NULL," .
 				"	approved datetime NOT NULL," .
 				"	ordered datetime NULL DEFAULT NULL," .
 				"	delivered_partially datetime NULL DEFAULT NULL," .
@@ -453,9 +453,9 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_consumables_order_statistics (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
 				"	order_id int NOT NULL," .
-				"	order_data varchar(MAX) NOT NULL," .
+				"	order_data nvarchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(255) NOT NULL," .
-				"	orderer_name varchar(255) NOT NULL," .
+				"	orderer_name nvarchar(255) NOT NULL," .
 				"	approved datetime NOT NULL," .
 				"	ordered datetime NULL DEFAULT NULL," .
 				"	delivered_partially datetime NULL DEFAULT NULL," .
@@ -466,25 +466,25 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_prepared_orders (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	order_data varchar(MAX) NOT NULL" .
+				"	order_data nvarchar(MAX) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_products (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	vendor_id int NOT NULL," .
-				"	article_no varchar(MAX) NULL DEFAULT NULL," .
-				"	article_name varchar(MAX) NULL DEFAULT NULL," .
-				"	article_alias varchar(255) NULL DEFAULT NULL," .
-				"	article_unit varchar(255) NULL DEFAULT NULL," .
+				"	article_no nvarchar(MAX) NULL DEFAULT NULL," .
+				"	article_name nvarchar(MAX) NULL DEFAULT NULL," .
+				"	article_alias nvarchar(255) NULL DEFAULT NULL," .
+				"	article_unit nvarchar(255) NULL DEFAULT NULL," .
 				"	article_ean varchar(255) NULL DEFAULT NULL," .
-				"	article_info varchar(MAX) NULL DEFAULT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL," .
+				"	article_info nvarchar(MAX) NULL DEFAULT NULL," .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL," .
 				"	has_files tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked datetime NULL DEFAULT NULL," .
-				"	sample_checks varchar(MAX) NULL DEFAULT NULL," .
-				"	incorporated varchar(MAX) NULL DEFAULT NULL," .
+				"	sample_checks nvarchar(MAX) NULL DEFAULT NULL," .
+				"	incorporated nvarchar(MAX) NULL DEFAULT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL," .
 				"	special_attention tinyint NULL DEFAULT NULL," .
 				"	last_order datetime NULL DEFAULT NULL," .
@@ -497,57 +497,57 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_vendors (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL," .
-				"	name varchar(MAX) NOT NULL," .
-				"	info varchar(MAX) NULL DEFAULT NULL," .
-				"	products varchar(MAX) NULL DEFAULT NULL," .
-				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL," .
+				"	name nvarchar(MAX) NOT NULL," .
+				"	info nvarchar(MAX) NULL DEFAULT NULL," .
+				"	products nvarchar(MAX) NULL DEFAULT NULL," .
+				"	evaluation nvarchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
 				"CREATE TABLE caro_csvfilter (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	name varchar(255) NOT NULL," .
+				"	name nvarchar(255) NOT NULL," .
 				"	date datetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL," .
-				"	approval varchar(MAX) NULL DEFAULT NULL" .
+				"	author nvarchar(255) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL," .
+				"	approval nvarchar(MAX) NULL DEFAULT NULL" .
 				");" 
-				.
-				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
-				"CREATE TABLE caro_file_external_documents (" .
-				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	path varchar(MAX) NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	regulatory_context varchar(MAX) NOT NULL," .
-				"	activated datetime NULL DEFAULT NULL" .
-				"	retired datetime NULL DEFAULT NULL" .
-				");"
 				.
 				"IF OBJECT_ID(N'caro_documents', N'U') IS NULL " .
 				"CREATE TABLE caro_documents (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	name varchar(MAX) NOT NULL," .
-				"	alias varchar(MAX) NOT NULL," .
+				"	name nvarchar(MAX) NOT NULL," .
+				"	alias nvarchar(MAX) NOT NULL," .
 				"	context varchar(255) NOT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	date datetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL," .
-				"	approval varchar(MAX) NULL DEFAULT NULL," .
+				"	author nvarchar(255) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL," .
+				"	approval nvarchar(MAX) NULL DEFAULT NULL," .
 				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
 				"	permitted_export tinyint NULL DEFAULT NULL," .
 				"	restricted_access varchar(MAX) NULL DEFAULT NULL," .
 				"	patient_access tinyint NULL DEFAULT NULL" .
 				");"
 				.
+				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
+				"CREATE TABLE caro_file_external_documents (" .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
+				"	path nvarchar(MAX) NOT NULL," .
+				"	author nvarchar(255) NOT NULL," .
+				"	regulatory_context varchar(MAX) NOT NULL," .
+				"	activated datetime NULL DEFAULT NULL" .
+				"	retired datetime NULL DEFAULT NULL" .
+				");"
+				.
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
 				"CREATE TABLE caro_manual (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	title varchar(255) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
+				"	title nvarchar(255) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL" .
 				");"
 				.
@@ -555,20 +555,20 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_measures (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	timestamp datetime NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
 				"	user_id int NULL," .
 				"	votes varchar(MAX) NULL," .
-				"	measures varchar(MAX) NULL," .
-				"	last_user varchar(255) NULL," .
+				"	measures nvarchar(MAX) NULL," .
+				"	last_user nvarchar(255) NULL," .
 				"	last_touch datetime NULL," .
-				"	closed varchar(MAX) NULL" .
+				"	closed nvarchar(MAX) NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_media', N'U') IS NULL " .
 				"CREATE TABLE caro_media (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
-				"	path varchar(255) NOT NULL," .
-				"	name varchar(MAX) NOT NULL," .
+				"	path varchar(MAX) NOT NULL," .
+				"	name nvarchar(MAX) NOT NULL," .
 				"	mime_type varchar(255) NOT NULL," .
 				"	content varbinary(max) NOT NULL," .
 				"	upload_date datetime NOT NULL" .
@@ -580,7 +580,7 @@ define('DEFAULTSQL', [
 				"	user_id int NOT NULL," .
 				"	conversation_user int NOT NULL," .
 				"	sender int NOT NULL," .
-				"	message varchar(MAX) NOT NULL," .
+				"	message nvarchar(MAX) NOT NULL," .
 				"	timestamp datetime NOT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .
 				"	seen tinyint NULL DEFAULT NULL" .
@@ -592,16 +592,16 @@ define('DEFAULTSQL', [
 				"	context varchar(255) NOT NULL," .
 				"	case_state varchar(MAX) NULL DEFAULT NULL," .
 				"	record_type varchar(255) NULL DEFAULT NULL," .
-				"	identifier varchar(MAX) NOT NULL," .
+				"	identifier nvarchar(MAX) NOT NULL," .
 				"	last_user int NOT NULL," .
 				"	last_touch datetime NOT NULL," .
-				"	last_document varchar(MAX) NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	closed varchar(MAX) NULL DEFAULT NULL," .
+				"	last_document nvarchar(MAX) NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
+				"	closed nvarchar(MAX) NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL," .
 				"	lifespan int NULL DEFAULT NULL," .
 				"	erp_case_number varchar(255) NULL DEFAULT NULL," .
-				"	note varchar(MAX) NULL DEFAULT NULL," .
+				"	note nvarchar(MAX) NULL DEFAULT NULL," .
 				"	restricted_access varchar(MAX) NULL DEFAULT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL" .
 				");"
@@ -609,31 +609,46 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .
 				"CREATE TABLE caro_records_datalist (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	issue varchar(MAX) NOT NULL," .
+				"	issue nvarchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
-				"	datalist varchar(MAX) NOT NULL" .
+				"	datalist nvarchar(MAX) NOT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_request_log', N'U') IS NULL " .
+				"CREATE TABLE caro_request_log (" .
+				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
+				"	timestamp datetime NOT NULL," .
+				"	method varchar(255 NOT NULL," .
+				"	api nvarchar(MAX) NOT NULL," .
+				"	payload nvarchar(MAX) NULL," .
+				"	user_id int NOT NULL," .
+				"	user_name nvarchar(255) NOT NULL," .
+				"	user_permissions varchar(MAX) NOT NULL," .
+				"	user_ip varchar(255) NOT NULL," .
+				"	session_id varchar(1024) NULL," .
+				"	response_code varchar(255) NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
 				"CREATE TABLE caro_risks (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	type varchar(255) NOT NULL," .
-				"	process varchar(MAX) NOT NULL," .
-				"	risk varchar(MAX) NOT NULL," .
+				"	process nvarchar(MAX) NOT NULL," .
+				"	risk nvarchar(MAX) NOT NULL," .
 				"	relevance tinyint NULL," .
-				"	cause varchar(MAX) NULL," .
-				"	effect varchar(MAX) NULL," .
+				"	cause nvarchar(MAX) NULL," .
+				"	effect nvarchar(MAX) NULL," .
 				"	probability int NULL," .
 				"	damage int NULL," .
-				"	measure varchar(MAX) NOT NULL," .
+				"	measure nvarchar(MAX) NOT NULL," .
 				"	measure_probability int NULL," .
 				"	measure_damage int NULL," .
-				"	risk_benefit varchar(MAX) NULL," .
-				"	measure_remainder varchar(MAX) NULL," .
-				"	proof varchar(MAX) NULL," .
+				"	risk_benefit nvarchar(MAX) NULL," .
+				"	measure_remainder nvarchar(MAX) NULL," .
+				"	proof nvarchar(MAX) NULL," .
 				"	date datetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL" .
+				"	author nvarchar(255) NOT NULL," .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_sessions', N'U') IS NULL " .
@@ -647,27 +662,27 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
 				"CREATE TABLE caro_texttemplates (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	name varchar(255) NOT NULL," .
+				"	name nvarchar(255) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	date datetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
+				"	author nvarchar(255) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
 				"	type varchar(255) NOT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL," .
-				"	approval varchar(MAX) NULL DEFAULT NULL" .
-				"	linked_files varchar(MAX) NULL DEFAULT NULL" .
+				"	hidden nvarchar(MAX) NULL DEFAULT NULL," .
+				"	approval nvarchar(MAX) NULL DEFAULT NULL" .
+				"	linked_files nvarchar(MAX) NULL DEFAULT NULL" .
 				");" 
 				.
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .
 				"CREATE TABLE caro_user (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	name varchar(MAX) NOT NULL," .
+				"	name nvarchar(255) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL," .
 				"	units varchar(MAX) NOT NULL," .
 				"	token varchar(MAX) NOT NULL," .
 				"	orderauth varchar(255) NOT NULL," .
 				"	image varchar(MAX) NOT NULL," .
-				"	app_settings varchar(MAX) NOT NULL," .
+				"	app_settings nvarchar(MAX) NOT NULL," .
 				"	skills varchar(MAX) NOT NULL" .
 				"	invalidation_date date NULL DEFAULT NULL," .
 				"	two_factor varchar(255) NULL DEFAULT NULL," .
@@ -682,46 +697,31 @@ define('DEFAULTSQL', [
 				"	proxy_users varchar(MAX) NULL DEFAULT NULL," .
 				"	span_start date NOT NULL," .
 				"	span_end date NOT NULL," .
-				"	responsibility varchar(MAX) NULL DEFAULT NULL," .
-				"	description varchar(MAX) NULL DEFAULT NULL" .
-				");"
-				.
-				"IF OBJECT_ID(N'caro_request_log', N'U') IS NULL " .
-				"CREATE TABLE caro_request_log (" .
-				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	timestamp datetime NOT NULL," .
-				"	method varchar(255 NOT NULL," .
-				"	api varchar(MAX) NOT NULL," .
-				"	payload varchar(MAX) NULL," .
-				"	user_id int NOT NULL," .
-				"	user_name varchar(255) NOT NULL," .
-				"	user_permissions varchar(MAX) NOT NULL," .
-				"	user_ip varchar(255) NOT NULL," .
-				"	session_id varchar(1024) NULL," .
-				"	response_code varchar(255) NULL" .
+				"	responsibility nvarchar(MAX) NULL DEFAULT NULL," .
+				"	description nvarchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
 				"CREATE TABLE caro_user_training (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
-				"	name varchar(MAX) NOT NULL," .
+				"	name nvarchar(MAX) NOT NULL," .
 				"	date date NULL," .
 				"	expires date NULL," .
 				"	experience_points int NULL," .
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
-				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
-				"	planned varchar(255) NULL DEFAULT NULL" .
+				"	evaluation nvarchar(MAX) NULL DEFAULT NULL," .
+				"	planned varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'dbo.caro_whiteboard', N'U') IS NULL " .
 				"CREATE TABLE caro_whiteboard (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	user_id int NOT NULL," .
-				"	name varchar(MAX) NOT NULL," .
+				"	name nvarchar(MAX) NOT NULL," .
 				"	last_touch datetime NULL," .
 				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
-				"	content varchar(MAX) NULL DEFAULT NULL," .
+				"	content nvarchar(MAX) NULL DEFAULT NULL," .
 				"	doodle varchar(MAX) NULL DEFAULT NULL" .
 				");"
 		],
