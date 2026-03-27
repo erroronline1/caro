@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * records
     * assignable unit to override automatic "detection"
-* ~~apache~~ file handling 'corrupts' stl files, but not pdf, images, nor obj?
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 * enable markdown for more (messages, etc.), regular users not parsing anchors to avoid malicious scripts
     * can it replace htmlcontent? alertUserGroup and depending language chunks
@@ -2403,7 +2402,6 @@ Albeit Safari being capable of displaying most of the content and contributing r
 		* footnotes
 		* emojis
 * Timetracking makes use of time inputs for working hours and breaks which may be confusing if your browsers locale settings forces a 12h-layout. Please speak to your systems operator for a decent locale setting.
-* For an unknown reason STL-files are 'corrupted' but repairable after redownload on the Apache development environment. For the moment you should stick with OBJ-files for digital models.
 
 [Content](#content)
 

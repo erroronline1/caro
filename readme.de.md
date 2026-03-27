@@ -2305,7 +2305,6 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 		* Fußnoten
 		* Emojis
 * Die Zeiterfassung nutzt Eingaben vom Typ `time` für Arbeitszeiten und Pausen, was verwirrend erscheint sofern die Systemeinstellungen im Browser ein 12h-Format erzwingen. Bitte sprechen Sie mit Ihrem Betreiber über vernünftige Systemeinstellungen.
-* Aus ungeklärter Ursache sind STL-Dateien 'defekt' aber reparierbar nach einem erneuten Herunterladen in der Apache-Entwicklungsumgebung. Für den Moment sollte sich auf OBJ-Dateien für digitale Modelle beschränkt werden.
 
 [Übersicht](#übersicht)
 
