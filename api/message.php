@@ -681,9 +681,9 @@ class MESSAGE extends API {
 				$whiteboard[':content'] .= "\n" . $this->_lang->GET('message.whiteboard.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
 
 
-				$owhiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
+				$owhiteboard = SQLQUERY::EXECUTE2($this->_pdo, 'whiteboard_get', [
 					':id' => $this->_requestedID
-				]]);
+				]);
 				$owhiteboard = $owhiteboard ? $owhiteboard[0] : null;
 				if ($owhiteboard){
 					$whiteboard[':id'] = $owhiteboard['id'];
@@ -704,9 +704,7 @@ class MESSAGE extends API {
 					if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_post', [
-					'values' => $whiteboard
-				])) {
+				if (SQLQUERY::EXECUTE2($this->_pdo, 'whiteboard_post', $whiteboard)) {
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle_export')) && $_FILES["_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')]){
 						$paths = [];
 						foreach ($this->_filehandler->storeUploadedFiles(
@@ -747,9 +745,9 @@ class MESSAGE extends API {
 					]]);
 				break;
 			case 'GET':
-				$whiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
+				$whiteboard = SQLQUERY::EXECUTE2($this->_pdo, 'whiteboard_get', [
 					':id' => $this->_requestedID
-				]]);
+				]);
 				$whiteboard = $whiteboard ? $whiteboard[0]: null;
 
 				$response['render']['form'] = [

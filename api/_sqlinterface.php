@@ -99,6 +99,83 @@ class SQLQUERY {
 	}
 
 	/**
+	 * execute a query  
+	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
+	 * 
+	 * @param object $_pdo preset database connection, passed from main application
+	 * @param string $query either defined within queries below or prepared raw queries
+	 * @param array $tokens strtr tokens and values
+	 * @param bool|string $searchwildcards true for ? and *, all for replacement of [^\w\d], contain for only %...% - see SEARCH()
+	 * 
+	 * @return false|int|array sql result not executed|affectedRows|selection
+	 */
+	public static function EXECUTE2($_pdo, $query = '', $tokens = [], $searchwildcards = false){
+		// retrive query matching sql driver, else process raw query
+		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
+		
+
+		foreach($tokens as $key => $value){
+			if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
+				$query = SELF::SEARCH($_pdo, $query, $value, ($searchwildcards ?? false));
+				if (!$query) return [];
+			}
+			if (in_array($key, [':field'])) $tokens[$key] = $value; // some replacements involve column names that must not be quoted
+			else $tokens[$key] = self::typehandler($_pdo, $value);
+		}
+		$query = strtr($query, $tokens);
+
+
+		// execute query
+		try {
+			$statement = $_pdo->query($query);
+		}
+		catch (\Exception $e) {
+			UTILITY::debug($e, $statement->queryString, $statement->debugDumpParams());
+			die();
+		}
+
+		// prepare result response
+		if (str_starts_with($query, 'SELECT')) {
+			//UTILITY::debug($statement->debugDumpParams());
+			$result = $statement->fetchAll();
+		}
+		elseif (str_starts_with($query, 'CREATE') || str_starts_with($query, 'IF OBJECT_ID(N')) $result = $statement->errorInfo(); // _databaseupdate.php table creation
+		elseif (str_starts_with($query, 'ALTER TABLE') || str_starts_with($query, 'IF COL_LENGTH(')) $result = $statement->errorInfo(); // _databaseupdate.php column altering
+		else $result = $statement->rowCount(); // affected rows
+
+		$statement = null;
+		return $result;
+	}
+	/**
+	 * value type handling, sanitation and quoting
+	 * also arrays (preferably lists) can be passed that are handled accordingly
+	 */
+	private static function typehandler($_pdo, $value){
+			switch (gettype($value)){
+				case 'array':
+					return implode(',', array_map(Fn($v) => self::typehandler($_pdo, $v), $value));
+					break;
+				case 'string':
+					if (in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) return $value;
+					return $_pdo->quote($value);
+					break;
+				case 'NULL':
+					return 'NULL';
+					break;
+				case 'integer':
+					return intval($value);
+					break;
+				case 'double':
+				case 'float':
+					return floatval($value);
+					break;
+				case 'boolean':
+					return $value ? intval($value) : 'NULL';
+					break;
+			}
+		}
+
+	/**
 	 * alters a query according to pattern of $value  
 	 * to make use of that, column comparisons have to be encapsulated within parentheses each  
 	 * SELECT FROM table WHERE (column LIKE :SEARCH) OR (column2 LIKE :SEARCH)
