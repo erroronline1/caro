@@ -897,14 +897,14 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access) " .
-						"VALUES (:id, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL, :restricted_access) " .
-						"ON DUPLICATE KEY UPDATE case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note, restricted_access = :restricted_access",
+			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access, unit) " .
+						"VALUES (:id, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL, :restricted_access, :unit) " .
+						"ON DUPLICATE KEY UPDATE case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note, restricted_access = :restricted_access, unit = :unit",
 			'sqlsrv' => "MERGE INTO caro_records WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :context AS context, :case_state AS case_state, :record_type AS record_type, :identifier AS identifier, :last_user AS last_user, :last_document AS last_document, :content AS content, :lifespan AS lifespan, :erp_case_number AS erp_case_number, :note AS note, :restricted_access AS restricted_access) AS source " .
-						"(id, context, case_state, record_type, identifier, last_user, last_document, content, lifespan, erp_case_number, note, restricted_access) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note, restricted_access = :restricted_access " .
-						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL, :restricted_access);"
+						"(SELECT :id AS id, :context AS context, :case_state AS case_state, :record_type AS record_type, :identifier AS identifier, :last_user AS last_user, :last_document AS last_document, :content AS content, :lifespan AS lifespan, :erp_case_number AS erp_case_number, :note AS note, :restricted_access AS restricted_access, :unit AS unit) AS source " .
+						"(id, context, case_state, record_type, identifier, last_user, last_document, content, lifespan, erp_case_number, note, restricted_access, unit) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note, restricted_access = :restricted_access, unit = :unit " .
+						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access, unit) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL, :restricted_access, :unit);"
 		],
 		'records_close' => [
 			'mysql' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier",

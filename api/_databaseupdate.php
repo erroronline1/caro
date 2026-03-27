@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2026_03_20'] as $update){
+		foreach (['_2026_03_27'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -643,6 +643,21 @@ class UPDATE{
 			'sqlsrv' => [
 				"ALTER TABLE caro_media DROP COLUMN expiry_date, metadata; ",
 				"UPDATE caro_user SET image = CONCAT('../', image) WHERE SUBSTRING(image, 1, 3) != '../'"
+			]
+		];
+	}
+
+	private function _2026_03_27(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS unit tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_records', 'unit') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD unit varchar(255) NULL DEFAULT NULL" .
+				" END; "
 			]
 		];
 	}
