@@ -147,6 +147,17 @@ class NOTIFICATION extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+		// construct unit-member lists to iterate over for summarized messages
+		$unit_members = [];
+		foreach($users as $user){
+			foreach(explode(',', $user['units']) as $unit){
+				if (!isset($unit_members[$unit])) $unit_members[$unit] = [];
+				$unit_members[$unit][] = $user['name'];
+			}
+		}
+
 
 		$override = false;
 		if ($this->_cronOverride && PERMISSION::permissionFor('cronoverride')) $override = true;
@@ -158,7 +169,6 @@ class NOTIFICATION extends API {
 					switch($task){
 						case 'SYSTEMDAILY':
 							// delete messages for users with enabled autodeletion
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							foreach($users as $user){
 								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 								if (isset($user['app_settings']['autodeleteMessages'])){
@@ -206,7 +216,6 @@ class NOTIFICATION extends API {
 
 								$from = date('Y-m-d', filemtime($logfile));
 								if (!($erpdata = ERPINTERFACE->birthdaymessage($from))) break;
-								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 								foreach ($erpdata as $workmate){
 									if (!array_search($workmate['name'], array_column($users, 'name'))) continue;
 									$this->alertUserGroup(
@@ -397,6 +406,8 @@ class NOTIFICATION extends API {
 							$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 							$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 							$alerts = [];
+							$unclosed_notif = [];
+							$missingretention_notif = [];
 							foreach ($data as $row){
 								// alert about unclosed records if difference between now and last touch is divisible by reminder-interval
 								if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
@@ -405,18 +416,26 @@ class NOTIFICATION extends API {
 									$last = new \DateTime($row['last_touch']);
 									$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
 									if ($row['notified'] < $diff){
-										$this->alertUserGroup(
-											[
-												// limit recipients to specialized workforce only, exclude admin, office and common
-												'unit' => $row['unit'] ? [$row['units']] : array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
-											],
-											$this->_lang->GET('record.reminder_message', [
-												':days' => $last->diff($this->_date['servertime'])->days,
-												':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
-												':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
-												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
-											], true)
-										);
+
+										// limit recipients to specialized workforce only, exclude admin, office and common
+										$units = $row['unit'] ? [$row['unit']] : array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']));
+
+										// iterate over units
+										foreach($units as $unit){
+											if (!empty($unit_members[$unit])) {
+												// iterate over unit members to summarize topic
+												foreach($unit_members[$unit] as $unit_member){
+													if (!isset($unclosed_notif[$unit_member])) $unclosed_notif[$unit_member] = [];
+													$unclosed_notif[$unit_member][] = $this->_lang->GET('record.reminder_message', [
+														':days' => $last->diff($this->_date['servertime'])->days,
+														':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
+														':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
+														':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+													], true);
+												}
+											}
+										}
+
 										// prepare alert flags
 										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
 											[
@@ -434,16 +453,26 @@ class NOTIFICATION extends API {
 										// skip non case related records for lifespan reminder
 										if (!in_array($row['context'], ['casedocumentation', 'incident'])) continue;
 
-										$this->alertUserGroup(
-											[
-												// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
-												'permission' => PERMISSION::permissionFor('recordscasestate', true),
-												'unit' => array_filter([$row['unit'], ...explode(',', $row['units'] ? : '')], fn($u) => !in_array($u, ['common', 'admin']))
-											],
-											$this->_lang->GET('record.lifespan.reminder_message', [
-												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
-											], true)
-										);
+										// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
+										$units = array_filter([$row['unit'], ...explode(',', $row['units'] ? : '')], fn($u) => !in_array($u, ['common', 'admin']));
+
+										// iterate over units
+										foreach($units as $unit){
+											if (!empty($unit_members[$unit])) {
+												// iterate over unit members to summarize topic
+												foreach($unit_members[$unit] as $unit_member){
+													// filter permission
+													$unit_member_permissions = explode(',', $user[array_search($unit_member, array_column($user, 'name'))]);
+													if (!array_intersect($unit_member_permissions, PERMISSION::permissionFor('recordscasestate', true))) continue;
+
+													if (!isset($missingretention_notif[$unit_member])) $missingretention_notif[$unit_member] = [];
+													$missingretention_notif[$unit_member][] = $this->_lang->GET('record.lifespan.reminder_message', [
+														':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+													], true);
+												}
+											}
+										}
+
 										// prepare alert flags
 										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
 											[
@@ -486,6 +515,24 @@ class NOTIFICATION extends API {
 									}
 								}
 							}
+
+							// deliver vendor request message grouped by vendor to decrease amount of messages
+							foreach($unclosed_notif as $user_name => $messages){
+								$this->alertUserGroup(
+									['user' => [$user_name]],
+									implode("\n\n", array_unique($messages))
+								);
+							}
+
+							// deliver single issue request message per unit to decrease amount of messages
+							foreach($missingretention_notif as $user_name => $messages){
+								$this->alertUserGroup(
+									[
+										'user' => [$user_name]
+									],
+									implode("\n\n", array_unique($messages))
+								);
+							}
 							// set alert flags
 							foreach ($alerts as $alert){
 								SQLQUERY::EXECUTE($this->_pdo, $alert);
@@ -522,9 +569,8 @@ class NOTIFICATION extends API {
 							// alert requesting undelivered orders or marking delivered as issued
 							$alerts = [];
 							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
-							// userlist to decode orderer
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-							$undelived_notif = [];
+							$undelivered_notif = [];
+							$unissued_notif = [];
 
 							foreach ($unissued as $order){
 								$update = false;
@@ -536,19 +582,19 @@ class NOTIFICATION extends API {
 								$ordered = new \DateTime($order['ordered'] ? : '');
 								switch($order['ordertype']){
 									case "service":
-										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['undelivered']));
+										$deliver_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['undelivered']));
 										break;
 									default:
-										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
+										$deliver_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
 										break;
 								}
-								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
-								if ($order['ordered'] && !$order['issued_full'] && $order['delivered_notified'] < $receive_interval){
+								$deliver_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
+								if ($order['ordered'] && !$order['issued_full'] && $order['delivered_notified'] < $deliver_interval){
 									$decoded_order_data = json_decode($order['order_data'], true);
 
 									// construct vendor request messages grouped by vendor
-									if (!isset($undelived_notif[$decoded_order_data['vendor_label'] ?? ''])) $undelived_notif[$decoded_order_data['vendor_label'] ?? ''] = [];
-									$undelived_notif[$decoded_order_data['vendor_label'] ?? ''][] = $this->_lang->GET('order.alert_undelivered_order', [
+									if (!isset($undelivered_notif[$decoded_order_data['vendor_label'] ?? ''])) $undelivered_notif[$decoded_order_data['vendor_label'] ?? ''] = [];
+									$undelivered_notif[$decoded_order_data['vendor_label'] ?? ''][] = $this->_lang->GET('order.alert_undelivered_order', [
 											':days' => $ordered->diff($this->_date['servertime'])->days,
 											':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 											':quantity' => $decoded_order_data['quantity_label'],
@@ -560,55 +606,65 @@ class NOTIFICATION extends API {
 											':orderer' => $users[array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))]['name']
 										], true);
 									$update = true;
-								} else $receive_interval = $order['delivered_notified'];
+								} else $deliver_interval = $order['delivered_notified'];
 
 								// alert unit members to mark as issued for orders and items returned from service
 								// return or cancellation don't matter as these are not delivered
 								$delivered_full = new \DateTime($order['delivered_full'] ? : '');
-								$delivery_interval = intval(abs($delivered_full->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unissued']));
-								if ($order['delivered_full'] && in_array($order['ordertype'], ['order', 'service']) && $order['issued_notified'] < $delivery_interval){
+								$issue_interval = intval(abs($delivered_full->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unissued']));
+								if ($order['delivered_full'] && in_array($order['ordertype'], ['order', 'service']) && $order['issued_notified'] < $issue_interval){
 									if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 
-									$organizational_unit = [$order['organizational_unit']];
+									$units = [$order['organizational_unit']];
 									// if unit is common, add ordering users units except admin
-									if ($organizational_unit === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))){
-										array_push($organizational_unit, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
+									if ($units === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))){
+										array_push($units, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
 									}
-
-									$this->alertUserGroup(
-										['unit' => $organizational_unit],
-										$this->_lang->GET('order.alert_unissued_order', [
-											':days' => $delivered_full->diff($this->_date['servertime'])->days,
-											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
-											':quantity' => $decoded_order_data['quantity_label'],
-											':unit' => $decoded_order_data['unit_label'] ?? '',
-											':number' => $decoded_order_data['ordernumber_label'] ?? '',
-											':name' => $decoded_order_data['productname_label'] ?? '',
-											':vendor' => $decoded_order_data['vendor_label'] ?? '',
-											':commission' => $decoded_order_data['commission'],
-											':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
-										], true)
-									);
+									
+									// iterate over units
+									foreach($units as $unit){
+										if (!empty($unit_members[$unit])) {
+											// iterate over unit members to summarize topic
+											foreach($unit_members[$unit] as $unit_member){
+												if (!isset($unissued_notif[$unit_member])) $unissued_notif[$unit_member] = [];
+												$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
+													':days' => $delivered_full->diff($this->_date['servertime'])->days,
+													':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
+													':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? '']) . '</a>',
+													':vendor' => $decoded_order_data['vendor_label'] ?? '',
+													':commission' => $decoded_order_data['commission'],
+													':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
+												], true);
+											}
+										}
+									}
 									$update = true;
-								} else $delivery_interval = $order['issued_notified'];
+								} else $issue_interval = $order['issued_notified'];
 
 								// prepare alert flags
 								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
 									[
-										':delivered_notified' => $receive_interval ? : 'NULL',
-										':issued_notified' => $delivery_interval ? : 'NULL',
+										':delivered_notified' => $deliver_interval ? : 'NULL',
+										':issued_notified' => $issue_interval ? : 'NULL',
 										':id' => $order['id']
 									]) . '; ');
 
 							}
 
 							// deliver vendor request message grouped by vendor to decrease amount of messages
-							foreach($undelived_notif as $message){
+							foreach($undelivered_notif as $messages){
 								$this->alertUserGroup(
 									['permission' => ['purchase']],
-									implode("\n\n", $message)
+									implode("\n\n", $messages)
 								);
+							}
 
+							// deliver single issue request message per unit to decrease amount of messages
+							foreach($unissued_notif as $user_name => $messages){
+								$this->alertUserGroup(
+									['user' => [$user_name]],
+									implode("\n\n", array_unique($messages))
+								);
 							}
 							// set alert flags
 							foreach ($alerts as $alert){
@@ -653,7 +709,6 @@ class NOTIFICATION extends API {
 							break;
 						case 'restrict_user_access':
 							// set new token for users that have an expired access date
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$sqlchunks = [];
 							foreach($users as $user){
 								if (!$user['invalidation_date']) continue;
@@ -841,7 +896,6 @@ class NOTIFICATION extends API {
 							break;
 						case 'schedule_training_evaluation':
 							// schedule training evaluation
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 								':ids' => array_column($users, 'id')
 							]);
@@ -885,7 +939,6 @@ class NOTIFICATION extends API {
 							break;
 						case 'schedule_retrainings':
 							// schedule retrainings
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 								':ids' => array_column($users, 'id')
 							]);
