@@ -504,9 +504,9 @@ class MESSAGE extends API {
 							'type' => 'error'
 						]]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
-						'from_user' => $_SESSION['user']['id'],
-						'to_user' => $recipient['id'],
-						'message' => $message
+						':from_user' => $_SESSION['user']['id'],
+						':to_user' => $recipient['id'],
+						':message' => $message
 					])) $success++;
 				}
 				if ($success === count($recipients)) $this->response([
