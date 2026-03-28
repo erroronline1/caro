@@ -1713,7 +1713,7 @@ class ORDER extends API {
 			}
 		}
 		else {
-			$decoded_order_data['additional_info'] = ($this->_lang->_DEFAULT['order_returns']['easy'][$return_reason] ?? $return_reason) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+			$decoded_order_data['additional_info'] = ($this->_lang->_DEFAULT['orderreturns']['easy'][$return_reason] ?? $return_reason) . "\n" . ($decoded_order_data['additional_info'] ?? '');
 		}
 		return $decoded_order_data;
 	}
