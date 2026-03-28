@@ -933,9 +933,8 @@ class RECORD extends API {
 				require_once('./document.php');
 				$documentfinder = new DOCUMENT(get_class_vars(get_class($this)));
 				$useddocument = $documentfinder->recentdocument('document_get', [
-					'values' => [
-						':id' => $document_id
-					]]);
+					':id' => $document_id
+				]);
 
 				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
@@ -1779,6 +1778,7 @@ class RECORD extends API {
 		foreach ($data as $contextkey => $context){
 			foreach ($context as $record){
 				// append units of available records
+				$record['units'] = $record['units'] ?: [];
 				$currentunits = array_filter([...$record['units'], $record['unit']]);
 				if ($currentunits) array_push($available_units, ...$currentunits);
 				else $available_units[] = null;
@@ -2467,9 +2467,8 @@ class RECORD extends API {
 			$printablecontent = $enumerate = [];
 			foreach ($summary['content'] as $document => $content){
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
-					'values' => [
-						':name' => $document
-					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
+					':name' => $document
+					], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 				else $printablecontent[$document] = $content; // pseudodocument
 			}
 			$summary['content'] = $printablecontent;

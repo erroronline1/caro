@@ -333,7 +333,7 @@ class DOCUMENT extends API {
 				if (!$bundle[':name'] || !$bundle[':content']) $this->response([], 400);
 
 				// check forbidden names
-				if (UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				// get latest by name
@@ -821,7 +821,7 @@ class DOCUMENT extends API {
 				if (!$component_approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.not_saved_missing'), 'type' => 'error']]);
 
 				// check for forbidden name
-				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
 				$component['content'] = fileupload($this->_filehandler, $component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
 
@@ -1199,7 +1199,7 @@ class DOCUMENT extends API {
 			case 'POST':
 				if (!$this->_payload->context) $this->response(['response' => ['msg' => $this->_lang->GET("assemble.compose.document.not_saved_missing"), 'type' => 'error']]); // no content provided
 				// check for forbidden names
-				if (UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 
 				// recursively retrieve input names and check for identifier withon component
 				function componentAttributes($element, $result = ['names' => [], 'hasidentifier' => false]){
@@ -1887,9 +1887,8 @@ class DOCUMENT extends API {
 				$row['regulatory_context'] = implode(', ', array_map(fn($c) => $this->_lang->GET('regulatory.' . $c), explode(',', $row['regulatory_context'] ? : '')));
 				// add component contents to terms
 				$document = $this->recentdocument('document_document_get_by_name', [
-					'values' => [
-						':name' => $row['name']
-					]]);
+					':name' => $row['name']
+				]);
 				$searchables = componentSearcheables($document['content']);
 				// compare search
 				if (SEARCH::filter($parameter['search'], [$row['name'], $row['alias'], $row['regulatory_context'], ...$searchables])){

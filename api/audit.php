@@ -3201,9 +3201,8 @@ class AUDIT extends API {
 		require_once('./document.php');
 		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
-			'values' => [
-				':context' => 'training_evaluation_document'
-			]])['content'];
+			':context' => 'training_evaluation_document'
+		])['content'];
 
 		foreach ($users as $user){
 			if (

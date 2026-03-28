@@ -268,9 +268,8 @@ class CONSUMABLES extends API {
 				// unsets payload keys for matches sample check inputs
 				if (array_filter($products, fn($p) => $p['trading_good'])){ // are there trading goods?
 					$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
-						'values' => [
-							':context' => 'mdr_sample_check_document'
-						]])['content']);
+						':context' => 'mdr_sample_check_document'
+					])['content']);
 					if ($inputnames){	
 						// create proper evaluation data
 						// convert checkbox value
@@ -315,9 +314,8 @@ class CONSUMABLES extends API {
 
 				// product incorporation data handling
 				$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
-					'values' => [
-						':context' => 'product_incorporation_document'
-					]])['content']);
+					':context' => 'product_incorporation_document'
+				])['content']);
 				// create proper evaluation data
 				// convert checkbox value
 				// unset empty values and keys from payload to freely process occasionally hidden system values
@@ -417,13 +415,11 @@ class CONSUMABLES extends API {
 		
 				// get incorporation- and sample-check-documents, chain for eligible products
 				$incorporationdocument = $document->recentdocument('document_document_get_by_context', [
-					'values' => [
-						':context' => 'product_incorporation_document'
-					]])['content'];
+					':context' => 'product_incorporation_document'
+				])['content'];
 				if ($product['trading_good']) array_push($incorporationdocument, ...$document->recentdocument('document_document_get_by_context', [
-					'values' => [
-						':context' => 'mdr_sample_check_document'
-					]])['content']);
+					':context' => 'mdr_sample_check_document'
+				])['content']);
 
 				// select similar products by article number from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -592,9 +588,8 @@ class CONSUMABLES extends API {
 					return $result;
 				}
 				$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
-					'values' => [
-						':context' => 'mdr_sample_check_document'
-					]])['content']);
+					':context' => 'mdr_sample_check_document'
+				])['content']);
 
 				if (!$inputnames) $this->response([
 					'response' => [
@@ -697,9 +692,8 @@ class CONSUMABLES extends API {
 							]
 						],
 						...$document->recentdocument('document_document_get_by_context', [
-							'values' => [
-								':context' => 'mdr_sample_check_document'
-							]])['content']
+							':context' => 'mdr_sample_check_document'
+						])['content']
 					],
 					'options' => [
 						$this->_lang->GET('order.sample_check.cancel') => false,
@@ -2401,9 +2395,8 @@ class CONSUMABLES extends API {
 		require_once('./document.php');
 		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
-			'values' => [
-				':context' => 'vendor_evaluation_document'
-			]]);
+			':context' => 'vendor_evaluation_document'
+		]);
 		$evaluationdocument = $evaluationdocument ? $evaluationdocument['content'] : [];
 
 		switch ($_SERVER['REQUEST_METHOD']){
