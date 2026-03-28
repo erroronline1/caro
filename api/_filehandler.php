@@ -324,7 +324,7 @@ class FILEHANDLER{
 				// delete database entries (records exceeding lifespan)
 				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
 					':path' => $pathinfo['dirname'],
-					':names' => $this->_pdo->quote($pathinfo['basename'])
+					':names' => $pathinfo['basename']
 				]);
 			}
 		}
