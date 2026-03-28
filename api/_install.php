@@ -173,7 +173,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE IF NOT EXISTS `caro_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`alias` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`date` datetime NOT NULL," .
@@ -406,7 +406,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_templates (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
-				"	content vnarchar(MAX) NOT NULL," .
+				"	content nvarchar(MAX) NOT NULL," .
 				"	objectives nvarchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	date datetime NOT NULL," .
@@ -519,7 +519,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_documents (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name nvarchar(MAX) NOT NULL," .
-				"	alias nvarchar(MAX) NOT NULL," .
+				"	alias nvarchar(MAX) NULL DEFAULT NULL," .
 				"	context varchar(255) NOT NULL," .
 				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	date datetime NOT NULL," .
