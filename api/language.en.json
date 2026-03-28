@@ -282,7 +282,7 @@
 	},
 	"assemble": {
 		"approve": {
-			"alert": "Following documents have been approved with new content. Please make sure to dispose of outdated prints!\n:documents",
+			"alert": "Following documents have been approved with new content. Please make sure to dispose of outdated prints!  \n:documents",
 			"approved": "approved",
 			"as_select": "Approve in your role as",
 			"completed": "This element is fully approved and can now be used.",
@@ -581,7 +581,7 @@
 				"observe": "Observation of activities"
 			},
 			"objectives": "Audit objectives",
-			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.\nPlease finalize the audit.",
+			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.  \nPlease finalize the audit.",
 			"template": {
 				"delete_confirm_header": "Delete template for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
@@ -1373,8 +1373,8 @@
 		"additional_info": "Additional Information",
 		"administrative_mark": "Administrative mark",
 		"alert_archived_limit": "There are currently more than :max orders archived. Please review if you can clear up.",
-		"alert_disapprove_order": "An order \n\n:order \n\nfor :unit has been disapproved by :user and reset as prepared order since further inquiry is required. Please get in touch.",
-		"alert_orderstate_change": "An order state \n\n:order \n\nfor :unit has been updated by :user.",
+		"alert_disapprove_order": "An order  \n:order  \nfor :unit has been disapproved by :user and reset as prepared order since further inquiry is required. Please get in touch.",
+		"alert_orderstate_change": "An order state  \n:order  \nfor :unit has been updated by :user.",
 		"alert_purchase": "New orders are awaiting processing :)",
 		"alert_undelivered_order": "The order (:ordertype) of :quantity :unit :number :name by :vendor for :commission has not yet been delivered for :days days. Please get in touch with :vendor to enquire the expected arrival. :orderer will be grateful!",
 		"alert_unissued_order": "The order (:ordertype) of :quantity :unit :number :name by :vendor for :commission has been delivered on :deliverydate but not marked as issued for :days days. Please mark as issued to clear things up for purchase or enquire delivery.",
@@ -1502,7 +1502,7 @@
 		"return_message_ok": "Yes, return",
 		"return_reason": "Reason of return",
 		"sample_check": {
-			"alert": "A new MDR §14 Sample check has been submitted by :name. Review within :audit\n\n",
+			"alert": "A new MDR §14 Sample check has been submitted by :name. Review within :audit  \n",
 			"by_user": "This article qualifies for a MDR §14 sample check by a personified user account!",
 			"cancel": "No, thank you",
 			"checked": "examined",
@@ -1618,7 +1618,7 @@
 		"reidentify_unauthorized_content": "Ask someone with a special permission (:permissions) to correct this.",
 		"reidentify_unauthorized_name": "Identifier not correct?",
 		"reidentify_warning": "The similarity of both identifiers are below the threshold of :percent%. Please reaffirm.",
-		"reminder_message": "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :document.\nHelp continuing or close the record.",
+		"reminder_message": "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :document.  \nHelp continuing or close the record.",
 		"restricted_access": "Restricted access",
 		"restricted_access_hint": "Records will be hidden from everyone else except administrative users.",
 		"restricted_access_units":"Limit access to selected groups",
@@ -1982,7 +1982,7 @@
 		"user_not_deleted": "User :name could not be deleted",
 		"user_not_saved": "User could not be saved",
 		"user_saved": "User :name has been saved",
-		"welcome_message": "Hello :name,\nwelcome to the :appname. A brief summary:\nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.\nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.\nI hope the app does make things easier at work, good luck!"
+		"welcome_message": "Hello :name,  \nwelcome to the :appname. A brief summary:  \nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.  \nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.  \nI hope the app does make things easier at work, good luck!"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 General quality management requirements",

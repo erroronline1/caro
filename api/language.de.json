@@ -282,7 +282,7 @@
 	},
 	"assemble": {
 		"approve": {
-			"alert": "Folgende Dokumente wurden mit einem neuen Inhalt freigegeben. Bitte veraltete Ausdrucke entsorgen!\n:documents",
+			"alert": "Folgende Dokumente wurden mit einem neuen Inhalt freigegeben. Bitte veraltete Ausdrucke entsorgen!  \n:documents",
 			"approved": "freigegeben",
 			"as_select": "Freigabe in deiner Rolle als",
 			"completed": "Dieses Element ist vollständig freigegeben und kann nun verwendet werden.",
@@ -581,7 +581,7 @@
 				"observe": "Beobachtung von Tätigkeiten"
 			},
 			"objectives": "Auditziele",
-			"reminder_message": "Es sind :days Tage vergangen seit der letzten Bearbeitung des Audits für :unit. Die letzte Bearbeitung fand am :date statt.\nBitte schließe das Audit ab.",
+			"reminder_message": "Es sind :days Tage vergangen seit der letzten Bearbeitung des Audits für :unit. Die letzte Bearbeitung fand am :date statt.  \nBitte schließe das Audit ab.",
 			"template": {
 				"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Vorlage löschen",
@@ -1373,8 +1373,8 @@
 		"additional_info": "Zusätzliche Informationen",
 		"administrative_mark": "Verwaltungskennzeichen",
 		"alert_archived_limit": "Aktuell sind mehr als :max Bestellungen archiviert. Bitte prüft ob davon welche gelöscht werden können.",
-		"alert_disapprove_order": "Die Bestellung \n\n:order \n\nfür :unit wurde von :user zurückgewiesen und als vorbereitete Bestellung zurückgesetzt, da weitere Recherchen erforderlich sind. Bitte tretet in Kontakt.",
-		"alert_orderstate_change": "Der Bestellstatus \n\n:order \n\nfür :unit wurde von :user aktualisiert.",
+		"alert_disapprove_order": "Die Bestellung  \n:order  \nfür :unit wurde von :user zurückgewiesen und als vorbereitete Bestellung zurückgesetzt, da weitere Recherchen erforderlich sind. Bitte tretet in Kontakt.",
+		"alert_orderstate_change": "Der Bestellstatus  \n:order  \nfür :unit wurde von :user aktualisiert.",
 		"alert_purchase": "Neue Bestellungen freuen sich auf Bearbeitung :)",
 		"alert_undelivered_order": "Die Bestellung (:ordertype) von :quantity :unit :number :name von :vendor für :commission ist seit :days Tagen noch nicht eingetroffen. Bitte setzt euch mit :vendor in Verbindung um das Lieferdatum zu erfragen. :orderer bedankt sich!",
 		"alert_unissued_order": "Die Bestellung (:ordertype) von :quantity :unit :number :name von :vendor für :commission wurde am :deliverydate geliefert aber seit :days Tagen nicht als ausgehändigt markiert. Bitte markiere als ausgehändigt um die Information auch für den Einkauf zu bereinigen oder frage den Einkauf nach dem Stand der Dinge.",
@@ -1502,7 +1502,7 @@
 		"return_message_ok": "Ja, zurücksenden",
 		"return_reason": "Rücksendegrund",
 		"sample_check": {
-			"alert": "Eine neue Stichprobenprüfung wurde von :name übermittelt. Bitte überprüfe sie bei :audit\n\n",
+			"alert": "Eine neue Stichprobenprüfung wurde von :name übermittelt. Bitte überprüfe sie bei :audit  \n",
 			"by_user": "Dieser Artikel kommt für eine Stichprobenprüfung durch eine persönliche Nutzeranmeldung in Frage!",
 			"cancel": "Nein danke",
 			"checked": "geprüft",
@@ -1618,7 +1618,7 @@
 		"reidentify_unauthorized_content": "Frage jemanden mit der passenden Berechtigung (:permissions) nach einer Korrektur.",
 		"reidentify_unauthorized_name": "Kennzeichen nicht richtig?",
 		"reidentify_warning": "Die Ähnlichkeit beider Kennzeichen liegt unter der Schwelle von :percent%. Bitte bestätige erneut.",
-		"reminder_message": "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :document statt.\nHilf bei der Weiterbearbeitung oder schließe den Fall ab.",
+		"reminder_message": "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :document statt.  \nHilf bei der Weiterbearbeitung oder schließe den Fall ab.",
 		"restricted_access": "Zugriffsbeschränkung",
 		"restricted_access_hint": "Die Aufzeichnungen werden anderen - mit Ausnahme der Leitung - nicht angezeigt.",
 		"restricted_access_units":"Zugriff auf ausgewählte Gruppen beschränken",
@@ -1982,7 +1982,7 @@
 		"user_not_deleted": "Der Nutzer :name konnte nicht gelöscht werden",
 		"user_not_saved": "Der nutzer konnte nicht gespeichert werde",
 		"user_saved": "Der Nutzer :name wurde gespeichert",
-		"welcome_message": "Hallo :name,\nwillkommen in der :appname. Hier eine kurze Zusammenfassung:\nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo, bei der Produktsicherheit unterstützt dich :prrc und bei Fragen zu Gefahrstoffen :hazardous_materials. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.\nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.\nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
+		"welcome_message": "Hallo :name,  \nwillkommen in der :appname. Hier eine kurze Zusammenfassung:  \nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo, bei der Produktsicherheit unterstützt dich :prrc und bei Fragen zu Gefahrstoffen :hazardous_materials. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.  \nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.  \nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem",
