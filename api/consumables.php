@@ -980,7 +980,7 @@ class CONSUMABLES extends API {
 				$_batchhidden = UTILITY::propertySet($this->_payload, '_batchhidden');
 				if (PERMISSION::permissionFor('products') && $_batchhidden){
 					$batchids = explode(',', $_batchhidden);
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
 						':value' => $product['hidden'],
 						':field' => 'hidden',
 						':ids' => array_map(Fn($id) => intval($id), $batchids),	
@@ -994,7 +994,7 @@ class CONSUMABLES extends API {
 					$batchids = explode(',', $_batchalias);
 
 					// alias is allowed to be updated by purchase assistants as well
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
 							':value' => $product['article_alias'],
 							':field' => 'article_alias',
 							':ids' => array_map(Fn($id) => intval($id), $batchids),	
@@ -1006,7 +1006,7 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('products') && $_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate')){
 					$batchids = explode(',', $_batchupdate);
 
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
 						':value' => $product['article_alias'],
 						':field' => 'article_alias',
 						':ids' => array_map(Fn($id) => intval($id), $batchids),	
