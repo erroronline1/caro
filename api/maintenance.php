@@ -343,7 +343,7 @@ class MAINTENANCE extends API {
 					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('records_datalist_post'), $insertions);
 					if ($sqlchunks){
 						// drop unit entries
-						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', ['values' => [':unit' => $unit]])) $response['render']['content'][] = [
+						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', [':unit' => $unit])) $response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
@@ -380,7 +380,7 @@ class MAINTENANCE extends API {
 					];
 				}
 				else {
-					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $unit]]);
+					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [':unit' => $unit]);
 					if (!$datalists){
 						$response['response'] = [
 							'msg' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
@@ -477,10 +477,8 @@ class MAINTENANCE extends API {
 				$until = $until ? $this->convertToServerTime($until . ' 23:59:59') : null;
 
 				if ($log = SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_get', [
-					'values' => [
-						':from' => $from,
-						':until' => $until
-					]
+					':from' => $from,
+					':until' => $until
 				])){
 					require_once('./_table.php');
 					$export = new TABLE([$log]);

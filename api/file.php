@@ -150,9 +150,7 @@ class FILE extends API {
 						$response = $this->_lang->GET('file.external_file.regulatory_context');
 				}
 				// process prepared database update
-				if ($this->_requestedId && SQLQUERY::EXECUTE($this->_pdo, $prepare, [
-					'values' => $tokens
-				])) $this->response(['response' => [
+				if ($this->_requestedId && SQLQUERY::EXECUTE($this->_pdo, $prepare, $tokens)) $this->response(['response' => [
 						'msg' => $response,
 						'type' => 'success'
 					]]);

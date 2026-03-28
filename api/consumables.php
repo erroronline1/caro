@@ -148,9 +148,7 @@ class CONSUMABLES extends API {
 		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 		$products = $downloadfiles = [];
 		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-			'values' => [
-				':id' => intval($this->_requestedID)
-			]
+			':id' => intval($this->_requestedID)
 		]);
 		$vendor = $vendor ? $vendor[0] : [];
 		if (!$vendor) $this->response([
@@ -159,9 +157,7 @@ class CONSUMABLES extends API {
 				'type' => 'error'
 			]]);
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-			'values' => [
-				':ids' => $this->_requestedID
-			]
+			':ids' => $this->_requestedID
 		]);
 		if (!$products) $this->response([
 			'response' => [
@@ -238,9 +234,7 @@ class CONSUMABLES extends API {
 					$batchids = explode(',', $_batchupdate);
 				}
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'replacements' => [
-						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)])
-					]
+						':ids' => [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)]
 				]);
 				if (!$products) $this->response([
 					'response' => [
@@ -303,13 +297,9 @@ class CONSUMABLES extends API {
 								$product['sample_checks'][] = ['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 				
 								if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
-									'values' => [
-										':ids' => $product['id'],
-										':sample_checks' => UTILITY::json_encode($product['sample_checks'])
-									],
-									'replacements' => [
-										':checked' => 'CURRENT_TIMESTAMP'
-									]
+									':ids' => $product['id'],
+									':sample_checks' => UTILITY::json_encode($product['sample_checks']),
+									':checked' => 'CURRENT_TIMESTAMP'
 								])) {
 									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 										$this->_lang->GET('order.sample_check.alert', [
@@ -386,13 +376,9 @@ class CONSUMABLES extends API {
 					}
 					// set has_files
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
 							':value' => 1,
-						],
-						'replacements' => [
 							':ids' => intval($this->_requestedID),
 							':field' => 'has_files',
-						]
 					]);
 				}
 
@@ -402,10 +388,8 @@ class CONSUMABLES extends API {
 					$product['incorporated'][] = $approve;
 					try {
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-							'replacements' => [
-								':id' => $product['id'],
-								':incorporated' => UTILITY::json_encode($product['incorporated'])
-							]
+							':id' => $product['id'],
+							':incorporated' => UTILITY::json_encode($product['incorporated'])
 						]);
 					}
 					catch(\Exception $e){
@@ -426,9 +410,7 @@ class CONSUMABLES extends API {
 			case 'GET':
 				$response = [];
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -445,9 +427,7 @@ class CONSUMABLES extends API {
 
 				// select similar products by article number from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-					'values' => [
-						':ids' => intval($product['vendor_id'])
-					]
+					':ids' => intval($product['vendor_id'])
 				]);
 				$similarproducts = [];
 				$productsPerSlide = 0;
@@ -581,9 +561,7 @@ class CONSUMABLES extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $this->response([
@@ -670,24 +648,16 @@ class CONSUMABLES extends API {
 					}
 					// set has_files
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
 							':value' => 1,
-						],
-						'replacements' => [
 							':ids' => intval($this->_requestedID),
 							':field' => 'has_files',
-						]
 					]);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
-					'values' => [
-						':ids' => $product['id'],
-						':sample_checks' => UTILITY::json_encode($product['sample_checks'])
-					],
-					'replacements' => [
-						':checked' => 'CURRENT_TIMESTAMP'
-					]
+					':ids' => $product['id'],
+					':sample_checks' => UTILITY::json_encode($product['sample_checks']),
+					':checked' => 'CURRENT_TIMESTAMP'
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check.alert', [
@@ -708,9 +678,7 @@ class CONSUMABLES extends API {
 				break;
 			case 'GET':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -745,9 +713,7 @@ class CONSUMABLES extends API {
 				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
 				// get product
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 
@@ -762,13 +728,9 @@ class CONSUMABLES extends API {
 				array_pop($product['sample_checks']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
-					'values' => [
-						':checked' => null,
-						':sample_checks' => count($product['sample_checks']) ? UTILITY::json_encode($product['sample_checks']) : null
-					],
-					'replacements' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':checked' => null,
+					':sample_checks' => count($product['sample_checks']) ? UTILITY::json_encode($product['sample_checks']) : null,
+					':ids' => intval($this->_requestedID)
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.sample_check.revoked'),
@@ -861,9 +823,7 @@ class CONSUMABLES extends API {
 
 				// validate vendor
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $product['vendor_name']
-					]
+					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 				if (!$vendor) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
@@ -874,9 +834,7 @@ class CONSUMABLES extends API {
 					$product['has_files'] = 1;
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', [
-					'values' => $product
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', $product)) {
 					// save documents
 					$filenamewarning = [];
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
@@ -927,9 +885,7 @@ class CONSUMABLES extends API {
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 				// prepare product-array to update, return error if not found
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
 						':ids' => intval($this->_requestedID)
-					]
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -979,9 +935,7 @@ class CONSUMABLES extends API {
 
 				// validate vendor
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $product['vendor_name']
-					]
+					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 				if (!$vendor) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
@@ -1027,13 +981,9 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('products') && $_batchhidden){
 					$batchids = explode(',', $_batchhidden);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
-							':value' => $product['hidden'],
-						],
-						'replacements' => [
-							':field' => 'hidden',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
-						]
+						':value' => $product['hidden'],
+						':field' => 'hidden',
+						':ids' => array_map(Fn($id) => intval($id), $batchids),	
 					]);
 				}
 
@@ -1045,13 +995,9 @@ class CONSUMABLES extends API {
 
 					// alias is allowed to be updated by purchase assistants as well
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
 							':value' => $product['article_alias'],
-						],
-						'replacements' => [
 							':field' => 'article_alias',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
-						]
+							':ids' => array_map(Fn($id) => intval($id), $batchids),	
 					]);	
 				}
 
@@ -1061,24 +1007,16 @@ class CONSUMABLES extends API {
 					$batchids = explode(',', $_batchupdate);
 
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
-							':value' => $product['article_alias'],
-						],
-						'replacements' => [
-							':field' => 'article_alias',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
-						]
+						':value' => $product['article_alias'],
+						':field' => 'article_alias',
+						':ids' => array_map(Fn($id) => intval($id), $batchids),	
 					]);	
 
 					foreach (['trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order'] as $field){ // apply setting to selected similar products
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-							'values' => [
-								':value' => $product[$field],
-							],
-							'replacements' => [
-								':field' => $field,
-								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
-							]
+							':value' => $product[$field],
+							':field' => $field,
+							':ids' => array_map(Fn($id) => intval($id), $batchids),	
 						]);	
 					}
 				}
@@ -1089,9 +1027,7 @@ class CONSUMABLES extends API {
 					$batchids = explode(',', $_batchincorporation);
 
 					$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-						'replacements' => [
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids))
-						]
+						':ids' => array_map(Fn($id) => intval($id), $batchids)
 					]);
 					foreach($products as $similarproduct){
 						$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
@@ -1118,10 +1054,8 @@ class CONSUMABLES extends API {
 						else $similarproduct['incorporated'] = null;
 
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-							'replacements' => [
-								':id' => $similarproduct['id'],
-								':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
-							]
+							':id' => $similarproduct['id'],
+							':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
 						]);
 					}
 				}
@@ -1131,26 +1065,24 @@ class CONSUMABLES extends API {
 
 				// update product
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_product', [
-					'values' => [
-						':id' => $this->_requestedID,
-						':vendor_id' => $product['vendor_id'],
-						':article_no' => $product['article_no'],
-						':article_name' => $product['article_name'],
-						':article_alias' => $product['article_alias'] ? : null,
-						':article_unit' => $product['article_unit'],
-						':article_ean' => $product['article_ean'],
-						':article_info' => $product['article_info'],
-						':hidden' => $product['hidden'],
-						':has_files' => $product['has_files'],
-						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated'] ? : null,
-						':has_expiry_date' => $product['has_expiry_date'],
-						':special_attention' => $product['special_attention'],
-						':stock_item' => $product['stock_item'],
-						':erp_id' => $product['erp_id'],
-						':thirdparty_order' => $product['thirdparty_order'],
-						':last_order' => $product['last_order']
-					]
+					':id' => $this->_requestedID,
+					':vendor_id' => $product['vendor_id'],
+					':article_no' => $product['article_no'],
+					':article_name' => $product['article_name'],
+					':article_alias' => $product['article_alias'] ? : null,
+					':article_unit' => $product['article_unit'],
+					':article_ean' => $product['article_ean'],
+					':article_info' => $product['article_info'],
+					':hidden' => $product['hidden'],
+					':has_files' => $product['has_files'],
+					':trading_good' => $product['trading_good'],
+					':incorporated' => $product['incorporated'] ? : null,
+					':has_expiry_date' => $product['has_expiry_date'],
+					':special_attention' => $product['special_attention'],
+					':stock_item' => $product['stock_item'],
+					':erp_id' => $product['erp_id'],
+					':thirdparty_order' => $product['thirdparty_order'],
+					':last_order' => $product['last_order']
 				])) $this->response([
 					'response' => [
 						'id' => intval($this->_requestedID),
@@ -1176,9 +1108,7 @@ class CONSUMABLES extends API {
 
 				// select single product based on id or name
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
+					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 
@@ -1227,9 +1157,7 @@ class CONSUMABLES extends API {
 
 				// select all products from selected vendor, retrieve similar products
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-					'values' => [
-						':ids' => intval($product['vendor_id'])
-					]
+					':ids' => intval($product['vendor_id'])
 				]);
 				$similarproducts = [];
 				foreach ($vendorproducts as $vendorproduct){
@@ -1788,16 +1716,12 @@ class CONSUMABLES extends API {
 			if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 			// prefetch to return proper name after deletion
 			$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-				'values' => [
-					':ids' => intval($this->_requestedID)
-				]
+				':ids' => intval($this->_requestedID)
 			]);
 			$product = $product ? $product[0] : ['id' => null];
 
 			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_unprotected_product', [
-				'values' => [
-					':id' => $product['id']
-					]
+				':id' => $product['id']
 			])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('consumables.product.deleted', [':name' => $product['article_name']]),
@@ -1856,14 +1780,11 @@ class CONSUMABLES extends API {
 		if ($parameter['search']) {
 			// get matches
 			$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? 'consumables_get_product_search' : 'order_get_product_search', [
-				'values' => [
-					':SEARCH' => $parameter['search'],
+				':SEARCH' => $parameter['search'],
+				':vendor' => $parameter['vendor'] ? ('%' . $parameter['vendor'] . '%') : '%',
 				],
-				'wildcards' => 'all',
-				'replacements' => [
-					':vendor' =>$parameter['vendor'] ? ('%' . $parameter['vendor'] . '%') : '%',
-				]
-			]);
+				'all'
+			);
 			// order matches by relevance; shift to top if all of optional terms have been found, apply column condition if applicable
 
 			$search = SEARCH::refine($parameter['search'], $search, ['article_ean', 'erp_id', 'article_no', 'article_name']);
@@ -2232,16 +2153,12 @@ class CONSUMABLES extends API {
 		if (count($productlist->_list[1])){
 			// purge all unprotected products for a fresh data set
 			if ($purge) SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
-				'values' => [
-					':id' => $vendorID
-				]
+				':id' => $vendorID
 			]);
 			// retrieve left items
 			$remainder = [];
 			$remained = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-				'values' => [
-					':ids' => intval($vendorID)
-				]
+				':ids' => intval($vendorID)
 			]);
 
 			// prepare hopefully distinguisheable product lists, based on article_no and article_name
@@ -2365,9 +2282,7 @@ class CONSUMABLES extends API {
 			// update entries with data from erp interface if available and selected
 			if ($erp_match && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $vendorID
-					]
+					':id' => $vendorID
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 				$erp_dump = ERPINTERFACE->consumables([$vendor['name']]);
@@ -2498,9 +2413,7 @@ class CONSUMABLES extends API {
 				$vendor = [];
 				if ($this->_requestedID){
 					$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					$vendor = $vendor ? $vendor[0] : null;
 					if (!$vendor) $this->response(null, 406);
@@ -2605,9 +2518,7 @@ class CONSUMABLES extends API {
 				// tidy up consumable products database if inactive
 				if ($vendor[':id'] && $vendor[':hidden']){
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
-						'values' => [
-							':id' => $vendor[':id']
-							]
+						':id' => $vendor[':id']
 					]);
 					unset ($vendor[':products']['validity']);
 				}
@@ -2686,9 +2597,7 @@ class CONSUMABLES extends API {
 				$vendor[':evaluation'] = $vendor[':evaluation'] ? UTILITY::json_encode($vendor[':evaluation']) : null;
 
 				// save vendor to database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
-					'values' => $vendor
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', $vendor)) {
 					// file handling only after successful insertion/update especially for evaluation document files
 					$vendor[':id'] = $vendor[':id'] ? : $this->_pdo->lastInsertId();
 
@@ -2762,9 +2671,7 @@ class CONSUMABLES extends API {
 				
 				// select single vendor based on id or name
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 
@@ -2819,10 +2726,8 @@ class CONSUMABLES extends API {
 				$available = 0;
 				$ordered = 0;
 				if ($vendor['id']) {
-						$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-						'values' => [
-							':ids' => intval($vendor['id'])
-						]
+					$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+						':ids' => intval($vendor['id'])
 					]);
 					// count available products for this vendor
 					foreach ($vendorproducts as $product){

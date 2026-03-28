@@ -164,14 +164,12 @@ class NOTIFICATION extends API {
 								if (isset($user['app_settings']['autodeleteMessages'])){
 									$prior_date = clone $this->_date['servertime'];
 									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
-										'values' => [
-											':user' => $user['id'],
-											':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
-										]
-									])) SQLQUERY::EXECUTE($this->_pdo, strtr(SQLQUERY::PREPARE('message_delete_messages'),[
+										':user' => $user['id'],
+										':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
+									])) SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
 											':user' => $user['id'],
 											':ids' => implode(',', array_column($messages, 'id')) 
-										]));
+										]);
 								}
 							}
 
@@ -179,26 +177,20 @@ class NOTIFICATION extends API {
 							$deldate = clone ($this->_date['servertime']);
 							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
 							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
-								'values' => [
-									':date' => $deldate->format('Y-m-d H:i:s')
-								]
+								':date' => $deldate->format('Y-m-d H:i:s')
 							]);
 							// delete sessions
 							$deldate = clone ($this->_date['servertime']);
 							$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
 							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
-								'values' => [
-									':date' => $deldate->format('Y-m-d H:i:s')
-								]
+								':date' => $deldate->format('Y-m-d H:i:s')
 							]);
 
 							// delete old delivered unarchived orders
 							require_once('./order.php');
 							$order = new ORDER(get_class_vars(get_class($this)));
 							$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_issued', [
-								'values' => [
-									':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
-								]
+								':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
 							]);
 							foreach ($old as $row){
 								$order->delete_approved_order($row);
@@ -309,13 +301,9 @@ class NOTIFICATION extends API {
 								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata($oldest))) break; 
 
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
-									'values' => [
-										':SEARCH' => '%'
-									],
-									'replacements' => [
-										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units'])),
+										':SEARCH' => '%',
+										':organizational_unit' => array_keys($this->_lang->_USER['units']),
 										':user' => 0
-									]
 								]);
 								
 								require_once('./order.php');
@@ -393,9 +381,7 @@ class NOTIFICATION extends API {
 							// prior to this implementation every approved order did a message resulting in spamming and the fear of them becoming dulled to notifications
 							if (file_exists($logfile)){
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed_alert', [
-									'values' => [
-										':timestamp' => date('Y-m-d H:i:s', filemtime($logfile)) 
-									]
+									':timestamp' => date('Y-m-d H:i:s', filemtime($logfile)) 
 								]);
 								$orders = $orders ? intval($orders[0]['num']) : null;
 
@@ -485,15 +471,12 @@ class NOTIFICATION extends API {
 										// delete orders containing identifier e.g. archived case related orders having identifier as commission
 										if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
 											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
-												'values'=> [
-													':SEARCH' => $row['identifier']
+												':SEARCH' => $row['identifier'],
+												':organizational_unit' => array_keys($this->_lang->_DEFAULT['units']), // all units
+												':user' => ''
 												],
-												'wildcards' => 'contained',
-												'replacements' => [
-													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])), // all units
-													':user' => ''
-												]
-											]);
+												'contained',
+											);
 											require_once('./order.php');
 											$order = new ORDER(get_class_vars(get_class($this)));
 											foreach($orders as $relatedorder){
@@ -527,14 +510,10 @@ class NOTIFICATION extends API {
 											':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 										], true)
 									);
-									SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified',
-										[
-											'values' => [
-												':notified' => $diff,
-												':id' => $row['id']
-											]
-										]
-									);
+									SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified', [
+										':notified' => $diff,
+										':id' => $row['id']
+									]);
 								}
 							}
 							$execution = true;
@@ -546,7 +525,6 @@ class NOTIFICATION extends API {
 							// userlist to decode orderer
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$undelived_notif = [];
-							$unissued_notif = [];
 
 							foreach ($unissued as $order){
 								$update = false;
@@ -668,9 +646,8 @@ class NOTIFICATION extends API {
 							// delete order statistics
 							$prior_date = clone $this->_date['servertime'];
 							SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics', [
-								'values' => [
-									':datetime' => $prior_date->modify('-' . CONFIG['lifespan']['order']['statistics'] . ' years')->format('Y-m-d H:i:s')
-								]]);
+								':datetime' => $prior_date->modify('-' . CONFIG['lifespan']['order']['statistics'] . ' years')->format('Y-m-d H:i:s')
+							]);
 
 							$execution = true;
 							break;
@@ -866,9 +843,7 @@ class NOTIFICATION extends API {
 							// schedule training evaluation
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-								'replacements' => [
-									':ids' => implode(',', array_column($users, 'id'))
-								]
+								':ids' => array_column($users, 'id')
 							]);
 							foreach ($trainings as $training){
 								if ($training['evaluation'] || !$training['date']) continue;
@@ -912,9 +887,7 @@ class NOTIFICATION extends API {
 							// schedule retrainings
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-								'replacements' => [
-									':ids' => implode(',', array_column($users, 'id'))
-								]
+								':ids' => array_column($users, 'id')
 							]);
 							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
 							foreach ($trainings as $training){
@@ -940,7 +913,6 @@ class NOTIFICATION extends API {
 										if ($none) {
 											// insert scheduled training and message user and supervisor
 											SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-												'values' => [
 													':name' => $training['name'],
 													':user_id' => $user['id'],
 													':date' => null,
@@ -953,7 +925,6 @@ class NOTIFICATION extends API {
 														'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 														'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => $this->_lang->GET('user.training.auto_schedule', [':expires' => $this->convertFromServerTime($training['expires'], true)], true)]
 													])
-												]
 											]);
 											$this->alertUserGroup([
 													'permission' => ['supervisor'],
@@ -1085,15 +1056,11 @@ class NOTIFICATION extends API {
 	 */
 	public function messageunnotified(){
 		$unnotified = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unnotified', [
-			'values' => [
-				':user' => $_SESSION['user']['id']
-			]
+			':user' => $_SESSION['user']['id']
 		]);
 		$unnotified = $unnotified ? intval($unnotified[0]['number']) : 0;
 		SQLQUERY::EXECUTE($this->_pdo, 'message_put_notified', [
-			'values' => [
-				':user' => $_SESSION['user']['id']
-			]
+			':user' => $_SESSION['user']['id']
 		]);
 		return $unnotified;
 	}
@@ -1108,9 +1075,7 @@ class NOTIFICATION extends API {
 	 */
 	public function messageunseen(){
 		$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen', [
-			'values' => [
-				':user' => $_SESSION['user']['id']
-			]
+			':user' => $_SESSION['user']['id']
 		]);
 		$unseen = $unseen ? intval($unseen[0]['number']) : 0;
 		return $unseen;
@@ -1252,9 +1217,7 @@ class NOTIFICATION extends API {
 		// schedule training evaluation
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
+			':ids' => array_column($users, 'id')
 		]);
 
 		$unitusers = [];
@@ -1264,9 +1227,7 @@ class NOTIFICATION extends API {
 			if (array_intersect(array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) $unitusers[] = $user['id'];
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', $unitusers)
-			]
+			':ids' => $unitusers
 		]);
 		foreach ($trainings as $training){
 			if ($training['planned']) {

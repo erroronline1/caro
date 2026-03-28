@@ -83,9 +83,7 @@ class TEXTTEMPLATE extends API {
 					}
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
-					'values' => $chunk
-				])) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', $chunk)) $this->response([
 					'response' => [
 						'name' => $chunk[':name'],
 						'msg' => $this->_lang->GET('texttemplate.chunk.saved', [':name' => $chunk[':name']]),
@@ -106,15 +104,11 @@ class TEXTTEMPLATE extends API {
 				// get selected chunk
 				if (intval($this->_requestedID)){
 					$chunk = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
-						'values' => [
-							':id' => intval($this->_requestedID)
-						]
+						':id' => intval($this->_requestedID)
 					]);
 				} else {
 					$chunk = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
+						':name' => $this->_requestedID
 					]);
 				}
 				$chunk = $chunk ? $chunk[0] : null;
@@ -340,16 +334,12 @@ class TEXTTEMPLATE extends API {
 				break;
 			case 'DELETE':
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$template = $template ? $template[0] : null;
 				if ($template && 
 					SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_delete', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					])
 				) $this->response([
 						'response' => [
@@ -399,9 +389,7 @@ class TEXTTEMPLATE extends API {
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
-					'values' => [
-						':name' => $template[':name']
-					]
+					':name' => $template[':name']
 				]);
 				foreach ($exists as $row => $entry){
 					if ($entry['type'] !== 'template') unset($exists[$row]);
@@ -423,9 +411,7 @@ class TEXTTEMPLATE extends API {
 				$template[':linked_files'] = implode($template[':linked_files']);
 
 				// else post new template
-				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
-					'values' => $template
-				])) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', $template)) $this->response([
 					'response' => [
 						'name' => $template[':name'],
 						'msg' => $this->_lang->GET('texttemplate.template.saved', [':name' => $template[':name']]),
@@ -448,15 +434,11 @@ class TEXTTEMPLATE extends API {
 				// get selected template
 				if (intval($this->_requestedID)){
 					$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
-						'values' => [
-							':id' => intval($this->_requestedID)
-						]
+						':id' => intval($this->_requestedID)
 					]);
 				} else {
 					$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
+						':name' => $this->_requestedID
 					]);
 				}
 				$template = $template ? $template[0] : null;
@@ -693,16 +675,12 @@ class TEXTTEMPLATE extends API {
 				break;
 			case 'DELETE':
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$template = $template ? $template[0] : null;
 				if ($template && 
 					SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_delete', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					])
 				) $this->response([
 						'response' => [
@@ -733,9 +711,7 @@ class TEXTTEMPLATE extends API {
 
 		// get selected template
 		$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
-			'values' => [
-				':id' => intval($this->_requestedID)
-			]
+			':id' => intval($this->_requestedID)
 		]);
 		$template = $template ? $template[0] : null;
 		if (!$template) $template = [

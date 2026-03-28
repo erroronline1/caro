@@ -44,9 +44,7 @@ class MEASURE extends API {
 				];
 				if (!$measure) $this->response([], 400);
 				
-				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_post', [
-					'values' => $measure
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_post', $measure)) {
 					// get users and trigger system message to all
 					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
@@ -70,7 +68,7 @@ class MEASURE extends API {
 			case 'PUT':
 				if (!PERMISSION::permissionFor('measureedit')) $this->response([], 401);
 				$measure = SQLQUERY::EXECUTE($this->_pdo, 'measure_get_by_id', [
-					'values' => [':id' => $this->_requestedID]
+					':id' => $this->_requestedID
 				]);
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->response([], 404);
@@ -88,9 +86,7 @@ class MEASURE extends API {
 				// delete. as edits are displayed within a modal this is handled by a checkbox instead of a confirming button, hence no delete request-method
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.delete'))){
 					if (SQLQUERY::EXECUTE($this->_pdo, 'measure_delete', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					])) $this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('measure.deleted'),
@@ -105,12 +101,10 @@ class MEASURE extends API {
 
 				// put if not deleted
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_put', [
-					'values' => [
-						':measures' => $measure['measures'],
-						':closed' => $measure['closed'],
-						':id' => $measure['id'],
-						':last_user' => $_SESSION['user']['name']
-					]
+					':measures' => $measure['measures'],
+					':closed' => $measure['closed'],
+					':id' => $measure['id'],
+					':last_user' => $_SESSION['user']['name']
 				])) {
 					if ($changed) // alert on changes only
 						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
@@ -280,7 +274,7 @@ class MEASURE extends API {
 			case 'PUT':
 				// anonymous user id upvote 1 downote -1 , able to calculate median
 				$measure = SQLQUERY::EXECUTE($this->_pdo, 'measure_get_by_id', [
-					'values' => [':id' => $this->_requestedID]
+					':id' => $this->_requestedID
 				]);
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->response([], 404);
@@ -304,10 +298,8 @@ class MEASURE extends API {
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_vote', [
-					'values' => [
-						':votes' => UTILITY::json_encode($measure['votes']),
-						':id' => $measure['id']
-					]
+					':votes' => UTILITY::json_encode($measure['votes']),
+					':id' => $measure['id']
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.vote_confirm'),

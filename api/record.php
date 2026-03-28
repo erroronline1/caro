@@ -61,9 +61,7 @@ class RECORD extends API {
 				if (!PERMISSION::permissionFor('recordscasestate') || array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-					'values' => [
-						':identifier' => $this->_requestedID
-					]
+					':identifier' => $this->_requestedID
 				]);
 				$case = $case ? $case[0] : null;
 				if ($case){
@@ -143,9 +141,7 @@ class RECORD extends API {
 					$case[':content'] = UTILITY::json_encode($records) ? : null;
 					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]);
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-						'values' => $case
-					])) $this->response([
+					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', $case)) $this->response([
 						'response' => [
 							'msg' => $successMsg,
 							'type' => 'success'
@@ -250,9 +246,7 @@ class RECORD extends API {
 		if (!PERMISSION::permissionFor('recordsclosing') && !PERMISSION::permissionFor('complaintclosing')) $this->response([], 401);
 		if (!in_array($this->_passedIdentify, PERMISSION::permissionFor('recordsclosing', true)) && !in_array($this->_passedIdentify, PERMISSION::permissionFor('complaintclosing', true))) $this->response([], 401);
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $this->_requestedID
-			]
+			':identifier' => $this->_requestedID
 		]);
 		$data = $data ? $data[count($data) - 1] : []; // most recent entry suffices 
 		if (!$data) $this->response([], 204);
@@ -264,10 +258,8 @@ class RECORD extends API {
 		];
 
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
-			'values' => [
-				':closed' => UTILITY::json_encode($data['closed']),
-				':identifier' => $this->_requestedID
-			]
+			':closed' => UTILITY::json_encode($data['closed']),
+			':identifier' => $this->_requestedID
 		]);
 		$this->response([
 			'response' => [
@@ -295,7 +287,9 @@ class RECORD extends API {
 
 		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, parse markdown if applicable, make images available on fileserver database strategy
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
+		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
+			':unit' => $document['unit']
+		]);
 		function setidentifier($element, $identify, $calendar, $_lang, $_filehandler, $datalists){
 			$content = [];
 			foreach ($element as $subs){
@@ -435,9 +429,7 @@ class RECORD extends API {
 				$preset = null;
 				if ($this->_passedIdentify){
 					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-						'values' => [
-							':identifier' => $this->_passedIdentify
-						]
+						':identifier' => $this->_passedIdentify
 					]);
 					$data = $data ? $data[0] : null;
 					if ($data) $preset = $data['record_type'];
@@ -461,9 +453,7 @@ class RECORD extends API {
 				$preset = null;
 				if ($this->_passedIdentify){
 					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-						'values' => [
-							':identifier' => $this->_passedIdentify
-						]
+						':identifier' => $this->_passedIdentify
 					]);
 					$data = $data ? $data[0] : null;
 					if ($data) $preset = $data['restricted_access'] ? json_decode($data['restricted_access'], true) : [];
@@ -747,15 +737,14 @@ class RECORD extends API {
 
 		if ($IDENTIFY_BY_){
 			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-				'values' => [
-					':identifier' => $IDENTIFY_BY_
-				]
+				':identifier' => $IDENTIFY_BY_
 			]);
 			$data = $data ? $data[0] : null;
 
 			if ($data) {
 				$result = [];
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				$records = json_decode($data['content'], true);
 				foreach ($records as $record){
@@ -776,7 +765,6 @@ class RECORD extends API {
 					if (isset($preset['unit'])) array_push($result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')], ...array_map(Fn($v) => $this->_lang->_USER['units'][$v], $preset['unit']));
 					if (isset($result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')])) $result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')] = implode(' | ', $result['DEFAULT_' . $this->_lang->GET('record.restricted_access_units')]);
 					if (isset($preset['user'])) {
-						$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 						$result['DEFAULT_' . $this->_lang->GET('record.restricted_access_users')] = implode(', ', array_map(Fn($usr, $id) => $usr['id'] === $id ? $usr['name'] : false, $user, $preset['user']));
 					}
 				} 
@@ -829,9 +817,7 @@ class RECORD extends API {
 		// get latest approved by name
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
-			'values' => [
-				':name' => $name
-			]
+			':name' => $name
 		]);
 		foreach ($elements as $element){
 			if (!$element['hidden'] && in_array($element['context'], ['bundle'])) return $element; // bundles have no approval
@@ -871,9 +857,7 @@ class RECORD extends API {
 		}
 		// retrieve record
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $this->_passedIdentify
-			]
+			':identifier' => $this->_passedIdentify
 		]);
 		$data = $data ? $data[0] : null;
 		if (!$data) $this->response([], 404); // record not found
@@ -1050,7 +1034,9 @@ class RECORD extends API {
 						};
 
 						if ($issues = autocomplete($useddocument['content'])){
-							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $useddocument['unit']]]);
+							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
+								':unit' => $useddocument['unit']
+							]);
 							foreach ($issues as $issue){
 								// gather values even for enumerated submissions
 								$values = [];
@@ -1066,21 +1052,21 @@ class RECORD extends API {
 									array_push($datalist, ...$values);
 									$datalist = array_values(array_unique($datalist));
 									sort($datalist);
-									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_put', ['values' => [
+									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_put', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
-									]]);
+									]);
 								}
 								else {
 									// issue not found, add unique and sorted datalist
 									$datalist = array_values(array_unique($values));
 									sort($datalist);
-									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_post', ['values' => [
+									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_post', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
-									]]);
+									]);
 								}
 							}
 						}
@@ -1096,9 +1082,7 @@ class RECORD extends API {
 					if ($secureattachments) $current_record['attachments'] = UTILITY::json_encode($secureattachments);
 					
 					$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-						'values' => [
-							':identifier' => $identifier
-						]
+						':identifier' => $identifier
 					]);
 					$case = $case ? $case[0] : null;
 
@@ -1157,9 +1141,7 @@ class RECORD extends API {
 					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
 					$case[':content'] = UTILITY::json_encode($case[':content']);
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-							'values' => $case
-						])){
+					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', $case)){
 						// append next document recommendation for common and matching user units
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
@@ -1967,12 +1949,11 @@ class RECORD extends API {
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_search', [
-			'values' => [
 				':search' => $parameter['search'] ? : '%',
 				':SEARCH' => $parameter['search'] ? : '%'
 			],
-			'wildcards' => 'all',
-		]);
+			'all',
+		);
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found
@@ -2099,16 +2080,12 @@ class RECORD extends API {
 		
 		// check if new id (e.g. scanned) is already taken
 		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $new_id
-			]
+			':identifier' => $new_id
 		]);
 		$original = $original ? $original[0] : null;
 
 		$merge = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $entry_id
-			]
+			':identifier' => $entry_id
 		]);
 		$merge = $merge ? $merge[0] : null;
 		$merge['content'] = json_decode($merge['content'], true);
@@ -2124,7 +2101,6 @@ class RECORD extends API {
 		if (!$original) {
 			// overwrite identifier, append record altering
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-				'values' => [
 					':context' => $merge['context'],
 					':case_state' => $merge['case_state'] ? : null,
 					':record_type' => $merge['record_type'],
@@ -2138,7 +2114,7 @@ class RECORD extends API {
 					':restricted_access' => $merge['restricted_access'],
 					':id' => $merge['id'],
 					':unit' => $merge['unit']
-			]])) $this->response([
+			])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
 					'type' => 'success'
@@ -2155,7 +2131,6 @@ class RECORD extends API {
 				]]);
 	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-				'values' => [
 					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $original['record_type'],
@@ -2170,10 +2145,9 @@ class RECORD extends API {
 					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
 					':unit' => $original['unit']
-			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
-				'values' => [
+			]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 					':id' => $merge['id']
-			]])) $this->response([
+			])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_merged'),
 					'type' => 'success'
@@ -2200,9 +2174,7 @@ class RECORD extends API {
 		$record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'));
 
 		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $entry_id
-			]
+			':identifier' => $entry_id
 		]);
 		$original = $original ? $original[0] : null;
 		if ($original && $record_type){
@@ -2220,7 +2192,6 @@ class RECORD extends API {
 			]);
 			// update record
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-				'values' => [
 					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $record_type,
@@ -2234,7 +2205,7 @@ class RECORD extends API {
 					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
 					':unit' => $original['unit']
-			]])) $this->response([
+			])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.saved'),
 					'type' => 'success'
@@ -2284,9 +2255,7 @@ class RECORD extends API {
 
 	private function summarizeRecord($type = 'full', $export = false){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $this->_requestedID
-			]
+			':identifier' => $this->_requestedID
 		]);
 		$data = $data ? $data[0] : null;
 		if (!$data) return false;
@@ -2517,9 +2486,7 @@ class RECORD extends API {
 
 	public function verify(){
 		$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => $this->_requestedID
-			]
+			':identifier' => $this->_requestedID
 		]);
 		$case = $case ? $case[0] : null;
 		if (!$case || ! BLOCKCHAIN::verified($this->_pdo, json_decode($case['content'], true))) $this->response([

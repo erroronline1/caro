@@ -49,9 +49,7 @@ class DOCUMENT extends API {
 				$approveas = explode(' | ', $approveas);
 
 				$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$approve = $approve ? $approve[0] : null;
 				if (!$approve) $this->response([], 404); // document not found, e.g. deleted before approval
@@ -72,10 +70,8 @@ class DOCUMENT extends API {
 
 				// update document approval 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
-					'values' => [
-						':id' => $approve['id'],
-						':approval' => UTILITY::json_encode($approve['approval']) ? : ''
-					]
+					':id' => $approve['id'],
+					':approval' => UTILITY::json_encode($approve['approval']) ? : ''
 				]) !== false) {
 					$pending_approvals = PERMISSION::pending('documentapproval', $approve['approval']);
 					if (!$pending_approvals){
@@ -206,9 +202,7 @@ class DOCUMENT extends API {
 					}
 
 					$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					$approve = $approve ? $approve[0] : null;
 					if (!$approve) $this->response([], 404);
@@ -345,9 +339,7 @@ class DOCUMENT extends API {
 				// get latest by name
 				$exists = [];
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
-					'values' => [
-						':name' => $bundle[':name']
-					]
+					':name' => $bundle[':name']
 				]);
 				foreach ($documents as $exists){
 					break;
@@ -360,9 +352,7 @@ class DOCUMENT extends API {
 					$bundle[':approval'] = $exists['approval'];
 				}
 				// append bundle to database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => $bundle
-				])) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $bundle)) $this->response([
 						'response' => [
 							'name' => $bundle[':name'],
 							'msg' => $this->_lang->GET('assemble.compose.bundle.saved', [':name' => $bundle[':name']]),
@@ -386,18 +376,14 @@ class DOCUMENT extends API {
 				// get selected bundle
 				if (intval($this->_requestedID)){
 					$bundle = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					$bundle = $bundle ? $bundle[0] : null;
 				} else {
 					// get latest by name
 					$bundle = [];
 					$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
+						':name' => $this->_requestedID
 					]);
 					foreach ($documents as $bundle){
 						break;
@@ -787,9 +773,7 @@ class DOCUMENT extends API {
 
 				// select latest document by name
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
-					'values' => [
-						':name' => $component_name
-					]
+					':name' => $component_name
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
@@ -817,9 +801,7 @@ class DOCUMENT extends API {
 					}
 
 					if ($update){
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-							'values' => $document_component
-						])) $this->response([
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document_component)) $this->response([
 								'response' => [
 									'name' => $exists['name'],
 									'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
@@ -845,9 +827,7 @@ class DOCUMENT extends API {
 
 				$document_component[':content'] = UTILITY::json_encode($component);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => $document_component
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document_component)) {
 					// alert userGroups for approval
 					$component_id = $this->_pdo->lastInsertId();
 					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
@@ -874,9 +854,7 @@ class DOCUMENT extends API {
 				// return just the content for the composer
 				if (intval($this->_requestedID)){
 					$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					$component = $component ? $component[0] : null;
 				} else {
@@ -891,9 +869,7 @@ class DOCUMENT extends API {
 				break;
 			case 'DELETE':
 				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.delete_failure'), 'type' => 'error']]); //early exit
@@ -910,9 +886,7 @@ class DOCUMENT extends API {
 				}
 				deleteImages($this->_filehandler, json_decode($component['content'], true)['content']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.component.delete_success'),
 					'type' => 'deleted',
@@ -940,9 +914,7 @@ class DOCUMENT extends API {
 		// get selected component
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
 			$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-				'values' => [
-					':id' => $this->_requestedID
-				]
+				':id' => $this->_requestedID
 			]);
 			$component = $component ? $component[0] : null;
 			if (!$component) $component = [
@@ -1317,9 +1289,7 @@ class DOCUMENT extends API {
 
 				// select latest document by name
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_document_get_by_name', [
-					'values' => [
-						':name' => $this->_payload->name
-					]
+					':name' => $this->_payload->name
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
@@ -1340,9 +1310,7 @@ class DOCUMENT extends API {
 					}
 
 					if ($update) {
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-							'values' => $document
-						])) $this->response([
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document)) $this->response([
 								'response' => [
 									'name' => $this->_payload->name,
 									'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
@@ -1361,9 +1329,7 @@ class DOCUMENT extends API {
 				// if not updated check if approve is set, not earlier
 				if (!$this->_payload->approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_saved_missing'), 'type' => 'error']]);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => $document
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document)) {
 						$document_id = $this->_pdo->lastInsertId();
 						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
 						foreach (PERMISSION::permissionFor('documentapproval', true) as $permission){
@@ -1387,17 +1353,13 @@ class DOCUMENT extends API {
 				break;
 			case 'DELETE':
 				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.delete_failure'), 'type' => 'error']]);
 				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.document.delete_success'),
 					'type' => 'deleted',
@@ -1428,9 +1390,7 @@ class DOCUMENT extends API {
 		// get selected document
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
 			$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-				'values' => [
-					':id' => $this->_requestedID
-				]
+				':id' => $this->_requestedID
 			]);
 			$document = $document ? $document[0] : null;
 		} else{
@@ -1964,9 +1924,7 @@ class DOCUMENT extends API {
 		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
 
 		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
-			'values' => [
-				':id' => $document_id
-			]
+			':id' => $document_id
 		]);
 		$document = $document ? $document[0] : null;
 		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
@@ -2220,9 +2178,7 @@ class DOCUMENT extends API {
 		// get latest approved by name
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
-			'values' => [
-				':name' => $name
-			]
+			':name' => $name
 		]);
 		foreach ($elements as $element){
 			if (PERMISSION::fullyapproved('documentapproval', $element['approval'])
@@ -2324,9 +2280,7 @@ class DOCUMENT extends API {
 				foreach (explode(',', $content['content']) as $usedcomponent) {
 					// get latest approved by name
 					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
-						'values' => [
-							':name' => $usedcomponent
-						]
+						':name' => $usedcomponent
 					]);
 					foreach ($components as $component){
 						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 

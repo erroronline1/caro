@@ -22,81 +22,6 @@ class SQLQUERY {
 		return self::QUERIES[$context][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 	}
 
-	/**
-	 * execute a query  
-	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
-	 * 
-	 * @param object $_pdo preset database connection, passed from main application
-	 * @param string $query either defined within queries below or prepared raw queries
-	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries, wildcards bool|string - see SEARCH()
-	 * 
-	 * @return false|int|array sql result not executed|affectedRows|selection
-	 */
-	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => [], 'wildcards' => false]){
-		// retrive query matching sql driver, else process raw query
-		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
-		
-		// substitute NULL values, sanitize values, apply self::SEARCH() on :SEARCH-key
-		if (isset($parameters['values'])){
-			foreach ($parameters['values'] as $key => $value){
-
-				if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
-					$query = SELF::SEARCH($_pdo, $query, $value, ($parameters['wildcards'] ?? false));
-					if (!$query) return [];
-					unset($parameters['values'][$key]);
-					continue;
-				}
-
-				if (gettype($value) === 'NULL' || $value === false) {
-					$query = preg_replace('/(' . $key . ')(\W|$)/m', 'NULL$2', $query); // :id in :identity would be replaced with strtr too
-					unset($parameters['values'][$key]);
-				}
-				else $parameters['values'][$key] = trim($value);
-			}
-		} else $parameters['values'] = [];
-		// replace tokens in query that can not be executed
-		if (isset($parameters['replacements'])) {
-			foreach ($parameters['replacements'] as $key => $value){
-				$list = [];
-				if (json_decode($value, true) === null) $list = explode(',', $value); // can't explode csv if json
-				if (count($list) > 1){ // handle lists
-					foreach ($list as $index => $value2){
-						if (strval(intval($value2)) === $value2) $list[$index] = intval($value2); // handle int
-						else if (strval(floatval($value2)) === $value2) $parameters['replacements'][$key] = floatval($value2); // handle float
-						elseif (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2); // handle string
-					}
-					$parameters['replacements'][$key] = implode(',', $list);
-				}
-				else if (strval(intval($value)) === $value) $parameters['replacements'][$key] = intval($value); // handle int
-				else if (strval(floatval($value)) === $value) $parameters['replacements'][$key] = floatval($value); // handle float
-				else if (in_array($key, [':field'])) $parameters['replacements'][$key] = $value; // some replacements involve column names that must not be quoted
-				else if (gettype($value) === 'string' && !in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) $parameters['replacements'][$key] = $_pdo->quote($value); // handle string
-			}
-			$query = strtr($query, $parameters['replacements']);
-		}
-
-		// execute query
-		try {
-			$statement = $_pdo->prepare($query);
-			if (!$statement->execute($parameters['values'])) return false;
-		}
-		catch (\Exception $e) {
-			UTILITY::debug($e, $statement->queryString, $statement->debugDumpParams());
-			die();
-		}
-
-		// prepare result response
-		if (str_starts_with($query, 'SELECT')) {
-			//UTILITY::debug($statement->debugDumpParams());
-			$result = $statement->fetchAll();
-		}
-		elseif (str_starts_with($query, 'CREATE') || str_starts_with($query, 'IF OBJECT_ID(N')) $result = $statement->errorInfo(); // _databaseupdate.php table creation
-		elseif (str_starts_with($query, 'ALTER TABLE') || str_starts_with($query, 'IF COL_LENGTH(')) $result = $statement->errorInfo(); // _databaseupdate.php column altering
-		else $result = $statement->rowCount(); // affected rows
-
-		$statement = null;
-		return $result;
-	}
 
 	/**
 	 * execute a query  
@@ -109,7 +34,7 @@ class SQLQUERY {
 	 * 
 	 * @return false|int|array sql result not executed|affectedRows|selection
 	 */
-	public static function EXECUTE2($_pdo, $query = '', $tokens = [], $searchwildcards = false){
+	public static function EXECUTE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
 		// retrive query matching sql driver, else process raw query
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
@@ -1111,8 +1036,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, image, app_settings, skills, invalidation_date FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:name)",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:name)"
+			'mysql' => "SELECT * FROM caro_user WHERE id IN (:ids) OR name IN (:names)",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:ids) OR name IN (:names)"
 		],
 		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",

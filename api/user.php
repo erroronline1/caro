@@ -77,10 +77,8 @@ class USER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PATCH':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => $_SESSION['user']['id'],
-						':name' => $_SESSION['user']['name']
-					]
+					':ids' => $_SESSION['user']['id'],
+					':names' => $_SESSION['user']['name']
 				]);
 				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
@@ -225,9 +223,7 @@ class USER extends API {
 				$_SESSION['user']['two_factor'] = $user[':two_factor'];
 
 				// update user
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-					'values' => $user
-				]) !== false) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', $user) !== false) {
 					$response = [
 						'response' =>  [
 							'id' => $user[':id'],
@@ -264,10 +260,8 @@ class USER extends API {
 				break;
 			case 'GET':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => $_SESSION['user']['id'],
-						':name' => $_SESSION['user']['name']
-					]
+					':ids' => $_SESSION['user']['id'],
+					':names' => $_SESSION['user']['name']
 				]);
 				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
@@ -349,9 +343,7 @@ class USER extends API {
 
 				// append user training with expiry info 
 				$alltrainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-					'replacements' => [
-						':ids' => $user['id'] ? : 0
-					]
+					':ids' => $user['id'] ? : 0
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
@@ -400,9 +392,7 @@ class USER extends API {
 
 				// append user sessions
 				$usersessions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_sessions', [
-					'values' => [
-						':user_id' => $user['id'] ? : 0
-					]
+					':user_id' => $user['id'] ? : 0
 				]);
 				$sessions = [];
 				foreach ($usersessions as $session){
@@ -698,10 +688,8 @@ class USER extends API {
 				$permissions = $units = $user = [];
 				if ($this->_requestedID) {
 					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-						'replacements' => [
-							':id' => intval($this->_requestedID),
-							':name' => ''
-						]
+						':ids' => intval($this->_requestedID),
+						':names' => ''
 					]);
 					$user = $user ? $user[0] : null;
 					// prepare user-array to update, return error if not found
@@ -728,10 +716,8 @@ class USER extends API {
 
 				//check forbidden names
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => '',
-						':name' => $submittedName
-					]
+					':ids' => '',
+					':names' => $submittedName
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
 				if (UTILITY::forbiddenName($user[':name']) || ($nametaken && $nametaken['id'] !== $user[':id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user[':name']]), 'type' => 'error']]);
@@ -879,9 +865,7 @@ class USER extends API {
 				}
 
 				// insert user into database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-					'values' => $user
-				]) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', $user) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					if (!$user[':id']){
 						// create welcome message
 						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -974,10 +958,8 @@ class USER extends API {
 		
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => intval($this->_requestedID) ? : '',
-						':name' => ''
-					]
+					':ids' => intval($this->_requestedID) ? : '',
+					':names' => ''
 				]);
 				$user = $user ? $user[0] : null;
 				if (!$user){ $user = [
@@ -1027,9 +1009,7 @@ class USER extends API {
 
 				// gather user trainings
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-					'replacements' => [
-						':ids' => $user['id'] ? : 0
-					]
+					':ids' => $user['id'] ? : 0
 				]);
 				foreach ($trainings as $row){
 					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
@@ -1301,10 +1281,8 @@ class USER extends API {
 			case 'DELETE':
 				// prefetch to return proper name after deletion
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => intval($this->_requestedID),
-						':name' => ''
-					]
+					':ids' => intval($this->_requestedID),
+					':names' => ''
 				]);
 				$user = $user[0];
 				if ($user['id'] < 2) $this->response([], 401);
@@ -1314,18 +1292,14 @@ class USER extends API {
 
 				// delete training attachments (certificates)
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-					'replacements' => [
-						':ids' => $user['id'] ? : 0
-					]
+					':ids' => $user['id'] ? : 0
 				]);
 				foreach ($trainings as $row){
 					if ($row['file_path']) $this->_filehandler->delete($row['file_path']);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
-					'values' => [
-						':id' => $user['id']
-					]
+					':id' => $user['id']
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('user.user_deleted', [':name' => $user['name']]),
@@ -1410,9 +1384,7 @@ class USER extends API {
 				$training = [];
 				if ($this->_requestedID && $this->_requestedID !== 'null'){
 					$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					$training = $training ? $training[0] : [];
 				}
@@ -1470,9 +1442,7 @@ class USER extends API {
 								]
 							)[0]['path'];
 						}
-						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-							'values' => $training
-						]);
+						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', $training);
 					}
 					else $notfound[] = $username;
 				}
@@ -1503,9 +1473,7 @@ class USER extends API {
 				}
 
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-					'replacements' => [
-						':ids' => implode(',', array_column($user, 'id'))
-					]
+					':ids' => implode(',', array_column($user, 'id'))
 				]);
 				foreach ($trainings as $training){
 					$datalist['training'][] = $training['name'];
@@ -1517,9 +1485,7 @@ class USER extends API {
 				// prefill scheduled training if id is submitted
 				if ($this->_requestedID && $this->_requestedID !== 'null'){
 					$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 					if ($training = $training ? $training[0] : null){
 						if ($user_id = array_search($training['user_id'], array_column($user, 'id'))){
@@ -1599,17 +1565,13 @@ class USER extends API {
 				break;
 			case 'DELETE':
 				$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 
 				if ($training = $training ? $training[0] : null){
 					if ($training['file_path']) $this->_filehandler->delete([$training['file_path']]);
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
-						'values' => [
-							':id' => $training['id']
-						]
+						':id' => $training['id']
 					]);
 
 					$this->response([

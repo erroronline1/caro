@@ -124,9 +124,7 @@ class RISK extends API {
 						}		
 						break;
 				}
-				if (SQLQUERY::EXECUTE($this->_pdo, 'risk_post', [
-					'values' => $risk
-				])) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'risk_post', $risk)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('risk.risk_saved'),
 						'id' => $this->_pdo->lastInsertId(),
@@ -144,9 +142,7 @@ class RISK extends API {
 
 				// get requested risk or set up properties
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-					]
+					':id' => intval($this->_requestedID)
 				]);
 				$risk = $risk ? $risk[0] : [
 					'id' => 0,
@@ -708,11 +704,10 @@ class RISK extends API {
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		$risk_datalist = $parameter['search'] ? SQLQUERY::EXECUTE($this->_pdo, 'risk_search', [
-			'values' => [
-				':SEARCH' => $parameter['search'] ? : '%'
+			':SEARCH' => $parameter['search'] ? : '%'
 			],
-			'wildcards' => true,
-		]) : [];
+			true,
+		) : [];
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found

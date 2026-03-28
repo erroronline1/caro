@@ -458,10 +458,8 @@ class UPDATE{
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		foreach($users as $user){
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'values' => [
-					':id' => $user['id'],
-					':name' => $user['name']
-				]
+				':id' => $user['id'],
+				':name' => $user['name']
 			]);
 			$user = $user ? $user[0] : null;
 
@@ -481,9 +479,7 @@ class UPDATE{
 			echo "<pre>";
 			print_r($u_user);
 			echo "</pre>";
-			if ($EXECUTE && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-					'values' => $u_user
-				])) echo "<br />[!] CREDENTIALS HAVE BEEN ADJUSTED, NOW DISABLE THE EXECUTION AGAIN!";
+			if ($EXECUTE && SQLQUERY::EXECUTE($this->_pdo, 'user_post', $u_user)) echo "<br />[!] CREDENTIALS HAVE BEEN ADJUSTED, NOW DISABLE THE EXECUTION AGAIN!";
 		}
 
 		return [

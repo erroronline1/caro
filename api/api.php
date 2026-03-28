@@ -141,9 +141,7 @@ class API {
 		if (isset($group['permission'])){
 			foreach ($group['permission'] as $prmssn){
 				$permissions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_permission_group', [
-					'values' => [
-						':group' => $prmssn
-					]
+					':group' => $prmssn
 				]);
 				foreach ($permissions as $userrow){
 					if (PERMISSION::filteredUser($userrow)) continue;
@@ -154,9 +152,7 @@ class API {
 		if (isset($group['unit'])){
 			foreach ($group['unit'] as $unt){
 				$groups = SQLQUERY::EXECUTE($this->_pdo, 'application_get_unit_group', [
-					'values' => [
-						':group' => $unt
-					]
+					':group' => $unt
 				]);
 				foreach ($groups as $userrow){
 					if (PERMISSION::filteredUser($userrow)) continue;
@@ -166,10 +162,8 @@ class API {
 		}
 		if (isset($group['user']) && count($group['user'])){
 			$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'replacements' => [
-					':id' => '',
-					':name' => implode(',', $group['user'])
-				]
+					':ids' => '',
+					':names' => implode(',', $group['user'])
 			]);
 			foreach ($users as $userrow){
 				if (PERMISSION::filteredUser($userrow)) continue;
@@ -252,10 +246,8 @@ class API {
 			// get user by token and their application settings for frontend setup
 			// if database has changed in the meantime, session credentials do not match, invalidating the session
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-				'values' => [
-					':token' => $token,
-					':two_factor' => $two_factor ?: 0
-				]
+				':token' => $token,
+				':two_factor' => $two_factor ?: 0
 			]);
 			$user = $user ? $user[0]: null;
 			if ($user){
@@ -641,11 +633,9 @@ class API {
 		
 		if (!empty($_SESSION['request']['id']) && $response){
 			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
-				'values' => [
 				':id' => $_SESSION['request']['id'],
 				':response_code' => $response,
 				':execution_time' => microtime(true) - REQUESTSTART
-				]
 			]);
 			return;
 		}
@@ -669,18 +659,16 @@ class API {
 		}
 
 		if (SQLQUERY::EXECUTE($this->_pdo, 'application_request_log', [
-			'values' => [
-				':timestamp' => date('Y-m-d H:i:s'),
-				':method' => $_SERVER['REQUEST_METHOD'],
-				':api' => mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])),
-				':payload' => $payload ?: null,
-				':user_id' => intval($_SESSION['user']['id']),
-				':user_name' => $_SESSION['user']['name'],
-				':user_permissions' => implode(', ', $_SESSION['user']['permissions']),
-				':user_ip' => $_SERVER['REMOTE_ADDR'],
-				':response_code' => null,
-				':execution_time' => null
-			]
+			':timestamp' => date('Y-m-d H:i:s'),
+			':method' => $_SERVER['REQUEST_METHOD'],
+			':api' => mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])),
+			':payload' => $payload ?: null,
+			':user_id' => intval($_SESSION['user']['id']),
+			':user_name' => $_SESSION['user']['name'],
+			':user_permissions' => implode(', ', $_SESSION['user']['permissions']),
+			':user_ip' => $_SERVER['REMOTE_ADDR'],
+			':response_code' => null,
+			':execution_time' => null
 		])) return $this->_pdo->lastInsertId();
 		return 0;
 	}
@@ -691,20 +679,16 @@ class API {
 	public function session_get_fingerprint(){
 		if (isset($_SESSION['user']['id']))
 			if ($fingerprint = SQLQUERY::EXECUTE($this->_pdo, 'application_get_session_fingerprint', [
-				'values' => [
-					':id' => session_id(),
-					':user_id' => $_SESSION['user']['id']
-				]
+				':id' => session_id(),
+				':user_id' => $_SESSION['user']['id']
 			])) return $fingerprint ? $fingerprint[0]['fingerprint'] : null;
 		return null;
 	}
 
 	public function session_get_user_from_fingerprint_checksum($hash, $checksum){
 		if ($user = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_from_fingerprint_checksum', [
-				'values' => [
-					':checksum' => $checksum,
-					':hash' => $hash
-				]
+				':checksum' => $checksum,
+				':hash' => $hash
 			])) return $user ? $user[0] : null;
 		return null;
 	}
@@ -719,10 +703,8 @@ class API {
 		// on failure the user may just not get a meaningful response and has to update the interface.
 		// does not happen on proper logout and even on automated logout only rarely
 		@SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
-			'values' => [
-				':id' => session_id(),
-				':user_id' => $_SESSION['user']['id']
-			]
+			':id' => session_id(),
+			':user_id' => $_SESSION['user']['id']
 		]);
 	}
 

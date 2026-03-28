@@ -174,20 +174,18 @@ class STRESSTEST extends INSTALL{
 		for ($i = 0; $i < $this->_calendarentries; $i++){
 			if (!($i % intval($this->_calendarentries/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-				'values' => [
-					':id' => null,
-					':type' => 'tasks',
-					':span_start' => $this->_currentdate->format('Y-m-d H:i:s'),
-					':span_end' => $this->_currentdate->format('Y-m-d H:i:s'),
-					':author_id' => 2,
-					':affected_user_id' => 2,
-					':organizational_unit' => 'prosthetics2',
-					':subject' => $this->_prefix . random_int(0, 1000000),
-					':misc' => 'str (e.g. UTILITY::json_encoded whatnot)',
-					':closed' => '',
-					':alert' => 0,
-					':autodelete' => 0
-				]
+				':id' => null,
+				':type' => 'tasks',
+				':span_start' => $this->_currentdate->format('Y-m-d H:i:s'),
+				':span_end' => $this->_currentdate->format('Y-m-d H:i:s'),
+				':author_id' => 2,
+				':affected_user_id' => 2,
+				':organizational_unit' => 'prosthetics2',
+				':subject' => $this->_prefix . random_int(0, 1000000),
+				':misc' => 'str (e.g. UTILITY::json_encoded whatnot)',
+				':closed' => '',
+				':alert' => 0,
+				':autodelete' => 0
 			]);
 		}
 		return $this->printSuccess($i. ' task entries done, please check the application for performance');
@@ -198,16 +196,13 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function removeCalendarEvents(){
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
-			'values' => [
 				':SEARCH' => $this->_prefix
 			],
-			'wildcards' => 'contained'
-		]);
+			'contained'
+		);
 		foreach ($entries as $entry){
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-				'values' => [
-					':id' => $entry['id']
-				]
+				':id' => $entry['id']
 			]);
 		}
 		return $this->printSuccess(count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted');
@@ -252,21 +247,19 @@ class STRESSTEST extends INSTALL{
 			}
 			else $recordcontent = [$current_record];
 			SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-				'values' => [
-					':context' => 'casedocumentation',
-					':case_state' => null,
-					':record_type' => 'treatment',
-					':identifier' => $identifier,
-					':last_user' => 2,
-					':last_document' => $document['name'],
-					':content' => UTILITY::json_encode($recordcontent),
-					':lifespan' => null,
-					':erp_case_number' => null,
-					':note' => null,
-					':restricted_access' => null,
-					':id' => $exists['id'] ?? null,
-					':unit' => null
-				]
+				':context' => 'casedocumentation',
+				':case_state' => null,
+				':record_type' => 'treatment',
+				':identifier' => $identifier,
+				':last_user' => 2,
+				':last_document' => $document['name'],
+				':content' => UTILITY::json_encode($recordcontent),
+				':lifespan' => null,
+				':erp_case_number' => null,
+				':note' => null,
+				':restricted_access' => null,
+				':id' => $exists['id'] ?? null,
+				':unit' => null
 			]);
 		}
 		return $this->printSuccess($i. ' records done, please check the application for performance');
@@ -291,9 +284,7 @@ class STRESSTEST extends INSTALL{
 		$response = '';
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-			'replacements' => [
-				':ids' => implode(',', array_column($vendors, 'id'))
-			] 
+			':ids' => array_column($vendors, 'id')
 		]);
 		$orders = [];
 		for ($i = 0; $i < $this->_orderentries; $i++){
@@ -479,9 +470,7 @@ class STRESSTEST extends INSTALL{
 					// no checking if $dbentry['content'] === $entry['content'] for db-specific character encoding
 				){
 					SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
-						'values' => [
-							':id' => $dbentry['id']
-						]
+						':id' => $dbentry['id']
 					]);
 					$matches++;
 				}
@@ -565,9 +554,7 @@ class STRESSTEST extends INSTALL{
 					// no checking if $dbdocument['content'] === $entry['content'] for db-specific character encoding
 				){
 					SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
-						'values' => [
-							':id' => $dbentry['id']
-						]
+						':id' => $dbentry['id']
 					]);
 					$matches++;
 				}
@@ -691,14 +678,10 @@ class STRESSTEST extends INSTALL{
 					!array_diff(explode(',', $dbentry['units'] ? : ''), explode(',', $entry['units'] ? : ''))
 				){
 					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-						'replacements' => [
-							':ids' => $dbentry['id'] ? : 0
-						]
+						':ids' => $dbentry['id'] ? : 0
 					]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
-						'values' => [
-							':id' => $dbentry['id']
-						]
+						':id' => $dbentry['id']
 					]))	{
 						// delete training attachments (certificates)
 						foreach ($trainings as $row){

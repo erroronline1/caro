@@ -190,9 +190,7 @@ class CALENDAR extends API {
 	 */
 	public function complete(){
 		$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-			'replacements' => [
-				':id' => $this->_requestedId
-			]
+			':id' => $this->_requestedId
 		]);
 		$calendarentry = $calendarentry ? $calendarentry[0] : null;
 		if (!$calendarentry) $this->response([], 404);
@@ -298,7 +296,9 @@ class CALENDAR extends API {
 					$schedule = null;
 					$import = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.import'));
 					if ($import && $import > 0) {
-						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', ['replacements' => [':id' => $import]]);
+						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+							':id' => $import
+						]);
 					}
 					$schedule = $schedule ? $schedule[0] : ['misc' => ''];
 					$schedule['misc'] = json_decode($schedule['misc'], true);
@@ -406,9 +406,7 @@ class CALENDAR extends API {
 						':alert' => null,
 						':autodelete' => null
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-						'values' => $columns
-					])) $this->response([
+					if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', $columns)) $this->response([
 						'response' => [
 							'id' => $this->_pdo->lastInsertId(),
 							'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
@@ -439,7 +437,9 @@ class CALENDAR extends API {
 						'...' => ['value' => '0']
 					]
 				];
-				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
+				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', [
+					':type' => 'longtermplanning'
+				]);
 				// sort by closed date desc since sql query sorts different
 				usort($schedules, function ($a, $b) {
 					$a['closed'] = json_decode($a['closed'] ? : '', true);
@@ -577,9 +577,7 @@ class CALENDAR extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-					'values' => [
-						':id' => $this->_requestedId
-					]
+					':id' => $this->_requestedId
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
@@ -1272,18 +1270,14 @@ class CALENDAR extends API {
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id']; // if not selected default to current user!
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => $affected_user_id,
-						':name' => ''
-					]
+					':ids' => $affected_user_id,
+					':names' => ''
 				])) $affected_user = $affected_user[0];
 
 				if (UTILITY::propertySet($this->_payload, 'calendarEventId')){
 					// editing of timesheet entries is allowed for admin and affected user for regulatory security only
 					$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-						'replacements' => [
-							':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
-						]
+						':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
 					]);
 					$calendarentry = $calendarentry ? $calendarentry[0] : null;
 					if (!$calendarentry) $this->response([], 404);
@@ -1526,9 +1520,7 @@ class CALENDAR extends API {
 				break;
 			case 'DELETE':
 				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-					'replacements' => [
-						':id' => $this->_requestedId
-					]
+					':id' => $this->_requestedId
 				]);
 				$calendarentry = $calendarentry ? $calendarentry[0] : null;
 				if (!$calendarentry) $this->response([], 404);

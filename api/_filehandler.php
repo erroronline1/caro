@@ -323,10 +323,8 @@ class FILEHANDLER{
 			if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
 				// delete database entries (records exceeding lifespan)
 				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
-					'values' => [
-						':path' => $pathinfo['dirname'],
-						':names' => $this->_pdo->quote($pathinfo['basename'])
-					]
+					':path' => $pathinfo['dirname'],
+					':names' => $this->_pdo->quote($pathinfo['basename'])
 				]);
 			}
 		}
@@ -385,9 +383,7 @@ class FILEHANDLER{
 		if (self::isInFilesystem($path)) return '';
 		
 		$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [
-			'values' => [
-				':path' => $path
-			]
+			':path' => $path
 		]);
 		$file = $file ? $file[0] : null;
 		if (!$file) return '';
@@ -550,9 +546,7 @@ class FILEHANDLER{
 		}
 		//else database
 		$files = SQLQUERY::EXECUTE($this->_pdo, 'media_get_path_contents', [
-			'values' => [
-				':path' => $directory
-			]
+			':path' => $directory
 		]);
 		$result = array_map(Fn($v) => $v['path'] . '/' . $v['name'], $files);
 		switch ($order){
@@ -580,9 +574,7 @@ class FILEHANDLER{
 
 			// else recreate from database
 			$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file', [
-				'values' => [
-					':path' => $path
-				]
+				':path' => $path
 			]);
 			$file = $file ? $file[0] : null;
 			if (!$file) return null;
@@ -748,9 +740,7 @@ class FILEHANDLER{
 	public function saveToDatabase($_pdo, $tmpname, $destination, $mime_type, $imageoptions = []){
 		$file = pathinfo($destination);
 		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_path_contents', [
-			'values' => [
-				':path' => $destination
-			]
+			':path' => $destination
 		]);
 		
 		$filename = self::enumerate($file['basename'], array_column($present, 'name'));
@@ -766,13 +756,11 @@ class FILEHANDLER{
 		}
 
 		if (SQLQUERY::EXECUTE($_pdo, 'media_post', [
-			'values' => [
-				':path' => $file['dirname'],
-				':name' => $filename,
-				':mime_type' => $mime_type,
-				':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
-				':upload_date' => date('Y-m-d H:i:s'),
-			]
+			':path' => $file['dirname'],
+			':name' => $filename,
+			':mime_type' => $mime_type,
+			':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
+			':upload_date' => date('Y-m-d H:i:s'),
 		])) return [
 			'path' => $file['dirname'] . '/' . $filename,
 			'hash' => hash('sha256', $fileContents)

@@ -215,12 +215,10 @@ class APPLICATION extends API {
 
 				// post manual entry
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_post_manual', [
-					'values' => [
-						':title' => $entry['title'],
-						':content' => $entry['content'],
-						':permissions' => $entry['permissions'],
-						':id' => $this->_requestedManual
-					]
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions'],
+					':id' => $this->_requestedManual
 				]);
 		
 				if ($query) $this->response([
@@ -238,9 +236,7 @@ class APPLICATION extends API {
 				break;
 			case 'GET':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
-					'values' => [
-						':id' => $this->_requestedManual != 'false' ? $this->_requestedManual : null
-					]
+					':id' => $this->_requestedManual != 'false' ? $this->_requestedManual : null
 				]);
 
 				// prepare entry properties
@@ -326,9 +322,7 @@ class APPLICATION extends API {
 				break;
 			case 'DELETE':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', [
-					'values' => [
-						':id' => $this->_requestedManual
-					]
+					':id' => $this->_requestedManual
 				]);
 				if ($query) $this->response([
 					'response' => [
@@ -551,10 +545,8 @@ class APPLICATION extends API {
 			if (isset($user['app_settings']['weeklyhours']) && isset($user['app_settings']['annualvacation'])){
 				// vacation warning
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => $_SESSION['user']['id'],
-						':name' => $_SESSION['user']['name']
-					]
+					':ids' => $_SESSION['user']['id'],
+					':names' => $_SESSION['user']['name']
 				]);
 				$user = $user ? $user[0] : null;
 				$timesheet_stats = $calendar->timesheetSummary([$user]);

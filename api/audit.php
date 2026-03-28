@@ -55,11 +55,15 @@ class AUDIT extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
-				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
+				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', [
+					':id' => $this->_requestedTemplate
+				]);
 				$template = $template ? $template[0] : null;
 				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
 
-				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+					':id' => $this->_requestedID
+				]);
 				$audit = $audit ? $audit[0] : null;
 				if ($this->_requestedID && !$audit) $this->response(['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
@@ -124,9 +128,7 @@ class AUDIT extends API {
 
 				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', [
-					'values' => $audit
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', $audit)) {
 					if ($audit[':closed']){
 						$audit[':content'] = json_decode($audit[':content'], true);
 						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit[':unit']] . "\n \n";
@@ -469,9 +471,7 @@ class AUDIT extends API {
 				break;
 			case 'DELETE':
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.execute.delete_success'),
 					'type' => 'deleted'
@@ -488,7 +488,9 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given audit
 	 */
 	private function exportaudit(){
-		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => UTILITY::propertySet($this->_payload, '_auditid') ?: 0]]);
+		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+			':id' => UTILITY::propertySet($this->_payload, '_auditid') ?: 0
+		]);
 		$audit = $audit ? $audit[0] : null;
 		if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
@@ -717,9 +719,7 @@ class AUDIT extends API {
 
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
-					'values' => $template
-				])) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', $template)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.template.saved'),
 						'id' => $this->_pdo->lastInsertId(),
@@ -967,9 +967,7 @@ class AUDIT extends API {
 				break;
 			case 'DELETE':
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.template.delete_success'),
 					'type' => 'deleted'
@@ -1524,9 +1522,7 @@ class AUDIT extends API {
 		}
 
 		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
-			'values' => [
-				':substr' => 'ordernumber_label'
-			]
+			':substr' => 'ordernumber_label'
 		]);
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
@@ -1691,7 +1687,9 @@ class AUDIT extends API {
 			case 'PUT':
 				$managementreview = [];
 				if ($this->_requestedID){
-					$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+					$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+						':id' => $this->_requestedID
+					]);
 					$managementreview = $managementreview ? $managementreview[0] : null;
 					if (!$managementreview) $this->response(['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
 				}
@@ -1711,9 +1709,7 @@ class AUDIT extends API {
 					$managementreview[':content'][$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.required.' . $key)) ? : '';
 				}
 				$managementreview[':content'] = UTILITY::json_encode($managementreview[':content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', [
-					'values' => $managementreview
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', $managementreview)) {
 					if ($managementreview[':closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
 							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
@@ -1855,9 +1851,7 @@ class AUDIT extends API {
 				break;
 			case 'DELETE':
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.managementreview.delete_success'),
 					'type' => 'deleted'
@@ -1874,7 +1868,9 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given management review
 	 */
 	private function exportmanagementreview(){
-		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => UTILITY::propertySet($this->_payload, '_reviewid') ?: 0]]);
+		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+			':id' => UTILITY::propertySet($this->_payload, '_reviewid') ?: 0
+		]);
 		$managementreview = $managementreview ? $managementreview[0] : null;
 		if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
 
@@ -1993,9 +1989,7 @@ class AUDIT extends API {
 			$vendor['products'] = json_decode($vendor['products'] ? : '', true); 
 		}
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-			'replacements' => [
-				':ids' => implode(",", array_column($vendors, 'id'))
-			]
+			':ids' => array_column($vendors, 'id')
 		]);
 		// get all checkable products
 		$checkable = [];
@@ -2569,9 +2563,7 @@ class AUDIT extends API {
 		];
 		if($_SERVER['REQUEST_METHOD'] === 'POST' && $identifier){
 			$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-				'values' => [
-					':identifier' => $identifier
-				]
+				':identifier' => $identifier
 			]);
 			$case = $case ? $case[0] : null;
 			if (!$case) $content[] = [
@@ -3148,16 +3140,12 @@ class AUDIT extends API {
 		if ($_SERVER['REQUEST_METHOD'] === 'PUT' && PERMISSION::permissionFor('trainingevaluation')){
 			$user = null;
 			$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
-				'values' => [
-					':id' => $this->_requestedID
-				]
+				':id' => $this->_requestedID
 			]);
 			$training = $training ? $training[0] : [];
 			if ($training) $user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'replacements' => [
-					':id' => intval($training['user_id']),
-					':name' => ''
-				]
+					':ids' => intval($training['user_id']),
+					':names' => ''
 			]);
 			$user = $user ? $user[0] : null;
 
@@ -3183,9 +3171,7 @@ class AUDIT extends API {
 						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 						'content' => (array) $this->_payload
 					]);
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-						'values' => $trainingclone
-					]);
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', $trainingclone);
 				}
 			}
 		}
@@ -3193,9 +3179,7 @@ class AUDIT extends API {
 		$content = [];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
+			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 
@@ -3340,9 +3324,7 @@ class AUDIT extends API {
 		];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
+			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		foreach ($users as $user){ // ordered by name
@@ -3488,9 +3470,7 @@ class AUDIT extends API {
 			}
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
+			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		foreach ($users as $user){
@@ -3661,9 +3641,7 @@ class AUDIT extends API {
 		}
 
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [ 
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
+			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		$allskills = [];

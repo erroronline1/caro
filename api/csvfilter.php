@@ -41,9 +41,7 @@ class CSVFILTER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-						]
+					':id' => intval($this->_requestedID)
 				]);
 				$filter = $filter ? $filter[0] : null;
 
@@ -194,15 +192,11 @@ class CSVFILTER extends API {
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 				} else {
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
+						':name' => $this->_requestedID
 					]);
 				}
 				$filter = $filter ? $filter[0] : null;
@@ -362,17 +356,13 @@ class CSVFILTER extends API {
 
 				// get filter passed by id
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-					'values' => [
-						':id' => intval($filter[':id'])
-						]
+					':id' => intval($filter[':id'])
 				]);
 				$exists = $exists ? $exists[0] : null;
 				// if not found query most recent by name
 				if (!$exists) {
 					$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
-						'values' => [
-							':name' => $filter[':name']
-						]
+						':name' => $filter[':name']
 					]);
 					$exists = $exists ? $exists[0] : null;
 				}
@@ -398,9 +388,7 @@ class CSVFILTER extends API {
 							}
 						}
 						$filter[':approval'] = UTILITY::json_encode($filter[':approval']) ? : null;
-						if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
-							'values' => $filter
-						])) $this->response([
+						if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', $filter)) $this->response([
 							'response' => [
 								'name' => $filter[':name'],
 								'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
@@ -414,9 +402,7 @@ class CSVFILTER extends API {
 				if (UTILITY::forbiddenName($filter[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 
 				// post filter
-				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
-					'values' => $filter
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', $filter)) {
 					if (!$filter[':id']){
 						// alert roles of a new filter to be approved
 						$filter_id = $this->_pdo->lastInsertId();
@@ -447,15 +433,11 @@ class CSVFILTER extends API {
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					]);
 				} else {
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
+						':name' => $this->_requestedID
 					]);
 				}
 				$filter = $filter ? $filter[0] : null;
@@ -611,16 +593,12 @@ class CSVFILTER extends API {
 
 			case 'DELETE':
 				$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				]);
 				$filter = $filter ? $filter[0] : null;
 				if ($filter && PERMISSION::pending('csvrules', $filter['approval']) && 
 					SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_delete', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
+						':id' => $this->_requestedID
 					])
 				) $this->response([
 						'response' => [

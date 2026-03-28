@@ -90,9 +90,7 @@ class CALENDARUTILITY {
 		$sqlchunks = [];
 		$affected_rows = 0;
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-			'replacements' => [
-				':id' => $id
-			]
+			':id' => $id
 		]);
 		foreach ($entries as $entry){
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
@@ -196,9 +194,7 @@ class CALENDARUTILITY {
 	 */
 	public function delete($id = 0){
 		if ($id !== null) return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-			'values' => [
-				':id' => $id
-			]
+			':id' => $id
 		]);
 		$num = 0;
 		foreach ($this->getWithinDateRange() as $entry){
@@ -206,9 +202,7 @@ class CALENDARUTILITY {
 			$entry['closed'] = json_decode($entry['closed'], true);
 			$closed = new \DateTime($entry['closed']['date']);
 			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar']['autodelete'])) && SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-				'values' => [
-					':id' => $entry['id']
-				]
+				':id' => $entry['id']
 			])) $num++;
 		}
 		return $num;
@@ -633,9 +627,7 @@ class CALENDARUTILITY {
 	 */
 	public function getDay($date = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_day', [
-			'values' => [
-				':date' => $date
-			]
+			':date' => $date
 		]);
 	}
 	
@@ -653,10 +645,8 @@ class CALENDARUTILITY {
 	 */
 	public function getWithinDateRange($earlier = '', $later = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_within_date_range', [
-			'values' => [
-				':earlier' => $earlier ? : '1970-01-01 00:00:01',
-				':later' => $later ? : '2079-06-05 23:59:59'	
-			]
+			':earlier' => $earlier ? : '1970-01-01 00:00:01',
+			':later' => $later ? : '2079-06-05 23:59:59'	
 		]);
 	}
 	
@@ -737,9 +727,7 @@ class CALENDARUTILITY {
 	 * @return int|bool insert id
 	 */
 	public function post($columns = []){
-		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-			'values' => $columns
-		])) return $columns[':id'] ?? $this->_pdo->lastInsertId();
+		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', $columns)) return $columns[':id'] ?? $this->_pdo->lastInsertId();
 		return false;
 	}
 	
@@ -1056,11 +1044,8 @@ class CALENDARUTILITY {
 	 */
 	public function search($search = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
-			'values' => [
-				':SEARCH' => $search
-			],
-			'wildcards' => true
-		]);
+			':SEARCH' => $search
+			],true);
 	}
 }
 ?>

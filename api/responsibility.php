@@ -39,9 +39,7 @@ class RESPONSIBILITY extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PATCH':
 				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-					]
+					':id' => intval($this->_requestedID)
 				]);
 				$responsibility = $responsibility ? $responsibility[0]: null;
 				if (!$responsibility) $this->response([], 404);
@@ -54,11 +52,9 @@ class RESPONSIBILITY extends API {
 					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
 				}
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
-					'values' => [
 						':id' => intval($this->_requestedID),
 						':assigned_users' => UTILITY::json_encode(($responsibility['assigned_users'])),
 						':proxy_users' => $responsibility['proxy_users']
-					]
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.accepted_success'),
@@ -297,9 +293,7 @@ class RESPONSIBILITY extends API {
 					'content' => []]
 				];
 				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-					]
+					':id' => intval($this->_requestedID)
 				]);
 				$responsibility = $responsibility ? $responsibility[0] : [
 					'id' => null,
@@ -473,9 +467,7 @@ class RESPONSIBILITY extends API {
 				break;
 			case 'DELETE':
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
+					':id' => $this->_requestedID
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.delete_success'),

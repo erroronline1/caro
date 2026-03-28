@@ -980,19 +980,17 @@ class INSTALL {
 		$response = $this->printSuccess('Databases installed.');
 
 		if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-			'values' => [
-				':id' => null,
-				':name' => $this->_defaultUser,
-				':permissions' => 'admin',
-				':units' => '',
-				':token' => REQUEST[1],
-				':orderauth' => '',
-				':image' => '../media/favicon/icon192.png',
-				':app_settings' => '',
-				':skills' => '',
-				':invalidation_date' => null,
-				':two_factor' => null
-			]
+			':id' => null,
+			':name' => $this->_defaultUser,
+			':permissions' => 'admin',
+			':units' => '',
+			':token' => REQUEST[1],
+			':orderauth' => '',
+			':image' => '../media/favicon/icon192.png',
+			':app_settings' => '',
+			':skills' => '',
+			':invalidation_date' => null,
+			':two_factor' => null
 		])) $response .= $this->printSuccess('Default user has been installed.');
 		else $response .= $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
 		return '';
