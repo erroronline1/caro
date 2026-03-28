@@ -419,7 +419,7 @@ class ORDER extends API {
 				// applicable units, state and search
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 					':SEARCH' => $filter['term'] ? : '%',
-					':organizational_unit' => implode(",", $units),
+					':organizational_unit' => $units,
 					':user' => PERMISSION::permissionFor('orderdisplayall') ? 0 : $_SESSION['user']['id'] // only users that are not able to select units will be presented their own orders as well independently of unit intersection
 					],
 					true,
@@ -429,7 +429,6 @@ class ORDER extends API {
 				if ($filter['term']) {
 					$order = SEARCH::refine($filter['term'], $order, ['order_data']);
 				}
-		
 				// request permissions once, avoiding repetitive comparisons within loop
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
