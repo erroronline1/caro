@@ -308,7 +308,7 @@ class STRESSTEST extends INSTALL{
 				':ordertype' => 'order'
 			];
 		}
-		$order = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('order_post_approved_order'), $orders);
+		$order = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
 		foreach ($order as $chunk){
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk));
@@ -352,10 +352,10 @@ class STRESSTEST extends INSTALL{
 				$row['approval'] = UTILITY::json_encode($row['approval']);
 				$update = [];
 				foreach($row as $key => $value){
-					$update[':' . $key] = $value ? $this->_pdo->quote($value) : 'NULL';
+					$update[':' . $key] = $value ?: null;
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('csvfilter_post'), $update) . '; ');
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post', $update) . '; ');
 			}
 			foreach ($sqlchunks as $chunk){
 				try {
@@ -389,9 +389,9 @@ class STRESSTEST extends INSTALL{
 
 				$row['approval'] = $row['approval'] + $this->_documentApproval;
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('document_put_approve'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'document_put_approve',
 				[
-					':approval' => $this->_pdo->quote(UTILITY::json_encode($row['approval'])),
+					':approval' => UTILITY::json_encode($row['approval']),
 					':id' => $row['id']
 				]) . '; ');
 			}
@@ -429,9 +429,9 @@ class STRESSTEST extends INSTALL{
 				$lastincorporation = $lastincorporation + $this->_incorporationApproval;
 				$row['incorporated'][count($row['incorporated']) - 1 ] = $lastincorporation;
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_incorporation'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation',
 				[
-					':incorporated' => $this->_pdo->quote(UTILITY::json_encode($row['incorporated'])),
+					':incorporated' => UTILITY::json_encode($row['incorporated']),
 					':id' => $row['id']
 				]) . '; ');
 			}

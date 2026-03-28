@@ -1264,12 +1264,12 @@ class ORDER extends API {
 				$order_data2 = $this->return_criticality($order_data2);
 			}
 
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('order_post_approved_order'),
+			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order',
 			[
-				':order_data' => $this->_pdo->quote(UTILITY::json_encode($order_data2)),
-				':organizational_unit' => $this->_pdo->quote($processedOrderData['order_data']['organizational_unit']),
-				':approval' => $this->_pdo->quote($processedOrderData['approval']),
-				':ordertype' => $this->_pdo->quote($processedOrderData['order_data']['order_type'])
+				':order_data' => UTILITY::json_encode($order_data2),
+				':organizational_unit' => $processedOrderData['order_data']['organizational_unit'],
+				':approval' => $processedOrderData['approval'],
+				':ordertype' => $processedOrderData['order_data']['order_type']
 			]) . '; ');
 		}
 		$success = false;

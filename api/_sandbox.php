@@ -12,7 +12,7 @@ $options = [
 	//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
 ];
 $_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
 if ($dbsetup) $_pdo->exec($dbsetup);
 
 

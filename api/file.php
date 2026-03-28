@@ -93,7 +93,7 @@ class FILE extends API {
 					}
 
 					// insert files and ressources to database
-					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
+					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'file_external_documents_post'), $insertions);
 					$success = false;
 					foreach ($sqlchunks as $chunk){
 						$success = false;

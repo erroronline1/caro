@@ -340,7 +340,7 @@ class MAINTENANCE extends API {
 						];
 					}
 
-					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('records_datalist_post'), $insertions);
+					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post'), $insertions);
 					if ($sqlchunks){
 						// drop unit entries
 						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', [':unit' => $unit])) $response['render']['content'][] = [
@@ -694,10 +694,10 @@ class MAINTENANCE extends API {
 					}
 
 					foreach($newrisk as $key => $value){
-						if (gettype($value) === 'string') $newrisk[$key] = $this->_pdo->quote($value);
-						if (gettype($value) === 'NULL') $newrisk[$key] = 'NULL';
+						if (gettype($value) === 'string') $newrisk[$key] = $value;
+						if (gettype($value) === 'NULL') $newrisk[$key] = null;
 					}
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('risk_post'), $newrisk) . '; ');
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'risk_post', $newrisk) . '; ');
 				}
 
 				//var_dump($sqlchunks);
@@ -893,14 +893,14 @@ class MAINTENANCE extends API {
 						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
 						[
 							':id' => $vendor['id'],
-							':name' => $this->_pdo->quote($vendor['name']),
-							':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
-							':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
-							':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
-							':products' => $vendor['products'] ? $this->_pdo->quote($vendor['products']) : 'NULL',
+							':name' => $vendor['name'],
+							':evaluation' => $vendor['evaluation'] ?? null,
+							':hidden' => $vendor['hidden'] ?? null,
+							':info' => $vendor['info'] ?? null,
+							':products' => $vendor['products'] ?? null,
 						]) . '; ');
 					$success[] = $vendor['name'];
 				}

@@ -30,7 +30,7 @@ class UPDATE{
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 		];
 		$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 		$this->driver = CONFIG['sql'][CONFIG['sql']['use']]['driver'];
 	}

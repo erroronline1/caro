@@ -765,7 +765,7 @@ class INSTALL {
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 		];
 		$this->_pdo = new \PDO( CONFIG['sql'][$this->_pdoDriver]['driver'] . ':' . CONFIG['sql'][$this->_pdoDriver]['host'] . ';' . CONFIG['sql'][$this->_pdoDriver]['database']. ';' . CONFIG['sql'][$this->_pdoDriver]['charset'], CONFIG['sql'][$this->_pdoDriver]['user'], CONFIG['sql'][$this->_pdoDriver]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
 		$this->_currentdate = new \DateTime('now');
@@ -1044,15 +1044,15 @@ class INSTALL {
 					continue;
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('audit_post_template'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'audit_post_template',
 				[
-					':id' => 'NULL',
-					':content' => $this->_pdo->quote($entry['content']),
-					':objectives' => $this->_pdo->quote($entry['objectives']),
-					':unit' => $this->_pdo->quote($entry['unit']),
-					':author' => isset($entry['author']) ? $this->_pdo->quote($entry['author']) : $this->_pdo->quote($this->_defaultUser),
-					':hint' => $this->_pdo->quote($entry['hint']) ? : 'NULL',
-					':method' => $this->_pdo->quote($entry['method'])
+					':id' => null,
+					':content' => $entry['content'],
+					':objectives' => $entry['objectives'],
+					':unit' => $entry['unit'],
+					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+					':hint' => $entry['hint'] ? : null,
+					':method' => $entry['method']
 				]) . '; ');
 			}
 		}
@@ -1099,7 +1099,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
+		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from csv-filter ressources.');
 
@@ -1180,21 +1180,21 @@ class INSTALL {
 			$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 			$name_context[] = $entry['name'] . '_' . $entry['context'];
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('document_post'),
+			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'document_post',
 			[
-				':id' => 'NULL',
-				':name' => $this->_pdo->quote($entry['name']),
-				':alias' => isset($entry['alias']) ? $this->_pdo->quote($entry['alias']) : '',
-				':context' => $this->_pdo->quote($entry['context']),
-				':unit' => $this->_pdo->quote($entry['unit']),
-				':author' => isset($entry['author']) ? $this->_pdo->quote($entry['author']) : $this->_pdo->quote($this->_defaultUser),
-				':content' => gettype($entry['content']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['content'])) : $this->_pdo->quote($entry['content']),
-				':hidden' => 'NULL',
-				':approval' => 'NULL',
-				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $this->_pdo->quote($entry['regulatory_context']) : 'NULL',
-				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $this->_pdo->quote($entry['permitted_export']) : 'NULL',
-				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $this->_pdo->quote($entry['restricted_access']) : 'NULL',
-				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $this->_pdo->quote($entry['patient_access']) : 'NULL'
+				':id' => null,
+				':name' => $entry['name'],
+				':alias' => $entry['alias'] ?? '',
+				':context' => $entry['context'],
+				':unit' => $entry['unit'],
+				':author' => $entry['author'] ?? $this->_defaultUser,
+				':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
+				':hidden' => null,
+				':approval' => null,
+				':regulatory_context' => $entry['regulatory_context'] ?? null,
+				':permitted_export' => $entry['permitted_export'] ?? null,
+				':restricted_access' => $entry['restricted_access'] ?? null,
+				':patient_access' => $entry['patient_access'] ?? null
 			]) . '; ');
 		}
 
@@ -1242,12 +1242,12 @@ class INSTALL {
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				$names[] = $entry['title'];
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('application_post_manual'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'application_post_manual',
 				[
-					':id' => 'NULL',
-					':title' => $this->_pdo->quote($entry['title']),
-					':content' => $this->_pdo->quote($entry['content']),
-					':permissions' => $this->_pdo->quote($entry['permissions'])
+					':id' => null,
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions']
 				]) . '; ');
 			}
 		}
@@ -1324,7 +1324,7 @@ class INSTALL {
 				];
 			}
 		}
-		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
+		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'texttemplate_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from texts ressources.');
 
@@ -1410,19 +1410,19 @@ class INSTALL {
 
 				$names[] = $entry['name'];
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('user_post'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_post',
 				[
-					':id' => 'NULL',
-					':name' => $this->_pdo->quote($entry['name']),
-					':permissions' => $this->_pdo->quote($entry['permissions']),
-					':units' => $this->_pdo->quote($entry['units']),
-					':token' => $this->_pdo->quote($entry['token']),
-					':orderauth' => $this->_pdo->quote($entry['orderauth']),
-					':image' =>$this->_pdo->quote( $entry['image']),
-					':app_settings' =>$this->_pdo->quote( UTILITY::json_encode($entry['app_settings'])),
+					':id' => null,
+					':name' => $entry['name'],
+					':permissions' => $entry['permissions'],
+					':units' => $entry['units'],
+					':token' => $entry['token'],
+					':orderauth' => $entry['orderauth'],
+					':image' => $entry['image'],
+					':app_settings' => UTILITY::json_encode($entry['app_settings']),
 					':skills' => '',
-					':invalidation_date' => 'NULL',
-					':two_factor' => $this->_pdo->quote($entry['two_factor'])
+					':invalidation_date' => null,
+					':two_factor' => $entry['two_factor']
 				]) . '; ');
 			}
 		}
@@ -1477,14 +1477,14 @@ class INSTALL {
 					}
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
 				[
-					':id' => 'NULL',
-					':hidden' => 'NULL',
-					':name' => $this->_pdo->quote($entry['name']),
-					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['info'])) : 'NULL',
-					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['products'])) : 'NULL',
-					':evaluation' => 'NULL',
+					':id' => null,
+					':hidden' => null,
+					':name' => $entry['name'],
+					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
+					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? UTILITY::json_encode($entry['products']) : null,
+					':evaluation' => null,
 				]) . '; ');
 			}
 		}

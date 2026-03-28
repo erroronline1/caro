@@ -14,30 +14,16 @@ namespace CARO\API;
 class SQLQUERY {
 	/**
 	 * return query for driver
-	 * @param string $context
-	 * 
-	 * @return string sql query
-	 */
-	public static function PREPARE($context){
-		return self::QUERIES[$context][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
-	}
-
-
-	/**
-	 * execute a query  
-	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
-	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
 	 * @param array $tokens strtr tokens and values
-	 * @param bool|string $searchwildcards true for ? and *, all for replacement of [^\w\d], contain for only %...% - see SEARCH()
 	 * 
-	 * @return false|int|array sql result not executed|affectedRows|selection
+	 * @return string sql query
 	 */
-	public static function EXECUTE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
+	public static function PREPARE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
 		// retrive query matching sql driver, else process raw query
+
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
-		
 
 		foreach($tokens as $key => $value){
 			if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
@@ -52,6 +38,24 @@ class SQLQUERY {
 		// handle unfortunate sqlsrv unicode implementation that is very much unsupportive of tokenized replacements on NULL-values
 		$quote = substr($_pdo->quote('.'), 0, 1);
 		$query = preg_replace("/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", 'ELSE N$1 END', $query);
+
+		return $query;
+	}
+
+
+	/**
+	 * wrapper for sql query preparation, but also executes the query and returns the result  
+	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
+	 * 
+	 * @param object $_pdo preset database connection, passed from main application
+	 * @param string $query either defined within queries below or prepared raw queries
+	 * @param array $tokens strtr tokens and values
+	 * @param bool|string $searchwildcards true for ? and *, all for replacement of [^\w\d], contain for only %...% - see SEARCH()
+	 * 
+	 * @return false|int|array sql result not executed|affectedRows|selection
+	 */
+	public static function EXECUTE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
+		$query = self::PREPARE($_pdo, $query, $tokens, $searchwildcards);
 
 		// execute query
 		try {
@@ -79,29 +83,29 @@ class SQLQUERY {
 	 * also arrays (preferably lists) can be passed that are handled accordingly
 	 */
 	private static function typehandler($_pdo, $value){
-			switch (gettype($value)){
-				case 'array':
-					return implode(',', array_map(Fn($v) => self::typehandler($_pdo, $v), $value));
-					break;
-				case 'string':
-					if (in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) return $value;
-					return $_pdo->quote($value);
-					break;
-				case 'NULL':
-					return 'NULL';
-					break;
-				case 'integer':
-					return intval($value);
-					break;
-				case 'double':
-				case 'float':
-					return floatval($value);
-					break;
-				case 'boolean':
-					return $value ? intval($value) : 'NULL';
-					break;
-			}
+		switch (gettype($value)){
+			case 'array':
+				return implode(',', array_map(Fn($v) => self::typehandler($_pdo, $v), $value));
+				break;
+			case 'string':
+				if (in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) return $value;
+				return $_pdo->quote($value);
+				break;
+			case 'NULL':
+				return 'NULL';
+				break;
+			case 'integer':
+				return intval($value);
+				break;
+			case 'double':
+			case 'float':
+				return floatval($value);
+				break;
+			case 'boolean':
+				return $value ? intval($value) : 'NULL';
+				break;
 		}
+	}
 
 	/**
 	 * alters a query according to pattern of $value  
@@ -174,7 +178,7 @@ class SQLQUERY {
 	/**
 	 * creates packages of well prepared sql queries to handle sql package size
 	 * 
-	 * MASKING HAS TO BE DONE BEFOREHAND
+	 * MASKING HAS TO BE DONE BEFOREHAND, best by chunkifying SQLQUERY::PREPARE
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param array $chunks packages so far
@@ -194,13 +198,13 @@ class SQLQUERY {
 	}
 
 	/**
-	 * creates packages of sql INSERTIONS to handle sql package size  
+	 * creates packages of sql INSERTIONS to utilize sql package size  
 	 * e.g. for multiple inserts
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query sql query
-	 * @param array $items named array to replace query by strtr have to be sanitized and masked
-	 * @return array $chunks extended packages so far
+	 * @param array $items named array to replace query tokens by strtr
+	 * @return array $chunks query packes
 	 * 
 	 * this does make sense to only have to define one valid (and standalone as well) reusable dummy query
 	 */
@@ -211,9 +215,7 @@ class SQLQUERY {
 			$chunkeditems = [];
 			foreach ($items as $item){
 				foreach ($item as &$replace){
-					if (gettype($replace) === 'NULL' || ($replace && strtoupper($replace) === 'NULL')) $replace = 'NULL';
-					elseif ($replace === '') $replace = "''";
-					elseif (gettype($replace) === 'string') $replace = $_pdo->quote($replace);
+					$replace = self::typehandler($_pdo, $replace);
 				}
 				$item = strtr($values, $item);
 				if (count($chunkeditems)){
@@ -515,7 +517,7 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = :last_order, thirdparty_order = :thirdparty_order WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = (CASE WHEN :article_no IS NULL THEN NULL ELSE N':article_no' END), article_name = (CASE WHEN :article_name IS NULL THEN NULL ELSE N':article_name' END), article_alias = (CASE WHEN :article_alias IS NULL THEN NULL ELSE N':article_alias' END), article_unit = (CASE WHEN :article_unit IS NULL THEN NULL ELSE N':article_unit' END), article_ean = :article_ean, article_info = (CASE WHEN :article_info IS NULL THEN NULL ELSE N':article_info' END), hidden = (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), has_files = :has_files, trading_good = :trading_good, incorporated = (CASE WHEN :incorporated IS NULL THEN NULL ELSE N':incorporated' END), has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(datetime, :last_order, 120), thirdparty_order = :thirdparty_order WHERE id = :id"
 		],
-		'consumables_put_product_productlist_import' => [
+		'consumables_put_product_productlist_import' => [ // this query is possibly modified within consumables.php->update_productlist(). the modification may have to be adjusted in case of additional driver-related query patterns
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = :last_order WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = (CASE WHEN :article_name IS NULL THEN NULL ELSE N':article_name' END), article_unit = (CASE WHEN :article_unit IS NULL THEN NULL ELSE N':article_unit' END), article_ean = :article_ean, trading_good = :trading_good, incorporated = (CASE WHEN :incorporated IS NULL THEN incorporated ELSE N':incorporated' END), has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id, last_order = CONVERT(datetime, :last_order, 120) WHERE id = :id"
 		],

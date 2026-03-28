@@ -272,19 +272,19 @@ class NOTIFICATION extends API {
 										foreach($current_records as $current){
 											$records = BLOCKCHAIN::add($records, $current);
 										}
-										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_post'),
+										$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'records_post',
 											[
-												':context' => $this->_pdo->quote($case['context']),
-												':case_state' => $this->_pdo->quote(UTILITY::json_encode($case['case_state'])),
-												':record_type' => $this->_pdo->quote($case['record_type']) ? : 'NULL',
-												':identifier' => $this->_pdo->quote($case['identifier']),
+												':context' => $case['context'],
+												':case_state' => UTILITY::json_encode($case['case_state']),
+												':record_type' => $case['record_type'] ?: null,
+												':identifier' => $case['identifier'],
 												':last_user' => $_SESSION['user']['id'],
-												':last_document' => 'NULL',
-												':content' => $this->_pdo->quote(UTILITY::json_encode($records)),
-												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : 'NULL',
-												':erp_case_number' => $this->_pdo->quote($case['erp_case_number']),
-												':note' => $this->_pdo->quote($case['note'] ? : ''),
-												':restricted_access' => $this->_pdo->quote($case['restricted_access'] ? : 'NULL'),
+												':last_document' => null,
+												':content' => UTILITY::json_encode($records),
+												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : null,
+												':erp_case_number' => $case['erp_case_number'],
+												':note' => $case['note'] ?: '',
+												':restricted_access' => $case['restricted_access'] ?: null,
 												':id' => $case['id'], // must come after :identifier, otherwise replacements fail
 												':unit' => null
 											]) . '; ');
@@ -354,20 +354,20 @@ class NOTIFICATION extends API {
 										$article = $articles[array_key_first($articles)];
 										foreach ($states as $state){
 											if ($order[$state] === null && $article[$state]){
-												$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
+												$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_state',
 													[
 														':id' => $order['id'],
 														':field' => $state,
-														':date' => $this->_pdo->quote($article[$state])
+														':date' => $article[$state]
 													]) . '; ');
 											}
 										}
 										if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
 											$order['order_data']['order_reference'] = $article['order_reference'];
-												$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_addinformation'),
+												$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_addinformation',
 													[
 														':id' => $order['id'],
-														':order_data' => $this->_pdo->quote(UTILITY::json_encode($order['order_data']))
+														':order_data' => UTILITY::json_encode($order['order_data'])
 													]) . '; ');
 										}
 
@@ -437,10 +437,10 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
 											[
 												':notified' => $diff,
-												':identifier' => $this->_pdo->quote($row['identifier'])
+												':identifier' => $row['identifier']
 											]) . '; ');
 									}
 								}
@@ -474,10 +474,10 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
 											[
 												':notified' => $diff,
-												':identifier' => $this->_pdo->quote($row['identifier'])
+												':identifier' => $row['identifier']
 											]) . '; ');
 									}
 									elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
@@ -492,7 +492,7 @@ class NOTIFICATION extends API {
 											$this->_filehandler->delete($delete, 'thisIsOnlySupposedToBeAbleFromTheCronJob');
 										}
 										// prepare deletion
-										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
+										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_delete',
 											[
 												':id' => intval($row['id'])
 											]) . '; ');
@@ -642,10 +642,10 @@ class NOTIFICATION extends API {
 								} else $issue_interval = $order['issued_notified'];
 
 								// prepare alert flags
-								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
+								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
 									[
-										':delivered_notified' => $deliver_interval ? : 'NULL',
-										':issued_notified' => $issue_interval ? : 'NULL',
+										':delivered_notified' => $deliver_interval ?: null,
+										':issued_notified' => $issue_interval ?: null,
 										':id' => $order['id']
 									]) . '; ');
 
@@ -713,10 +713,10 @@ class NOTIFICATION extends API {
 							foreach($users as $user){
 								if (!$user['invalidation_date']) continue;
 								if ($user['invalidation_date'] < date('Y-m-d')) {
-									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('user_put_auto_restrict'),
+									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_put_auto_restrict',
 									[
 										':id' => $user['id'],
-										':token' => $this->_pdo->quote(hash('sha256', $user[':name'] . random_int(100000,999999) . time())),
+										':token' => hash('sha256', $user[':name'] . random_int(100000,999999) . time()),
 									]) . '; ');
 								}
 							}

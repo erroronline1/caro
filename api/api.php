@@ -104,7 +104,7 @@ class API {
 					];
 					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
 					if (empty($_class_vars[$var])) {
-						$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+						$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
 						if ($dbsetup) $this->_pdo->exec($dbsetup);
 					}
 					break;
@@ -199,7 +199,7 @@ class API {
 					':message' => $message
 				];
 			}
-			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('message_post_system_message'), $insertions));
+			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
 		}
 		foreach ($sqlchunks as $chunk){
 			SQLQUERY::EXECUTE($this->_pdo, $chunk);
