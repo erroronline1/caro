@@ -31,16 +31,9 @@ Things are still in motion. Images may be outdated.
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
-* enable markdown for more (messages, etc.), regular users not parsing anchors to avoid malicious scripts
-    * can it replace htmlcontent? alertUserGroup and depending language chunks
-    * not record inputs though, might affect statistics
 * validate csvprocessor on complex filters (terminerinnerung)
-* convert varchar to nvarchar columns, consider unicode
-    * see https://stackoverflow.com/questions/144283/what-is-the-difference-between-varchar-and-nvarchar and https://stackoverflow.com/questions/4144767/unicode-characters-in-sql-table
 * file drag and drop, to and from the application
-* one message per reminder of open orders, unissued etc
 * https://web.dev/patterns/files/drag-and-drop-files?hl=de
-* css paper theme
 
 ## Content
 * [Aims](#aims)
