@@ -33,7 +33,8 @@ Things are still in motion. Images may be outdated.
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 * validate csvprocessor on complex filters (terminerinnerung)
 * file drag and drop, to and from the application
-* https://web.dev/patterns/files/drag-and-drop-files?hl=de
+    * https://web.dev/patterns/files/drag-and-drop-files?hl=de
+* inspect possible n+1 queries within loops
 
 ## Content
 * [Aims](#aims)
