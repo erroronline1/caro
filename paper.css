@@ -1,0 +1,152 @@
+/**
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
+ */
+
+:root {
+	--background: rgb(216, 222, 233);
+	--foreground: rgb(46, 52, 64);
+	--inputborder: rgb(67, 76, 94); /*#434c5e*/
+	--disabled: rgb(92, 97, 109);
+	--article: rgba(216, 214, 210, 1);
+	--3d-border: rgba(229, 233, 240, 0);
+	--lightshadow: rgba(229, 233, 240, 0.9);
+	--lightershadow: rgba(229, 233, 240, 0.5);
+	--darkshadow: rgba(46, 52, 64, 0.3);
+	--notsodarkshadow: rgba(46, 52, 64, 0.15);
+	--frostgreen: rgb(143, 188, 187);
+	--red: rgb(191, 97, 106);
+	--reddish: rgba(191, 97, 106, 0.3);
+	--orange: rgb(208, 135, 112);
+	--yellow: rgb(235, 203, 139);
+	--green: rgb(153, 179, 132);
+	--purple: rgb(180, 142, 173);
+	--cta: rgb(136, 192, 208);
+	--evenDiscreetButton: rgba(136, 192, 208, 0.2);
+	--cta_darker: rgb(80, 155, 176);
+	--cta_active: rgb(161, 227, 246);
+	--shadow: 2px 2px 6px rgba(46, 52, 64, 0.3);
+	--cta-shadow: inset -1px -1px 15px 2px rgba(136, 192, 208, 0.7);
+	--notif: rgb(229, 233, 240);
+	--menu: rgba(229, 233, 240, 0.9);
+}
+
+body {
+	background: linear-gradient(150deg, rgba(226, 224, 220, 1), rgba(198, 195, 188, 1));
+	background-attachment: fixed;
+}
+
+body::before {
+	opacity: 0.035;
+}
+body::after{
+	background: url("./media/wallpapers_com_coffeestain.png") no-repeat;
+	/*1086x570*/
+	background-size: 100%;
+	content: "";
+	position:fixed;
+	z-index: -1;
+	height: 40vw;
+	width: 40vw;
+	right: 0;
+	bottom: 5vh;
+	opacity: 0.25;
+}
+
+body > header {
+	background-color: rgba(226, 224, 220, 1);
+}
+nav {
+	background-color: rgba(198, 195, 188, 1);
+	div.options {
+		background-color: var(--article);
+	}
+}
+.discreetButton {
+	box-shadow: none;
+}
+mark {
+	background-color: var(--yellow);
+	color: var(--foreground);
+}
+
+main {
+	& div,
+	& form {
+		& article {
+			border: none;
+			border-radius: 0.2em;
+			border-bottom: 1px solid var(--darkshadow);
+			box-shadow: none;
+			background-color: transparent;
+		}
+		& button {
+			background-color: var(--article);
+			box-shadow:
+				-2px -2px 3px rgba(255, 255, 255, 0.5),
+				2px 2px 3px rgba(0, 0, 0, 0.3);
+			color: var(--foreground);
+		}
+	}
+}
+
+section {
+	box-shadow: 3px 0 6px rgba(0, 0, 0, 0.5) inset;
+	border: none;
+}
+
+article:has(> article) article, /* tiles */
+article:has(> article) article[role="link"],
+.displayDay,
+#html5-qrcode-select-camera,
+button {
+	background-color: var(--article);
+	box-shadow:
+		-2px -2px 3px rgba(255, 255, 255, 0.5),
+		2px 2px 3px rgba(0, 0, 0, 0.3);
+	color: var(--foreground);
+}
+button {
+	width: 98%;
+}
+
+[data-type="deletebutton"],
+.reducedCTA {
+	border: none;
+	margin: 0 1em;
+}
+dialog .confirmButton {
+	border: none;
+	margin-top: -0.5em;
+}
+
+[data-type="addblock"]::before,
+button[data-type="additem"]::before,
+button[data-type="calendarbutton"]::before,
+button[data-type="certificate"]::before,
+[data-type="copy"]::before,
+button[data-type="download"]::before,
+button[data-type="file"]::before,
+[data-type="helpbutton"]::before,
+button[data-type="image"]::before,
+button[data-type="import"]::before,
+button[data-type="markdown"]::before,
+button[data-type="merge"]::before,
+button[data-type="photo"]::before,
+button[data-type="documentbutton"]::before,
+button[data-type="reset"]::before,
+button[data-type="generateupdate"]::before,
+button[data-type="scanner"]::before,
+button[data-type="search"]::before,
+button[data-type="submitbutton"]::before,
+[data-type="toleft"]::before,
+[data-type="toright"]::after,
+button[data-type="upvote"]::before,
+button[data-type="downvote"]::before {
+	background-color: var(--foreground);
+}

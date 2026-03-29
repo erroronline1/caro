@@ -226,7 +226,7 @@
 04.01.25,4,"code maintenance, documentation"
 05.01.25,3,"code maintenance, templates"
 06.01.25,3,"templates, install routine"
-08.01.25,2,database type maintenance
+08.01.25,2,"database type maintenance"
 10.01.25,7,"stress-test, risk-api"
 11.01.25,10,"risk-api, templates, ui"
 12.01.25,1,ui
@@ -400,3 +400,5 @@
 14.03.26,11,"code maintenance, cron, ui-assembler, message-api, calendar-api, filehandler"
 20.03.26,10,filehandler
 21.03.26,10,"filehandler, markdown, message-api"
+27.03.26,10,"record-api, database type maintenance"
+28.03.26,9,"database type maintenance, notification-api, ui"
