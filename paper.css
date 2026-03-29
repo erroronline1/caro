@@ -34,6 +34,8 @@
 	--cta-shadow: inset -1px -1px 15px 2px rgba(136, 192, 208, 0.7);
 	--notif: rgb(229, 233, 240);
 	--menu: rgba(229, 233, 240, 0.9);
+
+	--lighterforeground: rgba(46, 52, 64, 0.6);
 }
 
 body {
@@ -79,10 +81,10 @@ main {
 			background-color: transparent;
 		}
 		& button {
-			background-color: var(--article);
-			box-shadow:
-				-2px -2px 3px rgba(255, 255, 255, 0.5),
-				2px 2px 3px rgba(0, 0, 0, 0.3);
+			background-color: var(--cta);
+			box-shadow: none;
+			border-width: 2px 3px 2px 1px;
+			border-color: var(--lighterforeground);
 			color: var(--foreground);
 		}
 	}
@@ -99,6 +101,7 @@ main {
 dialog[open] {
 	border-radius: 0.2em;
 	transform: rotate(-1deg);
+	background: linear-gradient(150deg, rgba(226, 224, 220, 1), rgba(198, 195, 188, 1));
 }
 
 section {
@@ -110,15 +113,38 @@ article:has(> article) article, /* tiles */
 article:has(> article) article[role="link"],
 .displayDay,
 #html5-qrcode-select-camera,
-button {
+button,
+[data-type="deletebutton"],
+.reducedCTA,
+dialog .confirmButton {
 	background-color: var(--article);
-	box-shadow:
-		-2px -2px 3px rgba(255, 255, 255, 0.5),
-		2px 2px 3px rgba(0, 0, 0, 0.3);
+	box-shadow: none;
+	border: 1px solid;
+	border-width: 2px 3px 2px 1px;
+	border-color: var(--lighterforeground);
 	color: var(--foreground);
+}
+article:has(> article) article[role="link"],
+.displayDay {
+	border-color: var(--cta_darker);
 }
 button {
 	width: 98%;
+}
+[data-type="deletebutton"],
+.reducedCTA {
+	margin-right: 0.3em;
+}
+
+#html5-qrcode-select-camera,
+button,
+dialog .confirmButton {
+	background-color: var(--cta);
+}
+[data-type="deletebutton"],
+.reducedCTA,
+dialog .reducedCTA {
+	background-color: var(--article);
 }
 
 label {
@@ -137,6 +163,7 @@ label {
 	.editor {
 		border-width: 2px 3px 2px 1px;
 		border-radius: 0.1em 1em 2em 1em/0.3em 2em 0.5em 5em;
+		border-color: var(--lighterforeground);
 	}
 }
 .radio,
@@ -146,13 +173,31 @@ label {
 input:checked + .checkbox,
 input:checked + .checkbox::before,
 input:checked + .radio {
-	border-color: var(--foreground);
+	border-color: var(--lighterforeground);
 }
 
 .signaturecanvas {
 	border-bottom: 3px solid var(--darkshadow);
 	border-bottom-left-radius: 2em 0.3em;
 	border-bottom-right-radius: 5em 0.5em;
+}
+
+section > div > hr,
+article > hr {
+	border: none;
+	border-bottom: 2px solid var(--lighterforeground);
+	border-radius: 1% 1% 2% 4% / 2% 6% 5% 4%;
+	transform: rotate(-1deg);
+	overflow: visible;
+}
+section > div > hr::before,
+article > hr::before {
+	content: "";
+	display: block;
+	border: none;
+	border-bottom: 1px solid var(--darkshadow);
+	border-radius: 2% 6% 5% 4% / 1% 1% 2% 4%;
+	transform: translate3d(-1%, -256%, 0) scale(1.015) rotate(1.3deg);
 }
 
 .discreetButton {
@@ -165,16 +210,7 @@ mark {
 
 input[type="range"]::-webkit-slider-runnable-track,
 input[type="range"]::-moz-range-track {
-	background-color: var(--darkshadow);
-}
-
-[data-type="deletebutton"],
-.reducedCTA {
-	border: none;
-	margin-right: 0.3em;
-}
-dialog .confirmButton {
-	border: none;
+	background-color: var(--lighterforeground);
 }
 
 [data-type="addblock"]::before,
