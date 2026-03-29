@@ -77,7 +77,7 @@ mark {
 
 input[type="range"]::-webkit-slider-runnable-track,
 input[type="range"]::-moz-range-track{
-	background-color: var(--article);
+	background-color: var(--darkshadow);
 }
 
 main {
