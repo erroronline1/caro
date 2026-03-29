@@ -2176,6 +2176,7 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.raw"),
 				id: "_compose_raw",
 				"data-loss": "prevent",
+				style:"height:29em"
 			},
 		};
 		result = result.concat(...this.code());
@@ -2410,7 +2411,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.textsection_content"),
-				rows: 5,
+				rows: 13,
 				"data-loss": "prevent",
 			},
 		};
