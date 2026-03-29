@@ -10,7 +10,7 @@
 
 :root {
 	--background: rgb(216, 222, 233);
-	--foreground: rgb(46, 52, 64);
+	--foreground: rgb(54, 60, 72);
 	--inputborder: rgb(67, 76, 94); /*#434c5e*/
 	--disabled: rgb(92, 97, 109);
 	--article: rgba(216, 214, 210, 1);
@@ -44,12 +44,12 @@ body {
 body::before {
 	opacity: 0.035;
 }
-body::after{
+body::after {
 	background: url("./media/wallpapers_com_coffeestain.png") no-repeat;
 	/*1086x570*/
 	background-size: 100%;
 	content: "";
-	position:fixed;
+	position: fixed;
 	z-index: -1;
 	height: min(40vh, 40vw);
 	width: min(40vh, 40vw);
@@ -66,18 +66,6 @@ nav {
 	div.options {
 		background-color: var(--article);
 	}
-}
-.discreetButton {
-	box-shadow: none;
-}
-mark {
-	background-color: var(--yellow);
-	color: var(--foreground);
-}
-
-input[type="range"]::-webkit-slider-runnable-track,
-input[type="range"]::-moz-range-track{
-	background-color: var(--darkshadow);
 }
 
 main {
@@ -98,6 +86,19 @@ main {
 			color: var(--foreground);
 		}
 	}
+
+	& div > article,
+	& form > article {
+		border-top: 3px solid var(--darkshadow);
+		border-top-left-radius: 2em 0.3em;
+		border-top-right-radius: 5em 0.5em;
+		border-bottom: none;
+	}
+}
+
+dialog[open] {
+	border-radius: 0.2em;
+	transform: rotate(-1deg);
 }
 
 section {
@@ -120,14 +121,60 @@ button {
 	width: 98%;
 }
 
+label {
+	input[type="text"],
+	input[type="number"],
+	input[type="search"],
+	input[type="password"],
+	input[type="date"],
+	input[type="time"],
+	input[type="datetime-local"],
+	input[type="tel"],
+	input[type="email"],
+	input[type="color"],
+	textarea,
+	select,
+	.editor {
+		border-width: 2px 3px 2px 1px;
+		border-radius: 0.1em 1em 2em 1em/0.3em 2em 0.5em 5em;
+	}
+}
+.radio,
+.checkbox {
+	border-width: 2px 3px 2px 1px;
+}
+input:checked + .checkbox,
+input:checked + .checkbox::before,
+input:checked + .radio {
+	border-color: var(--foreground);
+}
+
+.signaturecanvas {
+	border-bottom: 3px solid var(--darkshadow);
+	border-bottom-left-radius: 2em 0.3em;
+	border-bottom-right-radius: 5em 0.5em;
+}
+
+.discreetButton {
+	box-shadow: none;
+}
+mark {
+	background-color: var(--yellow);
+	color: var(--foreground);
+}
+
+input[type="range"]::-webkit-slider-runnable-track,
+input[type="range"]::-moz-range-track {
+	background-color: var(--darkshadow);
+}
+
 [data-type="deletebutton"],
 .reducedCTA {
 	border: none;
-	margin: 0 1em;
+	margin-right: 0.3em;
 }
 dialog .confirmButton {
 	border: none;
-	margin-top: -0.5em;
 }
 
 [data-type="addblock"]::before,
