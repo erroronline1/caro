@@ -178,7 +178,7 @@ class NOTIFICATION extends API {
 										':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
 									])) SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
 											':user' => $user['id'],
-											':ids' => implode(',', array_column($messages, 'id')) 
+											':ids' => array_column($messages, 'id')
 										]);
 								}
 							}
@@ -310,9 +310,9 @@ class NOTIFICATION extends API {
 								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata($oldest))) break; 
 
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
-										':SEARCH' => '%',
-										':organizational_unit' => array_keys($this->_lang->_USER['units']),
-										':user' => 0
+									':SEARCH' => '%',
+									':organizational_unit' => array_keys($this->_lang->_USER['units']),
+									':user' => 0
 								]);
 								
 								require_once('./order.php');
@@ -422,17 +422,16 @@ class NOTIFICATION extends API {
 
 										// iterate over units
 										foreach($units as $unit){
-											if (!empty($unit_members[$unit])) {
-												// iterate over unit members to summarize topic
-												foreach($unit_members[$unit] as $unit_member){
-													if (!isset($unclosed_notif[$unit_member])) $unclosed_notif[$unit_member] = [];
-													$unclosed_notif[$unit_member][] = $this->_lang->GET('record.reminder_message', [
-														':days' => $last->diff($this->_date['servertime'])->days,
-														':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
-														':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
-														':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
-													], true);
-												}
+											if (!$unit || empty($unit_members[$unit])) continue;
+											// iterate over unit members to summarize topic
+											foreach($unit_members[$unit] as $unit_member){
+												if (!isset($unclosed_notif[$unit_member])) $unclosed_notif[$unit_member] = [];
+												$unclosed_notif[$unit_member][] = $this->_lang->GET('record.reminder_message', [
+													':days' => $last->diff($this->_date['servertime'])->days,
+													':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
+													':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
+													':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+												], true);
 											}
 										}
 
@@ -458,18 +457,17 @@ class NOTIFICATION extends API {
 
 										// iterate over units
 										foreach($units as $unit){
-											if (!empty($unit_members[$unit])) {
-												// iterate over unit members to summarize topic
-												foreach($unit_members[$unit] as $unit_member){
-													// filter permission
-													$unit_member_permissions = explode(',', $user[array_search($unit_member, array_column($user, 'name'))]);
-													if (!array_intersect($unit_member_permissions, PERMISSION::permissionFor('recordscasestate', true))) continue;
+											if (!$unit || empty($unit_members[$unit])) continue;
+											// iterate over unit members to summarize topic
+											foreach($unit_members[$unit] as $unit_member){
+												// filter permission
+												$unit_member_permissions = explode(',', $user[array_search($unit_member, array_column($user, 'name'))]);
+												if (!array_intersect($unit_member_permissions, PERMISSION::permissionFor('recordscasestate', true))) continue;
 
-													if (!isset($missingretention_notif[$unit_member])) $missingretention_notif[$unit_member] = [];
-													$missingretention_notif[$unit_member][] = $this->_lang->GET('record.lifespan.reminder_message', [
-														':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
-													], true);
-												}
+												if (!isset($missingretention_notif[$unit_member])) $missingretention_notif[$unit_member] = [];
+												$missingretention_notif[$unit_member][] = $this->_lang->GET('record.lifespan.reminder_message', [
+													':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+												], true);
 											}
 										}
 
@@ -623,19 +621,18 @@ class NOTIFICATION extends API {
 									
 									// iterate over units
 									foreach($units as $unit){
-										if (!empty($unit_members[$unit])) {
-											// iterate over unit members to summarize topic
-											foreach($unit_members[$unit] as $unit_member){
-												if (!isset($unissued_notif[$unit_member])) $unissued_notif[$unit_member] = [];
-												$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
-													':days' => $delivered_full->diff($this->_date['servertime'])->days,
-													':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
-													':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? '']) . '</a>',
-													':vendor' => $decoded_order_data['vendor_label'] ?? '',
-													':commission' => $decoded_order_data['commission'],
-													':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
-												], true);
-											}
+										if (!$unit || empty($unit_members[$unit])) continue;
+										// iterate over unit members to summarize topic
+										foreach($unit_members[$unit] as $unit_member){
+											if (!isset($unissued_notif[$unit_member])) $unissued_notif[$unit_member] = [];
+											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
+												':days' => $delivered_full->diff($this->_date['servertime'])->days,
+												':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
+												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? '']) . '</a>',
+												':vendor' => $decoded_order_data['vendor_label'] ?? '',
+												':commission' => $decoded_order_data['commission'],
+												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
+											], true);
 										}
 									}
 									$update = true;
