@@ -88,12 +88,12 @@ class ORDER extends API {
 									// ordered aka processed return orders are delivered and issued immediately
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null,
-										':id' => $this->_requestedID,
+										':ids' => $this->_requestedID,
 										':field' => 'delivered_full'
 									]);
 									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null,
-										':id' => $this->_requestedID,
+										':ids' => $this->_requestedID,
 										':field' => 'issued_full'
 									]);
 								}
@@ -115,7 +115,7 @@ class ORDER extends API {
 						// generic state update
 						SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 							':date' => $this->_stateSet === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null,
-							':id' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID))),
+							':ids' => array_map(fn($id) => intval($id), explode('_', $this->_requestedID)),
 							':field' => $this->_orderState // verified safe by being in above array condition
 						]);
 					}
@@ -420,7 +420,7 @@ class ORDER extends API {
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 					':SEARCH' => $filter['term'] ? : '%',
 					':organizational_unit' => $units,
-					':user' => PERMISSION::permissionFor('orderdisplayall') ? 0 : $_SESSION['user']['id'] // only users that are not able to select units will be presented their own orders as well independently of unit intersection
+					':user' => PERMISSION::permissionFor('orderdisplayall') ? 0 : intval($_SESSION['user']['id']) // only users that are not able to select units will be presented their own orders as well independently of unit intersection
 					],
 					true,
 				);
