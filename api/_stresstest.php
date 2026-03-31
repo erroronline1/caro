@@ -200,11 +200,9 @@ class STRESSTEST extends INSTALL{
 			],
 			'contained'
 		);
-		foreach ($entries as $entry){
-			SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-				':id' => $entry['id']
-			]);
-		}
+		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+			':ids' => array_column($entries, 'id')
+		]);
 		return $this->printSuccess(count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted');
 	}
 

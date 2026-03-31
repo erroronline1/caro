@@ -577,7 +577,7 @@ class CALENDAR extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-					':id' => $this->_requestedId
+					':ids' => [$this->_requestedId]
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),

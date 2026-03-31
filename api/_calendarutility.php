@@ -194,18 +194,19 @@ class CALENDARUTILITY {
 	 */
 	public function delete($id = 0){
 		if ($id !== null) return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-			':id' => $id
+			':ids' => [$id]
 		]);
-		$num = 0;
+		$ids = [];
 		foreach ($this->getWithinDateRange() as $entry){
 			if (!$entry['closed']) continue;
 			$entry['closed'] = json_decode($entry['closed'], true);
 			$closed = new \DateTime($entry['closed']['date']);
-			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar']['autodelete'])) && SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-				':id' => $entry['id']
-			])) $num++;
+			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar']['autodelete']))) $ids[] = $entry['id'];
 		}
-		return $num;
+		if ($ids) return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+			':ids' => $ids
+		]);
+		return 0;
 	}
 	
 	/**
@@ -1045,7 +1046,8 @@ class CALENDARUTILITY {
 	public function search($search = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			':SEARCH' => $search
-			],true);
+		],
+		true);
 	}
 }
 ?>
