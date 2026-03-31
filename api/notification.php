@@ -356,7 +356,7 @@ class NOTIFICATION extends API {
 											if ($order[$state] === null && $article[$state]){
 												$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_state',
 													[
-														':id' => $order['id'],
+														':ids' => $order['id'],
 														':field' => $state,
 														':date' => $article[$state]
 													]) . '; ');
@@ -500,7 +500,7 @@ class NOTIFICATION extends API {
 											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 												':SEARCH' => $row['identifier'],
 												':organizational_unit' => array_keys($this->_lang->_DEFAULT['units']), // all units
-												':user' => ''
+												':user' => 0
 												],
 												'contained',
 											);
@@ -532,8 +532,8 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							foreach ($alerts as $alert){
-								SQLQUERY::EXECUTE($this->_pdo, $alert);
+							foreach ($alerts as $chunk){
+								SQLQUERY::EXECUTE($this->_pdo, $chunk);
 							}
 							$execution = true;
 							break;
@@ -664,8 +664,8 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							foreach ($alerts as $alert){
-								SQLQUERY::EXECUTE($this->_pdo, $alert);
+							foreach ($alerts as $chunk){
+								SQLQUERY::EXECUTE($this->_pdo, $chunk);
 							}
 							$execution = true;
 							break;
