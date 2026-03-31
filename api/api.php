@@ -247,7 +247,7 @@ class API {
 			// if database has changed in the meantime, session credentials do not match, invalidating the session
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				':token' => $token,
-				':two_factor' => $two_factor ?: 0
+				':two_factor' => $two_factor ?: null
 			]);
 			$user = $user ? $user[0]: null;
 			if ($user){
