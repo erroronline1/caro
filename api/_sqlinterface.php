@@ -477,8 +477,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP",
 		],
 		'calendar_delete' => [
-			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
+			'mysql' => "DELETE FROM caro_calendar WHERE id IN (:ids)",
+			'sqlsrv' => "DELETE FROM caro_calendar WHERE id IN (:ids)",
 		],
 
 
@@ -822,8 +822,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, delivered_partially, delivered_full, issued_partially, issued_full, archived, ordertype, delivered_notified, issued_notified) VALUES (N:order_data, :organizational_unit, N:approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
 		],
 		'order_put_approved_order_state' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id IN (:id)",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(datetime, :date, 120) WHERE id IN (:id)"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET :field = :date WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET :field = CONVERT(datetime, :date, 120) WHERE id IN (:ids)"
 		],
 		'order_put_approved_order_addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",
