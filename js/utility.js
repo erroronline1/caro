@@ -202,7 +202,7 @@ export const _serviceWorker = {
 	 *
 	 */
 	postMessage: function (message) {
-		this.worker.active.postMessage(message);
+		if (this.worker) this.worker.active.postMessage(message);
 	},
 
 	/**
@@ -211,22 +211,31 @@ export const _serviceWorker = {
 	 */
 	register: async function () {
 		if ("serviceWorker" in navigator) {
-			this.worker = await navigator.serviceWorker.register("./service-worker.js");
-			if (document.querySelector('html[data-useragent*="safari"]') === undefined && window.Notification) {
-				this.permission = window.Notification.requestPermission();
-			} else {
-				// safari sucks
-			}
-			navigator.serviceWorker.ready.then((registration) => {
-				if (registration && !_serviceWorker.notif.interval) {
-					_serviceWorker.notif.interval = setInterval(() => {
-						_serviceWorker.postMessage("getnotifications");
-					}, _serviceWorker.notif.interval_duration);
+			try {
+				this.worker = await navigator.serviceWorker.register("./service-worker.js");
+				if (document.querySelector('html[data-useragent*="safari"]') === undefined && window.Notification) {
+					this.permission = window.Notification.requestPermission();
+				} else {
+					// safari sucks
 				}
-				navigator.serviceWorker.addEventListener("message", (message) => {
-					this.onMessage(message);
+				navigator.serviceWorker.ready.then((registration) => {
+					if (registration && !_serviceWorker.notif.interval) {
+						_serviceWorker.notif.interval = setInterval(() => {
+							_serviceWorker.postMessage("getnotifications");
+						}, _serviceWorker.notif.interval_duration);
+					}
+					navigator.serviceWorker.addEventListener("message", (message) => {
+						this.onMessage(message);
+					});
 				});
-			});
+			} catch (e) {
+				api.notification("get", "notifs");
+				_serviceWorker.notif.interval = setInterval(() => {
+					api.notification("get", "notifs");
+				}, _serviceWorker.notif.interval_duration * 2);
+				return;
+				throw new Error("No Service Worker registered!");
+			}
 		} else throw new Error("No Service Worker support!");
 	},
 
@@ -237,6 +246,7 @@ export const _serviceWorker = {
 	 * @event show system notification
 	 */
 	showLocalNotification: function (title, body) {
+		if (!this.worker) return;
 		const options = {
 			body: body,
 			icon: "./media/favicon/android/android-launchericon-192-192.png",
@@ -724,6 +734,8 @@ export const _client = {
 							id: "timespan",
 							value: data.filter.timespan || "",
 						},
+						hint: api._lang.GET("assemble.render.datetime_local_hint"),
+
 					},
 					{
 						type: "button",
