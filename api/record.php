@@ -417,7 +417,8 @@ class RECORD extends API {
 					'name' => 'DEFAULT_' . $this->_lang->GET('record.datetime'),
 					'value' => $this->_date['usertime']->format('Y-m-d\TH:i'),
 					'required' => true
-				]
+				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			];
 			if (array_intersect(['patient'], $_SESSION['user']['permissions'])) {
 				$record_date['attributes']['readonly'] = true;

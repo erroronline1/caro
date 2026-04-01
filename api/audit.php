@@ -1203,7 +1203,8 @@ class AUDIT extends API {
 					'name' => $this->_lang->GET('audit.documents.datetime'),
 					'value' => $_requestedDateTime,
 					'data-usecase' => 'audit'
-				]
+				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'button',
 				'attributes' => [
@@ -1552,7 +1553,8 @@ class AUDIT extends API {
 					'name' => $this->_lang->GET('audit.documents.datetime'),
 					'value' => $_requestedDateTime,
 					'data-usecase' => 'audit'
-				]
+				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'button',
 				'attributes' => [
@@ -2034,7 +2036,8 @@ class AUDIT extends API {
 					'name' => $this->_lang->GET('audit.documents.datetime'),
 					'value' => $_requestedDateTime,
 					'data-usecase' => 'audit'
-				]
+				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'button',
 				'attributes' => [
@@ -2196,6 +2199,7 @@ class AUDIT extends API {
 					'value' => $from !== '-' ? $from . 'T00:00' : '',
 					'data-usecase' => 'audit'
 				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'datetime_local',
 				'attributes' => [
@@ -2203,6 +2207,7 @@ class AUDIT extends API {
 					'value' => $until !== '-' ? $until . 'T23:59' : '',
 					'data-usecase' => 'audit'
 				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'radio',
 				'attributes' => [
@@ -2941,7 +2946,8 @@ class AUDIT extends API {
 					'name' => $this->_lang->GET('audit.documents.datetime'),
 					'value' => $_requestedDateTime,
 					'data-usecase' => 'audit'
-				]
+				],
+				'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 			], [
 				'type' => 'button',
 				'attributes' => [

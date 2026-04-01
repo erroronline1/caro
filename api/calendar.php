@@ -144,7 +144,8 @@ class CALENDAR extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('calendar.appointment.datetime'),
 										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.datetime')) ? : ''
-									]
+									],
+									'hint' => $this->_lang->GET('assemble.render.datetime_local_hint')
 								], [
 									'type' => 'text',
 									'hint' => $this->_lang->GET('calendar.appointment.occasion_hint'),
