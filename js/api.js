@@ -11,6 +11,7 @@
 import { Assemble, Dialog, Toast } from "./assemble.js";
 import { Compose } from "./compose.js";
 import { Lang } from "../js/language.js";
+import { _serviceWorker } from "./utility.js";
 
 export const api = {
 	// passed from backend
@@ -165,7 +166,7 @@ export const api = {
 					_serviceWorker.notif.interval = null;
 
 					// add class. without being logged in the entry point always returns this error
-					if (api._settings.config.application && api._settings.config.application.is_development){
+					if (api._settings.config.application && api._settings.config.application.is_development) {
 						document.querySelector("body>header").classList.add("is_development");
 					}
 
@@ -537,9 +538,15 @@ export const api = {
 							try {
 								if (data.user) {
 									// reset notif interval
-									_serviceWorker.notif.interval = setInterval(() => {
-										_serviceWorker.postMessage("getnotifications");
-									}, _serviceWorker.notif.interval_duration);
+									if (_serviceWorker.worker)
+										// registered
+										_serviceWorker.notif.interval = setInterval(() => {
+											_serviceWorker.postMessage("getnotifications");
+										}, _serviceWorker.notif.interval_duration); // faulty certificate or whatever
+									else
+										_serviceWorker.notif.interval = setInterval(() => {
+											api.notification("get", "notifs");
+										}, _serviceWorker.notif.interval_duration * 2);
 
 									if (api._unauthorizedRequest.request && api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
 										// resend last request
@@ -687,7 +694,8 @@ export const api = {
 					const observer = new MutationObserver(async (mutations) => {
 						observer.disconnect();
 						// trigger notifications only after navigation has been successufully added to the dom
-						_serviceWorker.postMessage("getnotifications");
+						if (_serviceWorker.worker) _serviceWorker.postMessage("getnotifications");
+						else api.notification("get", "notifs");
 					});
 					observer.observe(document.querySelector("nav"), {
 						childList: true,
@@ -744,7 +752,7 @@ export const api = {
 					}
 
 					// ensure proper flagging in case of window refreshs
-					if (api._settings.config.application && api._settings.config.application.is_development){
+					if (api._settings.config.application && api._settings.config.application.is_development) {
 						document.querySelector("body>header").classList.add("is_development");
 					}
 
@@ -1652,6 +1660,20 @@ export const api = {
 			default:
 				return;
 		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
+	 * fallback in case of serviceworker failing to register due to outdated ssl certificate
+	 */
+	notification: (method, ...request) => {
+		request = [...request];
+
+		request.splice(0, 0, "notification");
+		let payload,
+			successFn = function (data) {
+				_serviceWorker.onMessage({ data: data });
+			};
 		api.send(method, request, successFn, null, payload);
 	},
 
