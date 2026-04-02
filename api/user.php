@@ -710,8 +710,8 @@ class USER extends API {
 					':image' => $user['image'] ?? '',
 					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
 					':skills' => [],
-					':invalidation_date' => $user['invalidation_date'],
-					':two_factor' => $user['two_factor']
+					':invalidation_date' => $user['invalidation_date'] ?? null,
+					':two_factor' => $user['two_factor'] ?? null
 				];
 
 				//check forbidden names
