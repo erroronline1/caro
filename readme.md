@@ -34,14 +34,6 @@ Things are still in motion. Images may be outdated.
 * validate csvprocessor on complex filters (terminerinnerung)
 * file drag and drop, to and from the application
     * https://web.dev/patterns/files/drag-and-drop-files?hl=de
-* inspect possible n+1 queries within loops
-    * chunk execution as sqlquery method? e.g. if query is array
-    * filehandler->delete:media_delete
-    * api->alertUserGroup
-    * consumables_put_incorporation
-    * chunkify message_post_message, records_datalist_put/~post, user_training_post
-    * alert_open_records_and_retention_periods order deletion
-* consider fileserver switching strategy during runtime (within stresstest)
 * orders
     * check if similar items have been ordered recently?
     * highlight amount (sanitized htmlcontent)
@@ -2346,7 +2338,7 @@ There may be the need for a somewhat advanced computer enthusiast for:
 You can try to get your hands dirty on diving into the sourcecode as well, most of the other functions should work out of the box though.
 
 ### Fileserver strategy
-Depending on available storage solutions and backup strategies you can decide whether to store record files in the filesystem or the database. The strategy has to be chosen on installation and should not be changed afterwards to avoid data loss.  
+Depending on available storage solutions and backup strategies you can decide whether to store record files in the filesystem or the database. The strategy should be chosen on installation and not be changed afterwards. However within the [_stresstest](#stress-test-and-performance) a method is available to switch files from or to filesystem/database. This may take a remarkable amount of computation and time, should be avoided if possible and at least executed from the command line to avoid timeouts on webrequests.  
 The directory structure within the `fileserver`-directory stays the same, for database stored files will be converted into local files temporarily to improve caching.
 
 ### Network connection handling
@@ -3067,6 +3059,8 @@ During development following outcomes could be noted:
 Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested, before going public.**
 
 Same applies to vendors. Vendor-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
+
+A Method is provided to change the [fileserver strategy](#fileserver-strategy), copying files between the filesystem and the database.
 
 One special usecase may be the auto-approval incorporations on migration from another quality management system. If you agree within the administration on terms, you can set up the approvals that will override all currently pending incorporations. This step should be well thought out, documented and only being used once after initial migration and imports of product lists through the [ERP interface](#erp-interface), assuming previous known products have been incorporated already.
 This is possible for document approval too and could also be used wisely on subsequently added roles for approval, to reduce the workload. Again, this should be well documented.

@@ -808,6 +808,98 @@ END;
 		$markdown = new MARKDOWN();
 		return $markdown->md2html($sample);
 	}
+
+	/**
+	 * 
+	 */
+	public function fileserver(){
+		if (!empty(REQUEST[1])){
+			require_once('./_filehandler.php');
+			$FILEHANDLER = new FILEHANDLER($this->_pdo);
+			// gather directories eligible for database strategy
+			$directories = [
+				$FILEHANDLER->directory('audit_attachments'),
+				$FILEHANDLER->directory('component_attachments'),
+				$FILEHANDLER->directory('record_attachments'),
+				$FILEHANDLER->directory('external_documents')
+			];
+			foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist') as $vendor){
+				$directories[] = $FILEHANDLER->directory('vendor_documents', [':id' => $vendor['id']]);
+				$directories[] = $FILEHANDLER->directory('vendor_products', [':id' => $vendor['id']]);
+			}
+			// gather files from the source 
+			$files = [];
+			foreach($directories as $directory){
+				switch(REQUEST[1]){
+					case 'fileserver':
+						$dbfiles = SQLQUERY::EXECUTE($this->_pdo, 'media_get_path_contents', [':path' => $directory]);
+						array_push($files, ...array_map(Fn($path, $filename) => $path . '/' . $filename, array_column($dbfiles, 'path'), array_column($dbfiles, 'name')));
+						break;
+					case 'database':
+						if (!file_exists($directory)) break;
+						$dir = scandir($directory);
+						foreach ($dir as $file){
+							if (is_file($directory . '/' . $file) && !in_array($file, [
+								'.htaccess',
+								'web.config'
+							])) $files[] = $directory . '/' . $file;
+						}
+						break;
+				}
+			}
+			// write files to the destination
+			// also see FILEHANDLER
+			foreach($files as $file){
+				switch(REQUEST[1]){
+					case 'fileserver':
+						if (file_exists($file)) {
+							echo $this->printWarning('file already present in filesystem', $file) . PHP_EOL;
+							break;
+						}
+
+						$dbfile = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file', [':path' => $file]);
+						$dbfile = $dbfile ? $dbfile[0] : null;
+						if (!$dbfile) break;
+
+						$FILEHANDLER->createDirectory($dbfile['path']);
+						// inflate and reconvert to binary again
+						$dbfile['content'] = SQLQUERY::retrievebinary($dbfile['content']);
+						$tempfile = fopen($file, 'wb');
+						fwrite($tempfile, $dbfile['content']);
+						fclose($tempfile);
+						echo $this->printSuccess('file successfully written to filesystem', $file) . PHP_EOL;
+						break;
+					case 'database':
+						if (SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [':path' => $file])) {
+							echo $this->printWarning('file already present in database', $file) . PHP_EOL;
+							break;
+						}
+						$pifile = pathinfo($file);
+						$fileHandle = fopen($file, 'rb');
+						$fileContents = fread($fileHandle, filesize($file));
+						fclose($fileHandle);
+
+						if (SQLQUERY::EXECUTE($this->_pdo, 'media_post', [
+							':path' => $pifile['dirname'],
+							':name' => $pifile['basename'],
+							':mime_type' => mime_content_type($file),
+							':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
+							':upload_date' => date('Y-m-d H:i:s'),
+						]))
+	 						echo $this->printSuccess('file successfully written to database', $file) . PHP_EOL;
+	 						else echo $this->printError('file NOT written to database', $file) . PHP_EOL;
+						break;
+				}
+			}
+		}
+		else {
+			echo $this->printWarning('transfering data may take a time exceeding the request window of a browser or server timeout for web requests. it is recommended to execute this command from the command line to avoid aborts. do not forget to switch the strategy within the config file accordingly.');
+			echo $this->printWarning('please note that this will not clean up. automated deletion of files on the fileserver will be done with the database strategy set, the database will remain unchanged.');
+			echo '<br/><br/><a href="./fileserver/fileserver">transfer database content -> fileserver</a>';
+			echo '<br/><br/><a href="./fileserver/database">transfer fileserver content -> database</a>';
+		}
+		
+	}
 }
 
 $stresstest = new STRESSTEST();

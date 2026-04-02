@@ -2240,7 +2240,7 @@ Es benötigt vermutlich eine einigermaßen fortgeschrittene computerbegeisterte 
 Man kann sich auch die Hände beim Eintauchen in den Quelltext schmutzig machen, aber alle anderen Funktionen sollten direkt funktionieren.
 
 ### Speicherstrategie
-Abhängig von verfügbaren Speicherlösungen und Backup-Strategien kann entschieden werden, ob Dateien von Aufzeichnungen im Dateisystem oder der Datenbank gespeichert werden sollen. Die Strategie muss bei der Installation festgelegt werden und sollte anschließend nicht geändert werden um Datenverlust zu vermeiden.  
+Abhängig von verfügbaren Speicherlösungen und Backup-Strategien kann entschieden werden, ob Dateien von Aufzeichnungen im Dateisystem oder der Datenbank gespeichert werden sollen. Die Strategie sollte bei der Installation festgelegt werden und anschließend nicht geändert werden. Es gibt jedoch innerhalb des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) eine Methode um Dateien zwischen dem Dateisystem und der Datenbank zu schieben. Dies könnte jedoch außergewöhnlich viele Serverressourcen blockieren und lange dauern, sollte daher möglichst vermieden und wenigstens von der Kommandozeile aus ausgeführt werden um Zeitüberschreitungen bei Serveranfragen zu vermeiden. 
 Die Verzeichnisstruktur innerhalb des `fileserver`-Verzeichnisses bleibt die gleiche, da Daten aus der Datenbank vorübergehend in lokale Dateien verwandelt werden im Caching zu verbessern.
 
 ### Handhabe der Netzwerkverbindung
