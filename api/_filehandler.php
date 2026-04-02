@@ -305,6 +305,7 @@ class FILEHANDLER{
 	public function delete($paths = [], $fromDatabase = false){
 		$result = false;
 		if (gettype($paths) === 'string') $paths = [$paths];
+		$sqlchunks = [];
 		foreach ($paths as $path) {
 			$pathinfo = pathinfo($path);
 			if (self::isInFilesystem($path, array_keys(CONFIG['fileserver']))){
@@ -322,11 +323,14 @@ class FILEHANDLER{
 			}
 			if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
 				// delete database entries (records exceeding lifespan)
-				$result = SQLQUERY::EXECUTE($this->_pdo, 'media_delete', [
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'media_delete', [
 					':path' => $pathinfo['dirname'],
 					':names' => $pathinfo['basename']
-				]);
+				]));
 			}
+		}
+		if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
+			$result = boolval(array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks)));
 		}
 		return $result;
 	}
