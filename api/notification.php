@@ -478,6 +478,7 @@ class NOTIFICATION extends API {
 												':identifier' => $row['identifier']
 											]) . '; ');
 									}
+									// delete records exceeding lifespan including files and orders containing the identifier
 									elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
 										// delete record attachments that begin with the identifier
 										if (file_exists($this->_filehandler->directory('record_attachments'))){
@@ -498,7 +499,7 @@ class NOTIFICATION extends API {
 										// delete orders containing identifier e.g. archived case related orders having identifier as commission
 										if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
 											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
-												':SEARCH' => $row['identifier'],
+												':SEARCH' => '"' . $row['identifier'] . '"', // literal
 												':organizational_unit' => array_keys($this->_lang->_DEFAULT['units']), // all units
 												':user' => 0
 												],
@@ -927,6 +928,7 @@ class NOTIFICATION extends API {
 								':ids' => array_column($users, 'id')
 							]);
 							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
+							$sqlchunks = [];
 							foreach ($trainings as $training){
 								if ($training['planned']) {
 									continue;
@@ -949,7 +951,7 @@ class NOTIFICATION extends API {
 										}
 										if ($none) {
 											// insert scheduled training and message user and supervisor
-											SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+											$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', [
 													':name' => $training['name'],
 													':user_id' => $user['id'],
 													':date' => null,
@@ -962,7 +964,7 @@ class NOTIFICATION extends API {
 														'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 														'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => $this->_lang->GET('user.training.auto_schedule', [':expires' => $this->convertFromServerTime($training['expires'], true)], true)]
 													])
-											]);
+											]));
 											$this->alertUserGroup([
 													'permission' => ['supervisor'],
 													'group' => array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
@@ -979,6 +981,7 @@ class NOTIFICATION extends API {
 									}
 								}
 							}
+							SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
 							$execution = true;
 							break;
 					}
