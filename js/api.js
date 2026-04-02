@@ -265,6 +265,9 @@ export const api = {
 	},
 
 	update_user_settings: async function () {
+		if (!api._settings.user.app_settings.theme){
+			api._settings.user.app_settings.theme = "light";
+		}
 		for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
 			switch (key) {
 				case "forceDesktop":
