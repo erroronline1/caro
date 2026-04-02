@@ -1031,10 +1031,10 @@ class SQLQUERY {
 						"VALUES (:id, :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills, :invalidation_date, :two_factor) " .
 						"ON DUPLICATE KEY UPDATE name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills, invalidation_date = :invalidation_date, two_factor = :two_factor",
 			'sqlsrv' => "MERGE INTO caro_user WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:name AS name, :permissions AS permissions, :units AS units, :token AS token, :orderauth AS orderauth, :image AS image, N:app_settings AS app_settings, :skills AS skills, :invalidation_date AS invalidation_date, :two_factor AS two_factor) AS source " .
+						"(SELECT :id AS id, N:name AS name, :permissions AS permissions, :units AS units, :token AS token, :orderauth AS orderauth, :image AS image, (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END) AS app_settings, :skills AS skills, :invalidation_date AS invalidation_date, :two_factor AS two_factor) AS source " .
 						"(id, name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET name = N:name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = N:app_settings, skills = :skills, invalidation_date = :invalidation_date, two_factor = :two_factor " .
-						"WHEN NOT MATCHED THEN INSERT (name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) VALUES (N:name, :permissions, :units, :token, :orderauth, :image, N:app_settings, :skills, :invalidation_date, :two_factor);",
+						"WHEN MATCHED THEN UPDATE SET name = N:name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END), skills = :skills, invalidation_date = :invalidation_date, two_factor = :two_factor " .
+						"WHEN NOT MATCHED THEN INSERT (name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) VALUES (N:name, :permissions, :units, :token, :orderauth, :image, (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END), :skills, :invalidation_date, :two_factor);",
 		],
 		'user_put_auto_restrict' => [
 			'mysql' => "UPDATE caro_user SET token = :token WHERE id = :id",
