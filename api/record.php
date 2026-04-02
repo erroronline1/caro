@@ -1037,6 +1037,7 @@ class RECORD extends API {
 							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
 								':unit' => $useddocument['unit']
 							]);
+							$sqlchunks = [];
 							foreach ($issues as $issue){
 								// gather values even for enumerated submissions
 								$values = [];
@@ -1052,23 +1053,24 @@ class RECORD extends API {
 									array_push($datalist, ...$values);
 									$datalist = array_values(array_unique($datalist));
 									sort($datalist);
-									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_put', [
+									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_put', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
-									]);
+									]));
 								}
 								else {
 									// issue not found, add unique and sorted datalist
 									$datalist = array_values(array_unique($values));
 									sort($datalist);
-									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_post', [
+									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
-									]);
+									]));
 								}
 							}
+							SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
 						}
 					}
 
