@@ -137,43 +137,31 @@ class API {
 	 * if permission and unit are both set only permission holders within units get the message! 
 	 */
 	public function alertUserGroup($group = [], $message = ''){
-		$permission = $unit = $user = $recipients = [];
-		if (isset($group['permission'])){
-			foreach ($group['permission'] as $prmssn){
-				$permissions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_permission_group', [
-					':group' => $prmssn
-				]);
-				foreach ($permissions as $userrow){
-					if (PERMISSION::filteredUser($userrow)) continue;
-					array_push($permission, $userrow['id']);
-				}
+		$recipients = [];
+
+		foreach(SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist') as $user){
+			$user['permissions'] = explode(',', $user['permissions']);
+			$user['units'] = explode(',', $user['units']);
+			// filter default (patients and system user)
+			if (PERMISSION::filteredUser($user)) continue;
+
+			// always include named users
+			if(isset($group['user'])&& in_array($user['name'], $group['user'])) {
+				$recipients[] = $user['id'];
+				continue;
+
 			}
-		}
-		if (isset($group['unit'])){
-			foreach ($group['unit'] as $unt){
-				$groups = SQLQUERY::EXECUTE($this->_pdo, 'application_get_unit_group', [
-					':group' => $unt
-				]);
-				foreach ($groups as $userrow){
-					if (PERMISSION::filteredUser($userrow)) continue;
-					array_push($unit, $userrow['id']);
-				}
+			// continue if set permissions do not intersect
+			if (isset($group['permission'])){
+				if (PERMISSION::filteredUser($user, ['permission' => $group['permission']])) continue;
 			}
-		}
-		if (isset($group['user']) && count($group['user'])){
-			$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					':ids' => '',
-					':names' => implode(',', $group['user'])
-			]);
-			foreach ($users as $userrow){
-				if (PERMISSION::filteredUser($userrow)) continue;
-				array_push($user, $userrow['id']);
+			// continue if set units do not intersect
+			if (isset($group['unit'])){
+				if (PERMISSION::filteredUser($user, ['unit' => $group['unit']])) continue;
 			}
+			$recipients[] = $user['id'];			
 		}
-		if ($permission) $recipients = $permission;
-		if ($unit) $recipients = $unit;
-		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
-		array_push($recipients, ...$user);
+
 		$recipients = array_unique($recipients);
 		if (!$recipients) return false;
 		if (!isset($this->_messages[$message])) $this->_messages[$message] = [];
