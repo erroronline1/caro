@@ -161,10 +161,10 @@ export const _serviceWorker = {
 	onMessage: function (message) {
 		const data = message.data;
 		if (!Object.keys(data).length) {
-			document.querySelector("header>div:nth-of-type(3)").style.display = "block";
+			document.querySelector("header>div:nth-of-type(4)").style.display = "block";
 			return;
 		}
-		document.querySelector("header>div:nth-of-type(3)").style.display = "none";
+		document.querySelector("header>div:nth-of-type(4)").style.display = "none";
 
 		if ("message_unnotified" in data && parseInt(data.message_unnotified, 10)) {
 			let body =
@@ -233,6 +233,7 @@ export const _serviceWorker = {
 				_serviceWorker.notif.interval = setInterval(() => {
 					api.notification("get", "notifs");
 				}, _serviceWorker.notif.interval_duration * 2);
+				document.querySelector("header>div:nth-of-type(2)").style.display = "block";
 				return;
 				throw new Error("No Service Worker registered!");
 			}

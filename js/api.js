@@ -152,7 +152,7 @@ export const api = {
 					return;
 				}
 
-				document.querySelector("header>div:nth-of-type(2)").style.display = [200, 511].includes(data.status) ? "none" : "block";
+				document.querySelector("header>div:nth-of-type(3)").style.display = [200, 511].includes(data.status) ? "none" : "block";
 				if (data.status === 203) new Toast(api._lang.GET("general.service_worker_get_cache_fallback"), "info");
 				if (data.status === 207) {
 					new Toast(api._lang.GET("general.service_worker_post_cache_fallback"), "info");
@@ -366,7 +366,7 @@ export const api = {
 				}
 				if (api._settings.config.lifespan.session.idle > 0 && remaining_visual > 0) {
 					// render the indicator as long as there is time left
-					document.querySelector("header>div:nth-of-type(3)").style.display = "none";
+					document.querySelector("header>div:nth-of-type(4)").style.display = "none";
 					api.session_timeout.render((100 * remaining_visual) / (api._settings.config.lifespan.session.idle * 1000), remaining_visual);
 					return;
 				}
@@ -376,7 +376,7 @@ export const api = {
 				clearInterval(api.session_timeout.interval);
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
-				document.querySelector("header>div:nth-of-type(3)").style.display = "block";
+				document.querySelector("header>div:nth-of-type(4)").style.display = "block";
 			}, 5000);
 		},
 		stop: null,
