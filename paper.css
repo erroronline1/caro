@@ -91,16 +91,29 @@ main {
 
 	& div > article,
 	& form > article {
-		border-top: 3px solid var(--darkshadow);
+		border-top: 3px solid var(--lighterforeground);
 		border-top-left-radius: 2em 0.3em;
 		border-top-right-radius: 5em 0.5em;
 		border-bottom: none;
+	}
+	& div > article::before,
+	& form > article::before {
+		content: "";
+		display: block;
+		position: relative;
+		top: 0;
+		left: 0;
+		border: none;
+		border-top: 2px solid var(--lighterforeground);
+		border-radius: 2% 6% 5% 4% / 1% 1% 2% 4%;
+
+		transform: translate3d(-0.1em, -1.3em, 0) scale(1.015) rotate(0.4deg);
 	}
 }
 
 dialog[open] {
 	border-radius: 0.2em;
-	transform: rotate(-1deg);
+	transform: rotate(-1deg) translateZ(0);
 	background: linear-gradient(150deg, rgba(226, 224, 220, 1), rgba(198, 195, 188, 1));
 }
 
@@ -124,6 +137,13 @@ dialog .confirmButton {
 	border-color: var(--lighterforeground);
 	color: var(--foreground);
 }
+
+article:has(> article) article, /* tiles */
+article:has(> article) article[role="link"],
+.displayDay {
+	border-radius: 0.1em 0.75em 0.1em 0.4em/0.3em 1.5em 0.5em 1em;
+}
+
 article:has(> article) article[role="link"],
 .displayDay {
 	border-color: var(--cta_darker);
