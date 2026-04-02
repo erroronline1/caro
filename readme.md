@@ -35,6 +35,16 @@ Things are still in motion. Images may be outdated.
 * file drag and drop, to and from the application
     * https://web.dev/patterns/files/drag-and-drop-files?hl=de
 * inspect possible n+1 queries within loops
+    * chunk execution as sqlquery method? e.g. if query is array
+    * filehandler->delete:media_delete
+    * api->alertUserGroup
+    * consumables_put_incorporation
+    * chunkify message_post_message, records_datalist_put/~post, user_training_post
+    * alert_open_records_and_retention_periods order deletion
+* consider fileserver switching strategy during runtime (within stresstest)
+* orders
+    * check if similar items have been ordered recently?
+    * highlight amount (sanitized htmlcontent)
 
 ## Content
 * [Aims](#aims)
