@@ -410,9 +410,9 @@ class ORDER extends API {
 					// also see UTILITY::identifier
 
 					$orderidentifier = UTILITY::identifier('  ' . $filter['term'], null, false, true);
-					$filter['term'] = trim(UTILITY::identifier($filter['term'], null, true) ?? '');
+					$filter['term'] = trim(UTILITY::identifier($filter['term'], null, true) ?? '') ?: null;
 
-					// if only searched for an identifier, most likely a order identifier. set term to null
+					// if only searched for an identifier, most likely a order identifier. set term to null to avoid wrong refining. value has been set to response above
 					if ($filter['term'] === UTILITY::identifier('  ' . $filter['term'], null, false, false, true)) $filter['term'] = null;
 				}
 				// get all approved orders filtered by
@@ -483,7 +483,7 @@ class ORDER extends API {
 						|| (in_array('return_filter', $filter['etc'] ?? []) && $row['ordertype'] !== 'return')
 						|| (in_array('return_filter_none', $filter['etc'] ?? []) && $row['ordertype'] === 'return')
 						|| ($filter['timespan'] && $row[$this->_orderState ? : 'approved'] < $filter['timespan'])
-						|| ($orderidentifier && $orderidentifier !== $row['approved']) // if part of the search
+						|| ($orderidentifier && $orderidentifier !== substr($row['approved'], 0, 19)) // if part of the search, only Y-m-d H:i:s
 					) continue;
 
 					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
