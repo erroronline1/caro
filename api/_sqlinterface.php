@@ -48,34 +48,47 @@ class SQLQUERY {
 	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
-	 * @param string $query either defined within queries below or prepared raw queries
-	 * @param array $tokens strtr tokens and values
+	 * @param string|array $query either defined within queries below, prepared raw query (string) or array of prepared queries
+	 * @param array $tokens strtr tokens and values for predefined queries
 	 * @param bool|string $searchwildcards true for ? and *, all for replacement of [^\w\d], contain for only %...% - see SEARCH()
 	 * 
-	 * @return false|int|array sql result not executed|affectedRows|selection
+	 * @return false|int|array sql result not executed|affectedRows|selection or multidimensional array of any in case of $query being an array
 	 */
 	public static function EXECUTE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
-		$query = self::PREPARE($_pdo, $query, $tokens, $searchwildcards);
+		$result = $queries = [];
+		if (gettype($query)==='string') $queries = [self::PREPARE($_pdo, $query, $tokens, $searchwildcards)];
+		else $queries = $query;
 
-		// execute query
-		try {
-			$statement = $_pdo->query($query);
-		}
-		catch (\Exception $e) {
-			UTILITY::debug($query, $e);
-			die();
+		// compress queries to packagesize
+		$sqlchunks = [];
+		foreach($queries as $q){
+			$sqlchunks = self::CHUNKIFY($sqlchunks, $q);
 		}
 
-		// prepare result response
-		if (str_starts_with($query, 'SELECT')) {
-			//UTILITY::debug($statement->debugDumpParams());
-			$result = $statement->fetchAll();
-		}
-		elseif (str_starts_with($query, 'CREATE') || str_starts_with($query, 'IF OBJECT_ID(N')) $result = $statement->errorInfo(); // _databaseupdate.php table creation
-		elseif (str_starts_with($query, 'ALTER TABLE') || str_starts_with($query, 'IF COL_LENGTH(')) $result = $statement->errorInfo(); // _databaseupdate.php column altering
-		else $result = $statement->rowCount(); // affected rows
+		// execute query packages
+		foreach($sqlchunks as $q){
+			try {
+				$statement = $_pdo->query($q);
+			}
+			catch (\Exception $e) {
+				/* // */ UTILITY::debug($q, $e);
+				/* // */ die();
+				$result[] = $q . PHP_EOL . $e;
+			}
 
+			// prepare result response
+			if (str_starts_with($q, 'SELECT')) {
+				//UTILITY::debug($statement->debugDumpParams());
+				$result[] = $statement->fetchAll();
+			}
+			elseif (str_starts_with($q, 'CREATE') || str_starts_with($q, 'IF OBJECT_ID(N')) $result[] = $statement->errorInfo(); // _databaseupdate.php table creation
+			elseif (str_starts_with($q, 'ALTER TABLE') || str_starts_with($q, 'IF COL_LENGTH(')) $result[] = $statement->errorInfo(); // _databaseupdate.php column altering
+			else $result[] = $statement->rowCount(); // affected rows
+		}
 		$statement = null;
+
+		if (gettype($query)==='string') return $result[0];
+
 		return $result;
 	}
 	/**
@@ -176,7 +189,7 @@ class SQLQUERY {
 	}
 
 	/**
-	 * creates packages of well prepared sql queries to handle sql package size
+	 * creates packages of well prepared sql queries to utilize sql package size
 	 * 
 	 * MASKING HAS TO BE DONE BEFOREHAND, best by chunkifying SQLQUERY::PREPARE
 	 * 
