@@ -381,24 +381,24 @@ class CONSUMABLES extends API {
 				}
 
 				// update and append incorporation state for selected products
+				$sqlchunks = [];
 				foreach($products as $product){
 					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 					$product['incorporated'][] = $approve;
-					try {
-						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-							':id' => $product['id'],
-							':incorporated' => UTILITY::json_encode($product['incorporated'])
-						]);
-					}
-					catch(\Exception $e){
-						$this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('order.incorporation.failure'),
-								'type' => 'error'
-							]
-						]);
-					}
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
+						':id' => $product['id'],
+						':incorporated' => UTILITY::json_encode($product['incorporated'])
+					]));
 				}
+				if (!array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
+					$this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('order.incorporation.failure'),
+							'type' => 'error'
+						]
+					]);
+				}
+
 				$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.incorporation.success'),
@@ -1023,6 +1023,7 @@ class CONSUMABLES extends API {
 					$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 						':ids' => array_map(Fn($id) => intval($id), $batchids)
 					]);
+					$sqlchunks = [];
 					foreach($products as $similarproduct){
 						$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
 						if ($similarproduct['incorporated']){
@@ -1047,11 +1048,12 @@ class CONSUMABLES extends API {
 						}
 						else $similarproduct['incorporated'] = null;
 
-						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
 							':id' => $similarproduct['id'],
 							':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
-						]);
+						]));
 					}
+					SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
 				}
 
 				require_once('./notification.php');
