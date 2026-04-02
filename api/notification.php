@@ -532,9 +532,7 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							foreach ($alerts as $chunk){
-								SQLQUERY::EXECUTE($this->_pdo, $chunk);
-							}
+							SQLQUERY::EXECUTE($this->_pdo, $alerts);
 							$execution = true;
 							break;
 						case 'alert_unclosed_audits':
@@ -664,9 +662,7 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							foreach ($alerts as $chunk){
-								SQLQUERY::EXECUTE($this->_pdo, $chunk);
-							}
+							SQLQUERY::EXECUTE($this->_pdo, $alerts);
 							$execution = true;
 							break;
 						case 'delete_files_and_calendar':
@@ -717,16 +713,7 @@ class NOTIFICATION extends API {
 									]) . '; ');
 								}
 							}
-							foreach ($sqlchunks as $chunk){
-								try {
-									SQLQUERY::EXECUTE($this->_pdo, $chunk);
-								}
-								catch (\Exception $e) {
-									echo $e, $chunk;
-									die();
-								}
-							}
-
+							SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
 							$execution = true;
 							break;
 						case 'schedule_archived_orders_review':

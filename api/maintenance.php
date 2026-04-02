@@ -349,12 +349,9 @@ class MAINTENANCE extends API {
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
 							]
 						];
-
-						foreach ($sqlchunks as $chunk){
-							try {
-								SQLQUERY::EXECUTE($this->_pdo, $chunk);
-							}
-							catch (\Exception $e) {
+						$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+						if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
+							foreach($error as $e){
 								$response['render']['content'][] = [
 									'type' => 'textsection',
 									'attributes' => [
@@ -362,8 +359,8 @@ class MAINTENANCE extends API {
 									],
 									'content' => $e,
 								];
-								return $response;
 							}
+							return $response;
 						}
 						$response['render']['content'][] = [
 							'type' => 'textsection',
@@ -699,17 +696,9 @@ class MAINTENANCE extends API {
 					}
 					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'risk_post', $newrisk) . '; ');
 				}
+				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+				$anomalies = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 
-				//var_dump($sqlchunks);
-				//die();
-				foreach ($sqlchunks as $chunk){
-					try {
-						SQLQUERY::EXECUTE($this->_pdo, $chunk);
-					}
-					catch (\Exception $e) {
-						$anomalies[] = UTILITY::json_encode([$e, $chunk], JSON_PRETTY_PRINT);
-					}
-				}
 				$this->response(
 					[
 						'response' => [
@@ -904,11 +893,9 @@ class MAINTENANCE extends API {
 						]) . '; ');
 					$success[] = $vendor['name'];
 				}
-				foreach ($sqlchunks as $chunk){
-					try {
-						SQLQUERY::EXECUTE($this->_pdo, $chunk);
-					}
-					catch (\Exception $e) {
+				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+				if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
+					foreach($error as $e){
 						$response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
@@ -916,8 +903,8 @@ class MAINTENANCE extends API {
 							],
 							'content' => $e,
 						];
-						return $response;
 					}
+					return $response;
 				}
 				if ($success) {
 					$response['render']['content'][] = [

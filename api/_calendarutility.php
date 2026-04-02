@@ -88,7 +88,6 @@ class CALENDARUTILITY {
 	public function complete($id = '0', $close = null, $alert = null){
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')];
 		$sqlchunks = [];
-		$affected_rows = 0;
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
 			':id' => $id
 		]);
@@ -101,17 +100,9 @@ class CALENDARUTILITY {
 				]
 			));
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				$rows = SQLQUERY::EXECUTE($this->_pdo, $chunk);
-				if ($rows) $affected_rows += $rows;
-			}
-			catch (\Exception $e) {
-				echo $e, $chunk;
-				die();
-			}
-		}
-		return $affected_rows;
+
+		$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+		return array_sum($result);
 	}
 	
 	/**

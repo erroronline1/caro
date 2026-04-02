@@ -201,9 +201,7 @@ class API {
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
 		}
-		foreach ($sqlchunks as $chunk){
-			SQLQUERY::EXECUTE($this->_pdo, $chunk);
-		}
+		SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
 	}
 
 	/**

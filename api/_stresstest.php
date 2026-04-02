@@ -306,15 +306,9 @@ class STRESSTEST extends INSTALL{
 				':ordertype' => 'order'
 			];
 		}
-		$order = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
-		foreach ($order as $chunk){
-			try {
-				if (SQLQUERY::EXECUTE($this->_pdo, $chunk));
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
+		$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
+		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+
 		$response .= $this->printSuccess($i. ' orders done, please check the application for performance');
 
 		return $response;
@@ -355,15 +349,9 @@ class STRESSTEST extends INSTALL{
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post', $update) . '; ');
 			}
-			foreach ($sqlchunks as $chunk){
-				try {
-					SQLQUERY::EXECUTE($this->_pdo, $chunk);
-				}
-				catch (\Exception $e) {
-					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-				}
-			}
-			$response .= $this->printSuccess('all csv filters in the database have been approved.');
+
+		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+		$response .= $this->printSuccess('all csv filters in the database have been approved.');
 
 			return $response;
 		}
@@ -393,14 +381,7 @@ class STRESSTEST extends INSTALL{
 					':id' => $row['id']
 				]) . '; ');
 			}
-			foreach ($sqlchunks as $chunk){
-				try {
-					SQLQUERY::EXECUTE($this->_pdo, $chunk);
-				}
-				catch (\Exception $e) {
-					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-				}
-			}
+			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all documents in the database have been approved.');
 
 			return $response;
@@ -433,14 +414,7 @@ class STRESSTEST extends INSTALL{
 					':id' => $row['id']
 				]) . '; ');
 			}
-			foreach ($sqlchunks as $chunk){
-				try {
-					SQLQUERY::EXECUTE($this->_pdo, $chunk);
-				}
-				catch (\Exception $e) {
-					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-				}
-			}
+			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all pending incorporation have been approved.');
 			return $response;
 		}

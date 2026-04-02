@@ -2348,16 +2348,8 @@ class CONSUMABLES extends API {
 				}
 			}
 
-			foreach ($sqlchunks as $chunk){
-				try {
-					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['servertime']->format('Y-m-d');
-				}
-				catch (\Exception $e) {
-					echo $e, $chunk;
-					die();
-				}
-			}
-			return [$date, $log];
+			SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+			return [$this->_date['servertime']->format('Y-m-d'), $log];
 		}
 		return '';
 	}

@@ -1272,16 +1272,7 @@ class ORDER extends API {
 				':ordertype' => $processedOrderData['order_data']['order_type']
 			]) . '; ');
 		}
-		$success = false;
-		foreach ($sqlchunks as $chunk){
-			try {
-				$success = SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				echo $e, $chunk;
-				die();
-			}
-		}
+		$success = array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 		if ($success) {
 			$response = [
 				'response' => [
