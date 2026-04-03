@@ -2310,8 +2310,8 @@ class AUDIT extends API {
 		if ($files = $export->dump($tempFile, null, $format)){
 			foreach($files as $file){
 				if ($file) $downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-					'href' => $this->_filehandler->getFileLink($file),
-					'download' => pathinfo($file)['basename']
+					'href' => $this->_filehandler->getFileLink($file['path']),
+					'download' => pathinfo($file['path'])['basename']
 				];
 			}
 		}
@@ -3115,8 +3115,8 @@ class AUDIT extends API {
 			if ($files = $export->dump($tempFile, null, $format)){
 				foreach($files as $file){
 					if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-						'href' => $this->_filehandler->getFileLink($file),
-						'download' => pathinfo($file)['basename']
+						'href' => $this->_filehandler->getFileLink($file['path']),
+						'download' => pathinfo($file['path'])['basename']
 					];
 				}
 			}

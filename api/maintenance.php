@@ -413,7 +413,7 @@ class MAINTENANCE extends API {
 
 					if ($files = $export->dump(preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'])] = [
-							'href' => $this->_filehandler->getFileLink($files[0]),
+							'href' => $this->_filehandler->getFileLink($files[0]['path']),
 							'download' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]) . '.csv'
 						];
 					}
@@ -481,7 +481,7 @@ class MAINTENANCE extends API {
 					$export = new TABLE([$log]);
 					if ($files = $export->dump('CONFIDENTIAL CARO REQUEST LOG.csv')){
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'CONFIDENTIAL CARO REQUEST LOG.csv'])] = [
-							'href' => $this->_filehandler->getFileLink($files[0]),
+							'href' => $this->_filehandler->getFileLink($files[0]['path']),
 							'download' =>'CONFIDENTIAL CARO REQUEST LOG.csv'
 						];
 					}

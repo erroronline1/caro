@@ -182,7 +182,7 @@ class CONSUMABLES extends API {
 
 		if ($files = $export->dump($this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv')){
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'])] = [
-				'href' => $this->_filehandler->getFileLink($files[0]),
+				'href' => $this->_filehandler->getFileLink($files[0]['path']),
 				'download' => $this->_date['usertime']->format('Y-m-d H-i-s ') . $vendor['name'] . 'productlist.csv'
 			];
 		}
