@@ -41,7 +41,6 @@ filters and returns a named array according to setup.
 		"comment": description, will be displayed
 		"keep": boolean if matches are kept or omitted
 		"date": filter by identifier and date diff in months
-			"identifier": column name with recurring values, e.g. customer id
 			"column": column name with date to process,
 			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"threshold": integer for months,
@@ -363,7 +362,8 @@ class Listprocessor {
 		if (isset($this->_setting['filesetting']['encoding']) && !isset($rule['filesetting']['encoding'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
 		if (isset($this->_setting['filesetting']['dialect']) && !isset($rule['filesetting']['dialect'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
 		$this->_log[] = '[*] comparing with '. (gettype($rule['filesetting']['source']) === 'string' ? $rule['filesetting']['source'] : 'self');
-		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']]);
+		$compare_list = new Listprocessor($rule, $this->_argument);
+		if ($compare_list->_log) array_push($this->_log, ...array_map(fn($v) => '-> ' . $v, $compare_list->_log));
 		if (!isset($compare_list->_list[1])) return;
 		$matched = [];
 		// reduce current list to avoid key errors on unset items
@@ -588,8 +588,14 @@ class Listprocessor {
 			if (!$row || !$row[$rule['date']['column']]) continue;
 
 			// format dates to iso
-			$entrydate = \DateTime::createFromFormat($rule['date']['format'], $row[$rule['date']['column']]);
-			$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			try {
+				$entrydate = \DateTime::createFromFormat($rule['date']['format'], $row[$rule['date']['column']]);
+				$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			}
+			catch (\Error $e){
+				var_dump($rule['date']['format'], $row[$rule['date']['column']], $e);
+				die();
+			}
 			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
 			$thismonth = $thismonth->format('Y-m-d');
 
@@ -631,8 +637,14 @@ class Listprocessor {
 			if (!$row || !$row[$rule['interval']['column']]) continue;
 
 			// format dates to iso
-			$entrydate = \DateTime::createFromFormat($rule['interval']['format'], $row[$rule['interval']['column']]);
-			$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			try {
+				$entrydate = \DateTime::createFromFormat($rule['interval']['format'], $row[$rule['interval']['column']]);
+				$entrydate = $entrydate->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			}
+			catch (\Error $e){
+				var_dump($rule['interval']['format'], $row[$rule['interval']['column']], $e);
+				die();
+			}
 			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
 			$thismonth = $thismonth->format('Y-m-d');
 
@@ -983,7 +995,8 @@ class Listprocessor {
 	public function monthdiff($first = "", $last = ""){
 		$backthen = new \DateTime($first);
 		$processedmonth = new \DateTime($last);
-		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
+		$diff = $processedmonth->diff($backthen, true);
+		return round($diff->m + 12 * $diff->y, 0);
 	}
 
 	/**
