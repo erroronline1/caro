@@ -340,8 +340,8 @@ class MAINTENANCE extends API {
 						];
 					}
 
-					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post'), $insertions);
-					if ($sqlchunks){
+					$sqlQueryStack = SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post'), $insertions);
+					if ($sqlQueryStack){
 						// drop unit entries
 						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', [':unit' => $unit])) $response['render']['content'][] = [
 							'type' => 'textsection',
@@ -349,7 +349,7 @@ class MAINTENANCE extends API {
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
 							]
 						];
-						$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+						$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 						if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
 							foreach($error as $e){
 								$response['render']['content'][] = [
@@ -618,7 +618,7 @@ class MAINTENANCE extends API {
 					]
 				]);
 
-				$sqlchunks = $anomalies = [];
+				$sqlQueryStack = $anomalies = [];
 				$new = count($datalist->_list[1]);
 				$update = 0;
 				foreach ($datalist->_list[1] as $importrisk){
@@ -694,9 +694,9 @@ class MAINTENANCE extends API {
 						if (gettype($value) === 'string') $newrisk[$key] = $value;
 						if (gettype($value) === 'NULL') $newrisk[$key] = null;
 					}
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'risk_post', $newrisk) . '; ');
+					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'risk_post', $newrisk) . '; ');
 				}
-				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 				$anomalies = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 
 				$this->response(
@@ -851,7 +851,7 @@ class MAINTENANCE extends API {
 				];
 				$intersections = array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 				
-				$sqlchunks = [];
+				$sqlQueryStack = [];
 				$success = [];
 				foreach($this->_payload as $key => $value){
 					if(!in_array($key, $intersections)) continue;
@@ -882,7 +882,7 @@ class MAINTENANCE extends API {
 						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
+					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
 						[
 							':id' => $vendor['id'],
 							':name' => $vendor['name'],
@@ -893,7 +893,7 @@ class MAINTENANCE extends API {
 						]) . '; ');
 					$success[] = $vendor['name'];
 				}
-				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 				if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
 					foreach($error as $e){
 						$response['render']['content'][] = [

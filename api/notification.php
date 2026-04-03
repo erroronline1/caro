@@ -272,7 +272,7 @@ class NOTIFICATION extends API {
 										foreach($current_records as $current){
 											$records = BLOCKCHAIN::add($records, $current);
 										}
-										$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'records_post',
+										$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'records_post',
 											[
 												':context' => $case['context'],
 												':case_state' => UTILITY::json_encode($case['case_state']),
@@ -354,7 +354,7 @@ class NOTIFICATION extends API {
 										$article = $articles[array_key_first($articles)];
 										foreach ($states as $state){
 											if ($order[$state] === null && $article[$state]){
-												$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_state',
+												$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_state',
 													[
 														':ids' => $order['id'],
 														':field' => $state,
@@ -364,7 +364,7 @@ class NOTIFICATION extends API {
 										}
 										if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
 											$order['order_data']['order_reference'] = $article['order_reference'];
-												$updates = SQLQUERY::CHUNKIFY($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_addinformation',
+												$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_addinformation',
 													[
 														':id' => $order['id'],
 														':order_data' => UTILITY::json_encode($order['order_data'])
@@ -405,7 +405,7 @@ class NOTIFICATION extends API {
 							// delete expired records including record attachments and orders that contain identifier e.g. as commission
 							$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 							$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-							$alerts = [];
+							$sqlQueryStack = [];
 							$unclosed_notif = [];
 							$missingretention_notif = [];
 							foreach ($data as $row){
@@ -436,7 +436,7 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
+										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
 											[
 												':notified' => $diff,
 												':identifier' => $row['identifier']
@@ -472,7 +472,7 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
+										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
 											[
 												':notified' => $diff,
 												':identifier' => $row['identifier']
@@ -491,7 +491,7 @@ class NOTIFICATION extends API {
 											$this->_filehandler->delete($delete, 'thisIsOnlySupposedToBeAbleFromTheCronJob');
 										}
 										// prepare deletion
-										$alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'records_delete',
+										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_delete',
 											[
 												':id' => intval($row['id'])
 											]) . '; ');
@@ -533,7 +533,7 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							SQLQUERY::EXECUTE($this->_pdo, $alerts);
+							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 							$execution = true;
 							break;
 						case 'alert_unclosed_audits':
@@ -564,7 +564,7 @@ class NOTIFICATION extends API {
 							break;
 						case 'alert_undelivered_orders':
 							// alert requesting undelivered orders or marking delivered as issued
-							$alerts = [];
+							$sqlQueryStack = [];
 							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
 							$undelivered_notif = [];
 							$unissued_notif = [];
@@ -638,7 +638,7 @@ class NOTIFICATION extends API {
 								} else $issue_interval = $order['issued_notified'];
 
 								// prepare alert flags
-								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
+								if ($update) $alersqlQueryStackts = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
 									[
 										':delivered_notified' => $deliver_interval ?: null,
 										':issued_notified' => $issue_interval ?: null,
@@ -663,7 +663,7 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							SQLQUERY::EXECUTE($this->_pdo, $alerts);
+							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 							$execution = true;
 							break;
 						case 'delete_files_and_calendar':
@@ -703,18 +703,18 @@ class NOTIFICATION extends API {
 							break;
 						case 'restrict_user_access':
 							// set new token for users that have an expired access date
-							$sqlchunks = [];
+							$sqlQueryStack = [];
 							foreach($users as $user){
 								if (!$user['invalidation_date']) continue;
 								if ($user['invalidation_date'] < date('Y-m-d')) {
-									$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_put_auto_restrict',
+									$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_put_auto_restrict',
 									[
 										':id' => $user['id'],
 										':token' => hash('sha256', $user[':name'] . random_int(100000,999999) . time()),
 									]) . '; ');
 								}
 							}
-							SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 							$execution = true;
 							break;
 						case 'schedule_archived_orders_review':
@@ -928,7 +928,7 @@ class NOTIFICATION extends API {
 								':ids' => array_column($users, 'id')
 							]);
 							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
-							$sqlchunks = [];
+							$sqlQueryStack = [];
 							foreach ($trainings as $training){
 								if ($training['planned']) {
 									continue;
@@ -951,7 +951,7 @@ class NOTIFICATION extends API {
 										}
 										if ($none) {
 											// insert scheduled training and message user and supervisor
-											$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', [
+											$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', [
 													':name' => $training['name'],
 													':user_id' => $user['id'],
 													':date' => null,
@@ -981,7 +981,7 @@ class NOTIFICATION extends API {
 									}
 								}
 							}
-							SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 							$execution = true;
 							break;
 					}

@@ -1422,7 +1422,7 @@ class USER extends API {
 				if (!($usernames && $usernames = preg_split('/([,;]\s{0,})/', $usernames))) $this->response([], 406);
 
 				$notfound = [];
-				$sqlchunks = [];
+				$sqlQueryStack = [];
 				foreach ($usernames as $username){
 					if (!$username) continue;
 					if ($user = array_search($username, array_column($users, 'name'))){
@@ -1443,11 +1443,11 @@ class USER extends API {
 								]
 							)[0]['path'];
 						}
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', $training));
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', $training));
 					}
 					else $notfound[] = $username;
 				}
-				SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+				SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 				if (count($notfound) !== count($usernames)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('user.training.save_success') . (count($notfound) ? ' ' . $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]) :''),

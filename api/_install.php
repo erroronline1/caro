@@ -891,15 +891,15 @@ class INSTALL {
 
 	/**
 	 * execute sql chunks, return success or display exception
-	 * @param array $sqlchunks
+	 * @param array $sqlQueryStack
 	 * @return int
 	 */
-	public function executeSQL($sqlchunks){
-		if (!$sqlchunks) return null;
+	public function executeSQL($sqlQueryStack){
+		if (!$sqlQueryStack) return null;
 		$response = '';
 
 		$counter = 0;
-		foreach ($sqlchunks as $chunk){
+		foreach ($sqlQueryStack as $chunk){
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
 					$response .= $this->printSuccess('Success:', $chunk);
@@ -1007,7 +1007,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
 		];
 
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		foreach ($json as $entry){
 			if (!(
 				isset($entry['unit']) && $entry['unit'] &&
@@ -1044,7 +1044,7 @@ class INSTALL {
 					continue;
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'audit_post_template',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'audit_post_template',
 				[
 					':id' => null,
 					':content' => $entry['content'],
@@ -1057,7 +1057,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL($sqlchunks))
+		if ($execution = $this->executeSQL($sqlQueryStack))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from audits ressources.');
 
@@ -1099,7 +1099,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post'), $insertions)))
+		if ($execution = $this->executeSQL(SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from csv-filter ressources.');
 
@@ -1146,7 +1146,7 @@ class INSTALL {
 		
 		$name_context = array_map(fn($doc) => $doc['name'] . '_' . $doc['context'], $DBall);
 
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken for the context
 			if (!(
@@ -1180,7 +1180,7 @@ class INSTALL {
 			$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 			$name_context[] = $entry['name'] . '_' . $entry['context'];
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'document_post',
+			$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'document_post',
 			[
 				':id' => null,
 				':name' => $entry['name'],
@@ -1198,7 +1198,7 @@ class INSTALL {
 			]) . '; ');
 		}
 
-		if ($execution = $this->executeSQL($sqlchunks))
+		if ($execution = $this->executeSQL($sqlQueryStack))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from documents ressources.');
 
@@ -1216,7 +1216,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual'),
 		];
 
-		$sqlchunks = $names = [];
+		$sqlQueryStack = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the title is not already taken
 			if (!(
@@ -1242,7 +1242,7 @@ class INSTALL {
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				$names[] = $entry['title'];
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'application_post_manual',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'application_post_manual',
 				[
 					':id' => null,
 					':title' => $entry['title'],
@@ -1252,7 +1252,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL($sqlchunks))
+		if ($execution = $this->executeSQL($sqlQueryStack))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from manuals ressources.');
 
@@ -1324,7 +1324,7 @@ class INSTALL {
 				];
 			}
 		}
-		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'texttemplate_post'), $insertions)))
+		if ($execution = $this->executeSQL(SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'texttemplate_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from texts ressources.');
 
@@ -1341,7 +1341,7 @@ class INSTALL {
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
 		];
-		$sqlchunks = $names = $orderauths = [];
+		$sqlQueryStack = $names = $orderauths = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			if (!(
@@ -1410,7 +1410,7 @@ class INSTALL {
 
 				$names[] = $entry['name'];
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'user_post',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_post',
 				[
 					':id' => null,
 					':name' => $entry['name'],
@@ -1427,7 +1427,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL($sqlchunks))
+		if ($execution = $this->executeSQL($sqlQueryStack))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from user ressources.');
 
@@ -1445,7 +1445,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
 		];
 
-		$sqlchunks = $names = [];
+		$sqlQueryStack = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			if (!(
@@ -1477,7 +1477,7 @@ class INSTALL {
 					}
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
 				[
 					':id' => null,
 					':hidden' => null,
@@ -1489,7 +1489,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL($sqlchunks))
+		if ($execution = $this->executeSQL($sqlQueryStack))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from vendor ressources.');
 

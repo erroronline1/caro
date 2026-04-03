@@ -306,8 +306,8 @@ class STRESSTEST extends INSTALL{
 				':ordertype' => 'order'
 			];
 		}
-		$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
-		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+		$sqlQueryStack = SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
+		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 
 		$response .= $this->printSuccess($i. ' orders done, please check the application for performance');
 
@@ -331,7 +331,7 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function approveCSVFilter(){
 		if ($this->_csvfilterApproval) {
-			$sqlchunks = [];
+			$sqlQueryStack = [];
 			$response = '';
 			$DBall = [
 				...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist')
@@ -347,10 +347,10 @@ class STRESSTEST extends INSTALL{
 					$update[':' . $key] = $value ?: null;
 				}
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post', $update) . '; ');
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post', $update) . '; ');
 			}
 
-		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 		$response .= $this->printSuccess('all csv filters in the database have been approved.');
 
 			return $response;
@@ -363,7 +363,7 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function approveDocuments(){
 		if ($this->_documentApproval) {
-			$sqlchunks = [];
+			$sqlQueryStack = [];
 			$response = '';
 			$DBall = [
 				...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
@@ -375,13 +375,13 @@ class STRESSTEST extends INSTALL{
 
 				$row['approval'] = $row['approval'] + $this->_documentApproval;
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'document_put_approve',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'document_put_approve',
 				[
 					':approval' => UTILITY::json_encode($row['approval']),
 					':id' => $row['id']
 				]) . '; ');
 			}
-			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all documents in the database have been approved.');
 
 			return $response;
@@ -394,7 +394,7 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function approvePendingIncorporations(){
 		if ($this->_incorporationApproval){
-			$sqlchunks = [];
+			$sqlQueryStack = [];
 			$response = '';
 			$DBall = [...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products')];
 			foreach ($DBall as $row){
@@ -408,13 +408,13 @@ class STRESSTEST extends INSTALL{
 				$lastincorporation = $lastincorporation + $this->_incorporationApproval;
 				$row['incorporated'][count($row['incorporated']) - 1 ] = $lastincorporation;
 
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation',
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation',
 				[
 					':incorporated' => UTILITY::json_encode($row['incorporated']),
 					':id' => $row['id']
 				]) . '; ');
 			}
-			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all pending incorporation have been approved.');
 			return $response;
 		}

@@ -60,13 +60,13 @@ class SQLQUERY {
 		else $queries = $query;
 
 		// compress queries to packagesize
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		foreach($queries as $q){
-			$sqlchunks = self::CHUNKIFY($sqlchunks, $q);
+			$sqlQueryStack = self::PACK($sqlQueryStack, $q);
 		}
 
 		// execute query packages
-		foreach($sqlchunks as $q){
+		foreach($sqlQueryStack as $q){
 			try {
 				$statement = $_pdo->query($q);
 			}
@@ -191,23 +191,23 @@ class SQLQUERY {
 	/**
 	 * creates packages of well prepared sql queries to utilize sql package size
 	 * 
-	 * MASKING HAS TO BE DONE BEFOREHAND, best by chunkifying SQLQUERY::PREPARE
+	 * MASKING HAS TO BE DONE BEFOREHAND, best by passing SQLQUERY::PREPARE
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
-	 * @param array $chunks packages so far
+	 * @param array $packages so far
 	 * @param string $query next sql query
-	 * @return array $chunks extended packages so far
+	 * @return array $packages extended packages so far
 	 */
-	public static function CHUNKIFY($chunks, $query = null){
+	public static function PACK($packages, $query = null){
 		if ($query){
-			$chunkIndex = count($chunks) - 1;
-			if (isset($chunks[$chunkIndex])){
-				if (strlen($chunks[$chunkIndex] . $query) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
-				else $chunks[] = $query;
+			$packageIndex = count($packages) - 1;
+			if (isset($packages[$packageIndex])){
+				if (strlen($packages[$packageIndex] . $query) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $packages[$packageIndex] .= $query;
+				else $packages[] = $query;
 			}
-			else $chunks[] = $query;
+			else $packages[] = $query;
 		}
-		return $chunks;
+		return $packages;
 	}
 
 	/**
@@ -217,33 +217,33 @@ class SQLQUERY {
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query sql query
 	 * @param array $items named array to replace query tokens by strtr
-	 * @return array $chunks query packes
+	 * @return array $packages query packages
 	 * 
 	 * this does make sense to only have to define one valid (and standalone as well) reusable dummy query
 	 */
-	public static function CHUNKIFY_INSERT($_pdo, $query = null, $items = null){
-		$chunks = [];
+	public static function PACK_INSERT($_pdo, $query = null, $items = null){
+		$packages = [];
 		if ($query && $items){
 			[$query, $values] = explode('VALUES', $query);
-			$chunkeditems = [];
+			$packageitems = [];
 			foreach ($items as $item){
 				foreach ($item as &$replace){
 					$replace = self::typehandler($_pdo, $replace);
 				}
 				$item = strtr($values, $item);
-				if (count($chunkeditems)){
-					$index = count($chunkeditems) - 1;
-					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$chunkeditems[$index]])) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']){
-						$chunkeditems[$index][] = $item;
+				if (count($packageitems)){
+					$index = count($packageitems) - 1;
+					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$packageitems[$index]])) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']){
+						$packageitems[$index][] = $item;
 					}
-					else $chunkeditems[] = [$item];
-				} else $chunkeditems[] = [$item];
+					else $packageitems[] = [$item];
+				} else $packageitems[] = [$item];
 			}
-			foreach ($chunkeditems as $items){
-				$chunks[] = $query . ' VALUES ' . implode(',', $items) . ';';
+			foreach ($packageitems as $items){
+				$packages[] = $query . ' VALUES ' . implode(',', $items) . ';';
 			}
 		}
-		return $chunks;
+		return $packages;
 	}
 
 	/**

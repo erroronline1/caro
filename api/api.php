@@ -177,7 +177,7 @@ class API {
 	 */
 	public function alertUserGroupSubmit(){
 		if (!$this->_messages) return;
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		foreach ($this->_messages as $message => $recipients) {
 			$recipients = array_unique($recipients);
 			$insertions = [];
@@ -187,9 +187,9 @@ class API {
 					':message' => $message
 				];
 			}
-			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
+			$sqlQueryStack = array_merge($sqlQueryStack, SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
 		}
-		SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+		SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 	}
 
 	/**

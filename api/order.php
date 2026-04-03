@@ -1249,7 +1249,7 @@ class ORDER extends API {
 	private function postApprovedOrder($processedOrderData){
 		$keys = array_keys($processedOrderData['order_data']);
 		$order_data2 = [];
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 
 		// iterate over items and create one order per item
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
@@ -1264,7 +1264,7 @@ class ORDER extends API {
 				$order_data2 = $this->return_criticality($order_data2);
 			}
 
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order',
+			$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order',
 			[
 				':order_data' => UTILITY::json_encode($order_data2),
 				':organizational_unit' => $processedOrderData['order_data']['organizational_unit'],
@@ -1272,7 +1272,7 @@ class ORDER extends API {
 				':ordertype' => $processedOrderData['order_data']['order_type']
 			]) . '; ');
 		}
-		$errors = array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
+		$errors = array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 		if (!$errors) {
 			$response = [
 				'response' => [

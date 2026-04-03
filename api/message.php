@@ -493,7 +493,7 @@ class MESSAGE extends API {
 						]]);
 					}
 				// post a message to each recipient
-				$sqlchunks = [];
+				$sqlQueryStack = [];
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
 					$message = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message_to', [':user' => $recipient['name']]));
@@ -503,13 +503,13 @@ class MESSAGE extends API {
 							'redirect' => false,
 							'type' => 'error'
 						]]);
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'message_post_message', [
+					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'message_post_message', [
 						':from_user' => $_SESSION['user']['id'],
 						':to_user' => $recipient['id'],
 						':message' => $message
 					]));
 				}
-				$success = array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks)) / 2; // message_post_message affects 2 rows for sender and receiver
+				$success = array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack)) / 2; // message_post_message affects 2 rows for sender and receiver
 				if ($success === count($recipients)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.message.send_success'),

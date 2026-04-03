@@ -87,12 +87,12 @@ class CALENDARUTILITY {
 	 */
 	public function complete($id = '0', $close = null, $alert = null){
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')];
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
 			':id' => $id
 		]);
 		foreach ($entries as $entry){
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'calendar_complete',
+			$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'calendar_complete',
 				[
 					':id' => $entry['id'],
 					':closed' => $close ? UTILITY::json_encode($close) : null,
@@ -101,7 +101,7 @@ class CALENDARUTILITY {
 			));
 		}
 
-		$result = SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+		$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 		return array_sum($result);
 	}
 	

@@ -381,16 +381,16 @@ class CONSUMABLES extends API {
 				}
 
 				// update and append incorporation state for selected products
-				$sqlchunks = [];
+				$sqlQueryStack = [];
 				foreach($products as $product){
 					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 					$product['incorporated'][] = $approve;
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
+					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
 						':id' => $product['id'],
 						':incorporated' => UTILITY::json_encode($product['incorporated'])
 					]));
 				}
-				if (!array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlchunks), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
+				if (!array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
 					$this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('order.incorporation.failure'),
@@ -1023,7 +1023,7 @@ class CONSUMABLES extends API {
 					$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 						':ids' => array_map(Fn($id) => intval($id), $batchids)
 					]);
-					$sqlchunks = [];
+					$sqlQueryStack = [];
 					foreach($products as $similarproduct){
 						$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
 						if ($similarproduct['incorporated']){
@@ -1048,12 +1048,12 @@ class CONSUMABLES extends API {
 						}
 						else $similarproduct['incorporated'] = null;
 
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
 							':id' => $similarproduct['id'],
 							':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
 						]));
 					}
-					SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+					SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 				}
 
 				require_once('./notification.php');
@@ -2134,7 +2134,7 @@ class CONSUMABLES extends API {
 		$filter = json_decode($filter, true);
 
 		$productlist = new Listprocessor($filter);
-		$sqlchunks = [];
+		$sqlQueryStack = [];
 		$date = '';
 
 		$log = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $productlist->_log);
@@ -2240,7 +2240,7 @@ class CONSUMABLES extends API {
 						$query = preg_replace('/' . $column . ' = (?::' . $column . '|\(CASE.+?:' . $column . '.+?END\)),/', '', $query);
 					}
 				}
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, $query, $replace) . '; ');
+				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, $query, $replace) . '; ');
 
 			}
 
@@ -2275,7 +2275,7 @@ class CONSUMABLES extends API {
 					':thirdparty_order' => !empty($imported[$key]['thirdparty_order']) ? 1 : null,
 				];
 			}
-			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_product'), $insertions));
+			$sqlQueryStack = array_merge($sqlQueryStack, SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_product'), $insertions));
 
 			// update entries with data from erp interface if available and selected
 			if ($erp_match && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
@@ -2301,7 +2301,7 @@ class CONSUMABLES extends API {
 						// CAVEAT: there may be shitty vendors with the same order number for different versions. currently i have no clue on how to address that
 						// since i consider it a better idea in general being able to update the product name too
 						if (!$article['article_no']) continue;
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_product_productlist_erp_amendment', [
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_product_productlist_erp_amendment', [
 							':article_unit' => $article['article_unit'] ? preg_replace('/\n/', '', $article['article_unit']) : null,
 							':article_ean' => $article['article_ean'] ? preg_replace('/\n/', '', $article['article_ean']) : null,
 							':trading_good' => !empty($article['trading_good']) ? 1 : null,
@@ -2331,17 +2331,17 @@ class CONSUMABLES extends API {
 						$_batchhidden[] = $remainder[$key]['id'];
 					}
 					if ($_batchhidden){
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
 							':field' => 'erp_id',
 							':value' => null,
 							':ids' => $_batchhidden
 						]) . '; ');
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
 							':field' => 'stock_item',
 							':value' => null,
 							':ids' => $_batchhidden
 						]) . '; ');
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
 							':field' => 'hidden',
 							':value' => UTILITY::json_encode(['name' => $this->_lang->GET('erpquery.integrations.update_via_erp_interface', [':systemuser' => CONFIG['system']['caroapp']], true), 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]),
 							':ids' => $_batchhidden
@@ -2350,7 +2350,7 @@ class CONSUMABLES extends API {
 				}
 			}
 
-			SQLQUERY::EXECUTE($this->_pdo, $sqlchunks);
+			SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
 			return [$this->_date['servertime']->format('Y-m-d'), $log];
 		}
 		return '';
