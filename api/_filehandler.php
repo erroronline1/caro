@@ -447,9 +447,11 @@ class FILEHANDLER{
 	 */
 	public function link($attributes, $dataurlname = ''){
 		if ($attributes['href']){
-			$file = ['basename' => '', 'extension' => ''];
+			$file = ['basename' => '', 'extension' => '', 'url' => $attributes['href'], 'realpath' => str_replace('./api/api.php/file/stream/', '.', $attributes['href'])];
+			$mime = 'application/octet-stream';
 			if (!str_starts_with($attributes['href'], 'data:')) {
-				$file = pathinfo($attributes['href']);
+				$file = array_merge($file, pathinfo($attributes['href']));
+				$mime = mime_content_type($file['realpath']);
 			}
 			else if ($dataurlname){
 				$file['basename'] = $dataurlname;
@@ -467,19 +469,26 @@ class FILEHANDLER{
 						break;
 				}
 			}
+			// an attempt has been made to drag files to the desktop or other applications.
+			// however this is not widely supported and does not work at all on linux
+			// just keeping it here for consistency, the genral behaviour is creating a link file on drop
+			// also see _.file.dragout()
+
 			if (in_array(strtolower($file['extension']), ['stl', 'obj'])){
-				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'stl', name: '" . $file['basename'] . "', url: '" . $attributes['href'] . "'}})";
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'stl', name: '" . $file['basename'] . "', url: '" . $attributes['href'] . "', downloadurl: '" . implode(':', [$mime, $file['basename'], $file['url']]) . "'}})";
 				$attributes['data-type'] = 'stl';
 			}
 			elseif (in_array(strtolower($file['extension']), ['png','jpg', 'jpeg', 'gif'])){
-				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'image', name: '" . $file['basename'] . "', content: '" . $attributes['href'] . "'}})";
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'image', name: '" . $file['basename'] . "', content: '" . $attributes['href'] . "', downloadurl: '" . implode(':', [$mime, $file['basename'], $file['url']]) . "'}})";
 				$attributes['data-type'] = 'imagelink';
 			}
 			elseif (str_starts_with($attributes['href'], 'data:') && $file['extension'] === 'pdf'){
-				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . ($dataurlname ?: 'DATAURL') . "', render:{type: 'dataurl', name: '" . ($dataurlname ?: 'DATAURL') . "', content: '" . $attributes['href'] . "'}})";
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . ($dataurlname ?: 'DATAURL') . "', render:{type: 'dataurl', name: '" . ($dataurlname ?: 'DATAURL') . "', content: '" . $attributes['href'] . "', downloadurl: '" . implode(':', [$mime, $file['basename'], $file['url']]) . "'}})";
 			}
 			else {
 				$attributes['target'] = '_blank';
+				$attributes['draggable'] = true;
+				$attributes['data-downloadurl'] = implode(':', [$mime, $file['basename'], $file['url']]);
 			}
 		}
 		return $attributes;
