@@ -146,18 +146,17 @@ class API {
 			if (PERMISSION::filteredUser($user)) continue;
 
 			// always include named users
-			if(isset($group['user'])&& in_array($user['name'], $group['user'])) {
+			if(isset($group['user']) && in_array($user['name'], $group['user'])) {
 				$recipients[] = $user['id'];
 				continue;
-
 			}
 			// continue if set permissions do not intersect
 			if (isset($group['permission'])){
-				if (PERMISSION::filteredUser($user, ['permission' => $group['permission']])) continue;
+				if (!PERMISSION::filteredUser($user, ['permission' => $group['permission']])) continue;
 			}
 			// continue if set units do not intersect
 			if (isset($group['unit'])){
-				if (PERMISSION::filteredUser($user, ['unit' => $group['unit']])) continue;
+				if (!PERMISSION::filteredUser($user, ['unit' => $group['unit']])) continue;
 			}
 			$recipients[] = $user['id'];			
 		}
