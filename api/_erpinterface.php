@@ -326,7 +326,7 @@ class _ERPINTERFACE {
 					require_once('_table.php');
 					$export = new TABLE([$result]);
 					if ($files = $export->dump($key . date(' Y-m-d H-i-s') . '.' . $export)){
-						return substr($files[0], 1);
+						return substr($files[0]['path'], 1);
 					}
 			}
 
@@ -1343,7 +1343,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	*/
 	public function customcsvdump($key = null, $params = null){
 		$queries = [
-			'Vorgangsexport für Terminerinnerung' => [
+			'CARO Vorgangsexport für Terminerinnerung' => [
 				'description' => 'Alle gelieferten Fälle. Die Liste kann anschließend mit dem CSV-Filter für den Serienbriefversand vorbereitet werden.',
 				'query' => <<<'END'
 					SELECT
@@ -1362,7 +1362,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						EMAIL.EMAIL,
 						pat.STERBEDATUM,
 						vorgaenge.LEISTUNG,
-						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
+						CAST(vorgaenge.AUFTRAGSWERT_BRUTTO AS decimal(10,2))) AS AUFTRAGSWERT_BRUTTO,
 						'geliefert' AS GELIEFERT,
 						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
 						[sys].GENEHMIGT,
@@ -1461,7 +1461,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
 						KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER,
 						vorgaenge.LEISTUNG,
-						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
+						CAST(vorgaenge.AUFTRAGSWERT_BRUTTO AS decimal(10,2))) AS AUFTRAGSWERT_BRUTTO,
 						[sys].GENEHMIGT,
 						CONVERT(varchar(255), vorgaenge.GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 						[sys2].GELIEFERT,
@@ -1918,7 +1918,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
 						CONCAT(pat.ANREDE, ' ', pat.NAME, ', ' , pat.VORNAME, ' *', CONVERT(varchar(255), pat.GEBURTSDATUM, 104)) AS NAME,
 						vorgaenge.LEISTUNG,
-						FORMAT(vorgaenge.AUFTRAGSWERT_BRUTTO, 'C2', 'de-de') AS AUFTRAGSWERT_BRUTTO,
+						CAST(vorgaenge.AUFTRAGSWERT_BRUTTO AS decimal(10,2))) AS AUFTRAGSWERT_BRUTTO,
 						VERORDNER.NAME AS VERORDNER,
 						MITARBEITER.NAME AS MITARBEITER,
 						UNIT.BETRIEB
