@@ -2,22 +2,13 @@
 	{
 		"name": "Inventurlisten nach Bereichen",
 		"content": {
-			"useCase": "Für die Aktualisierung der Bereichslager-Bestandslisten wird zunächst der Artikelstamm exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
+			"useCase": "Für die Bereichslager-Bestandslisten wird zunächst der Artikelstamm exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
 			"postProcessing": "Blattweise ausdrucken, ggf. Ausrichtung anpassen.",
 			"filesetting": {
 				"source": "EVA-Artikelstamm Lagerware....CSV",
 				"headerrow": 1,
 				"destination": "Inventurlisten.xlsx",
-				"columns": [
-					"ARTIKEL_REFERENZ",
-					"LIEFERANTEN_NAME",
-					"BESTELL_NUMMER",
-					"BESTELL_TEXT",
-					"BESTELLEINHEIT",
-					"LAGERORT",
-					"LAGER_REFERENZ",
-					"WARENEINGANGSDATUM"
-				]
+				"columns": ["ARTIKEL_REFERENZ", "LIEFERANTEN_NAME", "BESTELL_NUMMER", "BESTELL_TEXT", "BESTELLEINHEIT", "LAGERORT", "LAGER_REFERENZ", "WARENEINGANGSDATUM"]
 			},
 			"modify": {
 				"add": {
@@ -35,34 +26,34 @@
 					"ARTIKEL_REFERENZ": {
 						"height": 30,
 						"border": "top",
-						"width":7
+						"width": 7
 					},
 					"LIEFERANTEN_NAME": {
-						"width":15
+						"width": 15
 					},
 					"BESTELL_NUMMER": {
-						"width":15
+						"width": 15
 					},
 					"BESTELL_TEXT": {
-						"width":35
+						"width": 35
 					},
 					"BESTELLEINHEIT": {
-						"width":5
+						"width": 5
 					},
 					"LAGERORT": {
-						"width":8
+						"width": 8
 					},
 					"LAGER_REFERENZ": {
-						"width":8
+						"width": 8
 					},
 					"WARENEINGANGSDATUM": {
-						"width":4
+						"width": 4
 					},
-					"Anzahl":{
-						"width":8
+					"Anzahl": {
+						"width": 8
 					},
 					"Abwertung": {
-						"width":4,
+						"width": 4,
 						"type": "formula"
 					}
 				}
@@ -72,30 +63,19 @@
 	{
 		"name": "Falllisten",
 		"content": {
-			"useCase": "Für die Aktualisierung der Bereichslager-Bestandslisten wird zunächst der Artikelstamm exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
+			"useCase": "Für die Falllisten werden zunächst die laufenden Fälle exportiert (CARO EVA Datenbankabfrage). Diese Datei wird über die Schaltfläche geladen.",
 			"postProcessing": "Blattweise ausdrucken, ggf. Ausrichtung anpassen.",
 			"filesetting": {
 				"source": "genehmigt nicht geliefert/nicht genehmigt....CSV",
 				"headerrow": 1,
 				"destination": "Falllisten.xlsx",
-				"columns": [
-					"VORGANG",
-					"ANLAGEDATUM",
-					"NAME",
-					"KOSTENTRAEGER",
-					"LEISTUNG",
-					"AUFTRAGSWERT_BRUTTO",
-					"GENEHMIGT",
-					"GENEHMIGT_DATUM",
-					"BETRIEB",
-					"GENEHMIGT_FLAG"
-				]
+				"columns": ["VORGANG", "ANLAGEDATUM", "NAME", "KOSTENTRAEGER", "LEISTUNG", "AUFTRAGSWERT_BRUTTO", "GENEHMIGT", "GENEHMIGT_DATUM", "BETRIEB", "GENEHMIGT_FLAG"]
 			},
 			"split": {
 				"BETRIEB": "(.*)",
 				"GENEHMIGT_FLAG": "(.*)"
 			},
-			"modify2":{
+			"modify2": {
 				"remove": ["KUNDENNUMMER", "GENEHMIGT_FLAG"]
 			},
 			"xslxformat": {
@@ -132,6 +112,283 @@
 						"width": 8
 					}
 				}
+			}
+		}
+	},
+	{
+		"name": "Terminerinnerung",
+		"content": {
+			"useCase": "Zuerst müssen in EVA die Patientendaten zusammengeführt und anschließend der Vorgangsexports durch die CARO EVA Datenbankabfrage durchgeführt werden. Die Datei \"CARO Vorgangsexport für Terminerinnerung...csv\" wird über die Schaltfläche geladen. Die Vergleichsdatei ist die \"AUSSCHLUSS.csv\".\nEtwaige fehlerhafte eMail-Adressen sollen sowohl in der ausgegebenen Datei \"Einladungsfilter.csv\", als auch im Kundenstamm korrigiert werden.\nAnschließend kann der Serienbrief im Arbeitsverzeichnis per eMail versandt bzw. gedruckt werden.",
+			"postProcessing": "Nicht vergessen eMailadressen zu prüfen und die neue Datei zu archivieren: ",
+			"filesetting": {
+				"source": "CARO Vorgangsexport für Terminerinnerung.+?\\.csv",
+				"headerrowindex": 0,
+				"destination": "Einladungsfilter.csv",
+				"columns": [
+					"VORGANG",
+					"ANLAGEDATUM",
+					"ANREDE",
+					"PERSOENLICHE ANREDE",
+					"KUNDENNUMMER",
+					"NAME",
+					"VORNAME",
+					"STRASSE",
+					"LKZ",
+					"PLZ",
+					"ORT",
+					"GEBURTSDATUM",
+					"EMAIL",
+					"STERBEDATUM",
+					"LEISTUNG",
+					"AUFTRAGSWERT_BRUTTO",
+					"GELIEFERT",
+					"GELIEFERT_DATUM",
+					"GENEHMIGT",
+					"OHNE_SERIENBRIEF"
+				]
+			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "nur an Personen geliefert",
+					"keep": true,
+					"match": {
+						"all": {
+							"VORNAME": ".+?",
+							"LKZ": "d",
+							"ANREDE": ".+?",
+							"GELIEFERT": "^geliefert$",
+							"GELIEFERT_DATUM": ".+?"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_expression",
+					"comment": "nicht verstorben, nicht storniert, ohne serienbrief, nicht an Firmen und Ausschluss konkreter Begriffe",
+					"keep": false,
+					"match": {
+						"any": {
+							"STERBEDATUM": ".+?",
+							"GENEHMIGT": "Storno",
+							"NAME": "klinik|werkst|gmbh|technik|wolf, sebastian|sanitäts",
+							"LEISTUNG": "appartment|reparatur|(?!.*folgever|.*neuvers)verschleiß|(?<!konzept|umenver)änderung|anpassung|reklamation|cheneau|skoliose|bending|reklination|gebühr|leih|probefertig|teilabrechnung|abbruch|wechsel|kontrolle|monatige|wöchige testversorgung|wöchentliche|test.*?verlängerung|(?!.*definitiv)als test|^testversorgung",
+							"AUFTRAGSWERT_BRUTTO": "-\\d|^\\d$|^\\d\\D",
+							"OHNE_SERIENBRIEF": "ja"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_expression",
+					"comment": "Ausschluss bestimmter Leistungstexte über 400€ Auftragswert",
+					"keep": false,
+					"match": {
+						"all": {
+							"AUFTRAGSWERT_BRUTTO": "[4-9]\\d{2,}|\\d{4,}",
+							"LEISTUNG": "^((?!.*(dauerversorgung|prothese|nach maß|ziel)).*(punkt|funktionssichernd|entlastung|bei vorhandene|zu. vorhandene|ersatz|laufende|zusätzlich|schuh|gehstütze|dorsopull|daho|unloader|genu.*?train|mks|pcl|cds|medi.*?(?:pt|sas)|softec|vista|newport|quick.*?elektroden|boston.*?overlap|t.*?flex|mos genu|silosheath|cosa.*?junior|rebound.+?cartilage|schiefhals|einlage|fußorthese))"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_expression",
+					"comment": "Ausschluss unter 400€ Auftragswert außer Sonderanfertigungen, Kompressionsversorgungen und Peronaeusversorgungen",
+					"keep": false,
+					"match": {
+						"all": {
+							"AUFTRAGSWERT_BRUTTO": "^[1-3]{0,1}\\d{0,2}\\D.*?$",
+							"LEISTUNG": "^(?!(?!.*?(fingerling|ausgleichs|anziehhilfe|für.*?orthese|für vorhandene|stumpfstr|eilige frakturversorgung|glove|fingergelenk|\\Wpsa|elset|heelift|einlage|fußorthese|sandwich|hallux)).*?(kompression|haken|lagerung|anziehh|adaption|neopren|handballen|leder|fußhebe|peronaeus|tetraleibgurt|individuell|eigenanfertigung|sonderanfertigung|schaumstofflagerung|vierfuß)).*"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_monthdiff",
+					"comment": "keine Kinder unter 12 Monaten",
+					"keep": false,
+					"date": {
+						"column": "GEBURTSDATUM",
+						"format": "d.m.Y",
+						"threshold": 12,
+						"bias": "<"
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "Ausschluss von Kindern unter 14 Jahren und Lieferdatum von über 2 Jahren",
+					"keep": false,
+					"filesetting": {
+						"source": "SELF",
+						"headerrowindex": 0,
+						"columns": ["VORGANG", "GEBURTSDATUM", "GELIEFERT_DATUM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "Jünger als 14?",
+							"keep": true,
+							"date": {
+								"column": "GEBURTSDATUM",
+								"format": "d.m.Y",
+								"threshold": 168,
+								"bias": "<"
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "Vorgänge älter als 2 Jahre?",
+							"keep": true,
+							"date": {
+								"column": "GELIEFERT_DATUM",
+								"format": "d.m.Y",
+								"threshold": 24,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"VORGANG": "VORGANG"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "Ausschluss von Kompressions- und PostOP-Versorgungen älter als ein Jahr",
+					"keep": false,
+					"filesetting": {
+						"source": "SELF",
+						"headerrowindex": 0,
+						"columns": ["VORGANG", "LEISTUNG", "GELIEFERT_DATUM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "Kompressions- oder PostOP-Versorgungen",
+							"keep": true,
+							"match": {
+								"all": {
+									"LEISTUNG": "kompression|post.*?op"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "Vorgänge alter als ein Jahr?",
+							"keep": true,
+							"date": {
+								"column": "GELIEFERT_DATUM",
+								"format": "d.m.Y",
+								"threshold": 12,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"VORGANG": "VORGANG"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "Ausschluss falls in den letzten 6 Monaten bereits ein Kontakt stattfand (Anlage)",
+					"keep": false,
+					"filesetting": {
+						"source": "SELF",
+						"headerrowindex": 0,
+						"columns": ["VORGANG", "KUNDENNUMMER", "ANLAGEDATUM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "Vorgänge in den letzten 6 Monaten angelegt?",
+							"keep": true,
+							"date": {
+								"column": "ANLAGEDATUM",
+								"format": "d.m.Y",
+								"threshold": 6,
+								"bias": "<"
+							}
+						}
+					],
+					"match": {
+						"any": {
+							"KUNDENNUMMER": "KUNDENNUMMER"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "Ausschluss falls in den letzten 6 Monaten bereits ein Kontakt stattfand (Lieferung)",
+					"keep": false,
+					"filesetting": {
+						"source": "SELF",
+						"headerrowindex": 0,
+						"columns": ["VORGANG", "KUNDENNUMMER", "GELIEFERT_DATUM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "Vorgänge in den letzten 6 Monaten geliefert?",
+							"keep": true,
+							"date": {
+								"column": "GELIEFERT_DATUM",
+								"format": "d.m.Y",
+								"threshold": 6,
+								"bias": "<"
+							}
+						}
+					],
+					"match": {
+						"any": {
+							"KUNDENNUMMER": "KUNDENNUMMER"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "Behalte nur den ältesten Vorgang",
+					"duplicates": {
+						"orderby": ["VORGANG"],
+						"descending": false,
+						"column": "KUNDENNUMMER",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_monthinterval",
+					"comment": "Verwerfe alle bei denen der Zeitraum nicht glatt durch 7 Teilbar ist",
+					"keep": true,
+					"interval": {
+						"column": "GELIEFERT_DATUM",
+						"format": "d.m.Y",
+						"interval": 7,
+						"offset": 0
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "Ausschluss gemäß AUSSCHLUSS-Liste",
+					"keep": false,
+					"filesetting": {
+						"source": "AUSSCHLUSS.csv",
+						"headerrowindex": 0,
+						"columns": ["VORGANG"]
+					},
+					"filter": [],
+					"match": {
+						"all": {
+							"VORGANG": "VORGANG"
+						}
+					}
+				}
+			],
+			"modify": {
+				"replace": [
+					[null, "\"", ""],
+					[null, ";", ","]
+				]
+			},
+			"evaluate": {
+				"EMAIL": "^((?!@).)*$"
 			}
 		}
 	},
@@ -211,17 +468,7 @@
 				"rewrite": [
 					{
 						"article_no": ["BESTELL_NUMMER"],
-						"article_name": [
-							"BEZEICHNUNG",
-							" ",
-							"Zusatzinformation",
-							" ",
-							"MODELL_NAME",
-							" ",
-							"GROESSEN_NAME",
-							" ",
-							"FARBEN_NAME"
-						],
+						"article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"],
 						"article_unit": ["BESTELL_EINHEIT"],
 						"article_ean": ["EAN"],
 						"erp_id": ["REFERENZ"],
