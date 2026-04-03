@@ -952,6 +952,12 @@ export class Dialog {
 				a.href = this.render.url;
 				a.download = this.render.name || this.render.url;
 				a = Polyfill.a(a);
+				if (this.render.downloadurl){
+					a.draggable = true;
+					a.dataset.downloadurl = this.render.downloadurl;
+					_.file.dragout(a);
+				}
+
 				a.append(document.createTextNode(this.render.name || this.render.url));
 				if (warning) return [div, warning, a];
 				return [div, a];
@@ -967,6 +973,11 @@ export class Dialog {
 		a.download = this.render.name || this.render.content;
 		a.dataset.type = "downloadlink";
 		a.append(document.createTextNode(this.render.name || this.render.content));
+		if (this.render.downloadurl){
+			a.draggable = true;
+			a.dataset.downloadurl = this.render.downloadurl;
+			_.file.dragout(a);
+		}
 
 		if (["qrcode", "barcode"].includes(this.render.type)) {
 			result.push(canvas);
@@ -2241,6 +2252,8 @@ export class Assemble {
 		label.classList.add("inlinebutton");
 		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? api._lang.GET("assemble.render.files_choose") : api._lang.GET("assemble.render.file_choose")));
 		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
+
+		_.file.dragin(label, input);
 
 		button.onclick = () => {
 			let e = document.getElementById(input.id);
