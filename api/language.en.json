@@ -1528,7 +1528,7 @@
 		"token_verified": "verified by token through :user",
 		"trace_label": "Batch identifier",
 		"trace_label_hint": "e.g. delivery note number or consecuting number, vendor is added by default",
-		"unit_label": "Unit",
+		"unit_label": "Order unit",
 		"vendor_label": "Vendor"
 	},
 	"record": {

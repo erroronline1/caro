@@ -1529,7 +1529,7 @@
 		"token_verified": "freigegeben mit Token von :user",
 		"trace_label": "Rückverfolgung",
 		"trace_label_hint": "z.B. Lieferscheinnummer oder fortlaufende Chargennummer, Lieferant wird selbstständig beigefügt",
-		"unit_label": "Einheit",
+		"unit_label": "Bestelleinheit",
 		"vendor_label": "Lieferant"
 	},
 	"record": {
