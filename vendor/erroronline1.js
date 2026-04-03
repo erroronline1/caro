@@ -412,4 +412,43 @@ const _ = {
 			});
 		},
 	},
+	file: {
+		// kudos https://web.dev/patterns/files/drag-and-drop-files
+		supportsFileSystemAccessAPI: "getAsFileSystemHandle" in DataTransferItem.prototype,
+		supportsWebkitGetAsEntry : "webkitGetAsEntry" in DataTransferItem.prototype,
+
+		dragin: async function (dragarea, destination_input) {
+			dragarea.addEventListener("dragover", (e) => {
+				// Prevent navigation.
+				e.preventDefault();
+			});
+			dragarea.addEventListener("dragenter", (e) => {
+				dragarea.style.outlineOffset = ".25em";
+				dragarea.style.outline = "dashed rgb(153, 179, 132)";
+			});
+			dragarea.addEventListener("dragleave", (e) => {
+				dragarea.style.outline = "";
+			});
+			dragarea.addEventListener("drop", async (e) => {
+				e.preventDefault();
+				dragarea.style.outline = "";
+				const fileHandlesPromises = [...e.dataTransfer.items].filter((item) => item.kind === "file").map((item) => (this.supportsFileSystemAccessAPI ? item.getAsFileSystemHandle() : this.supportsWebkitGetAsEntry ? item.webkitGetAsEntry() : item.getAsFile()));
+				for await (const handle of fileHandlesPromises) {
+					if (handle.kind === "directory" || handle.isDirectory) {
+						return;
+					} else {
+						destination_input.files = e.dataTransfer.files;
+					}
+				}
+				destination_input.dispatchEvent(new Event("change"));
+			});
+		},
+		// kudos https://ryanseddon.com/html5/gmail-dragout/
+		// availability most likely limited though
+		dragout:async function(anchor){
+			if (anchor.dataset.downloadurl) anchor.addEventListener("dragstart",function(e){
+					e.dataTransfer.setData("DownloadURL", anchor.dataset.downloadurl);
+			},false);
+		}
+	},
 };
