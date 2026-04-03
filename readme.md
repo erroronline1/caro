@@ -31,12 +31,8 @@ Things are still in motion. Images may be outdated.
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
 * consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
-* validate csvprocessor on complex filters (terminerinnerung)
-* file drag and drop, to and from the application
-    * https://web.dev/patterns/files/drag-and-drop-files?hl=de
 * orders
     * check if similar items have been ordered recently?
-    * highlight amount (sanitized htmlcontent)
 
 ## Content
 * [Aims](#aims)

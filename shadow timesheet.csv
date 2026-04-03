@@ -404,3 +404,4 @@
 28.03.26,10,"database type maintenance, notification-api, ui"
 29.03.26,2,ui
 02.04.26,7,"sql-interface, stress-test, filehandler"
+03.04.26,12,"sql-interface, filehandler, ui, csvfilter"
