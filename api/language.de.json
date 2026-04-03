@@ -1072,7 +1072,9 @@
 			"filter_no_input_file": "Du hast vergessen eine Datei auszuwählen!",
 			"filter_select": "Wähle einen Filter",
 			"filter_track": "verfolgen",
-			"filter_year": "Jahr"
+			"filter_year": "Jahr",
+			"track_column": "Verfolge Spalte",
+			"track_values": "Verfolge Werte"
 		}
 	},
 	"erpquery": {

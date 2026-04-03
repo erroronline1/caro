@@ -98,10 +98,16 @@ class CSVFILTER extends API {
 				}
 					
 				// process filter
-				$datalist = new Listprocessor($content, [
+				$arguments = [
 					'processedMonth' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_month')),
 					'processedYear' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_year'))
-				]);
+				];
+				$track_column = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.track_column'));
+				if($track_values = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.track_values'))){
+					$arguments['track'] = [];
+					$arguments['track'][$track_column] = preg_split('/[\.,; ]+/', $track_values);
+				}
+				$datalist = new Listprocessor($content, $arguments);
 
 				// create and write to file
 				$downloadfiles = [];
@@ -119,9 +125,9 @@ class CSVFILTER extends API {
 								'escape' => $datalist->_setting['filesetting']['escape'] ?? CONFIG['csv']['dialect']['escape']
 							])){
 							foreach($files as $file){
-								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file)['basename']])] = [
-									'href' => $this->_filehandler->getFileLink($file),
-									'download' => pathinfo($file)['basename']
+								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($file['path'])['basename']])] = [
+									'href' => $this->_filehandler->getFileLink($file['path']),
+									'download' => pathinfo($file['path'])['basename']
 								];
 							}
 						}
@@ -155,8 +161,8 @@ class CSVFILTER extends API {
 							$format)){
 							foreach($files as $file){
 								if ($file) $downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
-									'href' => $this->_filehandler->getFileLink($file),
-									'download' => pathinfo($file)['basename']
+									'href' => $this->_filehandler->getFileLink($file['path']),
+									'download' => pathinfo($file['path'])['basename']
 								];
 							}
 						}
@@ -253,8 +259,18 @@ class CSVFILTER extends API {
 				if ($filter['id']){
 					$content = json_decode($filter['content'], true);
 
+					$additionalform = [];
+					if (isset($content['useCase'])){
+						array_push($additionalform, [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $content['useCase']
+							]
+						]);
+					}
+
 					// add default inputs for filter
-					$additionalform = [
+					array_push($additionalform,
 						[
 							'type' => 'file',
 							'hint' => $this->_lang->GET('csvfilter.use.filter_input_file_hint', [':name' => $content['filesetting']['source']]),
@@ -280,7 +296,7 @@ class CSVFILTER extends API {
 								'readonly' => true
 							]
 						]
-					];
+					);
 
 					// add inputs for comparison files if applicable
 					if (isset($content['filter'])){
@@ -297,6 +313,26 @@ class CSVFILTER extends API {
 						}
 					}
 
+					if (PERMISSION::permissionFor('csvrules') && !empty($content['filesetting']['columns'])){
+						$columns = [];
+						foreach($content['filesetting']['columns'] as $column){
+							$columns[$column] = [];
+						}
+						array_push($additionalform,
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.use.track_column')
+								],
+								'content' => $columns
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.use.track_values')
+								]
+							]
+						);
+					}
 					// append all filter inputs
 					array_push($response['render']['content'], $additionalform);
 

@@ -1072,7 +1072,9 @@
 			"filter_no_input_file": "You forgot to provide an input file!",
 			"filter_select": "Select filter",
 			"filter_track": "Track",
-			"filter_year": "Year"
+			"filter_year": "Year",
+			"track_column": "Track column",
+			"track_values": "Track values"
 		}
 	},
 	"erpquery": {
