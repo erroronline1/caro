@@ -295,6 +295,7 @@
 			"not_saved": "Approval could not be saved",
 			"pending": "This element still requires another approval by :approvals.",
 			"saved": "Approval saved.",
+			"snapshot": "I recommend to create a new :snapshot.",
 			"unapproved": "not approved"
 		},
 		"compose": {

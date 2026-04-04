@@ -295,6 +295,7 @@
 			"not_saved": "Die Freigabe konnte nicht gespeichert werden.",
 			"pending": "Dieses Element benötigt weitere Freigaben von :approvals.",
 			"saved": "Die Freigebe wurde gespeichert.",
+			"snapshot": "Ich empfehle dir einen neuen :snapshot zu erstellen.",
 			"unapproved": "nicht freigegeben"
 		},
 		"compose": {

@@ -94,9 +94,14 @@ class DOCUMENT extends API {
 							}
 						}
 						if ($documents){
-							// send to all users
+							// send information to all users
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 							$this->alertUserGroup(['user' => array_column($users, 'name')], preg_replace(['/\r/'], [''], $this->_lang->GET('assemble.approve.alert', [':documents' => implode("\n", $documents)], true)));
+							// recommend snapshot to eligible users
+							$this->alertUserGroup(['permission' => PERMISSION::permissionFor('documentcomposer', true)], 
+								$this->_lang->GET('assemble.approve.snapshot', [':snapshot' =>
+									'<a href="javascript:void(0)" onclick="api.maintenance(\'get\', \'task\', \'documents_snapshot\')">' . $this->_lang->GET('maintenance.navigation.documents_snapshot', [], true) . '</a>' 
+								], true));
 						}
 					}
 					$this->response([
