@@ -627,9 +627,9 @@ class NOTIFICATION extends API {
 											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
 												':days' => $delivered_full->diff($this->_date['servertime'])->days,
 												':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
-												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? '']) . '</a>',
-												':vendor' => $decoded_order_data['vendor_label'] ?? '',
-												':commission' => $decoded_order_data['commission'],
+												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
+												':vendor' => strip_tags($decoded_order_data['vendor_label'] ?? ''),
+												':commission' => strip_tags($decoded_order_data['commission']),
 												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
 											], true);
 										}
@@ -638,7 +638,7 @@ class NOTIFICATION extends API {
 								} else $issue_interval = $order['issued_notified'];
 
 								// prepare alert flags
-								if ($update) $alersqlQueryStackts = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
+								if ($update) $sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
 									[
 										':delivered_notified' => $deliver_interval ?: null,
 										':issued_notified' => $issue_interval ?: null,
@@ -651,7 +651,7 @@ class NOTIFICATION extends API {
 							foreach($undelivered_notif as $messages){
 								$this->alertUserGroup(
 									['permission' => ['purchase']],
-									implode("\n\n", $messages)
+									strip_tags(implode("\n\n", $messages))
 								);
 							}
 
@@ -1298,7 +1298,7 @@ class NOTIFICATION extends API {
 			// alert current events including workmates pto if alert is set
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')],
 				$this->_lang->GET('calendar.tasks.alert_message', [
-					':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']),
+					':content' => strip_tags((isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject'])),
 					':date' => substr($event['span_start'], 0, 10),
 					':author' => $event['author'],
 					':due' => substr($event['span_end'], 0, 10)

@@ -270,7 +270,7 @@ class RESPONSIBILITY extends API {
 					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
-						':task' => $responsibility[':responsibility'],
+						':task' => strip_tags($responsibility[':responsibility']),
 						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility'). '</a>',
 					], true)));
 

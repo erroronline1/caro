@@ -174,8 +174,8 @@ class ORDER extends API {
 								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-									], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+									], true)) . "\n \n" . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')));
 								// userlist to decode orderer
 								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 								if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
@@ -223,9 +223,9 @@ class ORDER extends API {
 										'vendor' => 'vendor_label',
 										'aut_idem' => 'aut_idem',
 										'commission' => 'commission'] as $key => $value){
-										$messagepayload[':' . $key] = $decoded_order_data[$value] ?? '';
+										$messagepayload[':' . $key] = strip_tags($decoded_order_data[$value] ?? '');
 									}
-									$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
+									$messagepayload[':info'] = strip_tags($decoded_order_data['additional_info'] ?? '');
 
 									$organizational_unit = [$prepared['organizational_unit']];
 									// if unit is common, add ordering users units except admin
@@ -1697,8 +1697,8 @@ class ORDER extends API {
 						':incorporated' => UTILITY::json_encode($product['incorporated'])
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
-						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
-						. "\n  ". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", $decoded_order_data['additional_info'])], true)
+						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . strip_tags(implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']])) . '</a>'
+						. "\n  ". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", strip_tags($decoded_order_data['additional_info']))], true)
 					);
 				}
 			}

@@ -209,15 +209,15 @@ class RECORD extends API {
 		if ($casestate)	{
 				$message = $this->_lang->GET('record.casestate_change_message_content', [
 				':user' => $_SESSION['user']['name'],
-				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . strip_tags($identifier) . '</a>',
 				':casestate' => $this->_lang->GET($casestatestate === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $context . '.' . $casestate, [], true)], true)
 			], true);
 		}
 		elseif ($inquiry) {
 				$message = $this->_lang->GET('record.inquiry_message_content', [
 				':user' => $_SESSION['user']['name'],
-				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
-				':inquiry' => $inquiry
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . strip_tags($identifier) . '</a>',
+				':inquiry' => strip_tags($inquiry)
 			], true);
 		}
 

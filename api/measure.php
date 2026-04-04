@@ -109,7 +109,7 @@ class MEASURE extends API {
 					if ($changed) // alert on changes only
 						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
 							':user' => $_SESSION['user']['name'],
-							':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
+							':content' => strip_tags(substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : '')),
 							':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('measure.navigation.measure'). '</a>',
 						], true)));
 					$this->response([

@@ -304,7 +304,7 @@ class CONSUMABLES extends API {
 										$this->_lang->GET('order.sample_check.alert', [
 											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true) . '</a>',
 											':name' => $_SESSION['user']['name']
-										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
+										], true) . implode("\n", [strip_tags($product['vendor_name']), strip_tags($product['article_no']), strip_tags($product['article_name']), strip_tags($checkcontent)]));
 								}
 							}
 						}
@@ -658,7 +658,7 @@ class CONSUMABLES extends API {
 						$this->_lang->GET('order.sample_check.alert', [
 							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true) . '</a>',
 							':name' => $_SESSION['user']['name']
-						], true) . " \n" . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
+						], true) . " \n" . implode("\n", [strip_tags($product['vendor_name']), strip_tags($product['article_no']), strip_tags($product['article_name']), strip_tags($checkcontent)]));
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.sample_check.success'),
