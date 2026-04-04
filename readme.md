@@ -30,7 +30,6 @@ Things are still in motion. Images may be outdated.
 ## to do
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
-* consider automated download / reminder to download documents to a third place in case of system inavailability (fallback option)
 * orders
     * check if similar items have been ordered recently?
 
@@ -1233,6 +1232,7 @@ The application has some options to be maintained by authorized users:
 * Risk data can be imported/updated through dedicated CSV-files.
 * In case of an available product list import via the [ERP interface](#erp-interface) there is an option to update the whole product database in one go. 
 * During ERP-software maintenance the interface can be temporarily disabled.
+* For a fallback option in case of a server issue, current documents and product lists can be exported as a snapshot and stored elsewhere.
 * The request-log can be exported by users with administrator permission. Please be aware that these contain very sensitive data!
 
 [Content](#content)
@@ -2881,6 +2881,7 @@ This has been interpreted merely as a recommendation than a requirement to avoid
 | Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
 | Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
 | Data loss | Low | High (regulatory penalties) | Database backups | Responsibility delegated to operator of infrastructure |
+| Server or network issue | Low | High (no structured records possible) | Option and recommendation for snapshots to store documents at a third place to allow operations to continue to a degree | none |
 
 #### Software risks
 | Risk | Probability | Impact | Measures | Statement |
@@ -4448,6 +4449,7 @@ Depending on {task}:
 * Uploads a vendor template file for selection of updates
 * Updates the records_datalist database or return its data dump
 * Initiates the product list update (if available via ERP-interface)
+* Initiates a snapshot
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -4486,7 +4488,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log","selected":true},"Record datalist":{"value":"records_datalist"},"Vendor update":{"value":"vendorupdate"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}],{"type":"textsection","attributes":{"name":"CRON"},"content":"\n\n2025-07-12 01:38:48 OK\n\n2025-07-13 00:07:31 OK"},{"type":"deletebutton","attributes":{"value":"Delete cron.log with 2 entries","onclick":"api.application('delete', 'cron_log')"}}]}}
+{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Current documents snapshot":{"value":"documents_snapshot"},"ERP-connection":{"value":"erp_connection"},"Record datalist":{"value":"records_datalist"},"Request Log":{"value":"request_log"},"Update table of riskanalysis contents":{"value":"riskupdate"},"Vendor update":{"value":"vendorupdate"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}]]}}
 ```
 
 

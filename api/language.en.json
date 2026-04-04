@@ -1183,6 +1183,16 @@
 			"not_found": "Logfile not found and has most probably just been deleted",
 			"delete": "Delete cron.log with :count entries"
 		},
+		"documents_snapshot":{
+			"description": "Download a ZIP-file of current documents to store elsewhere - not for archiving purpose but as an emergency fallback in case of server fails.",
+			"type_selection":"Contained documents within the snapshot",
+			"types":{
+				"application":"Application documents",
+				"external":"External documents",
+				"products_ods":"Product list (ODS)",
+				"products_xlsx":"Product list (XLSX)"
+			}
+		},
 		"erp_connection": {
 			"confirmation": "The ERP-interface is now :state",
 			"enabled": "enabled",
@@ -1193,6 +1203,7 @@
 		"navigation": {
 			"cron_log": "Cron Log",
 			"cronoverride": "Initiate background update manually",
+			"documents_snapshot": "Current documents snapshot",
 			"erp_connection": "ERP-connection",
 			"maintenance": "Maintenance",
 			"productsupdate": "Product lists update",

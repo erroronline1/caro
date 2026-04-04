@@ -1183,6 +1183,17 @@
 			"not_found": "Logfile wurde nicht gefunden und wurde vermutlich gerade eben gelöscht",
 			"delete": "cron.log mit :count Einträgen löschen"
 		},
+		"documents_snapshot":{
+			"description": "Lade eine ZIP-Datei mit den aktuellen Dokumenten für einen anderen Speicherort herunter - nicht für Archivierungszwecke, sondern als Notfallplan bei Serverausfall.",
+			"type_selection":"Beinhaltete Dokumente im Schnappschuss",
+			"types":{
+				"application":"Anwendungsdokumente",
+				"external":"Externe Dokumente",
+				"products_ods":"Artikelliste (ODS)",
+				"products_xlsx":"Artikelliste (XLSX)"
+			}
+
+		},
 		"erp_connection": {
 			"confirmation": "Die ERP-Anbindung ist jetzt :state",
 			"enabled": "aktiviert",
@@ -1193,6 +1204,7 @@
 		"navigation": {
 			"cron_log": "Cron Log",
 			"cronoverride": "Hintergrundaktualisierung manuell ausführen",
+			"documents_snapshot":"Schnappschuss der aktuellen Dokumente",
 			"erp_connection": "ERP-Anbindung",
 			"maintenance": "Wartung",
 			"productsupdate": "Aktualisierung der Artikellisten",

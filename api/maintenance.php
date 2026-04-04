@@ -230,6 +230,7 @@ class MAINTENANCE extends API {
 			'records_datalist',
 			'riskupdate',
 			'vendorupdate',
+			'documents_snapshot',
 		];
 		if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()) $methods[] = 'productsupdate';
 		if (PERMISSION::permissionIn(['admin'])) $methods[] = 'request_log';
@@ -258,6 +259,162 @@ class MAINTENANCE extends API {
 			}
 		}
 		$this->response($response);
+	}
+
+
+	/**
+	 *     _                           _                                 _       _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___       ___ ___ ___ ___ ___| |_ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -|     |_ -|   | .'| . |_ -|   | . |  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|_____|___|_|_|__,|  _|___|_|_|___|_|  
+	 *                                        |_____|           |_|
+	 * 
+	 */
+	private function documents_snapshot(){
+		$response = ['render' => ['content' => []]];
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if ($selection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.documents_snapshot.type_selection'))) {
+					$selection = array_map(Fn($v) => array_search($v, $this->_lang->_USER['maintenance']['documents_snapshot']['types']), explode(' | ', $selection));
+					$snapshot = 'CARO_snapshot_' . date('YmdHis');
+					$this->_filehandler->tidydir('tmp', [':snapshot' => $snapshot]);
+					$snapshotdir = $this->_filehandler->directory('tmp', [':snapshot' => $snapshot]);
+
+					// create product lists if applicable
+					if (array_intersect($selection, ['products_ods', 'products_xlsx'])){
+						// create table
+						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+						$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order', 'last_order'];
+						$result = [];
+						// reduce data to required columns, convert null to ''
+						foreach ($products as $row) {
+							$vendor_name = $row['vendor_name'];
+							if (empty($result[$vendor_name])) $result[$vendor_name] = [];
+							foreach (array_diff($columns, array_keys($row)) as $nkey){
+								$row[$nkey] = '';
+							}
+							$result[$vendor_name][] = array_combine($columns, array_map(fn($column) => $row[$column], $columns));
+						}
+						// clear empty vendors
+						foreach($result as $vendor => $products){
+							if (!$products) unset ($result[$vendor]);
+						}
+						require_once('./_table.php');
+						$export = new TABLE($result);
+
+						// process each selected snapshot type for product export
+						foreach($selection as $type){
+							$files = [];
+							switch ($type){
+								case 'products_ods':
+									$files = $export->dump('products_' . $snapshot . '.ods');
+									break;
+								case 'products_xlsx':
+									$files = $export->dump('products_' . $snapshot . '.xlsx');
+									break;
+							}
+							foreach($files as $file){
+								// TABLE exports to temp by default, move to subdirectory
+								$destination = pathinfo($file['path']);
+								rename($file['path'], $snapshotdir . '/' . $destination['basename']);
+							}
+						}
+						$export = null;
+					}
+
+					// process each selected snapshot type for other backups
+					foreach($selection as $type){
+						switch ($type){
+							case 'application':
+								require_once('./document.php');
+								$DOCUMENT = new DOCUMENT();
+								$approveddocuments = [];
+								$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+								$hidden = [];
+								foreach ($fd as $row) {
+									if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+									if (!in_array($row['name'], $hidden)) $approveddocuments[] = ['id' => $row['id'], 'unit' => $row['unit']]; // prepare for selection
+								}
+								foreach($approveddocuments as $document){
+									$file = $DOCUMENT->export($document['id']); 
+									$destination = pathinfo($file);
+									$destination = $snapshotdir . '/documents' . '/' . $document['unit'] . '/' . $destination['basename'];
+									@mkdir(dirname($destination), 0777, true);
+									rename($file, $destination);
+								}
+								break;
+							case 'external':
+								require_once('./file.php');
+								$FILE = new FILE();
+								$external_files = $FILE->activeexternalfiles();
+								if (!$external_files) break;
+
+								foreach($external_files as $file){
+									// ensure files are available in case of database strategy and copy to external subdirectory
+									if ($this->_filehandler->serve($file, false)){
+										$destination = pathinfo($file);
+										$destination = $snapshotdir . '/external' . '/' . $destination['basename'];
+										@mkdir(dirname($destination), 0777, true);
+										copy($file, $destination);
+									}
+								};
+								break;
+						}
+					}
+
+					// create zip
+					$zip = new \ZipArchive();
+					$zip->open($snapshotdir .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+					// kudos https://sqlpey.com/php/php-zipp-folder-methods/
+					$files = new \RecursiveIteratorIterator(
+						new \RecursiveDirectoryIterator($snapshotdir),
+						\RecursiveIteratorIterator::LEAVES_ONLY
+					);
+					foreach ($files as $file) {
+						// Only process files, directories are handled implicitly by the structure
+						if (!$file->isDir()) {
+							// Determine real and relative paths
+							$filePath = $file->getRealPath();
+							// Relative path calculation is crucial for maintaining structure inside the zip
+							$relativePath = substr($filePath, strlen($snapshotdir) + 1);
+							// Add file to archive
+							$zip->addFile($filePath, $relativePath);
+						}
+					}
+					$zip->close();
+
+					$downloadfiles[$snapshot .'.zip'] = [
+						'href' => $this->_filehandler->getFileLink($snapshotdir .'.zip'),
+						'download' => $snapshot .'.zip'
+					];
+
+					$this->response(['links' => $downloadfiles]);
+				}
+			case 'GET':
+				$response['render']['content'][] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.navigation.documents_snapshot'),
+					],
+					'content' => $this->_lang->GET('maintenance.documents_snapshot.description')
+				];
+				$types = [];
+				foreach($this->_lang->_USER['maintenance']['documents_snapshot']['types'] as $description){
+					$types[$description] = [];
+				}
+				$response['render']['content'][] = [
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.documents_snapshot.type_selection'),
+					],
+					'content' => $types
+				];
+				$response['render']['form'] = [
+					'data-usecase' => 'maintenance',
+					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
+		}
+		return $response;
 	}
 
 	/**
