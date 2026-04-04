@@ -502,6 +502,9 @@ Exportiertes Dokument
 
 ![exported document](http://toh.erroronline.one/caro/document%20export%20de.png)
 
+Das [Wartungs-Modul](#wartung) erlaubt Schnappschüsse der aktuellen Dokumentenversionen, sowie externer Dokumente und Artikellisten. Dies kann als Notfallplan im Falle eines Server- oder Netzwerkproblems dienen. Bei Freigabe von Dokumenten erhalten die für die Dokumentenbearbeitung authorisierten Nutzer eine Nachricht, die die Erstellung eines Schnappschusses empfiehlt. Dieser kann an einer anderen Stelle gespeichert werden und für die Verteilung aktueller PDF-Dokumente zugunsten weiterhin strukturierter Aufzeichnungen im Falle einer eingeschränkten Erreichbarkeit der Anwendung dienen.  
+Dieses Szenario rechtfertigt Dokumente um nicht erreichbare Funktionen der Anwendung zu überbrücken, z.B. strukturierte Bestellformulare, die an den Einkauf [gefaxt](http://toh.erroronline.one/caro/fax_meme.jpg) werden können. Diesen Dokumenten kann bei ihrer Erstellung ein eingeschränkter Zugang zugewiesen werden, damit sie während der normalen Nutzung nur wenigen Nutzern angezeicht werden; sie sind aber immer Teil des Schnappschusses.
+
 [Übersicht](#übersicht)
 
 ### Aufzeichnungen

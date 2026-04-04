@@ -32,6 +32,7 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
+    * highlight amount? (requires assemble micro markdown?)
 
 ## Content
 * [Aims](#aims)
@@ -599,6 +600,9 @@ Screen document
 Exported document
 
 ![exported document](http://toh.erroronline.one/caro/document%20export%20en.png)
+
+The [maintenance-module](#maintenance) allows for a snapshot of the current documents versions, including external documents and consumables lists. This is supposed to be usable as a fallback option in case of a server or network issue. On approval of documents the users authorized to edit documents get a recommendation message to create a snapshot. That can be stored in a different location and used to provide the current version of documents as a PDF-file to ensure continued structured documentation in case of availability issues with the application.  
+This scenario justifies documents to bypass unavailable application functions, e.g. a structured order form to [send by fax](http://toh.erroronline.one/caro/fax_meme.jpg) to purchase. These documents can be assigned a limited access during creation to not show up for most of the users during regular use, but will always be included in the snapshot.
 
 [Content](#content)
 
