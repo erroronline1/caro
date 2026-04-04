@@ -1911,13 +1911,15 @@ class DOCUMENT extends API {
 	 *  |___|_,_|  _|___|_| |_| 
 	 *          |_|
 	 * export a document as pdf, if earlier than requested maxDocumentTimestamp, with data if provided
+	 * @param null|int $internal_id defaults to null to respond with download link, int to return just the path of the pdf (if valid)
 	 */
-	public function export(){
+	public function export($internal_id = null){
 		$document_id = $identifier = null;
 		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 		if ($entry_datetime = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.datetime'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.datetime')});
 
+		if ($internal_id) $document_id = $internal_id;
 		// used by audit for export of outdated documents
 		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
 		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
@@ -1927,7 +1929,7 @@ class DOCUMENT extends API {
 		]);
 		$document = $document ? $document[0] : null;
 		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
-		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([], 409);
+		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([$document_id], 409);
 
 		if (strlen($entry_datetime) > 16) { // yyyy-mm-ddThh:ii datetime-locale format
 			$entry_datetime = $this->_date['usertime']->format('Y-m-d H:i');
@@ -1966,142 +1968,7 @@ class DOCUMENT extends API {
 			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)], true)
 		];
 
-		function enumerate($name, $enumerate = [], $number = 1){
-			if (isset($enumerate[$name])) $enumerate[$name] += $number;
-			else $enumerate[$name] = $number;	
-			return $enumerate;
-		}
 
-		/**
-		 * recursive content setting according to the most recent document, markdown parsing if applicable
-		 * @param array $element component and subsets
-		 * @param array $payload
-		 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
-		 * @param array $enumerate names of elements that have to be enumerated
-		 * 
-		 * also see record.php summarizeRecord() 
-		 */
-		function printable($element, $payload, $_lang, $enumerate = []){
-			$content = ['content' => [], 'images' => [], 'fillable' => false];
-			foreach ($element as $subs){
-				if (!isset($subs['type'])){
-					$subcontent = printable($subs, $payload, $_lang, $enumerate);
-					foreach ($subcontent['enumerate'] as $name => $number){
-						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
-					}
-					$content['content'] = array_merge($content['content'], $subcontent['content']);
-					$content['images'] = array_merge($content['images'], $subcontent['images']);
-					$content['fillable'] = $subcontent['fillable'];
-				}
-				else {
-					if (in_array($subs['type'], ['identify', 'hr'])) continue;
-					if (in_array($subs['type'], ['image', 'links'])) {
-						$name = $subs['description'];
-					}
-					elseif (in_array($subs['type'], ['documentbutton'])) {
-						$name = $subs['attributes']['value'];
-					}
-					elseif (in_array($subs['type'], ['calendarbutton'])) {
-						$name = $_lang->GET('assemble.render.export_element.' . $subs['type']);
-					}
-					else $name = $subs['attributes']['name'];
-					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
-					$originName = $name;
-					if ($enumerate[$name] > 1) {
-						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
-					}
-					$postname = $name;
-
-					if (isset($subs['attributes']['required'])) $name .= ' *';
-					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
-						foreach ($subs['content'] as $key => $attributes) {
-							if (!$attributes) break;
-							if (isset($attributes['required'])) {
-								$name .= ' *';
-								break;
-							}
-						}
-					}
-
-					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
-					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						$content['content'][$name] = ['type' => 'selection', 'value' => []];
-						foreach ($subs['content'] as $key => $v){
-							if ($key === '...') continue;
-							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
-							$selected = '';
-
-							// dynamic multiple select
-							$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
-							foreach ($dynamicMultiples as $submitted){
-								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
-							}
-	
-							if (UTILITY::propertySet($payload, $postname) && (
-								($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
-								($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
-								)) $selected = '_____';
-							$content['content'][$name]['value'][] = $selected . $key;
-						}
-					}
-					elseif ($subs['type'] === 'textsection'){
-						if (isset($subs['markdown']) && isset($subs['content'])){
-							$markdown = new MARKDOWN();
-							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
-						}
-						else $content['content'][$name] = ['type' => 'textsection', 'value' => $subs['content'] ?? ''];
-					}
-					elseif ($subs['type'] === 'textarea'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-					}
-					elseif ($subs['type'] === 'signature'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'image'){
-						$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
-						$file = pathinfo($subs['attributes']['url']);
-						if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'gif', 'png'])) {
-							$content['images'][] = $subs['attributes']['url'];
-						}
-					}
-					elseif ($subs['type'] === 'range'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . ($subs['attributes']['min'] ?? 0) . ' - ' . ($subs['attributes']['max'] ?? 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
-					}
-					elseif (in_array($subs['type'], ['photo', 'file'])){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];
-					}
-					elseif ($subs['type'] === 'links'){
-						$content['content'][$name] = ['type' => 'links', 'value' => []];
-						foreach (array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
-					}
-					elseif ($subs['type'] === 'documentbutton'){
-						// strip language chunk from wrappers to extract only the linkes documents name
-						$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
-						foreach ($language as $chunk){
-							$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
-							preg_match('/' . $chunk . '/', $name, $document);
-							if (isset($document[1])){
-								$name = $document[1];
-								break;
-							}
-						};
-						$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'calendarbutton'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
-					}
-					else {
-						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
-						foreach ($dynamicMultiples as $submitted){
-							$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
-						}
-					}
-				}
-			}
-			$content['enumerate'] = $enumerate;
-			return $content;
-		};
 
 		$enumerate = [];
 		$fillable = false;
@@ -2122,7 +1989,7 @@ class DOCUMENT extends API {
 			]);
 			// add component content prefilled by payload
 			$component['content'] = json_decode($component['content'], true);
-			$printablecontent = printable($component['content']['content'], $this->_payload, $this->_lang, $enumerate);
+			$printablecontent = self::printable($component['content']['content'], $this->_payload, $this->_lang, $enumerate);
 			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
 			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
 			$enumerate = $printablecontent['enumerate'];
@@ -2146,8 +2013,12 @@ class DOCUMENT extends API {
 		$summary['images'] = [' ' => $summary['images']];
 
 		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$pdffile = $PDF->documentsPDF($summary);
+
+		if ($internal_id) return $pdffile;
+
 		$downloadfiles[$this->_lang->GET('assemble.render.export')] = [
-			'href' => $this->_filehandler->getFileLink($PDF->documentsPDF($summary))
+			'href' => $this->_filehandler->getFileLink($pdffile)
 		];
 		$this->response([
 			'render' => [
@@ -2159,7 +2030,144 @@ class DOCUMENT extends API {
 			],
 		]);
 	}
-	
+	// in objects scope to avoid redeclaration on imports (e.g. maintenance)
+	private function enumerate($name, $enumerate = [], $number = 1){
+		if (isset($enumerate[$name])) $enumerate[$name] += $number;
+		else $enumerate[$name] = $number;	
+		return $enumerate;
+	}
+	/**
+	 * in objects scope to avoid redeclaration on imports (e.g. maintenance)
+	 * recursive content setting according to the most recent document, markdown parsing if applicable
+	 * @param array $element component and subsets
+	 * @param array $payload
+	 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
+	 * @param array $enumerate names of elements that have to be enumerated
+	 * 
+	 * also see record.php summarizeRecord() 
+	 */
+	private function printable($element, $payload, $_lang, $enumerate = []){
+		$content = ['content' => [], 'images' => [], 'fillable' => false];
+		foreach ($element as $subs){
+			if (!isset($subs['type'])){
+				$subcontent = self::printable($subs, $payload, $_lang, $enumerate);
+				foreach ($subcontent['enumerate'] as $name => $number){
+					$enumerate = self::enumerate($name, $enumerate,  $number); // add from recursive call
+				}
+				$content['content'] = array_merge($content['content'], $subcontent['content']);
+				$content['images'] = array_merge($content['images'], $subcontent['images']);
+				$content['fillable'] = $subcontent['fillable'];
+			}
+			else {
+				if (in_array($subs['type'], ['identify', 'hr'])) continue;
+				if (in_array($subs['type'], ['image', 'links'])) {
+					$name = $subs['description'];
+				}
+				elseif (in_array($subs['type'], ['documentbutton'])) {
+					$name = $subs['attributes']['value'];
+				}
+				elseif (in_array($subs['type'], ['calendarbutton'])) {
+					$name = $_lang->GET('assemble.render.export_element.' . $subs['type']);
+				}
+				else $name = $subs['attributes']['name'];
+				$enumerate = self::enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
+				$originName = $name;
+				if ($enumerate[$name] > 1) {
+					$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
+				}
+				$postname = $name;
+
+				if (isset($subs['attributes']['required'])) $name .= ' *';
+				elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
+					foreach ($subs['content'] as $key => $attributes) {
+						if (!$attributes) break;
+						if (isset($attributes['required'])) {
+							$name .= ' *';
+							break;
+						}
+					}
+				}
+
+				if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
+				if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
+					$content['content'][$name] = ['type' => 'selection', 'value' => []];
+					foreach ($subs['content'] as $key => $v){
+						if ($key === '...') continue;
+						$enumerate = self::enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
+						$selected = '';
+
+						// dynamic multiple select
+						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
+						foreach ($dynamicMultiples as $submitted){
+							if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
+						}
+
+						if (UTILITY::propertySet($payload, $postname) && (
+							($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
+							($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
+							)) $selected = '_____';
+						$content['content'][$name]['value'][] = $selected . $key;
+					}
+				}
+				elseif ($subs['type'] === 'textsection'){
+					if (isset($subs['markdown']) && isset($subs['content'])){
+						$markdown = new MARKDOWN();
+						$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
+					}
+					else $content['content'][$name] = ['type' => 'textsection', 'value' => $subs['content'] ?? ''];
+				}
+				elseif ($subs['type'] === 'textarea'){
+					$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
+				}
+				elseif ($subs['type'] === 'signature'){
+					$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
+				}
+				elseif ($subs['type'] === 'image'){
+					$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
+					$file = pathinfo($subs['attributes']['url']);
+					if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'gif', 'png'])) {
+						$content['images'][] = $subs['attributes']['url'];
+					}
+				}
+				elseif ($subs['type'] === 'range'){
+					$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . ($subs['attributes']['min'] ?? 0) . ' - ' . ($subs['attributes']['max'] ?? 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
+				}
+				elseif (in_array($subs['type'], ['photo', 'file'])){
+					$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];
+				}
+				elseif ($subs['type'] === 'links'){
+					$content['content'][$name] = ['type' => 'links', 'value' => []];
+					foreach (array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
+				}
+				elseif ($subs['type'] === 'documentbutton'){
+					// strip language chunk from wrappers to extract only the linkes documents name
+					$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
+					foreach ($language as $chunk){
+						$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
+						preg_match('/' . $chunk . '/', $name, $document);
+						if (isset($document[1])){
+							$name = $document[1];
+							break;
+						}
+					};
+					$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
+				}
+				elseif ($subs['type'] === 'calendarbutton'){
+					$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
+				}
+				else {
+					if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
+					$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
+					foreach ($dynamicMultiples as $submitted){
+						$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
+					}
+				}
+			}
+		}
+		$content['enumerate'] = $enumerate;
+		return $content;
+	}
+
 	/**
 	 *   _     _           _                                 _
 	 *  | |___| |_ ___ ___| |_ ___ ___ ___ ___ ___ _ _ ___ _| |___ ___ _____ ___
