@@ -374,14 +374,6 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token AND (two_factor = :two_factor OR two_factor IS NULL) LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token AND (two_factor = :two_factor OR two_factor IS NULL)"
 		],
-		'application_get_permission_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE (permissions LIKE :group OR permissions LIKE CONCAT(:group, ',%') OR permissions LIKE CONCAT('%,', :group, ',%') OR permissions LIKE CONCAT('%,', :group))",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE (permissions LIKE :group OR permissions LIKE CONCAT(:group, ',%') OR permissions LIKE CONCAT('%,', :group, ',%') OR permissions LIKE CONCAT('%,', :group))"
-		],
-		'application_get_unit_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))"
-		],
 		'application_request_log' => [
 			'mysql' => "INSERT INTO caro_request_log (id, timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code, execution_time) VALUES (NULL, :timestamp, :method, :api, :payload, :user_id, :user_name, :user_permissions, :user_ip, :response_code, :execution_time)",
 			'sqlsrv' => "INSERT INTO caro_request_log (timestamp, method, api, payload, user_id, user_name, user_permissions, user_ip, response_code, execution_time) VALUES (CONVERT(datetime, :timestamp, 120), :method, :api, (CASE WHEN :payload IS NULL THEN NULL ELSE N':payload' END), :user_id, N:user_name, :user_permissions, :user_ip, :response_code, :execution_time)"
