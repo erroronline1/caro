@@ -25,10 +25,11 @@ import { Composer } from "./compose.js";
 window.Composer = new Composer();
 
 // during development, can be deleted during production, doesn't mess up the application though
-import { rendertest, screenshot, request_param } from "../unittests/unittests.js";
+import { rendertest, screenshot, request_param,jsMarkdown } from "../unittests/unittests.js";
 window.rendertest = rendertest;
 window.screenshot = screenshot;
 window.request_param = request_param;
+window.jsMarkdown = jsMarkdown;
 
 // INITIALIZE APPLICATION
 

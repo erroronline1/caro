@@ -1,14 +1,223 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
 import { Assemble } from "../js/assemble.js";
+import { Markdown } from "../js/_markdown.js";
+
+const markdown = {
+	en: `
+# Plain text (h1 header)
+
+This is a markdown flavour for basic text styling.  
+Lines should end with two or more spaces  
+to have an intentional linebreak
+and not just continuing.
+
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
+Some escaping of formatting characters is possible with a leading \ as in
+**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.  
+also \`\`code with \` escaped by double backticks\`\` and ==marked text==  
+Subscript like H~2~O and superscript like X^2^  
+[ ] task  
+[x] accomplished
+
+http://some.url, not particularly styled  
+a phone number: tel:012345678  
+[Styled link to Markdown information](https://www.markdownguide.org)
+
+--------
+
+## Lists (h2 header) {#withcustomid}
+
+1. Ordered list items start with a number and a period
+    * Sublist nesting
+    * is possible
+    * by indentating with four spaces
+        1. and list types
+        2. are interchangeable
+2. Ordered list item 2
+3. Ordered list item 3
+
+* Unordered list items start with asterisk or dash
+    1. the number
+    1. of ordered lists
+    2. actually doesn't
+    3. matter at all
+* Unordered list item 2
+* Unordered list item 3
+
+***
+
+### Tables (h3 header)
+
+| Table header 1 | Table header 2 | Table header 3 | and 4 |
+| --- | --- | --- | --- |
+| *emphasis* | **is** | ***possible*** | \`too\` |
+| linebreaks | are | not | though<br />without<br />html-tag \`<br />\` |
+
+- - -
+
+#### Blockquotes and code (h4 header)
+
+> Blockquote  
+> with *multiple*  
+> lines
+
+    preformatted text/code must
+    start with 4 spaces <code>
+
+~~~
+or being surrounded by
+three \` or ~
+~~~
+
+## Other features:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
+some \`code with <brackets>\`  
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and escaped\\@mail.address  
+![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
+123\\. escaped period avoiding a list
+
+### Nested items in lists
+
+1. List item with
+    > Blockquote as item
+2. Next list item with
+    |Table|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. Last item
+
+### Nested items in blockquotes
+
+> * List within blockquote 1
+> * List within blockquote 2
+>     * Nested list
+> ~~~
+> Code within blockquote
+> ~~~
+>> Blockquote within blockquote
+> 
+> | Tables nested | within | blockquotes |
+> | :---------- | :-----: | ---: |
+> | are | possible | as well |
+> | like | aligning | colums |
+
+[top header](#plain-text)  
+[second header](#withcustomid)
+`,
+	de: `
+# Einfacher Text (h1 Überschrift)
+
+Dies ist eine Markdown-Variante für einfache Textgestaltung.  
+Zeilen sollten mit zwei oder mehr Leerzeichen enden  
+um einen beabsichtigten Zeilenumbruch zu erzeugen
+und nicht einfach fortgeführt zu werden.
+
+Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
+Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.  
+Außerdem \`\`Code mit \` maskiert durch umgebende doppelte Gravis'\`\` und ==markierter Text==  
+Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
+[ ] Aufgabe  
+[x] erledigt
+
+http://eine.url, nicht besonders gestaltet  
+eine Telefonnummer: tel:012345678  
+[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)
+
+--------
+
+## Listen (h2 Überschrift) {#miteigenerid}
+
+1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+    * Verschachtelte Listen
+    * sind möglich
+    * mit einer Einrückung von vier Leerzeichen
+        1. und Listenarten
+        2. können kombiniert werden
+2. geordneter Listeneintrag 2
+3. geordneter Listeneintrag 3
+
+* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
+    1. die Nummerierung
+    1. von geordneten Listen
+    2. spielt eigentlich
+    3. keine Rolle
+* ungeordneter Listeneintrag 2
+    - [x] mit Aufgabe
+* ungeordneter Listeneintrag 3
+
+***
+
+### Tabellen (h3 Überschrift)
+
+| Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
+| --- | --- | --- | --- |
+| *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
+| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl \`<br />\` |
+
+- - -
+
+#### Zitatblöcke und Code (h4 Überschrift)
+
+> Zitatblock  
+> mit *mehreren*  
+> Zeilen
+
+    Vorformatierter Text/Code muss
+    mit 4 Leerzeichen eingerückt werden
+
+~~~
+oder von drei Gravis' oder Tilde-Zeichen
+eingefasst sein
+~~~
+
+## Sonstige Funktionen:  
+<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
+ein \`code mit <Klammern>\`  
+Betonung*im*Wort und __Betonung mit Unterstrich__  
+eine@email.addresse und maskierte\\@email.addresse  
+![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
+123\\. maskierter Punkt um eine Liste zu vermeiden
+
+### Verschachtelte Elemente in Listen
+
+1. Listeneintrag mit
+    > Zitatblock
+2. Ein weiterer Listeneintrag mit einer
+    |Tabelle|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. Letzter Eintrag
+
+### Verschachtelte Elemente in Zitatblöcken
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+>     * Unterliste
+> ~~~
+> Code innerhalb eines Zitatblocks
+> ~~~
+>> Zitatblock im Zitatblock
+> 
+> | In Zitatblöcken | verschachtelte | Tabellen |
+> | :---------- | :-----: | -----: |
+> | sind | auch | möglich |
+> | so wie | spaltenweise | Ausrichtung |
+
+[erste Überschrift](#einfacher-text)  
+[zweite Überschrift](#miteigenerid)
+`,
+};
 
 export function rendertest(element) {
 	let tests = {
@@ -601,13 +810,7 @@ export function rendertest(element) {
 							[{ c: "This" }, { c: "is" }, { c: "the" }, { c: "header" }, { c: "row" }],
 							[{ c: "This" }, { c: "is" }, { c: "the" }, { c: "first" }, { c: "data row" }],
 							[{ c: "Empty" }, { c: "objects" }, {}, { c: "left" }, { c: "blank" }],
-							[
-								{ c: "Long" },
-								{ c: "text" },
-								{ c: "is" },
-								{ c: "possible" },
-								{ c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." },
-							],
+							[{ c: "Long" }, { c: "text" }, { c: "is" }, { c: "possible" }, { c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." }],
 							[{ c: "Applied attributes" }, { c: "style and onclick", a: { style: "cursor: pointer;", onclick: "new _client.Toast('the table says hello')" } }, { c: "class red", a: { class: "red" } }],
 						],
 						hint: "As seen in orders. If selected.",
@@ -1319,13 +1522,7 @@ export function rendertest(element) {
 							[{ c: "Dies" }, { c: "ist" }, { c: "die" }, { c: "Kopf" }, { c: "zeile" }],
 							[{ c: "Dies" }, { c: "ist" }, { c: "die" }, { c: "erste" }, { c: "Datenreihe" }],
 							[{ c: "Leere" }, { c: "Objekte" }, {}, { c: "frei" }, { c: "gelassen" }],
-							[
-								{ c: "Langer" },
-								{ c: "Text" },
-								{ c: "ist" },
-								{ c: "möglich" },
-								{ c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." },
-							],
+							[{ c: "Langer" }, { c: "Text" }, { c: "ist" }, { c: "möglich" }, { c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." }],
 							[{ c: "Angewandte Eigenschaften" }, { c: "style und onclick", a: { style: "cursor: pointer;", onclick: "new _client.Toast('Die Tabelle sagt hallo')" } }, { c: "class red", a: { class: "red" } }],
 						],
 						hint: "Verwendet bei Bestellungen. Falls gewählt.",
@@ -1911,111 +2108,7 @@ export async function screenshot(lang = null, distinct = null) {
 				en: async function () {
 					await api.application("get", "start");
 					const data = new FormData();
-					data.append(
-						api._lang.GET("tool.markdown.editor"),
-						`
-# Plain text (h1 header)
-
-This is a markdown flavour for basic text styling.  
-Lines should end with two or more spaces  
-to have an intentional linebreak
-and not just continuing.
-
-Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
-Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.  
-also \`\`code with \` escaped by double backticks\`\` and ==marked text==  
-Subscript like H~2~O and superscript like X^2^  
-[ ] task  
-[x] accomplished
-
-http://some.url, not particularly styled  
-a phone number: tel:012345678  
-[Styled link to Markdown information](https://www.markdownguide.org)
-
---------
-
-## Lists (h2 header) {#withcustomid}
-
-1. Ordered list items start with a number and a period
-    * Sublist nesting
-    * is possible
-    * by indentating with four spaces
-        1. and list types
-        2. are interchangeable
-2. Ordered list item 2
-3. Ordered list item 3
-
-* Unordered list items start with asterisk or dash
-    1. the number
-    1. of ordered lists
-    2. actually doesn't
-    3. matter at all
-* Unordered list item 2
-* Unordered list item 3
-
-***
-
-### Tables (h3 header)
-
-| Table header 1 | Table header 2 | Table header 3 | and 4 |
-| --- | --- | --- | --- |
-| *emphasis* | **is** | ***possible*** | \`too\` |
-| linebreaks | are | not | though<br />without<br />html-tag \`<br />\` |
-
-- - -
-
-#### Blockquotes and code (h4 header)
-
-> Blockquote  
-> with *multiple*  
-> lines
-
-    preformatted text/code must
-    start with 4 spaces <code>
-
-~~~
-or being surrounded by
-three \` or ~
-~~~
-
-## Other features:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
-some \`code with <brackets>\`  
-mid*word*emphasis and __underscore emphasis__  
-some@mail.address and escaped\@mail.address  
-![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
-123\\. escaped period avoiding a list
-
-### Nested items in lists
-
-1. List item with
-    > Blockquote as item
-2. Next list item with
-    |Table|Column2|
-    |---|---|
-    |R1C1|R1C2|
-4. Last item
-
-### Nested items in blockquotes
-
-> * List within blockquote 1
-> * List within blockquote 2
->     * Nested list
-> ~~~
-> Code within blockquote
-> ~~~
->> Blockquote within blockquote
-> 
-> | Tables nested | within | blockquotes |
-> | :---------- | :-----: | ---: |
-> | are | possible | as well |
-> | like | aligning | colums |
-
-[top header](#plain-text)  
-[second header](#withcustomid)
-`
-					);
+					data.append(api._lang.GET("tool.markdown.editor"), markdown.en);
 					await api.tool("post", "markdown", null, data);
 					await _.sleep(500);
 					const dialog = document.querySelectorAll("dialog")[0];
@@ -2027,112 +2120,7 @@ some@mail.address and escaped\@mail.address
 				de: async function () {
 					await api.application("get", "start");
 					const data = new FormData();
-					data.append(
-						api._lang.GET("tool.markdown.editor"),
-						`
-# Einfacher Text (h1 Überschrift)
-
-Dies ist eine Markdown-Variante für einfache Textgestaltung.  
-Zeilen sollten mit zwei oder mehr Leerzeichen enden  
-um einen beabsichtigten Zeilenumbruch zu erzeugen
-und nicht einfach fortgeführt zu werden.
-
-Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
-Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.  
-Außerdem \`\`Code mit \` maskiert durch umgebende doppelte Gravis'\`\` und ==markierter Text==  
-Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
-[ ] Aufgabe  
-[x] erledigt
-
-http://eine.url, nicht besonders gestaltet  
-eine Telefonnummer: tel:012345678  
-[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)
-
---------
-
-## Listen (h2 Überschrift) {#miteigenerid}
-
-1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
-    * Verschachtelte Listen
-    * sind möglich
-    * mit einer Einrückung von vier Leerzeichen
-        1. und Listenarten
-        2. können kombiniert werden
-2. geordneter Listeneintrag 2
-3. geordneter Listeneintrag 3
-
-* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
-    1. die Nummerierung
-    1. von geordneten Listen
-    2. spielt eigentlich
-    3. keine Rolle
-* ungeordneter Listeneintrag 2
-    - [x] mit Aufgabe
-* ungeordneter Listeneintrag 3
-
-***
-
-### Tabellen (h3 Überschrift)
-
-| Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
-| --- | --- | --- | --- |
-| *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
-| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl \`<br />\` |
-
-- - -
-
-#### Zitatblöcke und Code (h4 Überschrift)
-
-> Zitatblock  
-> mit *mehreren*  
-> Zeilen
-
-    Vorformatierter Text/Code muss
-    mit 4 Leerzeichen eingerückt werden
-
-~~~
-oder von drei Gravis' oder Tilde-Zeichen
-eingefasst sein
-~~~
-
-## Sonstige Funktionen:  
-<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
-ein \`code mit <Klammern>\`  
-Betonung*im*Wort und __Betonung mit Unterstrich__  
-eine@email.addresse und maskierte\@email.addresse  
-![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
-123\\. maskierter Punkt um eine Liste zu vermeiden
-
-### Verschachtelte Elemente in Listen
-
-1. Listeneintrag mit
-    > Zitatblock
-2. Ein weiterer Listeneintrag mit einer
-    |Tabelle|Spalte 2|
-    |---|---|
-    |Z1S1|Z1S2|
-4. Letzter Eintrag
-
-### Verschachtelte Elemente in Zitatblöcken
-
-> * Listeneintrag innerhalb eines Zitatblocks 1
-> * Listeneintrag innerhalb eines Zitatblocks 2
->     * Unterliste
-> ~~~
-> Code innerhalb eines Zitatblocks
-> ~~~
->> Zitatblock im Zitatblock
-> 
-> | In Zitatblöcken | verschachtelte | Tabellen |
-> | :---------- | :-----: | -----: |
-> | sind | auch | möglich |
-> | so wie | spaltenweise | Ausrichtung |
-
-[erste Überschrift](#einfacher-text)  
-[zweite Überschrift](#miteigenerid)
-`
-					);
+					data.append(api._lang.GET("tool.markdown.editor"), markdown.de);
 					await api.tool("post", "markdown", null, data);
 					await _.sleep(500);
 					const dialog = document.querySelectorAll("dialog")[0];
@@ -2244,9 +2232,9 @@ eine@email.addresse und maskierte\@email.addresse
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
 	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
 	if (!distinct) await _.sleep(timeout * 1000);
-	
+
 	document.documentElement.removeAttribute("data-useragent");
-	
+
 	console.clear();
 	iterator = menucall(0);
 	while ((value = iterator.next().value)) {
@@ -2309,11 +2297,11 @@ eine@email.addresse und maskierte\@email.addresse
 			s = timeout;
 			eval(value);
 			while (s > 0) {
-				if (s === timeout - 1 && index === 20){
+				if (s === timeout - 1 && index === 20) {
 					// scroll orders to render all images and qr-codes
-					window.scroll({top:document.body.scrollHeight, behaviour:"smooth"});
+					window.scroll({ top: document.body.scrollHeight, behaviour: "smooth" });
 					await _.sleep(1000);
-					window.scroll({top:0, behaviour:"instant"});
+					window.scroll({ top: 0, behaviour: "instant" });
 				}
 				console.log(s);
 				await _.sleep(1000);
@@ -2370,4 +2358,9 @@ export function request_param() {
 	api.send("put", ["application", "start", "api"], null, null, payload);
 	api.send("get", ["application", "start", "api"], null, null, payload);
 	api.send("delete", ["application", "start", "api"], null, null, payload);
+}
+
+export function jsMarkdown(lang = "en") {
+	const MARKDOWN = new Markdown();
+	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], ['a', 'mail']);
 }
