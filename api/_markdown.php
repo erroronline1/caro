@@ -53,8 +53,8 @@ class MARKDOWN {
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 	private $_task = '/\[(\s*x{0,1}\s*)\] (.+?(?:\n|\Z))/mi';
 
-	private $headings = [];
-	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
+	private $_headers = [];
+	private $_headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
 
 	public function __construct()
 	{
@@ -231,9 +231,9 @@ class MARKDOWN {
 		// replace blockquotes recursively
 		$content = preg_replace_callback($this->_blockquote,
 			function($match) use ($sub){
-				$match[0] = $this->blockquote(preg_replace(['/^\n/', '/\n$/', '/^>/m', '/^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
+				$match[0] = $this->blockquote(preg_replace(['/^\n|\n$/', '/^> {0,1}|^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
 				if (!$sub) return "<blockquote>\n" . $match[0] . "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
-				return "<blockquote>" . $match[0] . "</blockquote>"; // fence with tag, add linebreak for pattern recognition
+				return "<blockquote>" . $match[0] . "</blockquote>"; // fence with tag
 			},
 			$content
 		);
@@ -297,11 +297,11 @@ class MARKDOWN {
 					$size = str_starts_with($match[5], '=') ? 1 : 2;
 					$heading = trim($match[4]);
 				}
-				preg_match($this->headerchars, $heading, $id);
+				preg_match($this->_headerchars, $heading, $id);
 				if (isset($match[3]) || isset($id[0])){
 					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($match[3] ?? $id[0])));
 					// enumerate
-					$existing = array_filter($this->headings, fn($e) => str_starts_with($e, $id));
+					$existing = array_filter($this->_headers, fn($e) => str_starts_with($e, $id));
 					if ($existing) {
 						sort($existing);
 						$last = array_pop($existing);
@@ -309,7 +309,7 @@ class MARKDOWN {
 						if (isset($numerate[1]) && $numerate[1]) $id .= '-' . intval($numerate[1]) + 1;
 						else $id .= '-1';
 					}
-					$this->headings[] = $id;
+					$this->_headers[] = $id;
 				}
 				return '<h' . $size . ' id="' . $id . '">' . $heading . '</h' . $size . ">";
 			},
@@ -386,7 +386,7 @@ class MARKDOWN {
 	}
 
 	private function mail($content){
-		// replace code
+		// replace mailto
 		$content = preg_replace_callback($this->_mail,
 			function($match){
 				$encoded_email = '';
@@ -439,7 +439,7 @@ class MARKDOWN {
 	}
 
 	private function sub($content){
-		// replace s
+		// replace sub
 		return preg_replace($this->_sub,
 			"<sub>$1</sub>",
 			$content
@@ -447,7 +447,7 @@ class MARKDOWN {
 	}
 
 	private function sup($content){
-		// replace s
+		// replace sup
 		return preg_replace($this->_sup,
 			"<sup>$1</sup>",
 			$content
