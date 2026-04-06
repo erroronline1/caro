@@ -837,7 +837,8 @@ article:has(> article) {
 	object-fit: contain;
 }
 
-pre {
+pre,
+code {
 	font-family: monospace;
 }
 
