@@ -95,7 +95,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$_markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN(true);
 		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
@@ -119,7 +119,7 @@ class PDF{
 				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), '<pre>' . substr($value, 8) . '</pre>', 0, 1, 0, true, '', true);
 			}
 			else {
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value), 0, 1, 0, true, '', true);
 			}
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -146,7 +146,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$_markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN(true);
 		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
@@ -200,7 +200,7 @@ class PDF{
 						break;
 					case 'markdown':
 						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value['value'], true), 0, 1, 0, true, '', true);
+						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value['value']), 0, 1, 0, true, '', true);
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
@@ -289,7 +289,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 1, 5, 1);
-		$_markdown = new MARKDOWN();
+		$_markdown = new MARKDOWN(true);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
@@ -311,7 +311,7 @@ class PDF{
 				}
 
 				// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $_markdown->md2html($value), 0, 1, 0, true, '', true);
 				//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -432,8 +432,8 @@ class PDF{
 				}
 				elseif (str_starts_with($values, '::MARKDOWN::')){
 					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
-					$_markdown = new MARKDOWN();
-					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html(substr($values, 12), true), 0, 1, 0, true, '', true);
+					$_markdown = new MARKDOWN(true);
+					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
 				}
 				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
