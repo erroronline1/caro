@@ -9,6 +9,20 @@
  */
 
 export class Markdown {
+	/*
+	markdown parser.
+	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
+
+	Current limitations:
+	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
+	* this flavour currently lacks support of
+		* definitions
+		* multiline code within lists
+		* syntax highlighting
+		* footnotes
+		* emojis
+	*/
+
 	_a_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
 	_a_md = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/gm; // regular md links
 	_blockquote = /(^>{1,} .*(?:\n|$|\Z))+/gm;
@@ -20,6 +34,7 @@ export class Markdown {
 	_headings = /(?:\A|^\n+^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/gm; // must be first line or have a linebreak before
 	_hr = /^ {0,3}(?:\-|\- |\*|\* ){3,}$/gm;
 	_img = /(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/g;
+	_inlineEvents = /on\w+?=('|").+?(?<!\\)\1|<script.+?\/script>/g;
 	_list_any = /(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>|\Z)/gim;
 	_list_nested = /\n(^ {4}.+?\n)+/gm;
 	_list_ol = /(^( ){0,3}(\d+\.) (.+?(?:\n|\Z)))+/gm;
@@ -47,36 +62,34 @@ export class Markdown {
 	/**
 	 *
 	 * @param {string} text to convert from markdown to html
-	 * @param {array} ignoredtags critical tags that should not be translated to html but specialchars instead
+	 * @param {bool} safeMode returns anchors as specialchars
 	 * @returns {string}
 	 */
-	md2html(text = "", ignoredTags = []) {
+	md2html(text = "", safeMode = false) {
+		text = text.replaceAll(/\r/g, "");
+
 		// ensure a proper processing order
-		// apply all tags if none selected else only apply selected
-		[
-			"blockquote", // should come first to enable nesting
-			"a",
-			"code",
-			"headings", // before hr avoiding conversion of ----
-			"hr", // before emphasis avoiding matching *** as emphasis
-			"emphasis",
-			"img",
-			"task", // before list otherwise only the first occasionally nested item is converted
-			"list",
-			"mail",
-			"mark",
-			"pre",
-			"s",
-			"sub",
-			"sup",
-			"table",
-			"p", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-			"br",
-			"escape", // should come after other stylings have been applied
-		].forEach((tag) => {
-			if (ignoredTags.includes(tag) & (tag in this.ignore)) text = this.ignore[tag](text);
-			else text = this[tag](text);
-		});
+		text = this.blockquote(text); // should come first to enable nesting
+		text = this.a(text, safeMode); // nonAdminUser-content can not render anchors to avoid malicious scripts
+		text = this.code(text);
+		text = this.headings(text); // before hr avoiding conversion of ----
+		text = this.hr(text); // before emphasis avoiding matching *** as emphasis
+		text = this.emphasis(text);
+		text = this.img(text);
+		text = this.task(text); // before list otherwise only the first occasionally nested item is converted
+		text = this.list(text);
+		text = this.mail(text, safeMode);
+		text = this.mark(text);
+		text = this.pre(text);
+		text = this.s(text);
+		text = this.sub(text);
+		text = this.sup(text);
+		text = this.table(text);
+		text = this.p(text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		text = this.br(text);
+		text = this.inlineEvents(text, safeMode);
+		text = this.escape(text); // should come after other stylings have been applied
+
 		return text;
 	}
 
@@ -86,8 +99,9 @@ export class Markdown {
 		});
 	}
 
-	ignore = {
-		a: (content) => {
+	a(content, safeMode = false) {
+		// replace links in this order
+		if (safeMode) {
 			return content
 				.replaceAll(this._a_auto, (...match) => {
 					return this.escapeHtml(match[0]);
@@ -95,16 +109,8 @@ export class Markdown {
 				.replaceAll(this._a_md, (...match) => {
 					return this.escapeHtml(match[0]);
 				});
-		},
-		mail: (content) => {
-			return content.replaceAll(this._mail, (...match) => {
-				return this.escapeHtml(match[0]);
-			});
-		},
-	};
+		}
 
-	a(content) {
-		// replace links in this order
 		return content.replaceAll(this._a_auto, '<a href="$1" target="_blank" class="inline">$1</a>').replaceAll(this._a_md, (...match) => {
 			let url = "";
 			if (match[2].startsWith("javascript:")) url = match[2];
@@ -120,10 +126,12 @@ export class Markdown {
 			return '<a href="' + url + '" class="inline">' + match[1] + "</a>" + match[4];
 		});
 	}
+
 	br(content) {
 		// replace linebreaks
 		return content.replaceAll(this._br, "<br />");
 	}
+
 	blockquote(content, sub = false) {
 		// replace blockquotes recursively
 		return content.replaceAll(this._blockquote, (...match) => {
@@ -132,16 +140,18 @@ export class Markdown {
 			return "<blockquote>" + match[0] + "</blockquote>"; // fence with tag, add linebreak for pattern recognition
 		});
 	}
+
 	code(content) {
 		return content
 			.replaceAll(this._code_block, (...match) => {
-				if (match[1] == match[3]) return "<pre>" + match[2]._replaceArray(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"]) + "</pre>";
+				if (match[1] == match[3]) return "<pre>" + this.escapeHtml(match[2]) + "</pre>";
 				return match[0];
 			})
 			.replaceAll(this._code_inline, (...match) => {
-				return "<code>" + match[2]._replaceArray(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"]) + "</code>";
+				return "<code>" + this.escapeHtml(match[2]) + "</code>";
 			});
 	}
+
 	emphasis(content) {
 		// replace all em and strong formatting
 		return content.replaceAll(this._emphasis, (...match) => {
@@ -156,9 +166,11 @@ export class Markdown {
 			return tags[wrapper][0] + match[2] + tags[wrapper][1];
 		});
 	}
+
 	escape(content) {
 		return content.replaceAll(this._escape, "$1");
 	}
+
 	headings(content) {
 		return content.replaceAll(this._headings, (...match) => {
 			let size, heading;
@@ -188,12 +200,24 @@ export class Markdown {
 			return "<h" + size + ' id="' + id + '">' + heading + "</h" + size + ">";
 		});
 	}
+
 	hr(content) {
 		return content.replaceAll(this._hr, "<hr>");
 	}
+
 	img(content) {
 		return content.replaceAll(this._img, '<img alt="$1" src="$2" style="float:left; max-width:100%" />');
 	}
+
+	inlineEvents(content, safeMode = false) {
+		// replace onclick, on-whatever with specialchars
+		if (safeMode)
+			return content.replaceAll(this._inlineEvents, (...match) => {
+				return this.escapeHtml(match[0]);
+			});
+		return content;
+	}
+
 	list(content, sub = false) {
 		content = content.replaceAll(this._list_any, (...list) => {
 			// check lists for subelements, lists, blockquote, code, table or pre
@@ -230,31 +254,44 @@ export class Markdown {
 		});
 		return content; //preg_replace('/^\n/', '', $content);
 	}
-	mail(content) {
+
+	mail(content, safeMode = false) {
+		if (safeMode)
+			return content.replaceAll(this._mail, (...match) => {
+				return this.escapeHtml(match[0]);
+			});
+
 		return content.replaceAll(this._mail, (...match) => {
 			return '<a href="mailto:' + match[0] + '">' + match[0] + "</a>";
 		});
 	}
+
 	mark(content) {
 		return content.replaceAll(this._mark, "<mark>$1</mark>");
 	}
+
 	p(content) {
 		return content.replaceAll(this._p, "<p>$1</p>\n");
 	}
+
 	pre(content) {
 		return content.replaceAll(this._pre, (...match) => {
-			return "<pre>" + match[0].replaceAll(/^ {4}/gm, "")._replaceArray(["&", "<", ">"], ["&amp;", "&lt;", "&gt;"]) + "</pre>";
+			return "<pre>" + this.escapeHtml(match[0].replaceAll(/^ {4}/gm, "")) + "</pre>";
 		});
 	}
+
 	s(content) {
 		return content.replaceAll(this._s, "<s>$1</s>");
 	}
+
 	sub(content) {
 		return content.replaceAll(this._sub, "<sub>$1</sub>");
 	}
+
 	sup(content) {
 		return content.replaceAll(this._sup, "<sup>$1</sup>");
 	}
+
 	table(content) {
 		return content.replaceAll(this._table, (...match) => {
 			let rows = match[0].split("\n");
@@ -298,6 +335,7 @@ export class Markdown {
 			return output;
 		});
 	}
+
 	task(content) {
 		return content.replaceAll(this._task, (...match) => {
 			return '<input type="checkbox" disabled' + (match[1].trim().length ? " checked" : "") + ' class="markdown"> ' + match[2];
