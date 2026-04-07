@@ -9,7 +9,7 @@
  */
 
 import { Assemble } from "../js/assemble.js";
-import { Markdown } from "../js/_markdown.js";
+import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 
 const markdown = {
 	en: `
@@ -118,6 +118,7 @@ some@mail.address and escaped\\@mail.address
 
 <script>alert('script injection')</script>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
+<a href="javascript:alert('click event')">href with click event</a>  
 [mdscript js href](javascript:alert('js href'))  
 <div onclick="alert(\\"you clicked!\\")">clickable div</div>
 `,
@@ -2370,6 +2371,6 @@ export function request_param() {
 export function jsMarkdown(lang = "en") {
 	const MARKDOWN = new Markdown();
 	console.time("markdown");
-	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true);
+	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis']);
 	console.timeEnd("markdown");
 }
