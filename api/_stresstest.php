@@ -804,9 +804,19 @@ some@mail.address and escaped\@mail.address
 [top header](#plain-text)  
 [second header](#plain-text-1)  
 [third header](#withcustomid)  
+
+### Misc
+
+<script>alert('script injection')</script>  
+<a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
+[mdscript js href](javascript:alert('js href'))  
+<div onclick="alert('you clicked!')">clickable div</div>
 END;
+		$start = microtime(true);
 		$markdown = new MARKDOWN();
-		return $markdown->md2html($sample);
+		$result = $markdown->md2html($sample, true);
+		$end = microtime(true);
+		return $result . ($end-$start);
 	}
 
 	/**

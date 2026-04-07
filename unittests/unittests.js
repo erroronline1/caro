@@ -113,6 +113,13 @@ some@mail.address and escaped\\@mail.address
 
 [top header](#plain-text)  
 [second header](#withcustomid)
+
+### Misc
+
+<script>alert('script injection')</script>  
+<a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
+[mdscript js href](javascript:alert('js href'))  
+<div onclick="alert(\\"you clicked!\\")">clickable div</div>
 `,
 	de: `
 # Einfacher Text (h1 Überschrift)
@@ -2362,5 +2369,7 @@ export function request_param() {
 
 export function jsMarkdown(lang = "en") {
 	const MARKDOWN = new Markdown();
-	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], ['a', 'mail']);
+	console.time("markdown");
+	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true);
+	console.timeEnd("markdown");
 }
