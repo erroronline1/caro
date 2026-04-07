@@ -600,7 +600,7 @@ class TOOL extends API {
 				$md = '';
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]['tmp_name']) {
 					// convert csv to markdown table
-					$markdown = new MARKDOWN();
+					$markdown = new \erroronline1\Markdown\Markdown();
 					try {
 						$md = $markdown->csv2md($_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]['tmp_name'][0], [
 							'separator' => CONFIG['csv']['dialect']['separator'],
@@ -621,7 +621,7 @@ class TOOL extends API {
 				}
 				elseif(($md = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'))) !== false ) {
 					// convert markdown table to csv
-					$markdown = new MARKDOWN();
+					$markdown = new \erroronline1\Markdown\Markdown();
 					try {
 						$result = $markdown->md2csv($md, [
 							'separator' => CONFIG['csv']['dialect']['separator'],
@@ -671,7 +671,7 @@ class TOOL extends API {
 				}
 				break;
 			default: // quick reference and editor
-				$preview = new MARKDOWN();
+				$preview = new \erroronline1\Markdown\Markdown();
 				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
 				$response = ['render' => [
 					'content' => [

@@ -33,6 +33,7 @@ Things are still in motion. Images may be outdated.
 * orders
     * check if similar items have been ordered recently?
     * highlight amount? (requires assemble micro markdown?)
+* implement _markdown.js instead of server prerendering to reduce payload. php still necessary for pdf though
 
 ## Content
 * [Aims](#aims)
@@ -2392,12 +2393,10 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
     * images can be embedded but lack proper fetching within CARO context due to the Service-Worker
-    * code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
     * multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
     * this flavour currently lacks support of
         * definitions
         * multiline code within lists
-        * inline HTML on purpose
 		* syntax highlighting
 		* footnotes
 		* emojis
@@ -6552,6 +6551,11 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 10 forks
     * [ASL 2.0 license](https://github.com/MatheusAvellar/textarea-line-numbers?tab=Apache-2.0-1-ov-file)
     * slightly modified to drop font names, font sizes and colours, .tln-wrapper top padding adjustments within css
+* [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
+    * renders Markdown to HTML
+    * Justification: formatting text without the need of a rich text editor.
+    * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
+    * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
     * SVG ui-icon files, not executable
     * Justification: "Der Mensch ist doch ein Augentier, schöne Dinge wünsch ich mir!"

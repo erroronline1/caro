@@ -809,11 +809,12 @@ some@mail.address and escaped\@mail.address
 
 <script>alert('script injection')</script>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
+<a href="javascript:alert('click event')">href with click event</a>  
 [mdscript js href](javascript:alert('js href'))  
 <div onclick="alert('you clicked!')">clickable div</div>
 END;
 		$start = microtime(true);
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 		$result = $markdown->md2html($sample, true);
 		$end = microtime(true);
 		return $result . ($end-$start);

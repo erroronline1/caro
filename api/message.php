@@ -127,7 +127,7 @@ class MESSAGE extends API {
 			];
 		}
 
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 		foreach($announcements as $announcement){
 			$announcementunits = $units;
 			$concerns = [];
@@ -285,7 +285,7 @@ class MESSAGE extends API {
 					$datalist[] = $row['name'];
 				}
 
-				$markdown = new MARKDOWN();
+				$markdown = new \erroronline1\Markdown\Markdown();
 
 				if ($this->_conversation){
 					// select conversation

@@ -942,7 +942,7 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1263,7 +1263,7 @@ class CALENDAR extends API {
 	 */
 	public function timesheet(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1819,7 +1819,7 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':

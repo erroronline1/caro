@@ -134,7 +134,7 @@ class APPLICATION extends API {
 
 		if (isset($_SESSION['user']) && !array_intersect(['patient'], $_SESSION['user']['permissions']) &&
 			ERPINTERFACE && ERPINTERFACE->_readme){
-			$markdown = new MARKDOWN();
+			$markdown = new \erroronline1\Markdown\Markdown();
 			$erpmd = file_get_contents(ERPINTERFACE->_readme);
 			$response['render']['content'][] = [
 				'type' => 'button',
@@ -567,7 +567,7 @@ class APPLICATION extends API {
 			// display current announcements
 			$recentannouncements = [];
 			$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_recent');
-			$markdown = new MARKDOWN();
+			$markdown = new \erroronline1\Markdown\Markdown();
 			foreach($announcements as $announcement){
 				$announcement['organizational_unit'] = array_filter(explode(',', $announcement['organizational_unit'] ? : ''), fn($u) => boolval($u));
 				if ($announcement['organizational_unit'] && !array_intersect($announcement['organizational_unit'], $_SESSION['user']['units'])) continue;

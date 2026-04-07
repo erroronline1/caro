@@ -324,7 +324,7 @@ class RECORD extends API {
 						else unset($subs['autocomplete']);
 					}
 					if (isset($subs['markdown']) && isset($subs['content'])){
-						$markdown = new MARKDOWN();
+						$markdown = new \erroronline1\Markdown\Markdown();
 						$subs['htmlcontent'] = $markdown->md2html($subs['content']);
 						unset ($subs['content']);
 					}
@@ -2444,7 +2444,7 @@ class RECORD extends API {
 
 						if ($subs['type'] === 'textsection'){
 							if (isset($subs['markdown']) && isset($subs['content'])){
-								$markdown = new MARKDOWN();
+								$markdown = new \erroronline1\Markdown\Markdown();
 								$value  = '::MARKDOWN::' . $markdown->md2html($subs['content']);
 							}
 							else $value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks

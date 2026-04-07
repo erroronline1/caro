@@ -92,7 +92,7 @@ class LANG {
 	 * @return object
 	 */
 	public function GETALL(){
-		$markdown = new MARKDOWN();
+		$markdown = new \erroronline1\Markdown\Markdown();
 		$return = $this->_USER;
 		foreach (['skills', 'documentcontext', 'regulatory', 'risks'] as $unset) {
 			unset($return[$unset]);

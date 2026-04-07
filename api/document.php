@@ -196,7 +196,7 @@ class DOCUMENT extends API {
 									unset ($sub['attributes']['data-required']);
 								}
 								if (isset($sub['markdown']) && isset($sub['content'])){
-									$markdown = new MARKDOWN();
+									$markdown = new \erroronline1\Markdown\Markdown();
 									$sub['htmlcontent'] = $markdown->md2html($sub['content']);
 									unset ($sub['content']);
 								}
@@ -2116,7 +2116,7 @@ class DOCUMENT extends API {
 				}
 				elseif ($subs['type'] === 'textsection'){
 					if (isset($subs['markdown']) && isset($subs['content'])){
-						$markdown = new MARKDOWN();
+						$markdown = new \erroronline1\Markdown\Markdown();
 						$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
 					}
 					else $content['content'][$name] = ['type' => 'textsection', 'value' => $subs['content'] ?? ''];

@@ -11,7 +11,7 @@
 
 namespace CARO\API;
 
-include_once('./_markdown.php');
+require(__DIR__ . '/../vendor/autoload.php');
 include_once('./_filehandler.php');
 
 class UTILITY {

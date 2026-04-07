@@ -39,7 +39,7 @@ class AUDIT extends API {
 
 		$this->_requestedType = $this->_requestedTemplate = REQUEST[2] ?? null;
 		$this->_requestedID = $this->_requestedOption = REQUEST[3] ?? null;
-		$this->_markdown = new MARKDOWN();
+		$this->_markdown = new \erroronline1\Markdown\Markdown();
 	}
 
 	/**
