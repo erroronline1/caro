@@ -2299,12 +2299,10 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es gibt einige Einschränkungen und Unterschiede zu [regulärem](https://www.rfc-editor.org/rfc/rfc7763.html) bzw. [GitHub-flavoured](https://github.github.com/gfm/) Markdown sofern man damit vertraut ist:
     * Bilder können eingebunden werden, aber aufgrund des Service-Workers im CARO-Zusammenhang nicht abgerufen werden
-    * Code-Blöcke werden nicht als \<code\>, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style ausgegeben
     * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden, das Verhalten von Zeilenumbrüchen innerhalb von Listen unterscheidet sich leicht
     * diese Variante unterstützt derzeit keine
         * Definitionen
         * Mehrzeiliger Code innerhalb von Listen
-        * HTML Direkteingabe (absichtlich)
 		* Syntax Highlighting
 		* Fußnoten
 		* Emojis
