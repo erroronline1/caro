@@ -17,12 +17,10 @@ class MARKDOWN {
 	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
 
 	Current limitations:
-	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
 	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
 	* this flavour currently lacks support of
 		* definitions
 		* multiline code within lists
-		* inline HTML on purpose
 		* syntax highlighting
 		* footnotes
 		* emojis
@@ -39,6 +37,7 @@ class MARKDOWN {
 	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
+		private $_inlineEvents = '/on\w+?=(\'|").+?(?<!\\)\1|<script.+?\/script>/mi'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>|\Z)/mi';
 	private $_list_nested = '/\n(^ {4}.+?\n)+/m';
 	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?(?:\n|\Z)))+/m';
@@ -56,7 +55,14 @@ class MARKDOWN {
 	private $_headers = [];
 	private $_headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
 
-	public function __construct()
+	// convert some tags currently nocht supported by the mentioned library
+	private $TCPDF = null;
+
+	/**
+	 * instatiate the interface
+	 * @param bool $TCPDF default null switches some tags for compatibility reasons
+	 */
+	public function __construct($TCPDF = null)
 	{
 		// rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_a_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))([^\)]|$)/m'; // regular md links
@@ -64,9 +70,13 @@ class MARKDOWN {
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
+		$this->_inlineEvents = '/on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\1|<script.+?\/script>/mi';
 		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
 		$this->_sub = '/(?<!' . preg_quote('\\', '/') . ')~{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{1}/';
 		$this->_sup = '/(?<!' . preg_quote('\\', '/') . ')\^{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{1}/';
+
+		$this->TCPDF = boolval($TCPDF); 
+
 	}
 
 	/**
@@ -163,22 +173,24 @@ class MARKDOWN {
 
 	/**
 	 * @param string $text Markdown styled
+	 * @param bool $safeMode returns anchors as specialchars
 	 * @return string as HTML
 	 */
-	public function md2html($text, $forPDF = false, $nonAdminUser = false){
+	public function md2html($text, $safeMode = false){
 		$text = preg_replace("/\r/", '', $text ?: '');
 
+		// ensure a proper processing order
 		$text = $this->blockquote($text); // should come first to enable nesting
-		$text = $this->a($text, $nonAdminUser); // nonAdminUser-content can not render anchors to avoid malicious scripts
+		$text = $this->a($text, $safeMode); // nonAdminUser-content can not render anchors to avoid malicious scripts
 		$text = $this->code($text);
 		$text = $this->headings($text); // before hr avoiding conversion of ----
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
 		$text = $this->emphasis($text);
 		$text = $this->img($text);
-		$text = $this->task($text, $forPDF); // before list otherwise only the first occasionally nested item is converted
+		$text = $this->task($text); // before list otherwise only the first occasionally nested item is converted
 		$text = $this->list($text);
-		$text = $this->mail($text);
-		$text = $this->mark($text, $forPDF);
+		$text = $this->mail($text, $safeMode);
+		$text = $this->mark($text);
 		$text = $this->pre($text);
 		$text = $this->s($text);
 		$text = $this->sub($text);
@@ -186,14 +198,28 @@ class MARKDOWN {
 		$text = $this->table($text);
 		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		$text = $this->br($text);
+		$text = $this->inlineEvents($text, $safeMode);
 		$text = $this->escape($text); // should come after other stylings have been applied
 
 		return $text;
 	}
 
-	private function a($content, $nonAdminUser = false){
-		if ($nonAdminUser) return $content;
+	private function a($content, $safeMode = false){
 		// replace links in this order
+		if ($safeMode) {
+			$content = preg_replace_callback($this->_a_auto,
+				function($match){
+					return htmlspecialchars(($match[0]));
+				},
+				$content);
+			$content = preg_replace_callback($this->_a_md,
+				function($match){
+					return htmlspecialchars(($match[0]));
+				},
+				$content);
+			return $content;
+		}
+
 		$content = preg_replace($this->_a_auto,
 			'<a href="$1" target="_blank" class="inline">$1</a>',
 			$content);
@@ -244,16 +270,27 @@ class MARKDOWN {
 		// replace code
 		$content = preg_replace_callback($this->_code_block,
 			function($match){
-				if ($match[1] == $match[3])	return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</pre>'; // i'd rather use code, but tcpdf does not support that
+				if ($match[1] == $match[3])	return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</pre>';
 				return $match[0];
 			},
 			$content);
-		$content = preg_replace_callback($this->_code_inline,
-			function($match){
-				return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</span>'; // i'd rather use code, but tcpdf does not support that
-			},
-			$content
-		);
+
+		if ($this->TCPDF) {
+			$content = preg_replace_callback($this->_code_inline,
+				function($match){
+					return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</span>'; // current implementation of tcpdf does not support code
+				},
+				$content
+			);
+		}
+		else {
+			$content = preg_replace_callback($this->_code_inline,
+				function($match){
+					return '<code>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</code>';
+				},
+				$content
+			);
+		}
 		return $content;
 	}
 
@@ -334,6 +371,18 @@ class MARKDOWN {
 		return $content;
 	}
 
+	private function inlineEvents($content, $safeMode){
+		// replace onclick, on-whatever with specialchars
+		if ($safeMode) {
+			return preg_replace_callback($this->_inlineEvents,
+				function($match){
+					return htmlspecialchars($match[0]);
+				},
+				$content);
+		}
+		return $content;
+	}
+
 	private function list($content, $sub = false){
 		// detect any lists
 		// recursively replace nested lists
@@ -385,9 +434,17 @@ class MARKDOWN {
 		return $content;//preg_replace('/^\n/', '', $content);
 	}
 
-	private function mail($content){
+	private function mail($content, $safeMode){
 		// replace mailto
-		$content = preg_replace_callback($this->_mail,
+		if ($safeMode) {
+			return preg_replace_callback($this->_mail,
+				function($match){
+					return htmlspecialchars(($match[0]));
+				},
+				$content);
+		}
+
+		return preg_replace_callback($this->_mail,
 			function($match){
 				$encoded_email = '';
 				for ($a = 0, $b = strlen($match[0]); $a < $b; $a++)
@@ -398,12 +455,11 @@ class MARKDOWN {
 			},
 			$content
 		);
-		return $content;
 	}
 
-	private function mark($content, $forPDF = false){
+	private function mark($content){
 		// replace mark
-		if ($forPDF) return preg_replace($this->_mark,  // current implementation of tcpdf does not support mark
+		if ($this->TCPDF) return preg_replace($this->_mark,  // current implementation of tcpdf does not support mark
 			"<span style=\"background-color:yellow\">$1</span>",
 			$content);
 
@@ -491,14 +547,15 @@ class MARKDOWN {
 		return $content;
 	}
 
-	private function task($content, $forPDF = false){
+	private function task($content){
 		//replace tasks
-		if ($forPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
+		if ($this->TCPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
 			function($match){
 				return (trim(strtolower($match[1])) ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];
 			},
 			$content
 		);
+
 		return preg_replace_callback($this->_task,
 			function($match){
 				return '<input type="checkbox" disabled' . (trim(strtolower($match[1])) ? ' checked': '') . ' class="markdown"> ' . $match[2];
