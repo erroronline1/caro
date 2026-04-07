@@ -1,6 +1,49 @@
 {
     "packages": [
         {
+            "name": "erroronline1/markdown",
+            "version": "v1.0.2",
+            "version_normalized": "1.0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erroronline1/markdown.git",
+                "reference": "baef5debbbf91db2cc0ed9afa3435f870928d9fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/baef5debbbf91db2cc0ed9afa3435f870928d9fe",
+                "reference": "baef5debbbf91db2cc0ed9afa3435f870928d9fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "time": "2026-04-07T21:30:57+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "erroronline1\\Markdown\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "erroronline1",
+                    "email": "dev@erroronline.one"
+                }
+            ],
+            "description": "Markdown compiler for PHP and ECMA-script.",
+            "support": {
+                "issues": "https://github.com/erroronline1/markdown/issues",
+                "source": "https://github.com/erroronline1/markdown/tree/v1.0.2"
+            },
+            "install-path": "../erroronline1/markdown"
+        },
+        {
             "name": "openspout/openspout",
             "version": "v5.3.0",
             "version_normalized": "5.3.0.0",

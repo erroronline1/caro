@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit96662d1f59aa64d8ac2140b75a7025a8
 {
     public static $prefixLengthsPsr4 = array (
+        'e' =>
+        array (
+            'erroronline1\\Markdown\\' => 22,
+        ),
         'O' =>
         array (
             'OpenSpout\\' => 10,
@@ -28,6 +32,10 @@ class ComposerStaticInit96662d1f59aa64d8ac2140b75a7025a8
     );
 
     public static $prefixDirsPsr4 = array (
+        'erroronline1\\Markdown\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/erroronline1/markdown/src',
+        ),
         'OpenSpout\\' =>
         array (
             0 => __DIR__ . '/..' . '/openspout/openspout/src',

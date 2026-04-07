@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'erroronline1\\Markdown\\' => array($vendorDir . '/erroronline1/markdown/src'),
     'OpenSpout\\' => array($vendorDir . '/openspout/openspout/src'),
     'Com\\Tecnick\\Unicode\\Data\\' => array($vendorDir . '/tecnickcom/tc-lib-unicode-data/src'),
     'Com\\Tecnick\\Unicode\\' => array($vendorDir . '/tecnickcom/tc-lib-unicode/src'),

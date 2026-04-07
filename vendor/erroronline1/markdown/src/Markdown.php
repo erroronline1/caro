@@ -1,7 +1,7 @@
 <?php
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
- * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
+ * [Markdown](https://github.com/erroronline1/markdown)
+ * Copyright (C) 2026 error on line 1 (dev@erroronline.one)
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
@@ -9,24 +9,10 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-namespace CARO\API;
+namespace erroronline1\Markdown;
 
-class MARKDOWN {
-	/*
-	markdown parser.
-	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
-
-	Current limitations:
-	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
-	* this flavour currently lacks support of
-		* definitions
-		* multiline code within lists
-		* syntax highlighting
-		* footnotes
-		* emojis
-	*/
-
-	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
+class Markdown {
+	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel|javacript):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 		private $_a_md = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/m'; // regular md links
 	private $_blockquote = '/(^>{1,} .*(?:\n|$|\Z))+/m';
 	private $_br = '/ +\n/';
@@ -168,7 +154,7 @@ class MARKDOWN {
 		fclose($file);
 		return [
 			'tmpfile' => $tmp_name, 
-			'headers' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', implode('_', $data[0]))];
+			'headers' => preg_replace('/([^\w\s\d,\.\[\]\(\)\-\+&])/', '_', implode('_', $data[0]))];
 	}
 
 	/**
@@ -181,7 +167,7 @@ class MARKDOWN {
 
 		// ensure a proper processing order
 		$text = $this->blockquote($text); // should come first to enable nesting
-		$text = $this->a($text, $safeMode); // nonAdminUser-content can not render anchors to avoid malicious scripts
+		$text = $this->a($text, $safeMode); // safeMode can not render anchors to avoid malicious scripts
 		$text = $this->code($text);
 		$text = $this->headings($text); // before hr avoiding conversion of ----
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
@@ -189,7 +175,7 @@ class MARKDOWN {
 		$text = $this->img($text);
 		$text = $this->task($text); // before list otherwise only the first occasionally nested item is converted
 		$text = $this->list($text);
-		$text = $this->mail($text, $safeMode);
+		$text = $this->mail($text, $safeMode); // safeMode can not render anchors to avoid malicious scripts
 		$text = $this->mark($text);
 		$text = $this->pre($text);
 		$text = $this->s($text);
@@ -198,7 +184,7 @@ class MARKDOWN {
 		$text = $this->table($text);
 		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		$text = $this->br($text);
-		$text = $this->inlineEvents($text, $safeMode);
+		$text = $this->inlineEvents($text, $safeMode); // safeMode can not render inline events and scripts to avoid malicious inserts
 		$text = $this->escape($text); // should come after other stylings have been applied
 
 		return $text;
@@ -270,7 +256,7 @@ class MARKDOWN {
 		// replace code
 		$content = preg_replace_callback($this->_code_block,
 			function($match){
-				if ($match[1] == $match[3])	return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</pre>';
+				if ($match[1] == $match[3])	return '<pre>' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $match[2]) . '</pre>';
 				return $match[0];
 			},
 			$content);
@@ -278,7 +264,7 @@ class MARKDOWN {
 		if ($this->TCPDF) {
 			$content = preg_replace_callback($this->_code_inline,
 				function($match){
-					return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</span>'; // current implementation of tcpdf does not support code
+					return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $match[2]) . '</span>'; // current implementation of tcpdf does not support code
 				},
 				$content
 			);
@@ -286,7 +272,7 @@ class MARKDOWN {
 		else {
 			$content = preg_replace_callback($this->_code_inline,
 				function($match){
-					return '<code>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</code>';
+					return '<code>' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $match[2]) . '</code>';
 				},
 				$content
 			);
@@ -479,7 +465,7 @@ class MARKDOWN {
 		// replace code/pre
 		$content = preg_replace_callback($this->_pre,
 			function($match){
-				return "<pre>" . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], preg_replace('/^ {4}/m', '', $match[0])) . "</pre>";
+				return "<pre>" . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], preg_replace('/^ {4}/m', '', $match[0])) . "</pre>";
 			},
 			$content
 		);

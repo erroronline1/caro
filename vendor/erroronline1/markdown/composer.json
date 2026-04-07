@@ -1,0 +1,20 @@
+{
+    "name": "erroronline1/markdown",
+    "description": "Markdown compiler for PHP and ECMA-script.",
+    "type": "library",
+    "require": {
+        "php": ">=8.0"
+    },
+    "license": "AGPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "erroronline1\\Markdown\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "erroronline1",
+            "email": "dev@erroronline.one"
+        }
+    ]
+}

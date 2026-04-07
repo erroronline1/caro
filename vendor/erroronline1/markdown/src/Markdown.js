@@ -1,6 +1,6 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
- * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
+ * [Markdown](https://github.com/erroronline1/markdown)
+ * Copyright (C) 2026 error on line 1 (dev@erroronline.one)
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
@@ -9,21 +9,7 @@
  */
 
 export class Markdown {
-	/*
-	markdown parser.
-	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
-
-	Current limitations:
-	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
-	* this flavour currently lacks support of
-		* definitions
-		* multiline code within lists
-		* syntax highlighting
-		* footnotes
-		* emojis
-	*/
-
-	_a_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
+	_a_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel|javascript):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
 	_a_md = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/gm; // regular md links
 	_blockquote = /(^>{1,} .*(?:\n|$|\Z))+/gm;
 	_br = / +\n/g;
@@ -63,31 +49,40 @@ export class Markdown {
 	 *
 	 * @param {string} text to convert from markdown to html
 	 * @param {bool} safeMode returns anchors as specialchars
+	 * @param (array) limitTo process only given methods, empty for all
 	 * @returns {string}
 	 */
-	md2html(text = "", safeMode = false) {
+	md2html(text = "", safeMode = false, limitTo = []) {
 		text = text.replaceAll(/\r/g, "");
 
 		// ensure a proper processing order
-		text = this.blockquote(text); // should come first to enable nesting
-		text = this.a(text, safeMode); // nonAdminUser-content can not render anchors to avoid malicious scripts
-		text = this.code(text);
-		text = this.headings(text); // before hr avoiding conversion of ----
-		text = this.hr(text); // before emphasis avoiding matching *** as emphasis
-		text = this.emphasis(text);
-		text = this.img(text);
-		text = this.task(text); // before list otherwise only the first occasionally nested item is converted
-		text = this.list(text);
-		text = this.mail(text, safeMode);
-		text = this.mark(text);
-		text = this.pre(text);
-		text = this.s(text);
-		text = this.sub(text);
-		text = this.sup(text);
-		text = this.table(text);
-		text = this.p(text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-		text = this.br(text);
-		text = this.inlineEvents(text, safeMode);
+		[
+			"blockquote", // should come first to enable nesting
+			"a", // safeMode can not render anchors to avoid malicious scripts
+			"code",
+			"headings", // before hr avoiding conversion of ----
+			"hr", // before emphasis avoiding matching *** as emphasis
+			"emphasis",
+			"img",
+			"task", // before list otherwise only the first occasionally nested item is converted
+			"list",
+			"mail", // safeMode can not render anchors to avoid malicious scripts
+			"mark",
+			"pre",
+			"s",
+			"sub",
+			"sup",
+			"table",
+			"p", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+			"br",
+			"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
+		].forEach((method) => {
+			if (!limitTo.length || limitTo.includes(method) || (safeMode && ["a", "mail", "inlineEvents"].includes(method))) {
+				if (["a", "mail", "inlineEvents"].includes(method)) text = this[method](text, safeMode);
+				else text = this[method](text);
+			}
+		});
+
 		text = this.escape(text); // should come after other stylings have been applied
 
 		return text;

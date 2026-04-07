@@ -4,8 +4,48 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "070bd7b42b9d66dc59c0cc0f92b2497f",
+    "content-hash": "01c14adb037690b983ec4a080bf0c875",
     "packages": [
+        {
+            "name": "erroronline1/markdown",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erroronline1/markdown.git",
+                "reference": "baef5debbbf91db2cc0ed9afa3435f870928d9fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/baef5debbbf91db2cc0ed9afa3435f870928d9fe",
+                "reference": "baef5debbbf91db2cc0ed9afa3435f870928d9fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "erroronline1\\Markdown\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "erroronline1",
+                    "email": "dev@erroronline.one"
+                }
+            ],
+            "description": "Markdown compiler for PHP and ECMA-script.",
+            "support": {
+                "issues": "https://github.com/erroronline1/markdown/issues",
+                "source": "https://github.com/erroronline1/markdown/tree/v1.0.2"
+            },
+            "time": "2026-04-07T21:30:57+00:00"
+        },
         {
             "name": "openspout/openspout",
             "version": "v5.3.0",
