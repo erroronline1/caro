@@ -95,7 +95,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$_markdown = new MARKDOWN(true);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
 		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
@@ -146,7 +146,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$_markdown = new MARKDOWN(true);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
 		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
@@ -289,7 +289,7 @@ class PDF{
 		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 1, 5, 1);
-		$_markdown = new MARKDOWN(true);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
@@ -432,7 +432,7 @@ class PDF{
 				}
 				elseif (str_starts_with($values, '::MARKDOWN::')){
 					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
-					$_markdown = new MARKDOWN(true);
+					$_markdown = new \erroronline1\Markdown\Markdown(true);
 					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $_markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
 				}
 				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
