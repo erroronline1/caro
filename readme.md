@@ -33,7 +33,6 @@ Things are still in motion. Images may be outdated.
 * orders
     * check if similar items have been ordered recently?
     * highlight amount? (requires assemble micro markdown?)
-* implement _markdown.js instead of server prerendering to reduce payload. php still necessary for pdf though
 
 ## Content
 * [Aims](#aims)
@@ -2391,15 +2390,8 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer. iOS with a Magic-Keyboard works though.
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
-* There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
+* There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that. See [source](https://github.com/erroronline1/markdown) for further details.
     * images can be embedded but lack proper fetching within CARO context due to the Service-Worker
-    * multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
-    * this flavour currently lacks support of
-        * definitions
-        * multiline code within lists
-		* syntax highlighting
-		* footnotes
-		* emojis
 * Timetracking makes use of time inputs for working hours and breaks which may be confusing if your browsers locale settings forces a 12h-layout. Please speak to your systems operator for a decent locale setting.
 
 [Content](#content)
@@ -5473,7 +5465,7 @@ Parameters
 
 Sample response without "table"
 ```
-{"content": [[{"type": "textsection","attributes": {"name": "Quick reference"},"content": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information"},{"type": "textarea","attributes": {"name": "Markdown editor","rows": 24,"value": "# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}},{"type": "button","attributes": {"value": "Convert CSV to Markdown and vice versa","onclick": "api.tool('get', 'markdown', 'table')","class": "inlinebutton"}}],[{"type": "textsection","attributes": {"name": "Preview"},"htmlcontent": "<h1 id=\"header\">Header</h1>\n\nParagraph with <em>italic</em>, <strong>bold</strong> and <s>striked through</s> formatting"}]]}
+{"render":{"content":[[{"type":"textsection","attributes":{"name":"Quick reference"},"mdcontent":"#### #### Header\n> \\> Quote\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, ~\\~sub\\~~, ^\\^sup\\^^\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n \nStyling will be processed by server after saving.  \nSee manual for more information."},{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}},{"type":"button","attributes":{"value":"Convert a CSV-table to Markdown and vice versa","onclick":"api.tool('get', 'markdown', 'table')","class":"inlinebutton"}}],[{"type":"textsection","attributes":{"name":"Preview"},"mdcontent":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}]]}}
 ```
 
 Sample response with "table"
