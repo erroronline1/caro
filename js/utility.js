@@ -736,7 +736,6 @@ export const _client = {
 							value: data.filter.timespan || "",
 						},
 						hint: api._lang.GET("assemble.render.datetime_local_hint"),
-
 					},
 					{
 						type: "button",
@@ -849,7 +848,7 @@ export const _client = {
 				// append ordertext
 				collapsible.push({
 					type: "textsection",
-					content:
+					mdcontent:
 						api._lang.GET("order.prepared_order_item", {
 							":quantity": element.quantity ? element.quantity : "",
 							":unit": element.unit ? element.unit : "",
@@ -858,6 +857,10 @@ export const _client = {
 							":vendor": element.vendor ? element.vendor : "",
 							":aut_idem": element.aut_idem ? element.aut_idem : "",
 						}) + (element.ordertext ? "\n" + element.ordertext : ""),
+					mdrestrictions: {
+						safeMode: true,
+						limitTo: ["list", "emphasis"],
+					},
 					attributes: {
 						name: api._lang.GET("order.ordertype." + element.ordertype),
 						"data-type": element.ordertype,
