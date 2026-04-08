@@ -681,7 +681,7 @@ class TOOL extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
 								],
-								'htmlcontent' => $preview->md2html($this->_lang->GET('tool.markdown.quick_reference'))
+								'mdcontent' => $this->_lang->GET('tool.markdown.quick_reference')
 							], [
 								'type' => 'textarea',
 								'attributes' => [
@@ -707,7 +707,7 @@ class TOOL extends API {
 							'attributes' => [
 								'name' => $this->_lang->get('tool.markdown.preview')
 							],
-							'htmlcontent' => $preview->md2html($markdown)
+							'mdcontent' => $markdown
 						]
 					];
 				}

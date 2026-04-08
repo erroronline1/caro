@@ -196,8 +196,7 @@ class DOCUMENT extends API {
 									unset ($sub['attributes']['data-required']);
 								}
 								if (isset($sub['markdown']) && isset($sub['content'])){
-									$markdown = new \erroronline1\Markdown\Markdown();
-									$sub['htmlcontent'] = $markdown->md2html($sub['content']);
+									$sub['mdcontent'] = $sub['content'];
 									unset ($sub['content']);
 								}
 								if ($sub) $result[] = $sub;

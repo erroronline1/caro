@@ -198,7 +198,7 @@ class MAINTENANCE extends API {
 		$response['render']['content'][] = [
 			[
 				'type' => 'textsection',
-				'htmlcontent' => $this->_lang->GET('maintenance.erp_connection.explanation', [':announcement' => '<a href="javascript: api.message(\'get\', \'announcements\')" class="inline">' . $this->_lang->GET('message.announcement.new') . '</a>'])
+				'mdcontent' => $this->_lang->GET('maintenance.erp_connection.explanation', [':announcement' => '<a href="javascript: api.message(\'get\', \'announcements\')" class="inline">' . $this->_lang->GET('message.announcement.new') . '</a>'])
 			],
 			[
 				'type' => 'radio',

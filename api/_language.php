@@ -92,12 +92,10 @@ class LANG {
 	 * @return object
 	 */
 	public function GETALL(){
-		$markdown = new \erroronline1\Markdown\Markdown();
 		$return = $this->_USER;
 		foreach (['skills', 'documentcontext', 'regulatory', 'risks'] as $unset) {
 			unset($return[$unset]);
 		}
-		$return['general']['search_pattern_content'] = $markdown->md2html($return['general']['search_pattern_content']);
 		return $return;
 	}
 	

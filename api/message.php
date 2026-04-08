@@ -127,7 +127,6 @@ class MESSAGE extends API {
 			];
 		}
 
-		$markdown = new \erroronline1\Markdown\Markdown();
 		foreach($announcements as $announcement){
 			$announcementunits = $units;
 			$concerns = [];
@@ -153,7 +152,7 @@ class MESSAGE extends API {
 						'name' => $announcement['subject'],
 						'class' => $announcement['highlight'] ? : null
 					],
-					'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
+					'mdcontent' => implode("  \n", $announcementcontent), 
 				]
 			];
 			if (PERMISSION::permissionFor('announcements')){
@@ -309,7 +308,7 @@ class MESSAGE extends API {
 							'content' => [
 								'img' => $this->_filehandler->getFileLink($conversation['image']),
 								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
-								'text' => !in_array($conversation['sender'], $administrativeUser) ? $markdown->md2html(strip_tags($conversation['message']), true) : $markdown->md2html($conversation['message']),
+								'text' => !in_array($conversation['sender'], $administrativeUser) ? $markdown->md2html($conversation['message'], true) : $markdown->md2html($conversation['message']),
 								'date' => $this->convertFromServerTime($conversation['timestamp']),
 							],
 							'attributes' =>  [

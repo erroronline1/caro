@@ -1416,7 +1416,6 @@ class ORDER extends API {
 
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				$markdown = new \erroronline1\Markdown\Markdown();
 				// display selected prepared orders 
 				if (count($organizational_orders)){
 					foreach ($organizational_orders as $order){ // order
@@ -1461,7 +1460,11 @@ class ORDER extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => $order_attributes,
-								'htmlcontent' => $markdown->md2html($items),
+								'mdcontent' => $items,
+								'mdrestrictions' => [
+									'safeMode' => true,
+									'limitTo' => ['list', 'emphasis']
+								]
 							],[
 								'type' => 'textsection',
 								'content' => $info,

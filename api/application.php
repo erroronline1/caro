@@ -134,7 +134,6 @@ class APPLICATION extends API {
 
 		if (isset($_SESSION['user']) && !array_intersect(['patient'], $_SESSION['user']['permissions']) &&
 			ERPINTERFACE && ERPINTERFACE->_readme){
-			$markdown = new \erroronline1\Markdown\Markdown();
 			$erpmd = file_get_contents(ERPINTERFACE->_readme);
 			$response['render']['content'][] = [
 				'type' => 'button',
@@ -144,7 +143,7 @@ class APPLICATION extends API {
 						[
 							[
 								'type' => 'textsection',
-								'htmlcontent' => preg_replace('/\n/', '<br />', addslashes($markdown->md2html($erpmd)))
+								'mdcontent' => addslashes($erpmd)
 							]
 						]
 					) . "')})"
@@ -567,7 +566,6 @@ class APPLICATION extends API {
 			// display current announcements
 			$recentannouncements = [];
 			$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_recent');
-			$markdown = new \erroronline1\Markdown\Markdown();
 			foreach($announcements as $announcement){
 				$announcement['organizational_unit'] = array_filter(explode(',', $announcement['organizational_unit'] ? : ''), fn($u) => boolval($u));
 				if ($announcement['organizational_unit'] && !array_intersect($announcement['organizational_unit'], $_SESSION['user']['units'])) continue;
@@ -588,7 +586,7 @@ class APPLICATION extends API {
 							'name' => $announcement['subject'],
 							'class' => $announcement['highlight'] ? : null
 						],
-						'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
+						'mdcontent' => implode("  \n", $announcementcontent), 
 					]
 				];
 			}
@@ -964,7 +962,10 @@ class APPLICATION extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('calendar.tasks.events_assigned_units')
 				],
-				'htmlcontent' => $markdown->md2html($displaytasks), 
+				'mdcontent' => $displaytasks,
+				'mdrestiction' => [
+					'safeMode' => true
+				]
 			];
 			// display todays worklists
 			if ($displayworklists) $overview[] = [
@@ -972,7 +973,10 @@ class APPLICATION extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('calendar.worklists.events_assigned_units')
 				],
-				'htmlcontent' => $markdown->md2html($displayworklists), 
+				'mdcontent' => $displayworklists, 
+				'mdrestiction' => [
+					'safeMode' => true
+				]
 			];
 			// display todays absent workmates (sick, vacation, etc.)
 			if ($displayabsentmates) $overview[] = [
@@ -980,7 +984,10 @@ class APPLICATION extends API {
 				'attributes' => [
 						'name' => $this->_lang->GET('calendar.timesheet.irregular')
 				],
-				'htmlcontent' => $markdown->md2html($displayabsentmates), 
+				'mdcontent' => $displayabsentmates, 
+				'mdrestiction' => [
+					'safeMode' => true
+				]
 			];
 
 			// add past unclosed events

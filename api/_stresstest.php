@@ -735,6 +735,8 @@ Plain text (h1 header)
         2. are interchangeable
 2. Ordered list item 2
 3. Ordered list item 3
+asdfadsf  
+asdfasdf
 
 * Unordered list items start with asterisk or dash
     1. the number
@@ -768,6 +770,19 @@ or being surrounded by
 three \` or ~
 ~~~
 
+#### Definitions and footnotes
+definition list
+: first definition
+: second definition
+
+Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
+
+[^1]: This is the first footnote.
+[^bignote]: Here's one with multiple paragraphs and code.
+    Indent paragraphs to include them in the footnote.
+    \`code\`
+    Add as many paragraphs as you like.
+
 ## Other features:  
 <http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
 some `code with <brackets>`  
@@ -786,11 +801,13 @@ some@mail.address and escaped\@mail.address
     |R1C1|R1C2|
 4. Last item
 
+
 ## Nested items in blockquotes
 
 > * List within blockquote 1
 > * List within blockquote 2
 >     * Nested list
+> 
 > ~~~
 > Code within blockquote
 > ~~~
@@ -800,12 +817,16 @@ some@mail.address and escaped\@mail.address
 > | :---------- | :-----: | ---: |
 > | are | possible | as well |
 > | like | aligning | colums |
+> 
+> definition list
+> : first definition
+> : second definition
 
 [top header](#plain-text)  
 [second header](#plain-text-1)  
 [third header](#withcustomid)  
 
-### Misc
+### Safety related content that should pose no thread with safeMode
 
 <script>alert('script injection')</script>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  

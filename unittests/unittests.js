@@ -27,7 +27,7 @@ also \`\`code with \` escaped by double backticks\`\` and ==marked text==
 Subscript like H~2~O and superscript like X^2^  
 [ ] task  
 [x] accomplished
-
+  
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
 [Styled link to Markdown information](https://www.markdownguide.org)
@@ -78,6 +78,19 @@ or being surrounded by
 three \` or ~
 ~~~
 
+#### Definitions and footnotes
+definition list
+: first definition
+: second definition
+
+Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
+
+[^1]: This is the first footnote.
+[^bignote]: Here's one with multiple paragraphs and code.
+    Indent paragraphs to include them in the footnote.
+    \`code\`
+    Add as many paragraphs as you like.
+
 ## Other features:  
 <http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
 some \`code with <brackets>\`  
@@ -110,11 +123,15 @@ some@mail.address and escaped\\@mail.address
 > | :---------- | :-----: | ---: |
 > | are | possible | as well |
 > | like | aligning | colums |
+> 
+> definition list
+> : first definition
+> : second definition
 
 [top header](#plain-text)  
 [second header](#withcustomid)
 
-### Misc
+### Safety related content that should pose no thread with safeMode
 
 <script>alert('script injection')</script>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
@@ -2371,6 +2388,7 @@ export function request_param() {
 export function jsMarkdown(lang = "en") {
 	const MARKDOWN = new Markdown();
 	console.time("markdown");
-	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis']);
+	document.body.innerHTML = MARKDOWN.md2html(markdown[lang]);
+//	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis']);
 	console.timeEnd("markdown");
 }

@@ -282,9 +282,9 @@ class AUDIT extends API {
 							'attributes' => [
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
-							'htmlcontent' => $this->_markdown->md2html($template['objectives'] .
+							'mdcontent' => $template['objectives'] .
 								(!$template['method'] ? '' : "  \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $template['method'])) .
-								($audit['id'] ? "\n\n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->convertFromServerTime($audit['last_touch']), ':user' => $audit['last_user']]) : ''))
+								($audit['id'] ? "  \n\n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->convertFromServerTime($audit['last_touch']), ':user' => $audit['last_user']]) : '')
 						], [
 							'type' => 'textsection',
 							'attributes' => [
@@ -582,8 +582,8 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . $this->convertFromServerTime($audit['last_touch']) . ' ' . $audit['last_user']
 					],
-					'htmlcontent' => $this->_markdown->md2html($this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives'] .
-						(!isset($audit['content']['method']) ? '' : " \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method'])))
+					'mdcontent' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives'] .
+						(!isset($audit['content']['method']) ? '' : "  \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']))
 				]
 			];
 			foreach ($audit['content']['questions'] as $question){
@@ -620,7 +620,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $currentquestion
 					],
-					'htmlcontent' => $this->_markdown->md2html($currentanswer)
+					'mdcontent' => $currentanswer
 				];
 
 				if (isset($question['files'])){
@@ -652,7 +652,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.audit.execute.summary', [], true)
 				],
-				'htmlcontent' => $this->_markdown->md2html($audit['content']['summary'])
+				'mdcontent' => $audit['content']['summary']
 			];
 			$current[] = [
 				'type' => 'button',
@@ -1258,11 +1258,11 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $document['author'], ':date' => $this->convertFromServerTime($document['date'], true)])
 				],
-				'htmlcontent' => $this->_markdown->md2html($entry)
+				'mdcontent' => $entry
 			];
 			if (!$has_components) {
 				$documentscontent[count($documentscontent) - 1]['attributes']['class'] = 'orange';
-				$documentscontent[count($documentscontent) - 1]['htmlcontent'] .="\n\n" . $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
+				$documentscontent[count($documentscontent) - 1]['mdcontent'] .="\n\n" . $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
 			}
 			$documentscontent[] = [
 				'type' => 'button',
@@ -1329,7 +1329,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents.in_use_bundles')
 				],
-				'htmlcontent' => ''
+				'mdcontent' => ''
 			]
 		];
 		foreach ($currentbundles as $bundle){
@@ -1340,7 +1340,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $bundle['author'], ':date' => $this->convertFromServerTime($bundle['date'], true)])
 				],
-				'htmlcontent' => $this->_markdown->md2html('* ' . implode("\n* ", $documentslist))
+				'mdcontent' => '* ' . implode("\n* ", $documentslist)
 			];
 		}
 		$content[] = $bundlescontent;
@@ -1366,8 +1366,8 @@ class AUDIT extends API {
 
 		for($i = 1; $i < count($documents); $i++){
 			foreach ($documents[$i] as $item){
-				if (array_key_exists('htmlcontent', $item) && isset($item['attributes']['name']))
-					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];
+				if (array_key_exists('mdcontent', $item) && isset($item['attributes']['name']))
+					$summary['content'][$item['attributes']['name']] = $item['mdcontent'];
 				elseif (array_key_exists('content', $item) && isset($item['description'])) // links
 					$summary['content'][$item['description']] = $item['content'];
 			}
@@ -1454,7 +1454,7 @@ class AUDIT extends API {
 					'name' => $document['name'],
 					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
 				],
-				'htmlcontent' => $this->_lang->GET('audit.documents.usage_info', [
+				'mdcontent' => $this->_lang->GET('audit.documents.usage_info', [
 					':date' => $this->convertFromServerTime($document['date']),
 					':regulatory' => implode(', ', $document['regulatory_context'] ? : []),
 					':count' => $count,
@@ -1587,7 +1587,7 @@ class AUDIT extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('audit.checks_type.incorporation')
 			],
-			'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
+			'mdcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
 		];
 
 		foreach ($incorporated as $product){
@@ -1601,7 +1601,10 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $product['article_no'] . ' ' . $product['article_name']
 				],
-				'htmlcontent' => $this->_markdown->md2html($incorporationInfo)
+				'mdcontent' => $incorporationInfo,
+				'mdrestrictions' => [
+					'safeMode' => true
+				]
 			];
 			$incorporations[$product['vendor_name']][] = [
 				'type' => 'button',
@@ -1619,7 +1622,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.incorporation.export_vendor', [':vendor' => $vendor])
 					],
-					'htmlcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
+					'mdcontent' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($_requestedDateTime, true)])
 				],
 				...$vendorchecks
 			];
@@ -1645,11 +1648,11 @@ class AUDIT extends API {
 
 		for($i = 3; $i<count($documents); $i++){
 			foreach ($documents[$i] as $item){
-				if (isset($item['content']) || isset($item['htmlcontent'])){
+				if (isset($item['content']) || isset($item['mdcontent'])){
 					if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
-					elseif (isset($item['htmlcontent']) && isset($item['attributes']['name']))
-						$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];
+					elseif (isset($item['mdcontent']) && isset($item['attributes']['name']))
+						$summary['content'][$item['attributes']['name']] = $item['mdcontent'];
 				}
 			}
 		}
@@ -1952,7 +1955,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $currentquestion
 					],
-					'htmlcontent' => $this->_markdown->md2html($currentanswer)
+					'mdcontent' => $currentanswer
 				];
 			}
 
@@ -2084,7 +2087,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => implode(' ', [$product['article_no'], $product['article_name']])
 				],
-				'htmlcontent' => $this->_markdown->md2html(implode("\n\n", $productchecks))
+				'mdcontent' => implode("\n\n", $productchecks)
 			];
 
 			if (PERMISSION::permissionFor('regulatoryoperation')) $checks[$product['vendor_name']][] = [
@@ -2135,8 +2138,8 @@ class AUDIT extends API {
 			foreach ($checks[$i] as $item){
 				if (isset($item['content']) && isset($item['attributes']['name']))
 					$summary['content'][$item['attributes']['name']] = $item['content'];
-				elseif (isset($item['htmlcontent']) && isset($item['attributes']['name']))
-					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];
+				elseif (isset($item['mdcontent']) && isset($item['attributes']['name']))
+					$summary['content'][$item['attributes']['name']] = $item['mdcontent'];
 			}
 		}
 		$downloadfiles = [];
@@ -2657,7 +2660,7 @@ class AUDIT extends API {
 							'data-type' => 'certificate',
 							'name' => BLOCKCHAIN::verified($this->_pdo, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
 						],
-						'htmlcontent' => $this->_markdown->md2html($report)
+						'mdcontent' => $report
 					]
 				];
 				if ($files) $summary[] = [
@@ -2706,7 +2709,7 @@ class AUDIT extends API {
 			if (!isset($item['type'])) continue;
 			switch ($item['type']){
 				case 'textsection':
-					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];	
+					$summary['content'][$item['attributes']['name']] = $item['mdcontent'];	
 					break;
 				case 'links':
 					$summary['files'] = array_keys($item['content']);
@@ -2930,7 +2933,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.risk_issues.' . $key, [':process' => $process])
 					],
-					'htmlcontent' => $this->_markdown->md2html($issuecontent)
+					'mdcontent' => $issuecontent
 				];
 			}
 		}
@@ -3012,7 +3015,7 @@ class AUDIT extends API {
 		$issues = $this->risks();
 		foreach ($issues as $issue){
 			if (!isset($issue['type'])) continue;
-			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['htmlcontent']) ? $issue['htmlcontent'] : ' ';	
+			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['mdcontent']) ? $issue['mdcontent'] : ' ';	
 		}
 		if (count($summary['content']) > 1){
 			$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
@@ -3777,7 +3780,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $vendor['name']
 				],
-				'htmlcontent' => $this->_markdown->md2html($info)
+				'mdcontent' => $info
 			];
 
 			// gather documents
@@ -3839,7 +3842,7 @@ class AUDIT extends API {
 		for($i = 1; $i < count($incorporations); $i++){
 			foreach ($incorporations[$i] as $item){
 				if ($item['type'] === 'textsection') {
-					$summary['content'][$item['attributes']['name']] = $item['htmlcontent'];
+					$summary['content'][$item['attributes']['name']] = $item['mdcontent'];
 					$previous = $item['attributes']['name'];
 				}
 				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . $item['description'] . "\n" . implode("\n", array_keys($item['content']));

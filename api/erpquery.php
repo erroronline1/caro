@@ -435,7 +435,7 @@ class ERPQUERY extends API {
 			}
 			$content[] = [
 				'type' => 'textsection',
-				'htmlcontent' => nl2br(UTILITY::json_encode($response, JSON_PRETTY_PRINT))
+				'mdcontent' => nl2br(UTILITY::json_encode($response, JSON_PRETTY_PRINT))
 			];
 
 		}

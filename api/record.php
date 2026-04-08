@@ -324,8 +324,7 @@ class RECORD extends API {
 						else unset($subs['autocomplete']);
 					}
 					if (isset($subs['markdown']) && isset($subs['content'])){
-						$markdown = new \erroronline1\Markdown\Markdown();
-						$subs['htmlcontent'] = $markdown->md2html($subs['content']);
+						$subs['mdcontent'] = $subs['content'];
 						unset ($subs['content']);
 					}
 
@@ -1421,7 +1420,7 @@ class RECORD extends API {
 						foreach($values as $value){
 							preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
 							if ($link){
-								$display .= '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>\n";
+								$display .= '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>  \n";
 								continue;
 							}
 							$display .= $value . "<br />";
@@ -1432,7 +1431,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'htmlcontent' => trim($display)
+								'mdcontent' => trim($display)
 							]);
 					}
 					if (isset($content['attachments'][$document])){
@@ -1531,7 +1530,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'htmlcontent' => implode("<br />", $value)
+								'mdcontent' => implode("  \n", $value)
 							]); 
 					}
 				}

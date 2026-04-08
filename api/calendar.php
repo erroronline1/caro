@@ -942,7 +942,6 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1081,7 +1080,10 @@ class CALENDAR extends API {
 				// add absent mates
 				$events[] = [
 					'type' => 'textsection',
-					'htmlcontent' => $markdown->md2html($displayabsentmates),
+					'mdcontent' => $displayabsentmates,
+					'mdrestiction' => [
+						'safeMode' => true
+					],
 					'attributes' => [
 						'data-type' => 'calendar',
 						'name' => $this->convertFromServerTime($this->_requestedDate, false, true)
@@ -1263,7 +1265,6 @@ class CALENDAR extends API {
 	 */
 	public function timesheet(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1426,7 +1427,10 @@ class CALENDAR extends API {
 				// add header and absent mates if applicable
 				$events[] = [
 					'type' => 'textsection',
-					'htmlcontent' => $markdown->md2html($displayabsentmates),
+					'mdcontent' => $displayabsentmates,
+					'mdrestiction' => [
+						'safeMode' => true
+					],
 					'attributes' => [
 						'data-type' => 'calendar',
 						'name' => $this->convertFromServerTime($this->_requestedDate)
@@ -1486,7 +1490,10 @@ class CALENDAR extends API {
 						'name' => $this->_lang->GET('calendar.worklists.events_assigned_units'),
 						'data-type' => 'calendar'
 					],
-					'htmlcontent' => $markdown->md2html($displayworklists), 
+					'mdcontent' => $displayworklists,
+					'mdrestiction' => [
+						'safeMode' => true
+					]
 				];
 
 				// display past unclosed scheduled tasks to raise awareness
@@ -1819,7 +1826,6 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-		$markdown = new \erroronline1\Markdown\Markdown();
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1953,7 +1959,10 @@ class CALENDAR extends API {
 				// add absent mates
 				$events[] = [
 					'type' => 'textsection',
-					'htmlcontent' => $markdown->md2html($displayabsentmates),
+					'mdcontent' => $displayabsentmates,
+					'mdrestiction' => [
+						'safeMode' => true
+					],
 					'attributes' => [
 						'data-type' => 'calendar',
 						'name' => $this->convertFromServerTime($this->_requestedDate, false, true)
