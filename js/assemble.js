@@ -12,6 +12,7 @@
 this module helps to assemble content according to the passed simplified object notation.
 */
 import QrCreator from "../vendor/qr-creator.js";
+import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 import Icons from "./icons.json" with { type: "json" };
 
 export function getNextElementID() {
@@ -1159,7 +1160,7 @@ export class Assemble {
 	 *
 	 * elements are assembled by default but can be assigned common html attributes
 	 * names are mandatory for input elements
-	 * @requires api, _client, JsBarcode, QrCreator, SignaturePad, TLN
+	 * @requires api, _client, JsBarcode, QrCreator, SignaturePad, TLN, Markdown
 	 * @param {object} setup render object
 	 */
 	constructor(setup) {
@@ -1174,6 +1175,7 @@ export class Assemble {
 		this.composer = setup.composer;
 		this.signaturePads = [];
 		this.doodledata = {};
+		this.Markdown = new Markdown();
 	}
 
 	/**
@@ -2698,7 +2700,7 @@ export class Assemble {
 				new Dialog({
 					type: "input",
 					header: api._lang.GET("general.search_pattern"),
-					render: [[{ type: "textsection", htmlcontent: api._lang.GET("general.search_pattern_content") }]],
+					render: [[{ type: "textsection", mdcontent: api._lang.GET("general.search_pattern_content") }]],
 					options: option,
 				});
 			};
@@ -3872,7 +3874,10 @@ export class Assemble {
 	 * 	{
 	 * 		"type": "textsection",
 	 * 		"content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-	 * 		"htmlcontent": "serverside preparsed <strong>html</strong>"
+	 * 		"mdcontent": "markdown to be parsed via Markdown library or raw html preparsed by server"
+	 * 		"mdrestriction": {
+	 * 			"safeMode": "boolean markdown safeMode preventing malicious injection"
+	 * 			"limitTo": ["emphasis", ...] applicable markdown methods according to Markdown module
 	 * 		"attributes": {
 	 * 			"name": "very informative, content of header, former description"
 	 * 			"otherattribute": "value applies to header"
@@ -3894,10 +3899,15 @@ export class Assemble {
 			p.append(...this.linebreak(this.currentElement.content));
 			result.push(p);
 		}
-		if (this.currentElement.htmlcontent) {
+		if (this.currentElement.mdcontent) {
 			p = document.createElement("p");
 			p.id = getNextElementID();
-			p.innerHTML = this.currentElement.htmlcontent;
+			let safeMode = false, limitTo=[];
+			if (this.currentElement.mdrestrictions){
+				safeMode = this.currentElement.mdrestrictions.safeMode || false;
+				limitTo = this.currentElement.mdrestrictions.limitTo || [];
+			} 
+			p.innerHTML = this.Markdown.md2html(this.currentElement.mdcontent, safeMode, limitTo);
 			result.push(p);
 		}
 
