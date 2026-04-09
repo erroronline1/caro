@@ -1003,7 +1003,7 @@ td {
 	}
 }
 
-img.markdown {
+img.eol1_md {
 	float: left;
 	max-width: 100%;
 }
@@ -1034,7 +1034,8 @@ a + a {
 	margin-top: 1.5em;
 }
 
-a.inline {
+a.inline,
+a.eol1_md {
 	display: inline !important;
 	margin: initial;
 }
@@ -1427,8 +1428,11 @@ header[data-type] {
 	margin-top: 1rem;
 }
 
-/* e.g. checkboxes*/
-.markdown {
+/*
+e.g. checkboxes
+styleable markdown elements from the respective module
+*/
+input.eol1_md {
 	width: auto !important;
 	height: auto !important;
 	appearance: auto !important;

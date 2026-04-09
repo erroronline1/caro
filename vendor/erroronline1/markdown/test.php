@@ -155,9 +155,9 @@ require_once('../vendor/erroronline1/markdown/src/Markdown.php');
 		<table>
 			<tr>
 				<th>
-					PHP (<?= ($end - $start); ?>)
+					PHP (<?= ($end - $start)*1000; ?> ms)
 				</th>
-				<th>
+				<th id="scriptheader">
 					ECMA-Script
 				</th>
 			</tr>
@@ -174,6 +174,8 @@ require_once('../vendor/erroronline1/markdown/src/Markdown.php');
 <script type="module">
 	import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 	const MARKDOWN = new Markdown();
+	const start = performance.now();
 	document.getElementById("scriptcolumn").innerHTML = MARKDOWN.md2html(<?= json_encode($sample, JSON_UNESCAPED_UNICODE); ?>);
+	document.getElementById("scriptheader").innerHTML += " (" + (performance.now()-start) + " ms)";
 </script>
 </html>

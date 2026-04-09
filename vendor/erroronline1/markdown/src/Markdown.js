@@ -107,13 +107,13 @@ export class Markdown {
 		// replace links in this order
 		return content
 			.replaceAll(this._a_auto, (...match) => {
-				if (match[0].startsWith("#")) return '<a href="' + match[0] + '" class="inline">' + match[0] + "</a>";
+				if (match[0].startsWith("#")) return '<a href="' + match[0] + '" class="eol1_md">' + match[0] + "</a>";
 				if (safeMode) return this.escapeHtml(match[0]);
-				return '<a href="' + match[0] + '" class="inline">' + match[0] + "</a>";
-				//return '<a href="' + match[0] + '" target="_blank" class="inline">' + match[0] + "</a>";
+				return '<a href="' + match[0] + '" class="eol1_md">' + match[0] + "</a>";
+				//return '<a href="' + match[0] + '" target="_blank" class="eol1_md">' + match[0] + "</a>";
 			})
 			.replaceAll(this._a_md, (...match) => {
-				if (match[2].startsWith("#")) return '<a href="' + match[2] + '" class="inline">' + match[1] + "</a>";
+				if (match[2].startsWith("#")) return '<a href="' + match[2] + '" class="eol1_md">' + match[1] + "</a>";
 				if (safeMode) return this.escapeHtml(match[0]);
 				let url = "";
 				if (match[2].startsWith("javascript:")) url = match[2];
@@ -126,21 +126,21 @@ export class Markdown {
 					//url += '" target="_blank';
 				}
 				if (match[3]) url += '" title="' + match[3].substring(2, match[3].length - 1);
-				return '<a href="' + url + '" class="inline">' + match[1] + "</a>" + match[4];
+				return '<a href="' + url + '" class="eol1_md">' + match[1] + "</a>" + match[4];
 			});
 	}
 
 	bigger(content) {
 		// make font size bigger - CUSTOM MARKDOWN
-		return content.replaceAll(this._bigger, '<span class="markdown" style="font-size:larger;">$1</span>');
+		return content.replaceAll(this._bigger, '<span class="eol1_md" style="font-size:larger;">$1</span>');
 	}
 
 	blockquote(content, sub = false) {
 		// replace blockquotes recursively
 		return content.replaceAll(this._blockquote, (...match) => {
 			match[0] = this.blockquote(match[0].replaceAll(/^\n|\n$/g, "").replaceAll(/^> {0,1}|^ /gm, ""), sub); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
-			if (sub) return "<blockquote>" + match[0] + "</blockquote>"; // fence with tag, add linebreak for pattern recognition
-			return "<blockquote>\n" + match[0] + "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
+			if (sub) return '<blockquote class="eol1_md">' + match[0] + "</blockquote>"; // fence with tag, add linebreak for pattern recognition
+			return "<blockquote class=\"md\">\n" + match[0] + "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
 		});
 	}
 
@@ -152,11 +152,11 @@ export class Markdown {
 	code(content, sub = false) {
 		return content
 			.replaceAll(this._code_block, (...match) => {
-				if (match[1] == match[3]) return "<pre>" + this.escapeHtml(match[2].replaceAll(/^\n|\n$/gm, "")) + "</pre>" + (sub ? "" : "\n");
+				if (match[1] == match[3]) return '<pre class="eol1_md">' + this.escapeHtml(match[2].replaceAll(/^\n|\n$/gm, "")) + "</pre>" + (sub ? "" : "\n");
 				return match[0];
 			})
 			.replaceAll(this._code_inline, (...match) => {
-				return "<code>" + this.escapeHtml(match[2]) + "</code>";
+				return '<code class="eol1_md">' + this.escapeHtml(match[2]) + "</code>";
 			});
 	}
 
@@ -167,7 +167,7 @@ export class Markdown {
 			match[2].split("\n").forEach((d) => {
 				if (d.length) definitions.push(d.substring(2));
 			});
-			return "<dl><dt>" + match[1] + "</dt><dd>" + definitions.join("</dd><dd>") + "</dd></dl>";
+			return '<dl class="eol1_md"><dt>' + match[1] + "</dt><dd>" + definitions.join("</dd><dd>") + "</dd></dl>";
 		});
 	}
 
@@ -204,7 +204,7 @@ export class Markdown {
 			if (!match[2]) {
 				if (!_footnotes[match[1]]) return "^" + match[1] + "^";
 				key = Object.keys(_footnotes).indexOf(match[1]) + 1;
-				return '^<a id="fnref:' + key + '" href="#fn:' + key + '" class="inline">' + key + "</a>^";
+				return '^<a id="fnref:' + key + '" href="#fn:' + key + '" class="eol1_md">' + key + "</a>^";
 			}
 			// delete actual footnote
 			return "";
@@ -213,7 +213,7 @@ export class Markdown {
 		let footnote_appendix = "";
 		for (const [link, footnote] of Object.entries(_footnotes)) {
 			key = Object.keys(_footnotes).indexOf(link) + 1;
-			footnote_appendix += '1. <a id="fn:' + key + '" class="inline"></a>' + footnote.trim() + ' <a href="#fnref:' + key + '" class="inline">&crarr;</a>' + "  \n";
+			footnote_appendix += '1. <a id="fn:' + key + '" class="eol1_md"></a>' + footnote.trim() + ' <a href="#fnref:' + key + '" class="eol1_md">&crarr;</a>' + "  \n";
 		}
 		return content + (footnote_appendix ? "\n<hr>\n" + footnote_appendix + "\n" : "");
 	}
@@ -253,7 +253,7 @@ export class Markdown {
 	}
 
 	img(content) {
-		return content.replaceAll(this._img, '<img alt="$1" src="$2" class="markdown" />');
+		return content.replaceAll(this._img, '<img alt="$1" src="$2" class="eol1_md" />');
 	}
 
 	inlineEvents(content, safeMode = false) {
@@ -291,7 +291,7 @@ export class Markdown {
 				if (list_line[2]) entries.push(list_line[3] + "\n");
 				else entries[entries.length - 1] += " " + list_line[3] + "\n";
 			}
-			return "<" + type + "><li>" + entries.join("</li><li>") + "</li></" + type + ">";
+			return "<" + type + ' class="eol1_md"><li>' + entries.join("</li><li>") + "</li></" + type + ">";
 		});
 		return content;
 	}
@@ -308,7 +308,7 @@ export class Markdown {
 	}
 
 	mark(content) {
-		return content.replaceAll(this._mark, "<mark>$1</mark>");
+		return content.replaceAll(this._mark, '<mark class="eol1_md">$1</mark>');
 	}
 
 	p(content) {
@@ -317,7 +317,7 @@ export class Markdown {
 
 	pre(content) {
 		return content.replaceAll(this._pre, (...match) => {
-			return "<pre>" + this.escapeHtml(match[0].replaceAll(/^ {4}/gm, "")) + "</pre>";
+			return '<pre class="eol1_md">' + this.escapeHtml(match[0].replaceAll(/^ {4}/gm, "")) + "</pre>";
 		});
 	}
 
@@ -347,7 +347,7 @@ export class Markdown {
 				else if (align[2]) alignment.push(' align="right"');
 				else alignment.push("");
 			});
-			let output = "<table>",
+			let output = '<table class="eol1_md">',
 				row;
 			for (let rowindex = 0; rowindex < rows.length; rowindex++) {
 				row = rows[rowindex];
@@ -379,7 +379,7 @@ export class Markdown {
 
 	task(content) {
 		return content.replaceAll(this._task, (...match) => {
-			return '<input type="checkbox" disabled' + (match[1].trim().length ? " checked" : "") + ' class="markdown"> ' + match[2];
+			return '<input type="checkbox" disabled' + (match[1].trim().length ? " checked" : "") + ' class="eol1_md"> ' + match[2];
 		});
 	}
 }
