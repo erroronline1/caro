@@ -1503,7 +1503,7 @@
 			"cancellation": "Cancellation"
 		},
 		"organizational_unit": "Organizational unit",
-		"prepared_order_item": "**:quantity** :unit :number :name by :vendor :aut_idem",
+		"prepared_order_item": "**^^:quantity^^** :unit :number :name by :vendor :aut_idem",
 		"product_not_in_database": "Product not in Database",
 		"productlink": "go to product",
 		"productname_label": "Product name",
