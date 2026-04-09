@@ -671,7 +671,6 @@ class TOOL extends API {
 				}
 				break;
 			default: // quick reference and editor
-				$preview = new \erroronline1\Markdown\Markdown();
 				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
 				$response = ['render' => [
 					'content' => [
