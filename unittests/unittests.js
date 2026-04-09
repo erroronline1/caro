@@ -14,6 +14,7 @@ import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 const markdown = {
 	en: `
 # Plain text (h1 header)
+(ATX)
 
 This is a markdown flavour for basic text styling.  
 Lines should end with two or more spaces  
@@ -25,42 +26,60 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.  
 also \`\`code with \` escaped by double backticks\`\` and ==marked text==  
 Subscript like H~2~O and superscript like X^2^  
+Custom markdown for this engine for making ^^font bigger^^ 
 [ ] task  
 [x] accomplished
-  
+
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
-[Styled link to Markdown information](https://www.markdownguide.org)
+[Styled link to markdown information](https://www.markdownguide.org)
+
+Plain text (h1 header)
+======================
+(SETX)
 
 --------
 
 ## Lists (h2 header) {#withcustomid}
 
 1. Ordered list items start with a number and a period
+	* Unordered list items start with asterisk or dash
     * Sublist nesting
     * is possible
     * by indentating with four spaces
         1. and list types
         2. are interchangeable
-2. Ordered list item 2
-3. Ordered list item 3
-
-* Unordered list items start with asterisk or dash
+2. Ordered list item
+with  
+multiple lines
     1. the number
     1. of ordered lists
     2. actually doesn't
     3. matter at all
-* Unordered list item 2
-* Unordered list item 3
 
-***
+### Nested items in lists
 
-### Tables (h3 header)
+1. List item with
+    > Blockquote as item
+2. Next list item with
+    |Table|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. List item with
+    ~~~
+     code with
+	multiple line
+    ~~~
+8. List item with  
+[x] accomplished task  
+[ ] unaccomplished task
+
+## Tables (h3 header)
 
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | --- | --- | --- |
 | *emphasis* | **is** | ***possible*** | \`too\` |
-| linebreaks | are | not | though<br />without<br />html-tag \`<br />\` |
+| linebreaks | are | not | though<br />without HTML \`<br />\` |
 
 - - -
 
@@ -75,45 +94,15 @@ a phone number: tel:012345678
 
 ~~~
 or being surrounded by
-three \` or ~
+three backticks or tilde-signs
 ~~~
 
-#### Definitions and footnotes
-definition list
-: first definition
-: second definition
-
-Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
-
-[^1]: This is the first footnote.
-[^bignote]: Here's one with multiple paragraphs and code.
-    Indent paragraphs to include them in the footnote.
-    \`code\`
-    Add as many paragraphs as you like.
-
-## Other features:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
-some \`code with <brackets>\`  
-mid*word*emphasis and __underscore emphasis__  
-some@mail.address and escaped\\@mail.address  
-![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
-123\\. escaped period avoiding a list
-
-### Nested items in lists
-
-1. List item with
-    > Blockquote as item
-2. Next list item with
-    |Table|Column2|
-    |---|---|
-    |R1C1|R1C2|
-4. Last item
-
-### Nested items in blockquotes
+#### Nested items in blockquotes
 
 > * List within blockquote 1
 > * List within blockquote 2
 >     * Nested list
+> 
 > ~~~
 > Code within blockquote
 > ~~~
@@ -128,19 +117,42 @@ some@mail.address and escaped\\@mail.address
 > : first definition
 > : second definition
 
-[top header](#plain-text)  
-[second header](#withcustomid)
+## Definitions and footnotes
+definition list
+: first definition
+: second definition
 
-### Safety related content that should pose no thread with safeMode
+Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
+
+[^1]: This is the first footnote.
+[^bignote]: Here's one with multiple paragraphs and code.
+    Indent paragraphs to include them in the footnote.
+    \`code\`
+    Add as many paragraphs as you like.
+
+## Other features:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
+some \`code with <brackets>\`  
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and escaped\\@mail.address  
+![an image](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) if loadable  
+123\\. escaped period avoiding a list
+
+[top header](#plain-text)  
+[second header](#plain-text-1)  
+[third header](#withcustomid)  
+
+### Safety related content that should pose lesser thread with safeMode
 
 <script>alert('script injection')</script>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
 <a href="javascript:alert('click event')">href with click event</a>  
 [mdscript js href](javascript:alert('js href'))  
-<div onclick="alert(\\"you clicked!\\")">clickable div</div>
+<div onclick="alert('you clicked!')">clickable div</div>
 `,
 	de: `
 # Einfacher Text (h1 Überschrift)
+(ATX)
 
 Dies ist eine Markdown-Variante für einfache Textgestaltung.  
 Zeilen sollten mit zwei oder mehr Leerzeichen enden  
@@ -152,6 +164,7 @@ Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich,
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.  
 Außerdem \`\`Code mit \` maskiert durch umgebende doppelte Gravis'\`\` und ==markierter Text==  
 Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
+Individuelles Markdown für diese Engine um ^^Schrift zu vergrößern^^  
 [ ] Aufgabe  
 [x] erledigt
 
@@ -163,23 +176,34 @@ eine Telefonnummer: tel:012345678
 
 ## Listen (h2 Überschrift) {#miteigenerid}
 
-1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+1. Geordnete Listeneinträge beginnen mit einer Zahl und einem Punkt
+    * Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
     * Verschachtelte Listen
     * sind möglich
     * mit einer Einrückung von vier Leerzeichen
         1. und Listenarten
         2. können kombiniert werden
-2. geordneter Listeneintrag 2
-3. geordneter Listeneintrag 3
+2. geordneter Listeneintrag
+mit  
+mehreren Zeilen
 
-* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
-    1. die Nummerierung
-    1. von geordneten Listen
-    2. spielt eigentlich
-    3. keine Rolle
-* ungeordneter Listeneintrag 2
-    - [x] mit Aufgabe
-* ungeordneter Listeneintrag 3
+### Verschachtelte Elemente in Listen
+
+1. Listeneintrag mit
+    > Zitatblock
+2. Ein weiterer Listeneintrag mit einer
+    |Tabelle|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. Listeneintrag mit
+    ~~~
+     Code mit
+    mehreren Zeilen
+    ~~~
+8. Listeneintrag mit  
+[x] erledigter Aufgabe  
+[ ] unerledigter Aufgabe
+
 
 ***
 
@@ -206,29 +230,12 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-## Sonstige Funktionen:  
-<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
-ein \`code mit <Klammern>\`  
-Betonung*im*Wort und __Betonung mit Unterstrich__  
-eine@email.addresse und maskierte\\@email.addresse  
-![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
-123\\. maskierter Punkt um eine Liste zu vermeiden
-
-### Verschachtelte Elemente in Listen
-
-1. Listeneintrag mit
-    > Zitatblock
-2. Ein weiterer Listeneintrag mit einer
-    |Tabelle|Spalte 2|
-    |---|---|
-    |Z1S1|Z1S2|
-4. Letzter Eintrag
-
 ### Verschachtelte Elemente in Zitatblöcken
 
 > * Listeneintrag innerhalb eines Zitatblocks 1
 > * Listeneintrag innerhalb eines Zitatblocks 2
 >     * Unterliste
+> 
 > ~~~
 > Code innerhalb eines Zitatblocks
 > ~~~
@@ -238,6 +245,31 @@ eine@email.addresse und maskierte\\@email.addresse
 > | :---------- | :-----: | -----: |
 > | sind | auch | möglich |
 > | so wie | spaltenweise | Ausrichtung |
+> 
+> Definitionsliste
+> : erste Definition
+> : zweite Definition
+
+## Definitionen und Fußnoten
+Definitionsliste
+: erste Definition
+: zweite Definition
+
+Eine einfache Fußnote[^1], und eine längere Fußnote[^bignote]. Fußnoten tauchen automatisch am Ende auf.
+
+[^1]: Dies ist die erste Fußnote.
+[^bignote]: Hier ist eine andere mit meheren Zeilen und Code.
+    Rücke Absätze ein um sie in der Fußnote einzubinden.
+    \`code\`
+    Füge so viele Zeilen ein, wie du willst.
+
+## Sonstige Funktionen:  
+<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
+ein \`code mit <Klammern>\`  
+Betonung*im*Wort und __Betonung mit Unterstrich__  
+eine@email.addresse und maskierte\\@email.addresse  
+![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
+123\\. maskierter Punkt um eine Liste zu vermeiden
 
 [erste Überschrift](#einfacher-text)  
 [zweite Überschrift](#miteigenerid)
@@ -2389,6 +2421,6 @@ export function jsMarkdown(lang = "en") {
 	const MARKDOWN = new Markdown();
 	console.time("markdown");
 	document.body.innerHTML = MARKDOWN.md2html(markdown[lang]);
-//	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis']);
+//	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis', 'bigger']);
 	console.timeEnd("markdown");
 }
