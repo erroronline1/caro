@@ -1535,8 +1535,8 @@ span.nocontent {
 
 [data-type]::before,
 [data-menu] ~ label::before,
-main a:not([data-type])::before,
-dialog a:not([data-type])::before {
+main a[href]:not([data-type])::before,
+dialog a[href]:not([data-type])::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
@@ -1572,8 +1572,8 @@ article > header[data-type]::before {
 	mask-image: url("./media/clone.svg");
 }
 
-main a:not([data-type])::before,
-dialog a:not([data-type])::before {
+main a[href]:not([data-type])::before,
+dialog a[href]:not([data-type])::before {
 	background-color: var(--cta_darker);
 	-webkit-mask-image: url("./media/external-link-alt.svg");
 	mask-image: url("./media/external-link-alt.svg");
