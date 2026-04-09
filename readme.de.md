@@ -1238,6 +1238,7 @@ Unterstütze Formatierungsoptionen beinhalten:
 
 ```
 # Einfacher Text (h1 Überschrift)
+(ATX)
 
 Dies ist eine Markdown-Variante für einfache Textgestaltung.  
 Zeilen sollten mit zwei oder mehr Leerzeichen enden  
@@ -1249,6 +1250,7 @@ Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich,
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `Code mit einem \`-Zeichen`.  
 Außerdem ``Code mit ` maskiert durch umgebende doppelte Gravis'`` und ==markierter Text==  
 Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
+Individuelles Markdown für diese Engine um ^Ŝchrift zu vergrößern^^  
 [ ] Aufgabe  
 [x] erledigt
 
@@ -1260,23 +1262,33 @@ eine Telefonnummer: tel:012345678
 
 ## Listen (h2 Überschrift) {#miteigenerid}
 
-1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+1. Geordnete Listeneinträge beginnen mit einer Zahl und einem Punkt
+    * Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
     * Verschachtelte Listen
     * sind möglich
     * mit einer Einrückung von vier Leerzeichen
         1. und Listenarten
         2. können kombiniert werden
-2. geordneter Listeneintrag 2
-3. geordneter Listeneintrag 3
+2. geordneter Listeneintrag
+mit  
+mehreren Zeilen
 
-* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
-    1. die Nummerierung
-    1. von geordneten Listen
-    2. spielt eigentlich
-    3. keine Rolle
-* ungeordneter Listeneintrag 2
-    - [x] mit Aufgabe
-* ungeordneter Listeneintrag 3
+### Verschachtelte Elemente in Listen
+
+1. Listeneintrag mit
+    > Zitatblock
+2. Ein weiterer Listeneintrag mit einer
+    |Tabelle|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. Listeneintrag mit
+    ~~~
+     Code mit
+    mehreren Zeilen
+    ~~~
+8. Listeneintrag mit  
+[x] erledigter Aufgabe  
+[ ] unerledigter Aufgabe
 
 ### Tabellen (h3 Überschrift)
 
@@ -1301,29 +1313,12 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-## Sonstige Funktionen:  
-<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
-ein `code mit <Klammern>`  
-Betonung*im*Wort und __Betonung mit Unterstrich__  
-eine@email.addresse und maskierte\@email.addresse  
-![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
-123\. maskierter Punkt um eine Liste zu vermeiden  
-
-### Verschachtelte Elemente in Listen
-
-1. Listeneintrag mit
-    > Zitatblock
-2. Ein weiterer Listeneintrag mit einer
-    |Tabelle|Spalte 2|
-    |---|---|
-    |Z1S1|Z1S2|
-4. Letzter Eintrag
-
 ### Verschachtelte Elemente in Zitatblöcken
 
 > * Listeneintrag innerhalb eines Zitatblocks 1
 > * Listeneintrag innerhalb eines Zitatblocks 2
 >     * Unterliste
+> 
 > ~~~
 > Code innerhalb eines Zitatblocks
 > ~~~
@@ -1333,6 +1328,31 @@ eine@email.addresse und maskierte\@email.addresse
 > | :---------- | :-----: | -----: |
 > | sind | auch | möglich |
 > | so wie | spaltenweise | Ausrichtung |
+> 
+> Definitionsliste
+> : erste Definition
+> : zweite Definition
+
+## Definitionen und Fußnoten
+Definitionsliste
+: erste Definition
+: zweite Definition
+
+Eine einfache Fußnote[^1], und eine längere Fußnote[^bignote]. Fußnoten tauchen automatisch am Ende auf.
+
+[^1]: Dies ist die erste Fußnote.
+[^bignote]: Hier ist eine andere mit meheren Zeilen und Code.
+    Rücke Absätze ein um sie in der Fußnote einzubinden.
+    `code`
+    Füge so viele Zeilen ein, wie du willst.
+
+## Sonstige Funktionen:  
+<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
+ein `code mit <Klammern>`  
+Betonung*im*Wort und __Betonung mit Unterstrich__  
+eine@email.addresse und maskierte\@email.addresse  
+![ein externes Bild](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) falls ladbar  
+123\. maskierter Punkt um eine Liste zu vermeiden  
 
 [erste Überschrift](#einfacher-text)  
 [zweite Überschrift](#miteigenerid)
