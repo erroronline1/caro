@@ -140,7 +140,7 @@ class ORDER extends API {
 							else $prepared['items'][0][$key] = $value;
 						}
 						// add initially approval date
-						$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . ' ';
+						$prepared['additional_info'] .= ($prepared['additional_info'] ? "  \n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . "  \n";
 						$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')) ? : '';
 						// clear unused keys
 						foreach ($prepared as $key => $value) {
@@ -171,11 +171,11 @@ class ORDER extends API {
 									$messagepayload[':' . $key] = $decoded_order_data[$value] ?? '';
 								}
 								$messagepayload[':info'] = $decoded_order_data['additional_info'] ?? '';
-								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
+								$message = str_replace("\n", ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
 									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-									], true)) . "\n \n" . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')));
+									], true)) . "\n  \n" . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')));
 								// userlist to decode orderer
 								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 								if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
@@ -200,7 +200,7 @@ class ORDER extends API {
 							case 'addinformation':
 								// append information to order
 								if (isset($decoded_order_data['additional_info'])){
-									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
+									$decoded_order_data['additional_info'] .= "  \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
 
@@ -233,7 +233,7 @@ class ORDER extends API {
 										array_push($organizational_unit, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
 									}
 
-									$this->alertUserGroup(['unit' => [$organizational_unit]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
+									$this->alertUserGroup(['unit' => [$organizational_unit]], str_replace("\n", ', ', $this->_lang->GET('order.alert_orderstate_change', [
 										':order' => $this->_lang->GET('order.message', $messagepayload, true),
 										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
 										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
@@ -243,11 +243,11 @@ class ORDER extends API {
 							case 'cancellation':
 								// append to information
 								if (isset($decoded_order_data['additional_info'])){
-									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
+									$decoded_order_data['additional_info'] .= "  \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
-									. "\n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered'];
+								$decoded_order_data['additional_info'] .= "  \n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
+									. "  \n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 								
 								// rewrite order as cancelled type
@@ -259,13 +259,13 @@ class ORDER extends API {
 							case 'return':
 								// append to order info 
 								if (isset($decoded_order_data['additional_info'])){
-									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
+									$decoded_order_data['additional_info'] .= "  \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
 								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
-								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
-									. "\n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered']
-									. "\n" . $this->_lang->GET('order.order.delivered_full', [], true) . ': ' . $order['delivered_full']
-									. "\n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
+								$decoded_order_data['additional_info'] .= "  \n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved']
+									. "  \n" . $this->_lang->GET('order.ordered_on', [], true) . ': ' . $order['ordered']
+									. "  \n" . $this->_lang->GET('order.order.delivered_full', [], true) . ': ' . $order['delivered_full']
+									. "  \n" . $this->_lang->GET('order.order.issued_full', [], true) . ': ' . $order['issued_full'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 
 								// determine criticality, append to info or review incorporation
@@ -571,7 +571,7 @@ class ORDER extends API {
 
 					// add additional info
 					if ($additional_information = UTILITY::propertySet($decoded_order_data, 'additional_info')){
-						$data['information'] = preg_replace(['/\r/', '/\\\\n|\\n/'], ['', "\n"], $additional_information);
+						$data['information'] = preg_replace(['/\r/', '/\\\\n|\\n/'], ['', "  \n"], $additional_information);
 					}
 
 					// add order reference if provided by erp interface
@@ -1463,7 +1463,7 @@ class ORDER extends API {
 								'mdcontent' => $items,
 								'mdrestrictions' => [
 									'safeMode' => true,
-									'limitTo' => ['list', 'emphasis']
+									'limitTo' => ['list', 'emphasis', 'bigger', 'br']
 								]
 							],[
 								'type' => 'textsection',
@@ -1679,7 +1679,7 @@ class ORDER extends API {
 		if ($return_reason = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.return_reason'))) $criticality = array_key_exists($return_reason, $this->_lang->_USER['orderreturns']['critical']) ? $return_reason : false;
 		elseif ($return_reason = ($decoded_order_data['return_reason'] ?? '')) $criticality = array_key_exists($return_reason, $this->_lang->_USER['orderreturns']['critical']) ? $return_reason : false;
 		if ($criticality !== false){
-			$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.critical.' . $criticality, [], true) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+			$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.critical.' . $criticality, [], true) . "  \n" . ($decoded_order_data['additional_info'] ?? '');
 			// append incorporation review if applicable and alert eligible users
 			if (isset($decoded_order_data['productid'])){
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -1701,13 +1701,13 @@ class ORDER extends API {
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
 						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . strip_tags(implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']])) . '</a>'
-						. "\n  ". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", strip_tags($decoded_order_data['additional_info']))], true)
+						. "  \n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", strip_tags($decoded_order_data['additional_info']))], true)
 					);
 				}
 			}
 		}
 		else {
-			$decoded_order_data['additional_info'] = ($this->_lang->_DEFAULT['orderreturns']['easy'][$return_reason] ?? $return_reason) . "\n" . ($decoded_order_data['additional_info'] ?? '');
+			$decoded_order_data['additional_info'] = ($this->_lang->_DEFAULT['orderreturns']['easy'][$return_reason] ?? $return_reason) . "  \n" . ($decoded_order_data['additional_info'] ?? '');
 		}
 		return $decoded_order_data;
 	}
