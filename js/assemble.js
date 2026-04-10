@@ -3270,6 +3270,7 @@ export class Assemble {
 
 				this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 				input = this.apply_attributes(this.currentElement.attributes, input);
+				inputid = input.id;
 			}
 			if (multiple) {
 				input.onchange = () => {
