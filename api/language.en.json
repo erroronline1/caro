@@ -494,7 +494,7 @@
 			"assign_hint_documents": "\"My units\" lists all documents for your assigned units including common.",
 			"assign_hint_bundles": "\"My units\" lists all document bundles for your assigned units",
 			"clear_signature": "Clear Signature",
-			"datetime_local_hint" :"Datum und Uhrzeit",
+			"datetime_local_hint" :"Date and time",
 			"error_faulty_widget": "This element does not adhere to the allowed syntax:",
 			"error_no_approved_components": "It seems all contents of this document have been deactivated. Please inform any of :permission to clean things up!",
 			"export": "Export document as PDF",
