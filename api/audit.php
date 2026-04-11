@@ -28,7 +28,6 @@ class AUDIT extends API {
 	private $_requestedTemplate = null;
 	private $_requestedID = null;
 	private $_requestedOption = null;
-	private $_markdown = null;
 
 	/**
 	 * init parent class and set private requests
@@ -39,7 +38,6 @@ class AUDIT extends API {
 
 		$this->_requestedType = $this->_requestedTemplate = REQUEST[2] ?? null;
 		$this->_requestedID = $this->_requestedOption = REQUEST[3] ?? null;
-		$this->_markdown = new \erroronline1\Markdown\Markdown();
 	}
 
 	/**
@@ -522,13 +520,13 @@ class AUDIT extends API {
 			// assign question response as value
 			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
-					$summary['content'][$currentquestion] .= "  \n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
+					$summary['content'][$currentquestion] .= "  \n*" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ':* ';
 					switch ($key){
 						case 'rating':
 							$summary['content'][$currentquestion] .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 							break;
 						case 'regulatory':
-							$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
+							if ($values[0])	$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0]))) . "\n\n";
 							break;
 						case 'files':
 							array_push($summary['files'], ...$values);
@@ -582,8 +580,8 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . $this->convertFromServerTime($audit['last_touch']) . ' ' . $audit['last_user']
 					],
-					'mdcontent' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives'] .
-						(!isset($audit['content']['method']) ? '' : "  \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']))
+					'mdcontent' => '*' . $this->_lang->GET('audit.audit.objectives', [], true). "*\n \n" . $audit['content']['objectives'] .
+						(!isset($audit['content']['method']) ? '' : "  \n*" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']) . '*')
 				]
 			];
 			foreach ($audit['content']['questions'] as $question){
@@ -600,13 +598,13 @@ class AUDIT extends API {
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 						if ($key === 'files') continue;
-						$currentanswer .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ';
+						$currentanswer .= '*' . (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ':* ';
 						switch ($key){
 							case 'rating':
 								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 								break;
 							case 'regulatory':
-								$currentanswer .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
+								if ($values[0])	$currentanswer .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0]))) . "\n\n";
 								break;
 							default:
 								$currentanswer .= implode("  \n", $values);
@@ -1228,7 +1226,7 @@ class AUDIT extends API {
 			// display document approval
 			foreach (json_decode($document['approval'], true) as $position => $data){
 				$entry .= '* ' . $this->_lang->GET('audit.documents.in_use_approved', [
-					':permission' => $this->_lang->GET('permissions.' . $position),
+					':permission' => $this->_lang->GET('permissions.' . $position, [], true),
 					':name' => $data['name'],
 					':date' => $this->convertFromServerTime($data['date']),
 				]) . "\n";
@@ -1239,18 +1237,23 @@ class AUDIT extends API {
 				if ($cmpnnt = latestApprovedComponent($components, $requestedTimestamp, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
-					$entry .= "\n*" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $cmpnnt['author'], ':date' => $this->convertFromServerTime($cmpnnt['date'])]) . "*\n";
+					$entry .= "\n*" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $cmpnnt['author'], ':date' => $this->convertFromServerTime($cmpnnt['date'])], true) . "*\n";
 					foreach ($cmpnnt['approval'] as $position => $data){
 						$entry .= '* ' . $this->_lang->GET('audit.documents.in_use_approved', [
 							':permission' => $this->_lang->GET('permissions.' . $position),
 							':name' => $data['name'],
 							':date' => $this->convertFromServerTime($data['date'], true),
-						]) . "\n";
+						], true) . "\n";
 					}
 				}
 			}
-			foreach (explode(',', $document['regulatory_context'] ? : '') as $context){
-				$entry .= "\n* " . ($this->_lang->_USER['regulatory'][$context] ?? $context);
+			if ($document['regulatory_context']){
+				$entry .= "\n\n**" . $this->_lang->GET('assemble.compose.document.regulatory_context', [], true) . "**\n"; 
+				foreach (explode(',', $document['regulatory_context'] ? : '') as $context){
+					if (!$context) continue;
+					$entry .= "\n* " . ($this->_lang->_DEFAULT['regulatory'][$context] ?? $context);
+				}
+				$entry .= "\n";
 			}
 
 			$documentscontent[] = [
@@ -1340,7 +1343,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $bundle['author'], ':date' => $this->convertFromServerTime($bundle['date'], true)])
 				],
-				'mdcontent' => '* ' . implode("\n* ", $documentslist)
+				'mdcontent' => '* ' . implode("  \n* ", $documentslist) . "\n"
 			];
 		}
 		$content[] = $bundlescontent;
@@ -1592,7 +1595,7 @@ class AUDIT extends API {
 
 		foreach ($incorporated as $product){
 			if (!isset($incorporations[$product['vendor_name']])) $incorporations[$product['vendor_name']] = [];
-			$incorporationInfo = "\n* " . preg_replace(['/\r/', '/\n+/'], ['', "\n* "], $product['incorporated']['_check']);
+			$incorporationInfo = "\n* " . preg_replace(['/\r/', '/\n+/'], ['', "\n* "], $product['incorporated']['_check']) . "\n\n";
 			foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 				if (isset($product['incorporated'][$permission])) $incorporationInfo .= "  \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date'], true);
 			}
@@ -1984,8 +1987,8 @@ class AUDIT extends API {
 	private function mdrsamplecheck(){
 		$content = $unchecked = [];
 
-		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: '2023-10-01T00:00';
-		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
+		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: '2026-03-01T00:00';
+		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':00');
 
 		// get unchecked articles for MDR §14 sample check
 		// this is actually faster than a nested sql query
@@ -2080,7 +2083,7 @@ class AUDIT extends API {
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
 			$productchecks = [];
 			foreach ($product['sample_checks'] as $check){
-				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck.edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true) . "\n\n* " . preg_replace('/\n+/', "\n* ", $check['content']);
+				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck.edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true) . "\n\n* " . preg_replace('/\n+/', "\n* ", $check['content']) . "\n";
 			}
 			$checks[$product['vendor_name']][] = [
 				'type' => 'textsection',
@@ -2103,6 +2106,7 @@ class AUDIT extends API {
 			];
 		}
 		ksort($checks);
+
 		foreach ($checks as $vendor => $vendorchecks){
 			$content[] = [
 				[
@@ -2110,7 +2114,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.mdrsamplecheck.export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $requestedTimestamp, true])
+					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $requestedTimestamp], true)
 				],
 				...$vendorchecks
 			];
@@ -2133,8 +2137,7 @@ class AUDIT extends API {
 		];
 
 		$checks = $this->mdrsamplecheck();
-
-		for($i = 3; $i < count($checks); $i++){
+		for($i = 2; $i < count($checks); $i++){
 			foreach ($checks[$i] as $item){
 				if (isset($item['content']) && isset($item['attributes']['name']))
 					$summary['content'][$item['attributes']['name']] = $item['content'];
