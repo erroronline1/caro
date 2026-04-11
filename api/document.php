@@ -2280,31 +2280,32 @@ class DOCUMENT extends API {
 				|| !PERMISSION::permissionIn($content['restricted_access']) // user lacks permission to restricted
 				|| $content['date'] > $requestedTimestamp) return []; // document date is younger than requested
 			$result = $content;
-			if ($content['context'] === 'component') {
-				$content['content'] = json_decode($content['content'], true);
-				$contentBody = $content['content']['content'];
-			}
-			elseif ($content['context'] === 'bundle') {
-				$contentBody = explode(',', $content['content']);
-			}
-			else {
-				foreach (explode(',', $content['content']) as $usedcomponent) {
-					// get latest approved by name
-					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
-						':name' => $usedcomponent
-					]);
-					foreach ($components as $component){
-						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
-						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
-						else $component = [];
+			switch($content['context']){
+				case 'component':
+					$content['content'] = json_decode($content['content'] ?: '', true);
+					$contentBody = $content['content']['content'];
+					break;
+				case 'bundle':
+					$contentBody = explode(',', $content['content']);
+					break;
+				default:
+					foreach (explode(',', $content['content']) as $usedcomponent) {
+						// get latest approved by name
+						$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
+							':name' => $usedcomponent
+						]);
+						foreach ($components as $component){
+							$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
+							if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
+							else $component = [];
+						}
+						if ($component){
+							$component['content'] = gettype($component['content']) === 'string' ?  json_decode($component['content'] ?: '', true) : $component['content'];
+							array_push($contentBody, ...$component['content']['content']);
+						}
 					}
-					if ($component){
-						$component['content'] = json_decode($component['content'], true);
-						array_push($contentBody, ...$component['content']['content']);
-					}
-				}
 			}
-		$result['content'] = $contentBody;
+			$result['content'] = $contentBody;
 		}
 		return $result;
 	}
