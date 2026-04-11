@@ -390,7 +390,7 @@ class CONSUMABLES extends API {
 						':incorporated' => UTILITY::json_encode($product['incorporated'])
 					]));
 				}
-				if (!array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
+				if (array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
 					$this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('order.incorporation.failure'),
