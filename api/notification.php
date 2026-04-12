@@ -854,7 +854,7 @@ class NOTIFICATION extends API {
 							foreach ($responsibilities as $row){
 								if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 									// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-									$reminders = $calendar->search('"' . $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true) . '"'); // literal
+									$reminders = $calendar->search('"' . $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], array_filter(explode(',', $row['units'] ? : ''), Fn($v) => boolval($v))))], true) . '"'); // literal
 									$open = false;
 									foreach ($reminders as $reminder){
 										if (!$reminder['closed']) $open = true;
@@ -868,7 +868,7 @@ class NOTIFICATION extends API {
 											':author_id' => 1,
 											':affected_user_id' => null,
 											':organizational_unit' => 'admin',
-											':subject' => $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
+											':subject' => $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], array_filter(explode(',', $row['units'] ? : ''), Fn($v) => boolval($v))))], true),
 											':misc' => null,
 											':closed' => null,
 											':alert' => 1,
