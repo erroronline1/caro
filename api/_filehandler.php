@@ -550,10 +550,22 @@ class FILEHANDLER{
 					break;
 			}
 			foreach ($dir as $file){
-				if (is_file($directory . '/' . $file) && !in_array($file, [
-					'.htaccess',
-					'web.config'
-				])) $result[] = $directory . '/' . $file;
+				if (
+					(
+						is_file($directory . '/' . $file)
+						&& !in_array($file, [
+							'.htaccess',
+							'web.config'
+						])
+					) || 
+					(	// consider snapshot directories in tmp as well. double check if dir is in assigned tmp, otherwise this is nasty.
+						is_dir($directory . '/' . $file)
+						&& !in_array($file, ['.', '..'])
+						&& $directory . '/' . $file === self::directory('tmp', [
+							':snapshot' => $file
+						])
+					)
+				) $result[] = $directory . '/' . $file;
 			}
 			return $result;
 		}
