@@ -11,7 +11,6 @@
 export class Markdown {
 	_a_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
 	_a_md = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/gm; // regular md links
-	_bigger = /(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/g;
 	_blockquote = /(^>{1,} .*(?:\n|$))+/gm;
 	_br = / +\n/g;
 	_code_block = /^ {0,3}([`~]{3}.*?)\n((?:.+?\n)+)^ {0,3}([`~]{3})\n/gm;
@@ -24,6 +23,7 @@ export class Markdown {
 	_hr = /^ {0,3}(?:\-|\- |\*|\* ){3,}$/gm;
 	_img = /(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/g;
 	_inlineEvents = /on\w+?=('|").+?(?<!\\)\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|href=(\'|")javascript:.+?(?<!\\)\3/gi;
+	_larger = /(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/g;
 	_list_any = /((?:^ {0,3})(\*|\-|\+|\d+\.) (?:.|\n)+?)(?:\n$)/gim;
 	_list_indented = /\n(^ {4}.+?\n)+/gm;
 	_list_line = /(^ {0,3}(\*|\-|\+|\d+\.) )*(.+)/;
@@ -36,6 +36,7 @@ export class Markdown {
 	_sup = /(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/g;
 	_table = /^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/gm;
 	_task = /\[(\s*x{0,1}\s*)\] (.+?(?:\n))/gim;
+	_tidy_nl = />\n+|\n *<|[^>]\n+<[^\/]/gm;
 
 	_headers = [];
 	_headerchars = /[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/;
@@ -55,7 +56,7 @@ export class Markdown {
 	 * @returns {string}
 	 */
 	md2html(text = "", safeMode = false, limitTo = []) {
-		text = text.replaceAll(/\r/g, "").replaceAll(/\t/g, "    ");
+		text = text.replaceAll(/\r/g, "").replaceAll(/\t/g, "    ") + "\n"; // add a new line for improved pattern matching by default
 
 		// ensure a proper processing order
 		[
@@ -74,7 +75,7 @@ export class Markdown {
 			"mark",
 			"pre",
 			"s",
-			"bigger", // before sup for using the same character twice
+			"larger", // before sup for using the same character twice
 			"sub",
 			"sup",
 			"table",
@@ -89,8 +90,8 @@ export class Markdown {
 		});
 
 		text = this.escape(text); // should come after other stylings have been applied
-		text = text.replaceAll(/>\n+</gm, '><').replaceAll(/\n *<\//gm, '</'); // delete empty lines betwen tags
-		
+		text = this.tidy_nl(text);
+
 		return "<!-- Markdown parsing by error on line 1, https://github.com/erroronline1/markdown -->\n" + text;
 	}
 
@@ -102,6 +103,13 @@ export class Markdown {
 
 	debug(...content) {
 		console.log(...content);
+	}
+
+	tidy_nl(content) {
+		// strip new lines near tags to compress result
+		return content.replaceAll(this._tidy_nl, (...match) => {
+			return match[0].replaceAll(/[\n\s]+/g, " ");
+		});
 	}
 
 	a(content, safeMode = false) {
@@ -131,17 +139,12 @@ export class Markdown {
 			});
 	}
 
-	bigger(content) {
-		// make font size bigger - CUSTOM MARKDOWN
-		return content.replaceAll(this._bigger, '<span class="eol1_md" style="font-size:larger;">$1</span>');
-	}
-
 	blockquote(content, sub = false) {
 		// replace blockquotes recursively
 		return content.replaceAll(this._blockquote, (...match) => {
 			match[0] = this.blockquote(match[0].replaceAll(/^\n|\n$/g, "").replaceAll(/^> {0,1}|^ /gm, ""), sub); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
 			if (sub) return '<blockquote class="eol1_md">' + match[0] + "</blockquote>"; // fence with tag, add linebreak for pattern recognition
-			return "<blockquote class=\"eol1_md\">\n" + match[0] + "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
+			return '<blockquote class="eol1_md">\n' + match[0] + "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
 		});
 	}
 
@@ -266,6 +269,11 @@ export class Markdown {
 		return content;
 	}
 
+	larger(content) {
+		// make font size larger - CUSTOM MARKDOWN
+		return content.replaceAll(this._larger, '<span class="eol1_md" style="font-size:larger;">$1</span>');
+	}
+
 	list(content, sub = false) {
 		content = content.replaceAll(this._list_any, (...match) => {
 			// check lists for subelements, lists, blockquote, code, table or pre
@@ -289,8 +297,10 @@ export class Markdown {
 				list_line;
 			for (const line of match[1].split("\n")) {
 				list_line = line.match(this._list_line);
-				if (list_line[2]) entries.push(list_line[3] + "\n"); // add trailing linebreak to preserve pattern recognition
-				else entries[entries.length - 1] += " " + list_line[3] + "\n"; // add trailing linebreak to preserve pattern recognition
+				if (list_line){
+					if (!entries[entries.length - 1] || list_line[2]) entries.push(list_line[3] + "\n"); // add trailing linebreak to preserve pattern recognition
+					else entries[entries.length - 1] += " " + list_line[3] + "\n"; // add trailing linebreak to preserve pattern recognition
+				}
 			}
 			return "<" + type + ' class="eol1_md"><li>' + entries.join("</li><li>") + "</li></" + type + ">";
 		});

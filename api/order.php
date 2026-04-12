@@ -1463,7 +1463,7 @@ class ORDER extends API {
 								'mdcontent' => $items,
 								'mdrestrictions' => [
 									'safeMode' => true,
-									'limitTo' => ['list', 'emphasis', 'bigger', 'br']
+									'limitTo' => ['list', 'emphasis', 'larger', 'br']
 								]
 							],[
 								'type' => 'textsection',

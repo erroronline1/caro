@@ -2,23 +2,23 @@
     "packages": [
         {
             "name": "erroronline1/markdown",
-            "version": "v1.1.2",
-            "version_normalized": "1.1.2.0",
+            "version": "v1.1.5",
+            "version_normalized": "1.1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/erroronline1/markdown.git",
-                "reference": "f48101d660fd1f14f2446112c723352399469435"
+                "reference": "60d11aa0bd7d6aae79ca5ac1f2ed85c83c1a459d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/f48101d660fd1f14f2446112c723352399469435",
-                "reference": "f48101d660fd1f14f2446112c723352399469435",
+                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/60d11aa0bd7d6aae79ca5ac1f2ed85c83c1a459d",
+                "reference": "60d11aa0bd7d6aae79ca5ac1f2ed85c83c1a459d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.0"
             },
-            "time": "2026-04-10T22:50:55+00:00",
+            "time": "2026-04-11T23:23:24+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -39,7 +39,7 @@
             "description": "Markdown compiler for PHP and ECMA-script.",
             "support": {
                 "issues": "https://github.com/erroronline1/markdown/issues",
-                "source": "https://github.com/erroronline1/markdown/tree/v1.1.2"
+                "source": "https://github.com/erroronline1/markdown/tree/v1.1.5"
             },
             "install-path": "../erroronline1/markdown"
         },

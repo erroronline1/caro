@@ -14,7 +14,7 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.  
 also ``code with ` escaped by double backticks`` and ==marked text==  
 Subscript like H~2~O and superscript like X^2^  
-Custom markdown for this engine for making ^^font bigger^^ 
+Custom markdown for this engine for making ^^font larger^^ 
 [ ] task  
 [x] accomplished
 
@@ -200,7 +200,7 @@ $end = microtime(true);
 				PHP (<?= round(($end - $start) * 1000, 2); ?> ms)
 			</th>
 			<th id="scriptheader">
-				ECMA-Script
+				ECMAScript
 			</th>
 		</tr>
 		<tr>
