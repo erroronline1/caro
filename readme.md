@@ -32,6 +32,11 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
+* more compression of order attachment images
+* ::markdown:: in composer => mdcontent / also _pdf.php
+* order document as fallback
+* audit preparation and execution markdown available button for textareas
+* product search labels with separate text including article name?
 
 ## Content
 * [Aims](#aims)
