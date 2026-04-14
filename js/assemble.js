@@ -3625,6 +3625,7 @@ export class Assemble {
 	 * 		"content": [
 	 * 			[{"c": "th", "a":{}}, {"c": "th", "a":{}}, {"c": "th", "a":{}}, ...],
 	 * 			[{"c": "td", "a":{}}, {"c": "td", "a":{}}, {"c": "td", "a":{}}, ...],
+	 * 			[{"c": "td", "a":{"md": true}}, {"c": "td", "a":{"mds" = true}}, {"c": "td", "a":{}}, ...],
 	 * 			...
 	 * 		],
 	 * 		"hint": "read this like..."
@@ -3636,7 +3637,9 @@ export class Assemble {
 		let result = [...this.header()],
 			tr,
 			td,
-			cell;
+			cell,
+			md,
+			mds;
 		const table = document.createElement("table");
 
 		for (let row = 0; row < this.currentElement.content.length; row++) {
@@ -3644,10 +3647,19 @@ export class Assemble {
 			for (let column = 0; column < this.currentElement.content[row].length; column++) {
 				cell = this.currentElement.content[row][column];
 				td = document.createElement(row > 0 ? "td" : "th");
-
-				td = this.apply_attributes(cell.a || {}, td);
+				
+				md = mds = false; // reset markdown modes
+				if (cell.a) {
+					md = "md" in cell.a;
+					mds = "mds" in cell.a;
+					delete cell.a.md;
+					delete cell.a.mds;
+					td = this.apply_attributes(cell.a || {}, td);
+				}
 				if (cell.c) {
-					td.append(document.createTextNode(cell.c));
+					if (md) td.innerHTML = this.Markdown.md2html(cell.c);
+					else if (mds) td.innerHTML = this.Markdown.md2html(cell.c, true);
+					else td.append(document.createTextNode(cell.c));
 				}
 				tr.append(td);
 			}

@@ -1738,6 +1738,7 @@ export const _client = {
 						}),
 						a: {
 							"data-type": element.ordertype,
+							"mds": true
 						},
 					},
 					{ c: api._lang.GET("order.ordertype." + element.ordertype) + " " + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }) },
@@ -1828,9 +1829,7 @@ export const _client = {
 				// append ordertext
 				order.push({
 					type: "textsection",
-					content: api._lang.GET("order.ordertype." + element.ordertype) + "\n" + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }),
-					attributes: {
-						name: api._lang.GET("order.prepared_order_item", {
+					mdcontent: api._lang.GET("order.prepared_order_item", {
 							":quantity": element.quantity ? element.quantity : "",
 							":unit": element.unit ? element.unit : "",
 							":number": element.ordernumber ? element.ordernumber : "",
@@ -1838,6 +1837,12 @@ export const _client = {
 							":vendor": element.vendor ? element.vendor : "",
 							":aut_idem": element.aut_idem ? element.aut_idem : "",
 						}),
+					mdrestrictions:{
+						safeMode:true,
+						limitTo: ['emphasis', 'larger']
+					},
+					attributes: {
+						name: api._lang.GET("order.ordertype." + element.ordertype) + "\n" + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }),
 						"data-type": element.ordertype,
 					},
 				});
