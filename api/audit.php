@@ -383,6 +383,14 @@ class AUDIT extends API {
 									'value' => isset($preset[$question['question']]) ? $preset[$question['question']][0] : ''
 								]
 							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('tool.markdown.button'),
+									'data-type' => 'markdown',
+									'class' => 'floatright',
+									'onclick' => 'api.tool("get", "markdown")'
+								]
+							], [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => implode(', ' , array_map(fn($r) => $this->_lang->_USER['regulatory'][$r] ?? $r, explode(',', $question['regulatory'])))
@@ -406,6 +414,14 @@ class AUDIT extends API {
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.statement'),
 									'data-loss' => 'prevent',
 									'value' => isset($preset['statement']) ? $preset['statement'][0] : ''
+								]
+							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('tool.markdown.button'),
+									'data-type' => 'markdown',
+									'class' => 'floatright',
+									'onclick' => 'api.tool("get", "markdown")'
 								]
 							], ...$proof
 						];	
@@ -590,7 +606,7 @@ class AUDIT extends API {
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 					$currentquestion = $key;
-					$currentanswer = implode("  \n", $values) . "\n\n";
+					$currentanswer = implode("\n", $values) . "\n";
 					break;
 				}
 				if (!$currentquestion) continue;
@@ -598,7 +614,7 @@ class AUDIT extends API {
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 						if ($key === 'files') continue;
-						$currentanswer .= '*' . (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ':* ';
+						$currentanswer .= "  \n*" . (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ':* ';
 						switch ($key){
 							case 'rating':
 								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
@@ -609,7 +625,6 @@ class AUDIT extends API {
 							default:
 								$currentanswer .= implode("  \n", $values);
 						}
-						$currentanswer .= "  \n";
 					}
 				}
 				
@@ -786,8 +801,8 @@ class AUDIT extends API {
 					ksort($values);
 				}
 				$templatehints = array_unique($templatehints);
-				$templatehints = array_filter($values, fn($v) => boolval($v));
-				ksort($templatehints);
+				$templatehints = array_filter($templatehints, fn($v) => boolval($v));
+				sort($templatehints);
 
 				// prepare methods
 				$auditmethods = [];
