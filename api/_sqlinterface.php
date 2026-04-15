@@ -350,8 +350,8 @@ class SQLQUERY {
 						"VALUES (:id, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method) " .
 						"ON DUPLICATE KEY UPDATE content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author",
 			'sqlsrv' => "MERGE INTO caro_audit_templates WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:content AS content, N:objectives AS objectives, :unit AS unit, :date AS date, (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END) AS author, (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END) AS hint, :method AS method) AS source " .
-						"(id, content, objectives, unit, date, author, hint, method) ON (target.id = source.id) " .
+						"(SELECT :id AS id, N:content AS content, N:objectives AS objectives, :unit AS unit, (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END) AS author, (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END) AS hint, :method AS method) AS source " .
+						"(id, content, objectives, unit, author, hint, method) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET content = N:content, objectives = N:objectives, unit = :unit, hint = (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END), method = :method, date = CURRENT_TIMESTAMP, author = (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END) " .
 						"WHEN NOT MATCHED THEN INSERT (content, objectives, unit, date, author, hint, method) VALUES (N:content, N:objectives, :unit, CURRENT_TIMESTAMP, (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END), (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END), :method);",
 		],
