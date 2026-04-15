@@ -3834,7 +3834,9 @@ export class Assemble {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
 				}
-				autocomplete(event.key === forthKey ? "forth" : "back");
+				let direction = null;
+				if ([forthKey, backKey].includes(event.key)) direction = event.key === forthKey ? "forth" : "back";
+				autocomplete(direction);
 			});
 
 			if (swipe) {
