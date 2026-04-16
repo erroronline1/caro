@@ -1030,6 +1030,101 @@
 		}
 	},
 	{
+		"name": "Bestellung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Nur zur Verwendung bei Ausfall der CARO-App"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name":"Artikel (Anzahl, Kennzeichen, Bezeichnung, Lieferant)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Bereich",
+							"required": true
+						},
+						"content": {
+							"Allgemein": [],
+							"Orthetik I": [],
+							"Orthetik II": [],
+							"Prothetik I": [],
+							"Prothetik II": [],
+							"CAD": [],
+							"Kunststoffverarbeitung": [],
+							"Silikonlabor": []
+						}
+					},
+					{
+						"type": "scanner",
+						"attributes": {
+							"name": "Verwaltungskennzeichen"
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Art der Bestellung"
+						},
+						"content": {
+							"Bestellung":[],
+							"Servicierung von Kundeneigentum":[],
+							"Rücksendung an Lieferanten (Rücksendegrund angeben)":[],
+							"Stornierung":[]
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Rücksendegrund"
+						},
+						"content": {
+							"Falschbestellung":[],
+							"Farb- oder Musterfehler":[],
+							"Fertigungsfehler":[],
+							"Funktionsfehler":[],
+							"Leihteil":[],
+							"Rücksendung Auswahlbestellung":[],
+							"Sonderanfertigung passt nicht":[]
+						}
+					},{
+						"type": "date",
+						"attributes":{
+							"name": "Lieferung bis zum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name":"Zusätzliche Informationen"
+						}
+					},
+					{
+						"type": "signature",
+						"attributes": {
+							"name":"Datum, Unterschrift zur Freigabe"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"comment": "following are common documents #################################################################################################"
 	},
 	{
@@ -1141,5 +1236,16 @@
 		"permitted_export": null,
 		"restricted_access": "prrc,qmo,ceo",
 		"content": "Identifikator,Vorkommnismeldung"
+	},
+	{
+		"name": "Bestellung",
+		"alias": "",
+		"context": "generalrecords",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_4_1",
+		"permitted_export": null,
+		"restricted_access": "qmo,ceo",
+		"content": "operativer Identifikator,Bestellung"
 	}
 ]
