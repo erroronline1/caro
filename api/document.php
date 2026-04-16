@@ -86,6 +86,7 @@ class DOCUMENT extends API {
 							$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 							$hidden = [];
 							foreach ($fd as $row) {
+								if ($approve['id'] === $row['id'] || PERMISSION::pending('documentapproval', $row['approval'])) continue;
 								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 								if (isset($approve['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($approve['name'], explode(',', $row['content']))) {
 									$dependeddocuments[] = $row['name'];
@@ -94,9 +95,17 @@ class DOCUMENT extends API {
 							}
 						}
 						if ($documents){
-							// send information to all users
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-							$this->alertUserGroup(['user' => array_column($users, 'name')], preg_replace(['/\r/'], [''], $this->_lang->GET('assemble.approve.alert', [':documents' => implode("\n", $documents)], true)));
+							// send information to eligible users
+							$recipients = [];
+							if ($approve['restricted_access']){
+								$recipients['permission'] = explode(',', $approve['restricted_access']);
+							}
+							else {
+								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+								$recipients['user'] = array_column($users, 'name');
+							}
+							
+							$this->alertUserGroup($recipients, preg_replace(['/\r/'], [''], $this->_lang->GET('assemble.approve.alert', [':documents' => implode("\n", $documents)], true)));
 							// recommend snapshot to eligible users
 							$this->alertUserGroup(['permission' => PERMISSION::permissionFor('documentcomposer', true)], 
 								$this->_lang->GET('assemble.approve.snapshot', [':snapshot' =>
