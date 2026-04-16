@@ -158,7 +158,9 @@ class API {
 			if (isset($group['unit'])){
 				if (!PERMISSION::filteredUser($user, ['unit' => $group['unit']])) continue;
 			}
-			$recipients[] = $user['id'];			
+			// continue if nothing is set otherwise everyone receives the message
+			if (!(isset($group['permission']) || isset($group['unit']))) continue;
+			$recipients[] = $user['id'];		
 		}
 
 		$recipients = array_unique($recipients);
@@ -698,7 +700,7 @@ class API {
 	 * no return
 	 */
 	private function set_headers(){
-		if (in_array('admin', $_SESSION['user']['permissions'] ?? []) && headers_sent()) return;
+		if ((CONFIG['application']['debugging'] || in_array('admin', $_SESSION['user']['permissions'] ?? [])) && headers_sent()) return;
 		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
 		header("Content-Type:application/json; charset=utf-8");
 	}
