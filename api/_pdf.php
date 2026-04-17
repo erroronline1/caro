@@ -136,6 +136,7 @@ class PDF{
 
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 			if (str_starts_with($value, '::CODE::')) {
+				// this is not directly implemented as markdown by default, for the codeblock to have a smaller font size
 				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] - 4);
 				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), '<pre>' . substr($value, 8) . '</pre>', 0, 1, 0, true, '', true);
 			}
@@ -452,7 +453,8 @@ class PDF{
 					}
 				}
 				elseif (str_starts_with($values, '::MARKDOWN::')){
-					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
+					// textsection on full export with enabled markdown for documents textsection widget
+					// with prefix PDF can decide better over HTMLCell vs MultiCell
 					$_markdown = new \erroronline1\Markdown\Markdown(true);
 					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
 				}
