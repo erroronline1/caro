@@ -644,34 +644,9 @@ class RECORD extends API {
 				if ($content = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.create_identifier'))) {
 					$content = UTILITY::identifier($content, $this->_appendDate && !in_array($this->_appendDate, ['null', 'false']) ? $this->_date['usertime']->format('Y-m-d H:i:s') : null);
 				}
-				if ($content){
-					$downloadfiles = [];
-					$PDF = new PDF(CONFIG['label'][UTILITY::propertySet($this->_payload, '_type') ? : 'sheet']);
-					$content = [
-						'title' => $this->_lang->GET('record.create_identifier', [], true),
-						'content' => [$content, $content],
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $content)
-					];
-					$file = $PDF->qrcodePDF($content);
-					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => $this->_filehandler->getFileLink($file),
-						'download' => pathinfo($file)['basename']
-					];
-					$body = [
-						[
-							'type' => 'links',
-							'description' => $this->_lang->GET('record.create_identifier_proceed'),
-							'content' => $downloadfiles
-						]
-					];
-					$this->response([
-						'render' => $body
-					]);
-				}
-				else $this->response(['response' => [
-					'msg' => $this->_lang->GET('record.create_identifier_error'),
-					'type' => 'error'
-				]]);
+				require_once('./tool.php');
+				$tool =  new TOOL();
+				$tool->code_qr(UTILITY::propertySet($this->_payload, '_type') ? : 'sheet', $content, $content);
 				break;
 			case 'GET':
 				$response = ['render' =>
