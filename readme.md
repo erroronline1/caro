@@ -32,8 +32,6 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
-* ::markdown:: in composer => mdcontent / also _pdf.php
-* audit and management review: select timespan (last 12 month by default?)
 
 ## Content
 * [Aims](#aims)
@@ -471,7 +469,7 @@ Documents are modular. To create tracked and versioned documents, create reusabl
 #### Component editing
 Available elements for components or rather documents are:
 * scanner field, optional as multiple and context identifier
-* text section for information purpose without input, [Markdown](#markdown) by default. On record export the content will be prefixed with `::MARKDOWN::` to render accordingly. This works in theory if contents begin with this character set in general. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
+* text section for information purpose without input, [Markdown](#markdown) by default.
 * image for including e.g. infographics
 * single line text input, optional as multiple and with former inputs recommended
 * multi line text input, optional access to text templates and with former inputs recommended
@@ -2213,6 +2211,8 @@ length[identifier] = 128 ; characters for identifiers, the longer, the more comp
 length[record_overview] = 1024 ; display of record summaries
 length [products_per_slide] = 6 ; less creates more slides, more grows the respective boxes
 
+messages[reminder] = 20 ; if not diables within the user settings an annoying reminder will be read out loud on more than the configured amount of unread messages
+
 quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 quality[risk_acceptance_level] = 4 ; product of probability times damage to be highlighted, according to count of respective values within the language files
 
@@ -2926,12 +2926,10 @@ This has been interpreted merely as a recommendation than a requirement to avoid
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | None | Most important properties remain, the manual [warns](#component-editing) about this usage |
-| Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
-| Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
 | Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
 | Doubts on the validity of signatures within records. | Medium | High (regulatory penalties) | Signatures are part of the [records Blockchain](#blockchain-secured-content). Hashes are somewhat distributed with any record export and are supposed to be matched at some block of a valid chain | This is the safest to get to work without keys and should likely meet the criteria for a advanced electronic signature. Validity can be checked and a report exported in case of judicial disputes |
 | Malicious use of signatures by exporting | Low | High (loss of trust) | Watermarking and adapting file resolution to a just about recognizable quality does make it cumbersome to retrace the signature properly | none |
-| Malicious inputs on using Markdown | Low | High (application unstable, corrupted data) | Full availability of Markdown for administrative users only, where available for regular users (conversations) anchors will not be parsed, tags stripped by default | none |
+| Malicious inputs on using Markdown | Low | High (application unstable, corrupted data) | Full availability of Markdown including enabled HTML for administrative users only, where available for regular users (conversations) anchors will not be parsed, tags stripped by default | none |
 
 [Content](#content)
 
@@ -3424,22 +3422,6 @@ Sample response
 {"render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":{"value":"skillfulfilment"},"Employee skills and trainings":{"value":"userskills"},"Employee training evaluation":{"value":"trainingevaluation"},"Internal audits":{"value":"audits"},"Management reviews":{"value":"managementreviews"},"Products - Incorporations":{"value":"incorporation"},"Products - MDR sample check":{"value":"mdrsamplecheck"},"Record export":{"value":"records"},"Record verification":{"value":"recordverification"},"Risk management":{"value":"risks"},"Vendor list":{"value":"vendors"},"Vendor order statistics":{"value":"orderstatistics"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
-> GET/POST ./api/api.php/audit/export/{type}?{param}
-
-Returns filters for creation of or a download link to a temporary file based on type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {type} | path parameter | required | defines the response, none if omitted |
-
-| {param} | query parameter/form data | optional | additional filters if applicable |
-
-Sample response
-```
-{"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
-```
-
 > PUT ./api/api.php/audit/checks/{type}/{id}
 
 Updates data from the audit module. Currently implemented for user trainings only.
@@ -3469,6 +3451,22 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+```
+
+> GET/POST ./api/api.php/audit/export/{type}?{param}
+
+Returns filters for creation of or a download link to a temporary file based on type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | defines the response, none if omitted |
+
+| {param} | query parameter/form data | optional | additional filters if applicable |
+
+Sample response
+```
+{"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
 ```
 
 > GET ./api/api.php/audit/import/{type}/{param}
