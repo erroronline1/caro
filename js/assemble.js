@@ -3896,8 +3896,7 @@ export class Assemble {
 	 * 		"attributes": {
 	 * 			"name": "very informative, content of header, former description"
 	 * 			"otherattribute": "value applies to header"
-	 * 		},
-	 * 		"markdown": boolean, actually only used by the backend for preprocessing if document components are supposed to be parsed as such
+	 * 		}
 	 * 	}
 	 */
 	textsection() {

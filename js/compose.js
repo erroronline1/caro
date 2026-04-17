@@ -161,8 +161,7 @@ export class Composer {
 					else return;
 				}
 				if (siblingName === api._lang.GET("assemble.compose.component.textsection_content") && siblingValue) {
-					element["content"] = siblingValue;
-					element.markdown = true;
+					element["mdcontent"] = siblingValue;
 				}
 			} else if (["documentbutton"].includes(element.type)) {
 				if (siblingName === api._lang.GET("assemble.compose.component.link_document")) {
@@ -776,7 +775,7 @@ export class Composer {
 					if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = element.attributes.name;
 				} else if (["textsection"].includes(element.type)) {
 					if (siblingName === api._lang.GET("assemble.compose.component.textsection_description")) sibling.value = element.attributes.name;
-					if (siblingName === api._lang.GET("assemble.compose.component.textsection_content")) if (element.content) sibling.value = element.content;
+					if (siblingName === api._lang.GET("assemble.compose.component.textsection_content")) if (element.mdcontent) sibling.value = element.mdcontent;
 				} else if (["range"].includes(element.type)) {
 					if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = element.attributes.name;
 					if (siblingName === api._lang.GET("assemble.compose.component.range_min")) sibling.value = element.attributes.min;

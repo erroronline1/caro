@@ -193,7 +193,7 @@ class DOCUMENT extends API {
 				// display selected element for review
 				if ($this->_requestedID){
 					$alert = '';
-					// recursively delete required attributes and parse markdown if applicable
+					// recursively delete required attributes
 					function unrequire($element){
 						$result = [];
 						foreach ($element as $sub){
@@ -203,10 +203,6 @@ class DOCUMENT extends API {
 								if (isset($sub['attributes'])){
 									unset ($sub['attributes']['required']);
 									unset ($sub['attributes']['data-required']);
-								}
-								if (isset($sub['markdown']) && isset($sub['content'])){
-									$sub['mdcontent'] = $sub['content'];
-									unset ($sub['content']);
 								}
 								if ($sub) $result[] = $sub;
 							}
@@ -2051,7 +2047,7 @@ class DOCUMENT extends API {
 	}
 	/**
 	 * in objects scope to avoid redeclaration on imports (e.g. maintenance)
-	 * recursive content setting according to the most recent document, markdown parsing if applicable
+	 * recursive content setting according to the most recent document
 	 * @param array $element component and subsets
 	 * @param array $payload
 	 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
@@ -2123,9 +2119,8 @@ class DOCUMENT extends API {
 					}
 				}
 				elseif ($subs['type'] === 'textsection'){
-					if (isset($subs['markdown']) && isset($subs['content'])){
-						$markdown = new \erroronline1\Markdown\Markdown();
-						$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->md2html($subs['content'])];
+					if (isset($subs['mdcontent'])){
+						$content['content'][$name] = ['type' => 'markdown', 'value' => $subs['mdcontent']];
 					}
 					else $content['content'][$name] = ['type' => 'textsection', 'value' => $subs['content'] ?? ''];
 				}

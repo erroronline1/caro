@@ -285,7 +285,7 @@ class RECORD extends API {
 			'content' => []
 		]];
 
-		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, parse markdown if applicable, make images available on fileserver database strategy
+		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, make images available on fileserver database strategy
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
 			':unit' => $document['unit']
@@ -322,10 +322,6 @@ class RECORD extends API {
 							}
 						}
 						else unset($subs['autocomplete']);
-					}
-					if (isset($subs['markdown']) && isset($subs['content'])){
-						$subs['mdcontent'] = $subs['content'];
-						unset ($subs['content']);
 					}
 
 					if (in_array($subs['type'], [
@@ -2386,7 +2382,7 @@ class RECORD extends API {
 			}
 	
 			/**
-			 * recursive content setting according to the most recent document, markdown parsing if applicable
+			 * recursive content setting according to the most recent document
 			 * @param array $element component and subsets
 			 * @param array $payload
 			 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
@@ -2417,9 +2413,9 @@ class RECORD extends API {
 						}
 
 						if ($subs['type'] === 'textsection'){
-							if (isset($subs['markdown']) && isset($subs['content'])){
-								$markdown = new \erroronline1\Markdown\Markdown();
-								$value  = '::MARKDOWN::' . $markdown->md2html($subs['content']);
+							if (isset($subs['mdcontent'])){
+								// with prefix PDF can decide better over HTMLCell vs MultiCell
+								$value  = '::MARKDOWN::' . $subs['mdcontent'];
 							}
 							else $value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';
