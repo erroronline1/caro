@@ -32,10 +32,8 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
-* more compression of order attachment images
 * ::markdown:: in composer => mdcontent / also _pdf.php
 * audit and management review: select timespan (last 12 month by default?)
-* add user-hard-hat.svg
 
 ## Content
 * [Aims](#aims)
@@ -2206,9 +2204,10 @@ records_search_similarity = 50 ; percent
 
 [limits]
 image[document] = 2048 ; max pixels on longer side
-image[signature] = 512 ; max pixels on longer side, crappy resolution by intent to make it more difficult to abuse
+image[order_attachment] = 1024 ; max pixels on longer side
 image[profile] = 128 ; max pixels on longer side
 image[records] = 2048 ; max pixels on longer side
+image[signature] = 512 ; max pixels on longer side, crappy resolution by intent to make it more difficult to abuse
 
 length[identifier] = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 8-9 characters will be appended by default for a timestamp
 length[record_overview] = 1024 ; display of record summaries

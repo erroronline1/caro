@@ -1606,6 +1606,9 @@ class ORDER extends API {
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
+				],
+				imageoptions: [
+					'size' =>  CONFIG['limits']['image']['order_attachment']
 				]
 			));
 		}
@@ -1619,6 +1622,9 @@ class ORDER extends API {
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
+				],
+				imageoptions: [
+					'size' =>  CONFIG['limits']['image']['order_attachment']
 				]
 			));
 		}

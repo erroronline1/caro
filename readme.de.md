@@ -2105,9 +2105,10 @@ records_search_similarity = 50 ; Prozent
 
 [limits]
 image[document] = 2048 ; maximale Pixel für längste Seite
-image[signature] = 512 ; maximale Pixel für längste Seite, extra schlechte Auflösung um Missbrauch zu erschweren
+image[order_attachment] = 1024 ; maximale Pixel für längste Seite
 image[profile] = 128 ; maximale Pixel für längste Seite
 image[records] = 2048 ; maximale Pixel für längste Seite
+image[signature] = 512 ; maximale Pixel für längste Seite, extra schlechte Auflösung um Missbrauch zu erschweren
 
 length[identifier] = 128 ; Zeichenlänge für Kennzeichen, je länger desto komplexer und fehleranfälliger wird der QR-Code. 8-9 Zeichen werden für einen Zeitstempel automatisch angefügt
 length[record_overview] = 1024 ; maximal angezeigte offene Dokumentationen
