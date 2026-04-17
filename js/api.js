@@ -2386,6 +2386,19 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
+					case "code_qr":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+								if (data.render !== undefined) {
+									const options = {};
+									options[api._lang.GET("general.ok_button")] = false;
+									new Dialog({
+										type: "input",
+										render: data.render,
+										options: options,
+									});
+								}
+							};
 					default:
 				}
 				break;

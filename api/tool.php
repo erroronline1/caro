@@ -22,12 +22,17 @@ class TOOL extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
+	private $_code_label = null;
+	private $_code_qr = null;
+	private $_code_text = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_requestedType = REQUEST[2] ?? null;
+		$this->_requestedType = $this->_code_label = REQUEST[2] ?? null;
+		$this->_code_qr = REQUEST[3] ?? null;
+		$this->_code_text = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -477,6 +482,54 @@ class TOOL extends API {
 			}
 		}
 		$this->response($response);
+	}
+
+
+	/**
+	 *             _
+	 *   ___ ___ _| |___       ___ ___
+	 *  |  _| . | . | -_|     | . |  _|
+	 *  |___|___|___|___|_____|_  |_|
+	 *                  |_____| |_|
+	 * a custom code and text is available. input agnostic through available path parameters if called directly within tool context
+	 * importable though
+	 */
+	public function code_qr($code_label = null, $code_qr = null, $code_text = null){
+		$code_label = $code_label ?? $this->_code_label ?? null;
+		$code_qr = $code_qr ?? $this->_code_qr ?? null;
+		$code_text = $code_text ?? $this->_code_text ?? null;
+
+		if (!$code_qr && !$code_text ) $this->response(['response' => [
+			'msg' => $this->_lang->GET('record.create_identifier_error'),
+			'type' => 'error'
+		]]);
+
+		if (!$code_text) $code_text = $code_qr;
+		if (!$code_qr) $code_qr = $code_text;
+
+		$downloadfiles = [];
+		require_once('./_pdf.php');
+		$PDF = new PDF(CONFIG['label'][$code_label ? : 'sheet']);
+		$content = [
+			'title' => $this->_lang->GET('record.create_identifier', [], true),
+			'content' => [$code_qr, $code_text],
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $code_text)
+		];
+		$file = $PDF->qrcodePDF($content);
+		$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
+			'href' => $this->_filehandler->getFileLink($file),
+			'download' => pathinfo($file)['basename']
+		];
+		$body = [
+			[
+				'type' => 'links',
+				'description' => $this->_lang->GET('record.create_identifier_proceed'),
+				'content' => $downloadfiles
+			]
+		];
+		$this->response([
+			'render' => $body
+		]);
 	}
 
 	/**
