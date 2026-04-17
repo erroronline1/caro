@@ -282,7 +282,8 @@ class API {
 							]
 						],
 						'limits' => [
-							'qr_errorlevel' => CONFIG['limits']['quality']['qr_errorlevel']
+							'qr_errorlevel' => CONFIG['limits']['quality']['qr_errorlevel'],
+							'messages' => CONFIG['limits']['messages']['reminder']
 						],
 						'label' => CONFIG['label'],
 						'forbidden' => CONFIG['forbidden'],
