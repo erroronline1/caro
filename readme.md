@@ -34,9 +34,8 @@ Things are still in motion. Images may be outdated.
     * check if similar items have been ordered recently?
 * more compression of order attachment images
 * ::markdown:: in composer => mdcontent / also _pdf.php
-* order document as fallback
-* audit preparation and execution markdown available button for textareas
-* product search labels with separate text including article name?
+* audit and management review: select timespan (last 12 month by default?)
+* add user-hard-hat.svg
 
 ## Content
 * [Aims](#aims)
@@ -772,20 +771,18 @@ For risks with the same cause, effect, measure and remaining measures risk relat
 
 ### Audit
 The application enables you to prepare internal audits, including programme objectives, audit method and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.  
-Audits can be added to the calendar from the form as well, informing selected units.
+Audits can be added to the calendar from the form as well, informing selected units. [Markdown](#markdown) is available.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20en-fullpage.png)
 
-Executing an audit starts by selecting one of the prepared templates. Answers and statements will be initially imported from the last audit for the selected unit. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+Executing an audit starts by selecting one of the prepared templates. Answers and statements will be initially imported from the last audit for the selected unit. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries). [Markdown](#markdown) is available.
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20en-fullpage.png)
 
 [Content](#content)
 
 ### Management review
-Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
-
-Most of the CARO App is data driven, a management review may be adressed to third parties though. Therefore a bit of styling is possible using the [Markdown](#markdown) syntax.  
+Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries). [Markdown](#markdown) is available.
 
 [Content](#content)
 
@@ -2171,7 +2168,7 @@ names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CUSTOMERID|PRODUCTS|EXPIREDDOCUMENTS)$" ; literal terms |-separated
 
-filename[characters] = "[,\/\\\]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
+filename[characters] = "[^\s\w\d]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
 
 [lifespan]
 calendar[autodelete] = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
@@ -2255,7 +2252,7 @@ orderaddinfo = "ceo, purchase" ; permission to add information to any approved o
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase, purchase_assistant" ; display all orders by default, not only for own units
 orderprocessing = "purchase"; process orders
-products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
+products = "ceo, qmo, purchase, prrc" ; add and edit products; key roles should match with incorporation
 productslimited = "purchase_assistant" ; limited editing of products
 recordscasestate = "ceo, supervisor, office" ; set casestates
 recordsclosing = "ceo, supervisor" ; mark record as closed, reassign identifier (e.g. on accidentally duplicate creation)
@@ -5432,6 +5429,22 @@ Parameters
 Sample response
 ```
 {"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+```
+
+> GET ./api/api.php/tool/code_qr/{label}/{code}/{text}
+
+Returns a qr-code pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {label} | path parameter | required | label size as defined within config.ini |
+| {code} | path parameter | required | qr-code content |
+| {text} | path parameter | optional | text differing from qr-code content. defaults to qr-code content if omitted |
+
+Sample response
+```
+{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
 ```
 
 > GET ./api/api.php/tool/image
