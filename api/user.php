@@ -159,6 +159,7 @@ class USER extends API {
 				$user[':app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.dateformat'));
 				$user[':app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.location'));
 				$user[':app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.timezone'));
+				$user[':app_settings']['icanread'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.icanread'));
 
 				// unset defaults
 				if ($user[':app_settings']['language'] === CONFIG['application']['defaultlanguage']) $user[':app_settings']['language'] = null;
@@ -533,6 +534,7 @@ class USER extends API {
 								$this->_lang->GET('user.settings.force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.icanread') => isset($user['app_settings']['icanread']) ? ['checked' => true] : [],
 							]
 						], [
 							// append preferred order layout

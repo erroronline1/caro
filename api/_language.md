@@ -92,7 +92,8 @@ All keys are hardcoded.
 ### message
 All keys are hardcoded.
 
-`message.announcement.highlights` order is passed to application, keys refer to available reasonable class names; null is reserved. yellow is not suitable.
+`message.announcement.highlights` order is passed to application, keys refer to available reasonable class names; null is reserved. yellow is not suitable.  
+`message.message.tts` will be randomly selected.
 
 ### order
 Most keys are hardcoded, orderstate can be cropped or extended. `order.ordertype`, `order.orderstate` orders are passed to application.

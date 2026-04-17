@@ -265,7 +265,7 @@ export const api = {
 	},
 
 	update_user_settings: async function () {
-		if (!api._settings.user.app_settings.theme){
+		if (!api._settings.user.app_settings.theme) {
 			api._settings.user.app_settings.theme = "light";
 		}
 		for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
@@ -545,7 +545,8 @@ export const api = {
 										// registered
 										_serviceWorker.notif.interval = setInterval(() => {
 											_serviceWorker.postMessage("getnotifications");
-										}, _serviceWorker.notif.interval_duration); // faulty certificate or whatever
+										}, _serviceWorker.notif.interval_duration);
+									// faulty certificate or whatever
 									else
 										_serviceWorker.notif.interval = setInterval(() => {
 											api.notification("get", "notifs");
@@ -734,6 +735,7 @@ export const api = {
 					// update default language
 					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
 						document.querySelector("html").lang = api._settings.config.application.defaultlanguage;
+						_client._tts.getVoice(api._settings.config.application.defaultlanguage);
 					}
 
 					// update application menu icon with user image
@@ -2389,16 +2391,16 @@ export const api = {
 					case "code_qr":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-								if (data.render !== undefined) {
-									const options = {};
-									options[api._lang.GET("general.ok_button")] = false;
-									new Dialog({
-										type: "input",
-										render: data.render,
-										options: options,
-									});
-								}
-							};
+							if (data.render !== undefined) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									render: data.render,
+									options: options,
+								});
+							}
+						};
 					default:
 				}
 				break;

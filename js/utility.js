@@ -87,6 +87,9 @@ export const _serviceWorker = {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("message.navigation.conversations").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
 					message_unseen = parseInt(data.message_unseen, 10);
+					if (data.message_unseen > api._settings.application.limits.messages && !api._settings.user.app_settings.icanread) {
+						_client._tts.speak(pi._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": data.message_unseen }));
+					}
 				}
 				if ("responsibilities" in data) {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("responsibility.navigation.responsibility").replace(" ", "_") + "]"); // button
@@ -268,6 +271,30 @@ export const _client = {
 	// import due to calling from inline events prerendered by backend api into this object being in global scope anyway
 	Dialog: Dialog,
 	Toast: Toast,
+	_tts: {
+		voice: null,
+		getVoice: function (lang = "en") {
+			if (!!window.speechSynthesis) return;
+			const voices = window.speechSynthesis.getVoices();
+			for (let i = voices.length - 1; i > 0; i--) {
+				// for (let i = 0; i < voices.length; i++) {
+				if (voices[i].lang.toLowerCase().startsWith(lang.toLowerCase()) && voices[i].name.slice(-2) === "ea") {
+					this.voice = voices[i];
+					break;
+				}
+			}
+		},
+		speak: function (text = null, lang = "en") {
+			if (!text || !window.speechSynthesis || window.speechSynthesis.speaking) return;
+			if (!this.voice) this.getVoice(lang);
+			if (!this.voice) return;
+			const utterThis = new SpeechSynthesisUtterance(text);
+			utterThis.voice = this.voice;
+			utterThis.pitch = 0.9;
+			utterThis.rate = 0.8;
+			window.speechSynthesis.speak(utterThis);
+		},
+	},
 
 	application: {
 		/**
@@ -1738,7 +1765,7 @@ export const _client = {
 						}),
 						a: {
 							"data-type": element.ordertype,
-							"mds": true
+							mds: true,
 						},
 					},
 					{ c: api._lang.GET("order.ordertype." + element.ordertype) + " " + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }) },
@@ -1830,16 +1857,16 @@ export const _client = {
 				order.push({
 					type: "textsection",
 					mdcontent: api._lang.GET("order.prepared_order_item", {
-							":quantity": element.quantity ? element.quantity : "",
-							":unit": element.unit ? element.unit : "",
-							":number": element.ordernumber ? element.ordernumber : "",
-							":name": element.name ? element.name : "",
-							":vendor": element.vendor ? element.vendor : "",
-							":aut_idem": element.aut_idem ? element.aut_idem : "",
-						}),
-					mdrestrictions:{
-						safeMode:true,
-						limitTo: ['emphasis', 'larger']
+						":quantity": element.quantity ? element.quantity : "",
+						":unit": element.unit ? element.unit : "",
+						":number": element.ordernumber ? element.ordernumber : "",
+						":name": element.name ? element.name : "",
+						":vendor": element.vendor ? element.vendor : "",
+						":aut_idem": element.aut_idem ? element.aut_idem : "",
+					}),
+					mdrestrictions: {
+						safeMode: true,
+						limitTo: ["emphasis", "larger"],
 					},
 					attributes: {
 						name: api._lang.GET("order.ordertype." + element.ordertype) + "\n" + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }),

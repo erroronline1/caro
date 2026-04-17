@@ -494,7 +494,7 @@
 			"assign_hint_documents": "\"My units\" lists all documents for your assigned units including common.",
 			"assign_hint_bundles": "\"My units\" lists all document bundles for your assigned units",
 			"clear_signature": "Clear Signature",
-			"datetime_local_hint" :"Date and time",
+			"datetime_local_hint": "Date and time",
 			"error_faulty_widget": "This element does not adhere to the allowed syntax:",
 			"error_no_approved_components": "It seems all contents of this document have been deactivated. Please inform any of :permission to clean things up!",
 			"export": "Export document as PDF",
@@ -790,9 +790,9 @@
 			"new_hint": "The starting month will be set to the first, the ending month to the last day by default.",
 			"save_error": "Planning could not be saved, please try again.",
 			"save_success": "Planning has been saved",
-			"period":"Periods",
-			"periods":{
-				"weekly":"One week",
+			"period": "Periods",
+			"periods": {
+				"weekly": "One week",
 				"biweekly": "Two weeks",
 				"halfmonthly": "Half month",
 				"monthly": "Month"
@@ -1185,14 +1185,14 @@
 			"not_found": "Logfile not found and has most probably just been deleted",
 			"delete": "Delete cron.log with :count entries"
 		},
-		"documents_snapshot":{
+		"documents_snapshot": {
 			"description": "Download a ZIP-file of current documents to store elsewhere - not for archiving purpose but as an emergency fallback in case of server fails.",
-			"type_selection":"Contained documents within the snapshot",
-			"types":{
-				"application":"Application documents",
-				"external":"External documents",
-				"products_ods":"Product list (ODS)",
-				"products_xlsx":"Product list (XLSX)"
+			"type_selection": "Contained documents within the snapshot",
+			"types": {
+				"application": "Application documents",
+				"external": "External documents",
+				"products_ods": "Product list (ODS)",
+				"products_xlsx": "Product list (XLSX)"
 			}
 		},
 		"erp_connection": {
@@ -1210,7 +1210,7 @@
 			"maintenance": "Maintenance",
 			"productsupdate": "Product lists update",
 			"records_datalist": "Record datalist",
-			"request_log":"Request Log",
+			"request_log": "Request Log",
 			"riskupdate": "Update table of riskanalysis contents",
 			"vendorupdate": "Vendor update"
 		},
@@ -1331,7 +1331,17 @@
 			"send_failure": ":number message(s) could not be delivered. Please try again.",
 			"send_failure_self": "You can not send messages to yourself.",
 			"send_success": "Message successfully sent",
-			"to": "To"
+			"to": "To",
+			"tts": [
+				"You have :messages unread Messages. Don't you think it's about time to change that?",
+				"I sure am annoying, but read your messages.",
+				"Your :messages unread messaged make me dizzy. Do something about that!",
+				"Seriously. Read your messages!",
+				"Really? :messages unread messages? Are you kidding me?",
+				"If everyone would read their messages I would not be required to say something. Hush hush, go read them!",
+				"Now is probably as good as every other time to read some of your :messages unread messages.",
+				"Don't ignore your messages as they are an important source of information."
+			]
 		},
 		"navigation": {
 			"announcements": "Announcements",
@@ -1353,13 +1363,13 @@
 			"delete_confirm": "Permanently delete Whiteboard?",
 			"deleted_error": "Whiteboard could not be deleted. Please try again.",
 			"deleted_success": "Whiteboard deleted.",
-			"doodle":"Doodle",
-			"doodle_accuracy_warning":"Exports are not necessarily true to scale",
-			"doodle_clear":"Clear",
-			"doodle_clear_confirm":"Delete doole?",
-			"doodle_draw":"Draw",
-			"doodle_erase":"Erase",
-			"doodle_export":"Export as file on next save",
+			"doodle": "Doodle",
+			"doodle_accuracy_warning": "Exports are not necessarily true to scale",
+			"doodle_clear": "Clear",
+			"doodle_clear_confirm": "Delete doole?",
+			"doodle_draw": "Draw",
+			"doodle_erase": "Erase",
+			"doodle_export": "Export as file on next save",
 			"name": "Name",
 			"new": "New whiteboard",
 			"note_edit": "by :name on :date",
@@ -1637,8 +1647,8 @@
 		"reminder_message": "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :document.  \nHelp continuing or close the record.",
 		"restricted_access": "Restricted access",
 		"restricted_access_hint": "Records will be hidden from everyone else except administrative users.",
-		"restricted_access_units":"Limit access to selected groups",
-		"restricted_access_users":"and/or named users",
+		"restricted_access_units": "Limit access to selected groups",
+		"restricted_access_users": "and/or named users",
 		"retype_content": "The record has been retyped from :previoustype to :newtype",
 		"retype_header": "This is not a :type? Reselect then!",
 		"retype_pseudodocument_name": "Record retyped",
@@ -1939,6 +1949,7 @@
 			"header": "Application settings",
 			"hint": "Some settings require a reload. Use the browsers button, Ctrl + F5 or Ctrl + r for this, on mobile drag the screen downwards.",
 			"homeoffice": "Homeoffice",
+			"icanread": "I read my messages",
 			"idle": "Idle time before reauthentification",
 			"idle_hint": "Prolonging the default minimum value of :idle seconds may be required for accessibility reasons or for purchase on complex product list imports.",
 			"language": "Language",

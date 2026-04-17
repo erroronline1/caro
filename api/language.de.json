@@ -494,7 +494,7 @@
 			"assign_hint_documents": "\"Meine Bereiche\" listet alle Dokumente für deine zugeordneten Bereiche inklusive allgemeiner auf.",
 			"assign_hint_bundles": "\"Meine Bereiche\" listet alle Dokumentenpakete für deine zugeordneten Bereiche.",
 			"clear_signature": "Unterschrift löschen",
-			"datetime_local_hint" :"Datum und Uhrzeit",
+			"datetime_local_hint": "Datum und Uhrzeit",
 			"error_faulty_widget": "Dieses Element entspricht nicht der erlaubten Syntax:",
 			"error_no_approved_components": "Es scheint als wären alle Inhalte für dieses Dokument deaktiviert worden. Bitte informiere einen von :permission hier aufzuräumen!",
 			"export": "Exportiere das Dokument als PDF",
@@ -790,9 +790,9 @@
 			"new_hint": "Der Startmonat wird automatisch auf den ersten, der Endmonat auf den letzten Tag korrigiert.",
 			"save_error": "Die Planung konnte nicht gespeichert werden, bitte versuche es erneut.",
 			"save_success": "Die Planung wurde gespeichert",
-			"period":"Zeitabschnitte",
-			"periods":{
-				"weekly":"eine Woche",
+			"period": "Zeitabschnitte",
+			"periods": {
+				"weekly": "eine Woche",
 				"biweekly": "zwei Wochen",
 				"halfmonthly": "halber Monat",
 				"monthly": "Monat"
@@ -1185,16 +1185,15 @@
 			"not_found": "Logfile wurde nicht gefunden und wurde vermutlich gerade eben gelöscht",
 			"delete": "cron.log mit :count Einträgen löschen"
 		},
-		"documents_snapshot":{
+		"documents_snapshot": {
 			"description": "Lade eine ZIP-Datei mit den aktuellen Dokumenten für einen anderen Speicherort herunter - nicht für Archivierungszwecke, sondern als Notfallplan bei Serverausfall.",
-			"type_selection":"Beinhaltete Dokumente im Schnappschuss",
-			"types":{
-				"application":"Anwendungsdokumente",
-				"external":"Externe Dokumente",
-				"products_ods":"Artikelliste (ODS)",
-				"products_xlsx":"Artikelliste (XLSX)"
+			"type_selection": "Beinhaltete Dokumente im Schnappschuss",
+			"types": {
+				"application": "Anwendungsdokumente",
+				"external": "Externe Dokumente",
+				"products_ods": "Artikelliste (ODS)",
+				"products_xlsx": "Artikelliste (XLSX)"
 			}
-
 		},
 		"erp_connection": {
 			"confirmation": "Die ERP-Anbindung ist jetzt :state",
@@ -1206,12 +1205,12 @@
 		"navigation": {
 			"cron_log": "Cron Log",
 			"cronoverride": "Hintergrundaktualisierung manuell ausführen",
-			"documents_snapshot":"Schnappschuss der aktuellen Dokumente",
+			"documents_snapshot": "Schnappschuss der aktuellen Dokumente",
 			"erp_connection": "ERP-Anbindung",
 			"maintenance": "Wartung",
 			"productsupdate": "Aktualisierung der Artikellisten",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
-			"request_log":"Request Log",
+			"request_log": "Request Log",
 			"riskupdate": "Aktualisierung der Risikoanalyse-Inhalte",
 			"vendorupdate": "Lieferantenupdate"
 		},
@@ -1332,7 +1331,17 @@
 			"send_failure": ":number Nachricht(en) konnten nicht übermittelt werden, bitte versuche es erneut.",
 			"send_failure_self": "Du kannst dir selbst keine Nachrichten senden.",
 			"send_success": "Nachricht erfolgreich übermittelt",
-			"to": "An"
+			"to": "An",
+			"tts": [
+				"Du hast :messages ungelesene Nachrichten. Denkst du nicht es wäre Zeit das zu ändern?",
+				"Klar nerve ich, aber lies deine Nachrichten!",
+				"Deine :messages ungelesenen Nachrichten machen mich ganz verrückt. Mach da mal was!",
+				"Ernsthaft. Lies deine Nachrichten!",
+				"Wirklich? :messages ungelesene Nachrichten? Willst du mich veralbern?",
+				"Wenn jeder seine Nachrichten lesen würde, müsste ich ja gar nichts sagen. Husch husch, lies welche!",
+				"Jetzt ist vermutlich so gut wie jeder andere Zeitpunkt um einige deiner :messages ungelesenen Nachrichten zu lesen.",
+				"Ignoriere nicht deine Nachrichten. Sie sind eine wichtige Informationsquelle."
+			]
 		},
 		"navigation": {
 			"announcements": "Ankündigungen",
@@ -1354,13 +1363,13 @@
 			"delete_confirm": "Whiteboard unwiderruflich löschen?",
 			"deleted_error": "Whiteboard konnte nicht gelöscht werden. Bitte versuche es erneut.",
 			"deleted_success": "Whiteboard gelöscht.",
-			"doodle":"Skizze",
-			"doodle_accuracy_warning":"Exporte sind nicht notwendigerweise maßstabsgetreu",
-			"doodle_clear":"Skizze löschen",
-			"doodle_clear_confirm":"Skizze wirklich löschen?",
-			"doodle_draw":"Zeichnen",
-			"doodle_erase":"Radieren",
-			"doodle_export":"Nach dem nächsten Speichern als Datei exportieren",
+			"doodle": "Skizze",
+			"doodle_accuracy_warning": "Exporte sind nicht notwendigerweise maßstabsgetreu",
+			"doodle_clear": "Skizze löschen",
+			"doodle_clear_confirm": "Skizze wirklich löschen?",
+			"doodle_draw": "Zeichnen",
+			"doodle_erase": "Radieren",
+			"doodle_export": "Nach dem nächsten Speichern als Datei exportieren",
 			"name": "Bezeichnung",
 			"new": "Neues Whiteboard erstellen",
 			"note_edit": "von :name am :date",
@@ -1479,7 +1488,6 @@
 		},
 		"order_filter": "Filtern",
 		"order_filter_datetime": "Bestellungen seit",
-		"order_filter_datetime_hint": "Datum und Uhrzeit",
 		"order_filter_etc": "sonstige Filter",
 		"order_filter_label": "Suchbegriff",
 		"order_last_ordered": "Zuletzt bestellt und ausgeliefert am :date",
@@ -1639,8 +1647,8 @@
 		"reminder_message": "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :document statt.  \nHilf bei der Weiterbearbeitung oder schließe den Fall ab.",
 		"restricted_access": "Zugriffsbeschränkung",
 		"restricted_access_hint": "Die Aufzeichnungen werden anderen - mit Ausnahme der Leitung - nicht angezeigt.",
-		"restricted_access_units":"Zugriff auf ausgewählte Gruppen beschränken",
-		"restricted_access_users":"und/oder namentliche Nutzer",
+		"restricted_access_units": "Zugriff auf ausgewählte Gruppen beschränken",
+		"restricted_access_users": "und/oder namentliche Nutzer",
 		"retype_content": "Die Aufzeichnung wurde von :previoustype zu :newtype geändert",
 		"retype_header": "Dies ist keine :type? Dann wähle neu!",
 		"retype_pseudodocument_name": "Dokumentationstyp",
@@ -1941,6 +1949,7 @@
 			"header": "Anwendungseinstellungen",
 			"hint": "Manche Einstellungen erfordern ein erneutes Laden der Oberfläche. Nutze dazu die Schaltfläche, Strg + F5 oder Strg + r, oder ziehe auf einem mobilen Gerät den Bildschirm nach unten.",
 			"homeoffice": "Homeoffice",
+			"icanread": "Ich lese meine Nachrichten",
 			"idle": "Zeit nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt",
 			"idle_hint": "Die Verlängerung des Standardmindestwerts von :idle Sekunden kann im Sinne der Barrierefreiheit erforderlich sein, oder für den Einkauf bei komplexen Preislistenimports.",
 			"language": "Sprache",
