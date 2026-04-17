@@ -585,10 +585,39 @@ class AUDIT extends API {
 	 * 
 	 */
 	public function audits(){
-		$content = [];
+		$lastYear = clone $this->_date['usertime'];
+		$lastYear = $lastYear->modify('-1 year');
+		$from = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.start_date')) ?: $lastYear->format('Y-m-d');
+		$until = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.end_date')) ?: $this->_date['usertime']->format('Y-m-d');
+		$content = [
+			[
+				[
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.start_date'),
+						'value' => $from,
+						'data-usecase' => 'audit'
+					]
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.end_date'),
+						'value' => $until,
+						'data-usecase' => 'audit'
+					]
+				], [
+					'type' => 'button',
+					'attributes' => [
+						'value' => "UPDATE",
+						'onclick' => "api.audit('get', 'checks', 'audits')"
+					]
+				]
+			]
+		];
 		$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
 		foreach ($audits as $audit){
 			if (!$audit['closed']) continue;
+			if ($from > $audit['last_touch'] || $until < $audit['last_touch']) continue;
 			$audit['content'] = json_decode($audit['content'], true);
 			$current = [
 				[
@@ -1947,10 +1976,39 @@ class AUDIT extends API {
 	 * 
 	 */
 	private function managementreviews(){
-		$content = [];
+		$lastYear = clone $this->_date['usertime'];
+		$lastYear = $lastYear->modify('-1 year');
+		$from = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.start_date')) ?: $lastYear->format('Y-m-d');
+		$until = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.records.end_date')) ?: $this->_date['usertime']->format('Y-m-d');
+		$content = [
+			[
+				[
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.start_date'),
+						'value' => $from,
+						'data-usecase' => 'audit'
+					]
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records.end_date'),
+						'value' => $until,
+						'data-usecase' => 'audit'
+					]
+				], [
+					'type' => 'button',
+					'attributes' => [
+						'value' => "UPDATE",
+						'onclick' => "api.audit('get', 'checks', 'managementreviews')"
+					]
+				]
+			]
+		];
 		$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
 		foreach ($managementreviews as $managementreview){
 			if (!$managementreview['closed']) continue;
+			if ($from > $managementreview['last_touch'] || $until < $managementreview['last_touch']) continue;
 			$managementreview['content'] = json_decode($managementreview['content'], true);
 			$current = [
 				[
@@ -2733,6 +2791,7 @@ class AUDIT extends API {
 					$summary['files'] = array_keys($item['content']);
 					break;
 				case 'code':
+					// this is not directly implemented as markdown by default, for the codeblock to have a smaller font size, decided by PDF using the prefix
 					$summary['content'][$item['attributes']['name']] = '::CODE::' . $item['attributes']['value'];	
 					break;
 			}
