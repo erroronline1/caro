@@ -451,7 +451,14 @@ class FILEHANDLER{
 			$mime = 'application/octet-stream';
 			if (!str_starts_with($attributes['href'], 'data:')) {
 				$file = array_merge($file, pathinfo($attributes['href']));
-				$mime = mime_content_type($file['realpath']);
+				if (self::isInFilesystem($file['realpath'])) $mime = mime_content_type($file['realpath']);
+				else {
+					$dbfile = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [
+						':path' => $file['realpath']
+					]);
+					$dbfile = $dbfile ? $dbfile[0] : null;
+					$mime = $dbfile['mime_type'] ?? $mime;
+				}
 			}
 			else if ($dataurlname){
 				$file['basename'] = $dataurlname;
