@@ -666,20 +666,18 @@ Für Risiken mit der selben Ursache, Auswirkung, Maßnahme und verbleibender Ma�
 
 ### Audit
 Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele, der Auditmethode und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt, [umsortiert](#verschiedenes) und reimportiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.  
-Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren.
+Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de-fullpage.png)
 
-Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem letzten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
+Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem letzten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20de-fullpage.png)
 
 [Übersicht](#übersicht)
 
 ### Managementbericht
-Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umgewandelt werden. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) umgesetzt. Abgeschlossene Managementberichte können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
-
-Der Großteil der CARO App ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittels [Markdown](#markdown)-Syntax möglich.  
+Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umgewandelt werden. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) umgesetzt. Abgeschlossene Managementberichte können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
 [Übersicht](#übersicht)
 
@@ -2069,7 +2067,7 @@ names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CUSTOMERID|PRODUCTS|EXPIREDDOCUMENTS)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
-filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
+filename[characters] = "[^\s\w\d]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 
 [lifespan]
 calendar[autodelete] = 365 ; Tage nach denen abgeschlossene Kalendereinträge gelöscht werden sofern nicht anderweitig angegeben
@@ -2153,7 +2151,7 @@ orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen
 ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu stornieren oder Rücksendungen zu veranlassen
 orderdisplayall = "purchase, purchase_assistant" ; standardmäßig alle Bestellungen anzeigen
 orderprocessing = "purchase"; Bestellungen bearbeiten
-products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
+products = "ceo, qmo, purchase, prrc" ; Artikel anlegen und bearbeiten, Schlüsselrollen sollten mit incorporation übereinstimmen
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
 recordscasestate = "ceo, supervisor, office" ; Fall-Stände bearbeiten
 recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen, Kennzeichen ändern (z.B. bei versehentlicher doppelter Anlage)
