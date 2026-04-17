@@ -106,7 +106,7 @@ body > header {
 
 	/* service worker not registered */
 	& > div:nth-of-type(2) {
-		right: 1rem;
+		right: 5.5rem;
 		top: 1rem;
 		height: 2rem;
 		width: 2rem;
@@ -121,7 +121,7 @@ body > header {
 
 	/* server connection loss */
 	& > div:nth-of-type(3) {
-		right: 1rem;
+		right: 3.5rem;
 		top: 1rem;
 		height: 2rem;
 		width: 2rem;
