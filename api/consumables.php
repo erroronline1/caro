@@ -1313,7 +1313,7 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value; if (_searchlabel) _client.application.postLabelSheet(_searchlabel, null, {_type:'" . $type . "'});",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
@@ -1322,9 +1322,17 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search_label'),
+									'name' => $this->_lang->GET('consumables.product.search_label_qr'),
 									'id' => '_searchlabel',
 									'value' => ($product['article_no'] ?: ($product['erp_id'] ?: $product['article_name'])) . ' +vendor_name:"' . $product['vendor_name'] . '"'
+								]
+							],
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.search_label_text'),
+									'id' => '_searchlabel2',
+									'value' => ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name']
 								]
 							],
 							...$labels
@@ -1553,7 +1561,7 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value; if (_searchlabel) _client.application.postLabelSheet(_searchlabel, null, {_type:'" . $type . "'});",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
@@ -1562,9 +1570,17 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search_label'),
+									'name' => $this->_lang->GET('consumables.product.search_label_qr'),
 									'id' => '_searchlabel',
 									'value' => ($product['article_no'] ?: ($product['erp_id'] ?: $product['article_name'])) . ' +vendor_name:"' . $product['vendor_name'] . '"'
+								]
+							],
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.search_label_text'),
+									'id' => '_searchlabel2',
+									'value' => ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name']
 								]
 							],
 							...$labels
@@ -2108,6 +2124,7 @@ class CONSUMABLES extends API {
 	 * @param string js event
 	 */
 	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
+		if (!$similarproducts) return '';
 		if (gettype($substring) === 'array') $substring = implode(',', $substring);
 		return "let similarproducts = " . UTILITY::json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
 			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
