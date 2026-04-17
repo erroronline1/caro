@@ -382,7 +382,7 @@ Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müsse
 #### Komponentenbearbeitung
 Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 * Scannerfeld, optional als Mehrfachauswahl und Kennzeichen
-* Textabschnitt für informative Zwecke ohne Eingabe, standardmäßig mit [Markdown](#markdown) für eine Formatierung. Bei dem Export von Aufzeichnungen wird dem Inhalt `::MARKDOWN::`vorangestellt um den Inhalt entsprechend darzustellen. Theoretisch geschieht das auch wenn diese Zeichenketten manuell vorangestellt wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
+* Textabschnitt für informative Zwecke ohne Eingabe, standardmäßig mit [Markdown](#markdown) für eine Formatierung.
 * Bild um beispielsweise Informationgrafiken einzubinden
 * einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
 * mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben
@@ -2113,6 +2113,8 @@ image[signature] = 512 ; maximale Pixel für längste Seite, extra schlechte Auf
 length[identifier] = 128 ; Zeichenlänge für Kennzeichen, je länger desto komplexer und fehleranfälliger wird der QR-Code. 8-9 Zeichen werden für einen Zeitstempel automatisch angefügt
 length[record_overview] = 1024 ; maximal angezeigte offene Dokumentationen
 length [products_per_slide] = 6 ; weniger erzeugt mehr Slides, mehr vergößert die jeweiligen Boxen
+
+messages[reminder] = 20 ; sofern nicht in den Nutzereinstellungen deaktiviert wird eine nervige Erinnerung laut vorgelesen, sobald mehr als die eingestellte Anzahl ungelesener Nachrichten vorliegen
 
 quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 quality[risk_acceptance_level] = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe, gemäß der Anzahl entsprechender Einträge in den Sprachdateien
