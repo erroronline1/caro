@@ -414,8 +414,8 @@ const _ = {
 	},
 	file: {
 		// kudos https://web.dev/patterns/files/drag-and-drop-files
-		supportsFileSystemAccessAPI: "getAsFileSystemHandle" in DataTransferItem.prototype,
-		supportsWebkitGetAsEntry : "webkitGetAsEntry" in DataTransferItem.prototype,
+		// supportsFileSystemAccessAPI: "getAsFileSystemHandle" in DataTransferItem.prototype,
+		// supportsWebkitGetAsEntry : "webkitGetAsEntry" in DataTransferItem.prototype,
 
 		dragin: async function (dragarea, destination_input) {
 			dragarea.addEventListener("dragover", (e) => {
@@ -432,7 +432,7 @@ const _ = {
 			dragarea.addEventListener("drop", async (e) => {
 				e.preventDefault();
 				dragarea.style.outline = "";
-				const fileHandlesPromises = [...e.dataTransfer.items].filter((item) => item.kind === "file").map((item) => (this.supportsFileSystemAccessAPI ? item.getAsFileSystemHandle() : this.supportsWebkitGetAsEntry ? item.webkitGetAsEntry() : item.getAsFile()));
+				/*const fileHandlesPromises = [...e.dataTransfer.items].filter((item) => item.kind === "file").map((item) => (this.supportsFileSystemAccessAPI ? item.getAsFileSystemHandle() : this.supportsWebkitGetAsEntry ? item.webkitGetAsEntry() : item.getAsFile()));
 				for await (const handle of fileHandlesPromises) {
 					if (handle.kind === "directory" || handle.isDirectory) {
 						return;
@@ -440,6 +440,9 @@ const _ = {
 						destination_input.files = e.dataTransfer.files;
 					}
 				}
+				*/
+				// kudos https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files
+				destination_input.files = e.dataTransfer.files; // should it be that simple? confirm for other browsers
 				destination_input.dispatchEvent(new Event("change"));
 			});
 		},
