@@ -738,7 +738,7 @@ class TOOL extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->get('tool.markdown.editor'),
-									'rows' => 24,
+									'rows' => 16,
 									'value' => $markdown ? : ''
 								]
 							], [
