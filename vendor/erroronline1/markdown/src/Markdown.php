@@ -11,65 +11,86 @@
 
 namespace erroronline1\Markdown;
 
+class ListTypeGenerator{
+	/**
+	 * being able to assign/instatiate a new generator function
+	 */
+	public function generator(){
+		while(true){
+			yield '1';
+			yield 'I';
+			yield 'i';
+			yield 'A';
+			yield 'a';
+		}
+	}
+}
+
 class Markdown {
-	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
-		private $_a_md = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))([^\)]|$)/m'; // regular md links
-	private $_blockquote = '/(^>{1,} .*(?:\n|$|\Z))+/m';
+	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,"\'>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
+		private $_a_md = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))(?!\))/m'; // regular md links; rewrite working regex101.com expression on construction for correct escaping of \
+	private $_blockquote = '/(^>{1,}.*?\n$)+/ms';
 	private $_br = '/ +\n/';
-	private $_code_block = '/^ {0,3}([`~]{3}.*?)\n((?:.+?\n)+)^ {0,3}([`~]{3})\n/m';
+	private $_code_block = '/^ {0,3}([`~]{3})(.*?)\n((?:.|\n)+?)\n^ {0,3}\1\n/m';
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_compress = '/>\n+|\n *<|[^>]\n+<[^\/]/m';
 	private $_definition = '/(^.+?\n)((?:^: .+?\n)+)/m';
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_footnote = '/\[\^(.+?)\](:.+?\n(?: {4}.*?\n)*)*/';
-	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
+	private $_headings = '/(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
 		private $_inlineEvents = '/on\w+?=(\'|").+?(?<!\\)\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|href=(\'|")javascript:.+?(?<!\\)\3/mi'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_larger = '/(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_list_any = '/((?:^ {0,3})(\*|\-|\+|\d+\.) (?:.|\n)+?)(?:\n$|\Z)/mi';
-	private $_list_indented = '/\n(^ {4}.+?\n)+/m';
-	private $_list_line = '/(^ {0,3}(\*|\-|\+|\d+\.) )*(.+)/';
+	private $_list = '/((?:^)(\*|\-|\+|\d+\.) {1,3}(?:.|\n)+?)(?:\n$|\Z)/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_mark = '/==(.+?)==/';
 	private $_p = '/(?:^$\n|\A)((?<!^<)(?:(\n|.)(?!>$))+?)(?:\n^$|\Z)/mi';
 	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
+		private $_reference = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/m'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_s = '/(?<!\\)~{2}([^\n]+?)(?<!\\| |\n)~{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_sub = '/(?<!\\)~{1}([^\n]+?)(?<!\\| |\n)~{1}/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_sup = '/(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/';
-	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
+	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n((?:(?:\|.+?){1,}\|(?:\n|$))+)/m';
 	private $_task = '/\[(\s*x{0,1}\s*)\] (.+?(?:\n|\Z))/mi';
-	private $_tidy_nl = '/>\n+|\n *<|[^>]\n+<[^\/]/m';
 
-	private $_headers = [];
+	// allowed characters for headers
 	private $_headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
+
+	// class properties to use over multiple methods
+	private $_headers = [];
+	private $_references = [];
 
 	// convert some tags currently nocht supported by the mentioned library
 	private $TCPDF = null;
 
 	/**
 	 * instatiate the interface
+	 * 
 	 * @param bool $TCPDF default null switches some tags for compatibility reasons
 	 */
 	public function __construct($TCPDF = null)
 	{
 		// rewrite working regex101.com expression on construction for correct escaping of \
-		$this->_a_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))([^\)]|$)/m'; // regular md links
+		$this->_a_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))(?!\))/m'; // regular md links
 		$this->_code_inline = '/(?<!' . preg_quote('\\', '/') . ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1/';
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
 		$this->_inlineEvents = '/on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|(\'|")javascript:.+?(?<!' . preg_quote('\\', '/') . ')\3/mi';
 		$this->_larger = '/(?<!' . preg_quote('\\', '/') . ')\^{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{2}/';
+		$this->_reference = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/m';
 		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
 		$this->_sub = '/(?<!' . preg_quote('\\', '/') . ')~{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{1}/';
 		$this->_sup = '/(?<!' . preg_quote('\\', '/') . ')\^{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{1}/';
 
 		$this->TCPDF = boolval($TCPDF); 
-
 	}
 
 	/**
+	 * convert a csv-file to markdown table
+	 * 
 	 * @param string $path filepath to csv
 	 * @param array $csv dialect options
 	 * @return string|exception Marktown table or exception for lack of rows
@@ -94,9 +115,9 @@ class Markdown {
 				// set header as data keys
 				foreach($row as &$column){
 					if ($column) {
-						$bom = pack('H*','EFBBBF'); //coming from excel this is utf8
-						// delete bom, convert linebreaks to space
-						$column = preg_replace(["/^$bom/", '/\n/'], ['',' '], $column);
+						$bom = pack('H*','EFBBBF'); // coming from excel this is utf8
+						// delete bom, convert linebreaks to br
+						$column = preg_replace(["/^$bom/", '/\n/'], ['','<br />'], $column);
 					}
 				}
 				$md .= '| ' . implode(' | ', $row) . " |\n";
@@ -115,6 +136,8 @@ class Markdown {
 	}
 
 	/**
+	 * convert a markdown table to csv
+	 * 
 	 * @param string $content Markdown table
 	 * @param array $csv dialect options
 	 * @return array|exception [tempfile => string, headers => string] or exception due to lack of identified tables
@@ -162,64 +185,102 @@ class Markdown {
 	}
 
 	/**
+	 * entry method to convert a text to markdown
+	 * 
 	 * @param string $text Markdown styled
 	 * @param bool $safeMode returns anchors as specialchars
+	 * @param array $limitTo process only given methods, empty for all
 	 * @return string as HTML
 	 */
-	public function md2html($text, $safeMode = false){
+	public function md2html($text, $safeMode = false, $limitTo = []){
 		$text = preg_replace(['/\r/','/\t/'], ['', '    '], $text ?: '') . "\n"; // add a new line for improved pattern matching by default
 
-		// ensure a proper processing order
-		$text = $this->footnote($text); // should come first to avoid mishandling indentation and reutilizing list and sup
-		$text = $this->blockquote($text); // should come second to enable nesting
-		$text = $this->a($text, $safeMode); // safeMode can not render anchors to avoid malicious scripts
-		$text = $this->code($text);
-		$text = $this->headings($text); // before hr avoiding conversion of ----
-		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
-		$text = $this->definition($text);
-		$text = $this->emphasis($text);
-		$text = $this->img($text);
-		$text = $this->task($text); // before list otherwise only the first occasionally nested item is converted
-		$text = $this->list($text);
-		$text = $this->mail($text, $safeMode); // safeMode can not render anchors to avoid malicious scripts
-		$text = $this->mark($text);
-		$text = $this->pre($text);
-		$text = $this->s($text);
-		$text = $this->larger($text); // before sup for using the same character twice
-		$text = $this->sub($text);
-		$text = $this->sup($text);
-		$text = $this->table($text);
-		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-		$text = $this->br($text);
-		$text = $this->inlineEvents($text, $safeMode); // safeMode can not render inline events and scripts to avoid malicious inserts
+		foreach ([
+			"footnote", // should come first to avoid mishandling indentation and reutilizing list and sup
+			"blockquote", // should come second to enable nesting
+			"reference", // before a and footnote to not mess up with similar patterns
+			"a", // safeMode can not render anchors to avoid malicious scripts
+			"code",
+			"headings", // before hr avoiding conversion of ----
+			"hr", // before emphasis avoiding matching *** as emphasis
+			"definition",
+			"emphasis",
+			"img",
+			"task", // before list otherwise only the first occasionally nested item is converted
+			"list",
+			"mail", // safeMode can not render anchors to avoid malicious scripts
+			"mark",
+			"pre",
+			"s",
+			"larger", // before sup for using the same character twice
+			"sub",
+			"sup",
+			"table",
+			"p", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+			"br",
+			"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
+		] as $method) {
+			if (!$limitTo || in_array($method, $limitTo) || ($safeMode && in_array($method, ["a", "inlineEvents", "reference", "mail"]))) {
+				if (in_array($method, ["a", "inlineEvents", "reference", "mail"])) $text = $this->$method($text, $safeMode);
+				else $text = $this->$method($text);
+			}
+		}
 
 		$text = $this->escape($text); // should come after other stylings have been applied
-		$text = $this->tidy_nl($text);
+		$text = $this->compress($text);
+		$text = preg_replace(['/\t/'], ['    '], $text); // revert code indentation
 
 		return "<!-- Markdown parsing by error on line 1, https://github.com/erroronline1/markdown -->\n" . $text;
 	}
 
+	/**
+	 * escape special chars for code, pre and in case of safeMode
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
+	private function escapeHtml($content){
+		return str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $content);
+	}
+
+	/**
+	 * development helper...
+	 */
 	private function debug(...$content){
 		echo "<pre>"; var_dump(...$content); echo "</pre>";
 	}
 
-	private function tidy_nl($content){
-		// replace links in this order
-		return preg_replace_callback($this->_tidy_nl,
+	/**
+	 * strip new lines near tags to compress result 
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
+	private function compress($content){
+		return preg_replace_callback($this->_compress,
 			function($match){
 				return preg_replace('/[\n\s]+/', ' ', $match[0]);
 			},
 			$content);
 	}
 
+	/**
+	 * replaces links unless already converted by the reference-method or external links in safeMode
+	 * internal links are always rendered since considerable safe
+	 * 
+	 * @param string $content
+	 * @param bool $safeMode
+	 * @return string
+	 */
 	private function a($content, $safeMode = false){
 		// replace links in this order
+		$_references = $this->_references;
 		$content = preg_replace_callback($this->_a_auto,
-			function($match) use ($safeMode){
+			function($match) use ($safeMode, $_references){
+				if (in_array($match[1], $_references)) return $match[1]; // avoid duplication of link creation from references
 				if (str_starts_with($match[1],'#')) return '<a href="' . $match[1] . '" class="eol1_md">' . htmlspecialchars($match[1]) . '</a>';
 				if ($safeMode) return htmlspecialchars($match[0]);
 				return '<a href="' . $match[1] . '" class="eol1_md">' . htmlspecialchars($match[1]) . '</a>';
-				//return '<a href="' . $match[0] . '" target="_blank" class="eol1_md">' . $match[0] . '</a>';
 			},
 			$content);
 		$content = preg_replace_callback($this->_a_md,
@@ -238,47 +299,64 @@ class Markdown {
 					//$url .= '" target="_blank';
 				}
 				if (isset($match[3]) && $match[3]) $url .= '" title="' . substr($match[3], 2, -1);
-				return '<a href="' . $url . '" class="eol1_md">' . $match[1] . '</a>' . $match[4];
+				return '<a href="' . $url . '" class="eol1_md">' . $match[1] . '</a>';
 			},
 			$content
 		);
 		return $content;
 	}
 
-	private function blockquote($content, $sub = false){
-		// replace blockquotes recursively
+	/**
+	 * replace blockquotes recursively
+	 * 
+	 * @param string $content
+	 * @param bool $recursion for altered behaviour on pattern relevant linbreak wrappers
+	 * @return string
+	 */
+	private function blockquote($content, $recursion = false){
 		$content = preg_replace_callback($this->_blockquote,
-			function($match) use ($sub){
-				$match[0] = $this->blockquote(preg_replace(['/^\n|\n$/', '/^> {0,1}|^ /m'], '', $match[0]), $sub); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
-				if ($sub) return '<blockquote class="eol1_md">' . $match[0] . '</blockquote>'; // fence with tag
-				return "<blockquote class=\"eol1_md\">\n" . $match[0] . "\n</blockquote>\n"; // fence with tag, add linebreak for pattern recognition
+			function($match) use ($recursion){
+				$match[0] = $this->blockquote(preg_replace(['/^\n|\n$/', '/^> {0,1}|^ /m'], '', $match[0]), true); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
+				if ($recursion) return '<blockquote class="eol1_md"><p>' . $match[0] . "</p></blockquote>"; // fence with tags
+				return '<blockquote class="eol1_md"><p>' . "\n" . $match[0] . "\n</p></blockquote>\n";
 			},
 			$content
 		);
 		return $content;
 	}
 
+	/**
+	 * replace linebreaks
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function br($content){
-		// replace linebreaks
 		return preg_replace($this->_br,
 			"<br />",
 			$content
 		);
 	}
 
-	private function code($content, $sub = false){
-		// replace code
+	/**
+	 * replace fenced or quoted code
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
+	private function code($content){
+		// replace fenced or quoted code
 		$content = preg_replace_callback($this->_code_block,
-			function($match) use ($sub){
-				if ($match[1] == $match[3])	return '<pre class="eol1_md">' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], preg_replace('/^\n|\n$/m', '', $match[2])) . "</pre>" . ($sub ? '' : "\n");
-				return $match[0];
+			function($match){
+				// $match[2] would be a specified language, not sure what to do with that yet
+				return '<pre class="eol1_md">' . (!$this->TCPDF ? '<code class="eol1_md">' : '') . str_replace('    ', "\t", $this->escapeHtml($match[3])) . (!$this->TCPDF ? '</code>' : '') . "</pre>"; // replace 4 spaces within code with tabs to avoid collision with pre
 			},
 			$content);
 
 		if ($this->TCPDF) {
 			$content = preg_replace_callback($this->_code_inline,
 				function($match){
-					return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $match[2]) . '</span>'; // current implementation of tcpdf does not support code
+					return '<span style="font-family: monospace;">' . $this->escapeHtml($match[2]) . '</span>'; // current implementation of tcpdf does not support code
 				},
 				$content
 			);
@@ -286,7 +364,7 @@ class Markdown {
 		else {
 			$content = preg_replace_callback($this->_code_inline,
 				function($match){
-					return '<code class="eol1_md">' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], $match[2]) . '</code>';
+					return '<code class="eol1_md">' . $this->escapeHtml($match[2]) . '</code>';
 				},
 				$content
 			);
@@ -294,8 +372,13 @@ class Markdown {
 		return $content;
 	}
 
+	/**
+	 * replace definition lists
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function definition($content){
-		// create a definition block
 		return preg_replace_callback($this->_definition, 
 			function($match) {
 				$definitions = [];
@@ -308,11 +391,16 @@ class Markdown {
 		);
 	}
 
+	/**
+	 * replace all em and strong formatting
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function emphasis($content){
-		// replace all em and strong formatting
 		return preg_replace_callback($this->_emphasis, 
 			function($match) {
-				// check whether **opening and closing*** match
+				// check whether **opening and closing*** match (or underscore respectively)
 				$wrapper = strlen($match[1]);
 				$tags = [
 					[], // wrapper offset, easier than reducing index
@@ -320,22 +408,33 @@ class Markdown {
 					['<strong>', '</strong>'],
 					['<em><strong>', '</strong></em>']
 				];
-				return $tags[$wrapper][0] . $match[2] . $tags[$wrapper][1];
+				return $tags[$wrapper][0] . $this->emphasis($match[2]) . $tags[$wrapper][1];
 			},
 			$content
 		);
 	}
 
+	/**
+	 * replace escaped characters
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function escape($content){
-		// replace escaped characters
 		return preg_replace($this->_escape,
 			'$1',
 			$content
 		);
 	}
 
+	/**
+	 * replace footnote references with links an append an actual footnote list at the end of the content
+	 * no need for safeMode, since these are internal links only
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function footnote($content){
-		// create footnotes
 		// find all footnotes
 		preg_match_all($this->_footnote, $content, $footnotes);
 		$_footnotes = [];
@@ -365,8 +464,13 @@ class Markdown {
 		return $content . ($footnote_appendix ? "\n<hr>\n" . $footnote_appendix . "\n" : '');
 	}
 
+	/**
+	 * replace headers and assign auto or custom ids
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function headings($content){
-		// replace headers
 		return preg_replace_callback($this->_headings,
 			function($match){
 				if (!isset($match[4])){
@@ -400,16 +504,26 @@ class Markdown {
 		);
 	}
 
+	/**
+	 * replace hr
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function hr($content){
-		// replace hr	
 		return preg_replace($this->_hr,
 			"<hr>",
 			$content
 		);
 	}
 	
+	/**
+	 * replace images
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function img($content){
-		// replace images
 		if ($this->TCPDF) return preg_replace($this->_img,
 				'<img alt="$1" src="$2" style="float:left; max-width:100%" />',
 				$content
@@ -421,8 +535,15 @@ class Markdown {
 
 	}
 
+	/**
+	 * replace inline events, href-javascript and some tags with spechialchars
+	 * may break some links but better safe than sorry
+	 * 
+	 * @param string $content
+	 * @param bool $safeMode
+	 * @return string
+	 */
 	private function inlineEvents($content, $safeMode){
-		// replace onclick, on-whatever with specialchars
 		if ($safeMode) {
 			return preg_replace_callback($this->_inlineEvents,
 				function($match){
@@ -433,60 +554,81 @@ class Markdown {
 		return $content;
 	}
 
+	/**
+	 * replace lager font decorator
+	 * THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function larger($content){
-		// make font size larger - CUSTOM MARKDOWN
 		return preg_replace($this->_larger,
 			'<span class="eol1_md" style="font-size:larger;">$1</span>',
 			$content
 		);
 	}
 
-	private function list($content, $sub = false){
-		// detect any lists
-		// recursively replace nested lists
-		$content = preg_replace_callback($this->_list_any,
-			function($match){
-				// check lists for subelements, lists, blockquote, code, table or pre
-				return preg_replace_callback($this->_list_indented,
-					function($indented){
-						return preg_replace('/^\n/', '', $this->list(preg_replace('/^ {4}/m', '', $indented[0] . "\n"), true));  // drop leading linebreak, but add one to end for pattern recognition
-					},
-					$match[0]
-				);
+	/**
+	 * detects list and replaces list items recursively with available nested blocks
+	 * 
+	 * @param string $content
+	 * @param bool|Generator $recursion for passing down a generator for ol list styles
+	 * @return string
+	 */
+	private function list($content, $recursion = false){
+		$content = preg_replace_callback($this->_list,
+			function($match) use ($recursion){
+				// used recursion is immutable between each callback function appliance
+				// first list item decides for the type
+				$li_type = intval($match[2]) > 0 ? 'ol' : 'ul';
+				$entries = [];
+				switch($li_type){
+					case 'ol':
+						$item_split = '/^\d+\. */m';
+						if (gettype($recursion) === 'boolean') {
+							$recursion = new ListTypeGenerator();
+							$recursion = $recursion->generator();
+						}
+						else $recursion->next();
+						$type = ' type="' . $recursion->current() . '"'; 
+						break;
+					case 'ul':
+						$item_split = '/^[\*|\-|\+] */m';
+						$recursion = true;
+						$type = '';
+						break;
+				}
+				foreach(preg_split($item_split, $match[0]) as $list_entry){
+					if ($list_entry){
+						// recursively replace nested items
+						$list_entry = $this->list(preg_replace('/^ {4}/m', '', $list_entry . "\n"), $recursion);  // add linebreak to end for pattern recognition
+						$entries[] = ($this->TCPDF && $li_type === 'ol' ? str_repeat('&nbsp;', 3) : '') . trim($list_entry);
+					}
+				}
+				return '<' . $li_type . $type . ' class="eol1_md"><li>' . implode('</li><li>', $entries) . '</li></' . $li_type . '>';
 			},
 			$content
 		);
-		if ($sub){
-			// replace possible nested blocks in advance to list matching
+		if ($recursion){
+			// replace possible nested blocks in list item
 			$content = $this->blockquote($content, true);
-			$content = $this->code($content, true);
+			$content = $this->code($content);
 			$content = $this->definition($content);
 			$content = $this->table($content);
 			$content = $this->pre($content);
 		}
-
-		$content = preg_replace_callback($this->_list_any,
-			function($match){
-				// first list item decides for the type
-				$type = intval($match[2]) > 0 ? 'ol' : 'ul';
-				$entries = [];
-				foreach(explode("\n", $match[1]) as $line){
-					preg_match($this->_list_line, $line, $list_line);
-					if ($list_line){
-						// add some whitespace fpr TCPDF because ordered lists are a bit misaligned, and I couldn't fix that with styling
-						if (empty($entries[count($entries) - 1]) || !empty($list_line[2])) $entries[] = ($this->TCPDF && $type === 'ol' ? str_repeat('&nbsp;', 3) : '') .$list_line[3] . "\n"; // add trailing linebreak to preserve pattern recognition
-						else $entries[count($entries) - 1] .= ' '. $list_line[3] . "\n"; // add trailing linebreak to preserve pattern recognition
-					}
-				}
-				return '<' . $type . ' class="eol1_md"><li>' . implode('</li><li>', $entries) . '</li></' . $type . '>';
-			},
-			$content
-		);
 		return $content;
 	}
 
+	/**
+	 * replace email adresses with mailto link unless in safeMode
+	 * encoded by default
+	 * 
+	 * @param string $content
+	 * @param bool $safeMode
+	 * @return string
+	 */
 	private function mail($content, $safeMode){
-		// replace mailto
 		if ($safeMode) {
 			return preg_replace_callback($this->_mail,
 				function($match){
@@ -508,8 +650,13 @@ class Markdown {
 		);
 	}
 
+	/**
+	 * replace marked text
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function mark($content){
-		// replace mark
 		if ($this->TCPDF) return preg_replace($this->_mark,  // current implementation of tcpdf does not support mark
 			"<span style=\"background-color:yellow\">$1</span>",
 			$content);
@@ -519,50 +666,121 @@ class Markdown {
 			$content);
 	}
 
+	/**
+	 * replace paragraphs
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function p($content){
-		// replace p
 		return preg_replace($this->_p,
 			"<p>$1</p>\n",
 			$content);
 	}
 
+	/**
+	 * replace indented code / preformatted text
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function pre($content){
-		// replace code/pre
 		$content = preg_replace_callback($this->_pre,
 			function($match){
-				return '<pre class="eol1_md">' . str_replace(['&', '<', '>', '"', '\''], ['&amp;', '&lt;', '&gt;', '&quot;', '&#039;'], preg_replace('/^ {4}/m', '', $match[0])) . "</pre>";
+				return '<pre class="eol1_md">' . $this->escapeHtml(preg_replace('/^ {4}/m', '', $match[0])) . "</pre>";
 			},
 			$content
 		);
 		return $content;
 	}
 
+	/**
+	 * replace references unless in safeMode
+	 * then an internal link to the escaped reference will be generated
+	 * like a footnote but without altering the position within the content
+	 * 
+	 * @param string $content
+	 * @param bool $safeMode
+	 * @return string
+	 */
+	private function reference($content, $safeMode = false){
+		// replace references
+		preg_match_all($this->_reference, $content, $matches);
+		// look for actual available references
+		foreach ($matches[0] as $index => $match) {
+			if ($matches[4][$index] && trim($matches[4][$index])) $this->_references[$matches[3][$index]] = trim($matches[4][$index]);
+		}
+		$_references = $this->_references;
+		// link references
+		$content = preg_replace_callback($this->_reference,
+			function($match) use ($safeMode, $_references) {
+				if ($safeMode) {
+					// i don't know if this is canon, but i assume this might be a practical solution for safe mode to link to the escaped reference
+					if ($match[2]) {
+						if (isset($_references[$match[2]])) return '<a href="#ref:' . $match[2] . '">' . $match[1] . "</a>";
+						else return $match[1];
+					} else if ($match[4]) return '<a id="ref:' . $match[3] . '" class="eol1_md"></a>(' . $this->escapeHtml($match[4]) .")";
+				} else {
+					// return link with reference
+					if ($match[2]) {
+						if (isset($_references[$match[2]])) return '<a href="' . $_references[$match[2]] . '">' . $match[1] . "</a>";
+						else return $match[1];
+					}
+					// strip reference from text
+					else if ($match[4]) return '';
+				}
+			},
+			$content
+		);
+		return $content;
+	}
+
+	/**
+	 * replace strikethrough
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function s($content){
-		// replace s
 		return preg_replace($this->_s,
 			"<s>$1</s>",
 			$content
 		);
 	}
 
+	/**
+	 * replace subscript
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function sub($content){
-		// replace sub
 		return preg_replace($this->_sub,
 			"<sub>$1</sub>",
 			$content
 		);
 	}
 
+	/**
+	 * replace superscript
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function sup($content){
-		// replace sup
 		return preg_replace($this->_sup,
 			"<sup>$1</sup>",
 			$content
 		);
 	}
 
+	/**
+	 * replace tables
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function table($content){
-		// replace tables
 		$content = preg_replace_callback($this->_table,
 			function($match){
 				$rows = explode("\n", $match[0]);
@@ -600,8 +818,13 @@ class Markdown {
 		return $content;
 	}
 
+	/**
+	 * replace tasks with checkboxes unless in TCPDF-mode
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
 	private function task($content){
-		//replace tasks
 		if ($this->TCPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
 			function($match){
 				return (trim(strtolower($match[1])) ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];

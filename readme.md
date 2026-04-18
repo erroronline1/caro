@@ -368,7 +368,7 @@ The personnel register gives an overview of all registered users, also grouped b
 [Content](#content)
 
 ### Text recommendations
-To avoid unneccesary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
+To avoid unnecessary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
 * Child female - the girl
 * Child male - the boy
 * Child genderless - the child
@@ -6582,9 +6582,9 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * [ASL 2.0 license](https://github.com/MatheusAvellar/textarea-line-numbers?tab=Apache-2.0-1-ov-file)
     * slightly modified to drop font names, font sizes and colours, .tln-wrapper top padding adjustments within css
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
-    * renders Markdown to HTML
-    * Justification: formatting text without the need of a rich text editor.
-    * v1.1.5
+    * Markdwown utilities
+    * Justification: formatting text without the need for a rich text editor.
+    * v1.2.0
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
