@@ -333,7 +333,7 @@ class PDF{
 				}
 
 				// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value, true), 0, 1, 0, true, '', true);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value, true, ["list", "emphasis", "larger", "br"]), 0, 1, 0, true, '', true);
 				//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
