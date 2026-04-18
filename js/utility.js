@@ -88,7 +88,7 @@ export const _serviceWorker = {
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
 					message_unseen = parseInt(data.message_unseen, 10);
 					if (data.message_unseen > api._settings.config.limits.messages && !api._settings.user.app_settings.icanread) {
-						_client._tts.speak(pi._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": data.message_unseen }));
+						_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": data.message_unseen }));
 					}
 				}
 				if ("responsibilities" in data) {
