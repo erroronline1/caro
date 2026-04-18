@@ -87,7 +87,7 @@ export const _serviceWorker = {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("message.navigation.conversations").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
 					message_unseen = parseInt(data.message_unseen, 10);
-					if (data.message_unseen > api._settings.application.limits.messages && !api._settings.user.app_settings.icanread) {
+					if (data.message_unseen > api._settings.config.limits.messages && !api._settings.user.app_settings.icanread) {
 						_client._tts.speak(pi._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": data.message_unseen }));
 					}
 				}
@@ -332,6 +332,17 @@ export const _client = {
 		},
 
 		/**
+		 *
+		 * @param {string|domNode} inputElement
+		 */
+		markdownpreview: (inputElement) => {
+			const formdata = new FormData();
+			if (typeof inputElement === "string") inputElement = document.getElementById(inputElement);
+			if (inputElement) formdata.append(api._lang.GET("tool.markdown.editor"), inputElement.value);
+			api.tool("post", "markdown", null, formdata);
+		},
+
+		/**
 		 * requests a pdf identifier label from backend
 		 * @requires api
 		 * @param {string} value
@@ -523,9 +534,21 @@ export const _client = {
 					attributes: {
 						name: api._lang.GET("message.message.message"),
 						rows: 8,
-						value: message,
+						value: message ? message + "\n\n" : "",
+						id: "message",
+						autofocus: true,
 					},
 				},
+				{
+					type: "button",
+					attributes: {
+						value: api._lang.GET("tool.markdown.button"),
+						"data-type": "markdown",
+						class: "floatright",
+						onclick: '_client.application.markdownpreview("message")',
+					},
+				},
+				{ type: "br" },
 			];
 
 			// add datalist and set recipient type to text instead of hidden
