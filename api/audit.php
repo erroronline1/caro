@@ -380,7 +380,8 @@ class AUDIT extends API {
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $question['question'],
 									'data-loss' => 'prevent',
-									'value' => isset($preset[$question['question']]) ? $preset[$question['question']][0] : ''
+									'value' => isset($preset[$question['question']]) ? $preset[$question['question']][0] : '',
+									'id' => 'auditquestion' . $number + 1 
 								]
 							], [
 								'type' => 'button',
@@ -388,7 +389,7 @@ class AUDIT extends API {
 									'value' => $this->_lang->GET('tool.markdown.button'),
 									'data-type' => 'markdown',
 									'class' => 'floatright',
-									'onclick' => 'api.tool("get", "markdown")'
+									'onclick' => '_client.application.markdownpreview("auditquestion' . $number + 1 . '")'
 								]
 							], [
 								'type' => 'textsection',
@@ -413,7 +414,8 @@ class AUDIT extends API {
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.statement'),
 									'data-loss' => 'prevent',
-									'value' => isset($preset['statement']) ? $preset['statement'][0] : ''
+									'value' => isset($preset['statement']) ? $preset['statement'][0] : '',
+									'id' => 'auditstatemnt' . $number + 1
 								]
 							], [
 								'type' => 'button',
@@ -421,7 +423,7 @@ class AUDIT extends API {
 									'value' => $this->_lang->GET('tool.markdown.button'),
 									'data-type' => 'markdown',
 									'class' => 'floatright',
-									'onclick' => 'api.tool("get", "markdown")'
+									'onclick' => '_client.application.markdownpreview("auditstatement' . $number + 1 . '")'
 								]
 							], ...$proof
 						];	
@@ -434,7 +436,8 @@ class AUDIT extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $this->_lang->GET('audit.audit.execute.summary'),
-								'value' => $audit['content']['summary'] ?? ''
+								'value' => $audit['content']['summary'] ?? '',
+								'id' => 'auditsummary'
 							],
 							'hint' => $this->_lang->GET('audit.audit.execute.summary_hint')
 						], [
@@ -443,7 +446,7 @@ class AUDIT extends API {
 								'value' => $this->_lang->GET('tool.markdown.button'),
 								'data-type' => 'markdown',
 								'class' => 'floatright',
-								'onclick' => 'api.tool("get", "markdown")'
+								'onclick' => '_client.application.markdownpreview("auditsummary")'
 							]
 						], [
 							'type' => 'calendarbutton',
@@ -901,7 +904,7 @@ class AUDIT extends API {
 							'value' => $this->_lang->GET('tool.markdown.button'),
 							'data-type' => 'markdown',
 							'class' => 'floatright',
-							'onclick' => 'api.tool("get", "markdown")'
+							'onclick' => '_client.application.markdownpreview("TemplateObjectives")'
 						]
 					], [
 						'type' => 'br'
@@ -1858,7 +1861,8 @@ class AUDIT extends API {
 								'name' => $issue,
 								'value' => $managementreview['content'][$key] ?? '',
 								'data-loss' => 'prevent',
-								'onblur' => '_client.audit.managementreview()'
+								'onblur' => '_client.audit.managementreview()',
+								'id' => 'managementissue' . preg_replace('/[\W\D]/', '', $issue)
 							],
 							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
 						], [
@@ -1867,7 +1871,7 @@ class AUDIT extends API {
 								'value' => $this->_lang->GET('tool.markdown.button'),
 								'data-type' => 'markdown',
 								'class' => 'floatright',
-								'onclick' => 'api.tool("get", "markdown")'
+								'onclick' => '_client.application.markdownpreview("managementissue' . preg_replace('/[\W\D]/', '', $issue) . '")'
 							]
 						]
 					];

@@ -221,7 +221,8 @@ class MESSAGE extends API {
 					'type' => 'textarea',
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.text'),
-						'value' => isset($preset['text']) ? str_replace('\\\\n', '\n', addslashes($preset['text'])) : ''
+						'value' => isset($preset['text']) ? str_replace('\\\\n', '\n', addslashes($preset['text'])) : '',
+						'id' => 'announcement'
 					]
 				], [
 					'type' => 'button',
@@ -229,7 +230,7 @@ class MESSAGE extends API {
 						'value' => $this->_lang->GET('tool.markdown.button'),
 						'data-type' => 'markdown',
 						'class' => 'floatright',
-						'onclick' => 'api.tool(\\"get\\", \\"markdown\\")'
+						'onclick' => '_client.application.markdownpreview(\\"announcement\\")' // escape quotes for being rendered from onclick
 					]
 				], [
 					'type' => 'br'
@@ -366,6 +367,7 @@ class MESSAGE extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('message.message.message_to', [':user' => $conversation_user['name']]),
+									'id' => 'message'
 								],
 								'hint' => $this->_lang->GET('message.message.forward_hint')
 							], [
@@ -374,7 +376,7 @@ class MESSAGE extends API {
 								'value' => $this->_lang->GET('tool.markdown.button'),
 								'data-type' => 'markdown',
 								'class' => 'floatright',
-								'onclick' => 'api.tool("get", "markdown")'
+								'onclick' => '_client.application.markdownpreview("message")'
 							]
 						]
 						];
