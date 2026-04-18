@@ -1284,7 +1284,11 @@ export class Assemble {
 			});
 		}
 		document.querySelector("main").focus();
-		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
+		if (document.querySelector("[autofocus]")) {
+			const focused = document.querySelector("[autofocus]");
+			focused.focus();
+			setTimeout(function(){ focused.selectionStart = focused.selectionEnd = focused.value.length + 100; }, 0);
+		}
 	}
 
 	/**
