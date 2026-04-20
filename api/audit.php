@@ -415,7 +415,7 @@ class AUDIT extends API {
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.statement'),
 									'data-loss' => 'prevent',
 									'value' => isset($preset['statement']) ? $preset['statement'][0] : '',
-									'id' => 'auditstatemnt' . $number + 1
+									'id' => 'auditstatement' . $number + 1
 								]
 							], [
 								'type' => 'button',
@@ -1862,7 +1862,7 @@ class AUDIT extends API {
 								'value' => $managementreview['content'][$key] ?? '',
 								'data-loss' => 'prevent',
 								'onblur' => '_client.audit.managementreview()',
-								'id' => 'managementissue' . preg_replace('/[\W\D]/', '', $issue)
+								'id' => 'managementissue' . $key
 							],
 							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
 						], [
@@ -1871,7 +1871,7 @@ class AUDIT extends API {
 								'value' => $this->_lang->GET('tool.markdown.button'),
 								'data-type' => 'markdown',
 								'class' => 'floatright',
-								'onclick' => '_client.application.markdownpreview("managementissue' . preg_replace('/[\W\D]/', '', $issue) . '")'
+								'onclick' => '_client.application.markdownpreview("managementissue' . $key . '")'
 							]
 						]
 					];
