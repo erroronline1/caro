@@ -274,13 +274,15 @@ export const _client = {
 	_tts: {
 		voice: null,
 		getVoice: function (lang = "en") {
-			if (!!window.speechSynthesis) return;
+			if (!window.speechSynthesis) return;
 			const voices = window.speechSynthesis.getVoices();
+			// for (let i = 0; i < voices.length; i++) {
 			for (let i = voices.length - 1; i > 0; i--) {
-				// for (let i = 0; i < voices.length; i++) {
-				if (voices[i].lang.toLowerCase().startsWith(lang.toLowerCase()) && voices[i].name.slice(-2) === "ea") {
+				// the later the more advanced/natural? don't know about the browsers order
+				if (voices[i].lang.toLowerCase().startsWith(lang.toLowerCase())) {
 					this.voice = voices[i];
-					break;
+					// exit cases for a nice one have to be manually hardcoded depending on device specific results from api/_tts.html
+					if (voices[i].name.slice(-2) === "ea") break;
 				}
 			}
 		},
