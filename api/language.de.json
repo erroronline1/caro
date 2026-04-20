@@ -1950,6 +1950,7 @@
 			"hint": "Manche Einstellungen erfordern ein erneutes Laden der Oberfläche. Nutze dazu die Schaltfläche, Strg + F5 oder Strg + r, oder ziehe auf einem mobilen Gerät den Bildschirm nach unten.",
 			"homeoffice": "Homeoffice",
 			"icanread": "Ich lese meine Nachrichten",
+			"icanread_tts": "Wirklich, ehrlich?",
 			"idle": "Zeit nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt",
 			"idle_hint": "Die Verlängerung des Standardmindestwerts von :idle Sekunden kann im Sinne der Barrierefreiheit erforderlich sein, oder für den Einkauf bei komplexen Preislistenimports.",
 			"language": "Sprache",

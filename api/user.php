@@ -482,7 +482,7 @@ class USER extends API {
 				foreach (glob('../*.css') as $file){
 					$name = pathinfo($file)['filename'];
 					if (in_array($name, ['style'])) continue;
-					$theme[ucfirst($name)] = (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
+					$theme[ucfirst($name)] = ((!isset($user['app_settings']['theme']) && $name === 'light') || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
 				}
 				// available timezones
 				$timezones = [];
@@ -534,7 +534,7 @@ class USER extends API {
 								$this->_lang->GET('user.settings.force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings.masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings.icanread') => isset($user['app_settings']['icanread']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.icanread') => isset($user['app_settings']['icanread']) ? ['checked' => true, 'onchange' => 'if (this.checked) _client._tts.speak(api._lang.GET("user.settings.icanread_tts"))'] : ['onchange' => 'if (this.checked) _client._tts.speak(api._lang.GET("user.settings.icanread_tts"))'],
 							]
 						], [
 							// append preferred order layout
