@@ -1,18 +1,19 @@
 <html>
-<body>
-list of vailable voices for speech synthesis to refine the results within utility.js _client._tts.getVoice() (e.g. by early exiting)<br /><br />
-</body>
+	<body>
+		list of vailable voices for speech synthesis to refine the results within utility.js _client._tts.setVoice() (e.g. by early exiting)<br /><br />
+	</body>
 	<script>
-	function getVoices(languages = ['en']){
+		function getVoices(languages = ["en-gb"]) {
 			if (!window.speechSynthesis) {
-				return 'speechSynthesis not available';
+				return "speechSynthesis not available";
 			}
 			let voices = window.speechSynthesis.getVoices(),
 				options = {};
 			// roughly filter voices by language
-			voices = voices.filter(voice => {
+			voices = voices.filter((voice) => {
+				if (!languages) return true;
 				for (const lang of languages) {
-					if (voice.lang.toLowerCase().startsWith(lang)) return true;
+					if (voice.lang.toLowerCase().startsWith(lang.toLowerCase())) return true;
 				}
 				return false;
 			});
@@ -23,7 +24,9 @@ list of vailable voices for speech synthesis to refine the results within utilit
 			}
 			return `${navigator.userAgent}<br><pre>${JSON.stringify(options, null, 4)}</pre>`;
 		}
-	document.body.innerHTML += getVoices(['de', 'en']);
-</script>
-
+		window.speechSynthesis.getVoices();
+		setTimeout(() => {
+			document.body.innerHTML += getVoices(null);
+		}, 100);
+	</script>
 </html>
