@@ -301,6 +301,10 @@ export const api = {
 						link.id = "csstheme";
 						document.getElementsByTagName("head")[0].appendChild(link);
 					}
+					break;
+				case "language":
+					document.querySelector("html").lang = value;
+					_client._tts.voice = null;
 			}
 		}
 	},
@@ -733,9 +737,9 @@ export const api = {
 					);
 
 					// update default language
-					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
-						document.querySelector("html").lang = api._settings.config.application.defaultlanguage;
-						_client._tts.getVoice(api._settings.config.application.defaultlanguage);
+					if (api._settings.config.application && api._settings.config.application.language) {
+						document.querySelector("html").lang = api._settings.config.application.language;
+						_client._tts.voice = null;
 					}
 
 					// update application menu icon with user image
