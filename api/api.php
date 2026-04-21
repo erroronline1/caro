@@ -318,7 +318,8 @@ class API {
 			],
 			'config' => [
 				'application' => [
-					'defaultlanguage' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
+					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
+					'language' =>  $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
 					'debugging' => CONFIG['application']['debugging'] ?? false,
 					'is_development' => CONFIG['application']['is_development'] ?? false,
 				],
@@ -353,7 +354,7 @@ class API {
 				[
 					'type' => 'checkbox',
 					'content' => [
-						$this->_lang->GET('application.terms_of_service_accepted', [], true) => ['required' => true]
+						$this->_lang->GET('application.terms_of_service_accepted', [], true) => ['required' => true, 'onclick' => '_client._tts.speak(" ")'] // safari hack, initiate tts on user action
 					]
 				]
 			];
