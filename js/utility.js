@@ -8,7 +8,7 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-import { Assemble, Dialog, Toast } from "./assemble.js";
+import { Polyfill, Assemble, Dialog, Toast } from "./assemble.js";
 
 export const _serviceWorker = {
 	worker: null,
@@ -87,8 +87,8 @@ export const _serviceWorker = {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("message.navigation.conversations").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
 					message_unseen = parseInt(data.message_unseen, 10);
-					if (data.message_unseen > api._settings.config.limits.messages && !api._settings.user.app_settings.icanread) {
-						_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": data.message_unseen }));
+					if (data.message_unseen > 0) {
+						_client.message.escalation(data.message_unseen);
 					}
 				}
 				if ("responsibilities" in data) {
@@ -273,9 +273,16 @@ export const _client = {
 	Toast: Toast,
 	_tts: {
 		voice: null,
-		getVoice: function (lang = "en") {
+		voices: window.speechSynthesis.getVoices(),
+		setVoice: async function () {
 			if (!window.speechSynthesis) return;
-			const voices = window.speechSynthesis.getVoices();
+			let voices = window.speechSynthesis.getVoices(),
+				lang = document.querySelector("html").lang;
+			lang = {
+				de: "de-de",
+				en: "en-gb",
+			}[lang];
+			if (Polyfill.isIOS() && api._settings.config && api._settings.config.application.language === api._settings.config.application.defaultlanguage) return null; // as tested ios does not list german as a language in a german environment. this likely does the trick for the intended usecase.
 			// for (let i = 0; i < voices.length; i++) {
 			for (let i = voices.length - 1; i > 0; i--) {
 				// the later the more advanced/natural? don't know about the browsers order
@@ -285,15 +292,30 @@ export const _client = {
 					if (voices[i].name.slice(-2) === "ea") break;
 				}
 			}
+			// default to english
+			if (!this.voice) {
+				lang = "en-gb";
+				for (let i = voices.length - 1; i > 0; i--) {
+					// the later the more advanced/natural? don't know about the browsers order
+					if (voices[i].lang.toLowerCase().startsWith(lang.toLowerCase())) {
+						this.voice = voices[i];
+						// exit cases for a nice one have to be manually hardcoded depending on device specific results from api/_tts.html
+						if (voices[i].name.slice(-2) === "ea") break;
+					}
+				}
+			}
 		},
-		speak: function (text = null, lang = "en") {
+		speak: async function (text = null) {
 			if (!text || !window.speechSynthesis || window.speechSynthesis.speaking) return;
-			if (!this.voice) this.getVoice(lang);
-			if (!this.voice) return;
-			const utterThis = new SpeechSynthesisUtterance(text);
-			utterThis.voice = this.voice;
+			if (!this.voice) await this.setVoice();
+			const utterThis = new SpeechSynthesisUtterance();
+			if (this.voice) utterThis.voice = this.voice;
+			utterThis.text = text;
+			utterThis.voiceURI = "native";
+			utterThis.volume = 1;
 			utterThis.pitch = 0.9;
 			utterThis.rate = 0.8;
+
 			window.speechSynthesis.speak(utterThis);
 		},
 	},
@@ -506,6 +528,26 @@ export const _client = {
 		},
 	},
 	message: {
+		/**
+		 * annoys the user to read their messages
+		 * @param {int} amount
+		 */
+		escalation: (amount = 0) => {
+			if (amount > api._settings.config.limits.messages) {
+				new Toast(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
+			}
+			if (amount > api._settings.config.limits.messages * 2 && !api._settings.user.app_settings.icanread) {
+				_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
+			}
+			if (amount > api._settings.config.limits.messages * 3) {
+				new Dialog({
+					type: "confirm",
+					header: api._lang.GET("message.navigation.conversations"),
+					render: api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }),
+				});
+			}
+		},
+
 		/**
 		 * returns a message modal dialog
 		 * @requires api, Dialog
