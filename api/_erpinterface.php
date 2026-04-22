@@ -902,6 +902,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				CONVERT(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 				AUFTRAGSWERT_BRUTTO,
 				GENEHMIGT_TEILSUMME,
+				KOSTENTRAEGER,
 				CONVERT(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
 				LEISTUNG
 			FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
@@ -912,8 +913,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				a.NAME_3,
 				a.NAME_4,
 				CONVERT(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
-				a.REFERENZ,
-				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+				a.REFERENZ
 			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
 			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
@@ -924,7 +924,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			ka.REFERENZ
 			FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
 			WHERE kia.BEZEICHNUNG = 'Kostenträger'
-		) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+		) AS KOSTENTRAEGER ON vorgang.KOSTENTRAEGER = KOSTENTRAEGER.REFERENZ
 		WHERE
 
 		pos.POSITIONSTEXT IS NOT NULL AND pos.POSITIONSTEXT != ''
@@ -1530,7 +1530,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 							ka.REFERENZ
 						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
 						WHERE kia.BEZEICHNUNG = 'Kostenträger'
-					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+					) AS KOSTENTRAEGER ON vorgaenge.KOSTENTRAEGER = KOSTENTRAEGER.REFERENZ
 			
 					WHERE
 					UNIT.ADRESSEN_REFERENZ IN (12, 14, 15, 16, 17, 18)
@@ -1771,7 +1771,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 							ka.REFERENZ
 						FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
 						WHERE kia.BEZEICHNUNG = 'Kostenträger'
-					) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+					) AS KOSTENTRAEGER ON vorgaenge.KOSTENTRAEGER = KOSTENTRAEGER.REFERENZ
 			
 					WHERE 
 					vorgaenge.STATUS = 0
