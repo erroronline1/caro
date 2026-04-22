@@ -1093,12 +1093,30 @@ class NOTIFICATION extends API {
 	 *  |_|_|_|___|___|___|__,|_  |___|___|_|_|_|_|___|_| |_|_| |_|___|___|
 	 *                        |___|
 	 * number of new messages that have not been notified of (system alert)
+	 * reset icanread user setting if applicable because obviously they won't
 	 */
 	public function messageunnotified(){
 		$unnotified = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unnotified', [
 			':user' => $_SESSION['user']['id']
 		]);
 		$unnotified = $unnotified ? intval($unnotified[0]['number']) : 0;
+		if ($unnotified > CONFIG['limits']['messages']['reminder'] * 3){
+			unset($_SESSION['user']['app_settings']['icanread']);
+			$user = [
+				':id' => $_SESSION['user']['id'],
+				':name' => $_SESSION['user']['name'],
+				':permissions' => implode(',', $_SESSION['user']['permissions']),
+				':units' => implode(',', $_SESSION['user']['units']),
+				':token' => $_SESSION['user']['token'],
+				':orderauth' => $_SESSION['user']['orderauth'],
+				':image' => $_SESSION['user']['image'],
+				':app_settings' => isset($_SESSION['user']['app_settings']) ? UTILITY::json_encode($_SESSION['user']['app_settings']) : null,
+				':skills' => implode(',', $_SESSION['user']['skills']),
+				':invalidation_date' => $_SESSION['user']['invalidation_date'],
+				':two_factor' => $_SESSION['user']['two_factor']
+			];
+			SQLQUERY::EXECUTE($this->_pdo, 'user_post', $user);
+		}
 		SQLQUERY::EXECUTE($this->_pdo, 'message_put_notified', [
 			':user' => $_SESSION['user']['id']
 		]);
