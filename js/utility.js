@@ -530,21 +530,28 @@ export const _client = {
 	message: {
 		/**
 		 * annoys the user to read their messages
+		 * api._settings.config.limits.messages takes up to three stringified values e.g. "25, 50, 75", splits and processes in reversed order
 		 * @param {int} amount
 		 */
 		escalation: (amount = 0) => {
-			if (amount > api._settings.config.limits.messages) {
-				new Toast(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
-			}
-			if (amount > api._settings.config.limits.messages * 2 && !api._settings.user.app_settings.icanread) {
-				_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
-			}
-			if (amount > api._settings.config.limits.messages * 3) {
+			const limits = api._settings.config.limits.messages.split(/\D+/).reverse();
+			if (limits.length && amount > limits.pop()) {
+				const options = {};
+				options[api._lang.GET("general.cancel_button")] = false;
+				options[api._lang.GET("message.navigation.conversations")] = { value: true, class: "reducedCTA", onclick: 'api.message("get", "conversation")' };
 				new Dialog({
 					type: "confirm",
 					header: api._lang.GET("message.navigation.conversations"),
 					render: api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }),
+					options: options,
 				});
+				_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
+			}
+			if (limits.length && amount > limits.pop() && !api._settings.user.app_settings.icanread) {
+				_client._tts.speak(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
+			}
+			if (limits.length && amount > limits.pop()) {
+				new Toast(api._lang.GET("message.message.tts." + Math.floor(Math.random() * api._lang._USER.message.message.tts.length), { ":messages": amount }));
 			}
 		},
 
