@@ -1100,7 +1100,8 @@ class NOTIFICATION extends API {
 			':user' => $_SESSION['user']['id']
 		]);
 		$unnotified = $unnotified ? intval($unnotified[0]['number']) : 0;
-		if ($unnotified > CONFIG['limits']['messages']['reminder'] * 3){
+		$limits = preg_split('/\D+/', CONFIG['limits']['messages']['reminder']);
+		if ($unnotified > array_pop($limits)){
 			unset($_SESSION['user']['app_settings']['icanread']);
 			$user = [
 				':id' => $_SESSION['user']['id'],
