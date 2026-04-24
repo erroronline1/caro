@@ -935,7 +935,8 @@ export const _client = {
 				productaction = [],
 				buttons = {},
 				links = {},
-				labels = [];
+				labels = [],
+				formdata;
 
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {
@@ -1761,7 +1762,14 @@ export const _client = {
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.incorporation.incorporation"),
-								onclick: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
+								onclick:
+									"if (!this.disabled) {" +
+									"formdata = new FormData();" +
+									`formdata.append(api._lang.GET("order.sample_check.checked_order"), "${element.ordertext ? element.ordertext.replaceAll(/\n/g, " ") : ""}");` +
+									"api.purchase('post', 'incorporation', " +
+									element.incorporation.item +
+									", formdata);}" +
+									" this.disabled = true",
 							},
 						});
 					else if (element.incorporation.state)
@@ -1774,15 +1782,22 @@ export const _client = {
 				}
 				// append sample check state if regular order, otherwise out of reach
 				if (["order"].includes(element.ordertype) && element.samplecheck) {
-					if (element.samplecheck.item)
+					if (element.samplecheck.item) {
 						productaction.push({
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.sample_check.sample_check", { ":vendor": element.vendor ? element.vendor : "" }),
-								onclick: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
+								onclick:
+									"if (!this.disabled) {" +
+									"formdata = new FormData();" +
+									`formdata.append(api._lang.GET("order.sample_check.checked_order"), "${element.ordertext ? element.ordertext.replaceAll(/\n/g, " ") : ""}");` +
+									"api.purchase('post', 'mdrsamplecheck', " +
+									element.samplecheck.item +
+									", formdata);}" +
+									" this.disabled = true",
 							},
 						});
-					else if (element.samplecheck.state)
+					} else if (element.samplecheck.state)
 						productaction.push({
 							type: "textsection",
 							attributes: {

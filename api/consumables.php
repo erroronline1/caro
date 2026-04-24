@@ -226,7 +226,7 @@ class CONSUMABLES extends API {
 		require_once('./document.php');
 		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
+			case 'PUT':
 				// retrieve ids from possible multiple selected products for inforporation
 				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
 				$batchids = [];
@@ -242,7 +242,7 @@ class CONSUMABLES extends API {
 						'type' => 'error'
 					]]);
 
-				// recursively retrieve input names, alter as url format (see language->PROPERTY)
+				// recursively retrieve input names
 				function inputnames($element, $result = []){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -265,7 +265,7 @@ class CONSUMABLES extends API {
 				}
 
 				// samplecheck data handling, also see self::mdrsamplecheck()
-				// unsets payload keys for matches sample check inputs
+				// unsets payload keys for matched sample check inputs
 				if (array_filter($products, fn($p) => $p['trading_good'])){ // are there trading goods?
 					$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
 						':context' => 'mdr_sample_check_document'
@@ -275,6 +275,9 @@ class CONSUMABLES extends API {
 						// convert checkbox value
 						// unset empty values and keys from payload to freely process occasionally hidden system values
 						$check = [];
+						if ($checked_order = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order'))){
+							$check[$this->_lang->GET('order.sample_check.checked_order', [], true)] = $checked_order;
+						}
 						foreach ($this->_payload as $key => &$value){
 							if (!in_array($key, array_values($inputnames))) continue;
 							if (gettype($value) === 'array') $value = trim(implode(' ', $value));
@@ -405,6 +408,7 @@ class CONSUMABLES extends API {
 						'type' => 'success'
 					]]);			
 				break;
+			case "POST":
 			case 'GET':
 				$response = [];
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -500,6 +504,14 @@ class CONSUMABLES extends API {
 									$product['article_name'] ? : '',
 									$product['vendor_name'] ? : ''])
 							]
+						], [
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->GET("order.sample_check.checked_order"),
+								'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order')) ?: '',
+								'readonly' => true,
+								'rows' => 4
+							]
 						], ...$incorporationdocument
 					],
 					'options' => [
@@ -555,7 +567,7 @@ class CONSUMABLES extends API {
 		require_once('./document.php');
 		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
+			case 'PUT':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
@@ -601,6 +613,9 @@ class CONSUMABLES extends API {
 				// convert checkbox value
 				// unset empty values and keys from payload to freely process occasionally hidden system values
 				$check = [];
+				if ($checked_order = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order'))){
+					$check[$this->_lang->GET('order.sample_check.checked_order', [], true)] = $checked_order;
+				}
 				foreach ($this->_payload as $key => &$value){
 					if (!in_array($key, array_values($inputnames))) continue;
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
@@ -671,6 +686,7 @@ class CONSUMABLES extends API {
 						'type' => 'error'
 					]]);
 				break;
+			case 'POST':
 			case 'GET':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					':ids' => intval($this->_requestedID)
@@ -707,10 +723,18 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-								'name' => implode(' ', [
+									'name' => implode(' ', [
 										$product['article_no'],
 										$product['article_name'],
 										$product['vendor_name']])
+								]
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => $this->_lang->GET("order.sample_check.checked_order"),
+									'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order')) ?: '',
+									'readonly' => true,
+									'rows' => 4
 								]
 							]
 						],
