@@ -191,6 +191,8 @@ class API {
 			$sqlQueryStack = array_merge($sqlQueryStack, SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
 		}
 		SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+		// clear stack in case this method is called before end of request handling
+		$this->_messages = [];
 	}
 
 	/**
