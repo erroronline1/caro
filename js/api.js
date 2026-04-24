@@ -1795,14 +1795,14 @@ export const api = {
 								new Dialog(
 									{
 										type: "input",
-										header: api._lang.GET("order.sample_check.sample_check"),
+										header: api._lang.GET("order.sample_check.sample_check", { ":vendor": data.render.vendor }),
 										render: data.render.content,
 										options: data.render.options,
 									},
 									"FormData"
 								).then((response) => {
 									if (response) api.purchase("post", "mdrsamplecheck", data.render.productid, response);
-									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+									else new Toast(api._lang.GET("order.sample_check.failure"), "error");
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);

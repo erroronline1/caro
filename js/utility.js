@@ -1778,7 +1778,7 @@ export const _client = {
 						productaction.push({
 							type: "button",
 							attributes: {
-								value: api._lang.GET("order.sample_check.sample_check"),
+								value: api._lang.GET("order.sample_check.sample_check", { ":vendor": element.vendor ? element.vendor : "" }),
 								onclick: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
 							},
 						});
@@ -1859,7 +1859,7 @@ export const _client = {
 				}
 				// add info on necessary actions if regular order, otherwise out of reach
 				if (["order"].includes(element.ordertype) && element.incorporation) info.push(api._lang.GET("order.incorporation.incorporation"));
-				if (["order"].includes(element.ordertype) && element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check"));
+				if (["order"].includes(element.ordertype) && element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check", { ":vendor": element.vendor ? element.vendor : "" }));
 				if (!element.id) info.push(api._lang.GET("order.product_not_in_database"));
 				info = info.join(", ");
 
@@ -1984,7 +1984,7 @@ export const _client = {
 					tileinfo = [];
 					// add info on necessary actions if regular order, otherwise out of reach
 					if (["order"].includes(element.ordertype) && element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
-					if (["order"].includes(element.ordertype) && element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
+					if (["order"].includes(element.ordertype) && element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check", { ":vendor": element.vendor ? element.vendor : "" }));
 					if (element.addproduct) tileinfo.push(api._lang.GET("order.product_not_in_database"));
 					if (tileinfo.length)
 						order.push({
