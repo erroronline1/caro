@@ -100,10 +100,12 @@ class LANG {
 	}
 	
 	/**
-	 * returns a language specific chunk with whitespaces and periods replaced with underscore as in request parameters
+	 * returns a language specific chunk ~~with whitespaces and periods replaced with underscore as in request parameters~~
 	 * @param string $request dot separated keys of languagefile
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
-	 * @return string textchunk with replacements and whitespaces replaced with underscore as in request parameters
+	 * @return string textchunk ~~with replacements and whitespaces replaced with underscore as in request parameters~~
+	 * 
+	 * legacy kept as precaution, payload parameters are processed by this, but currently do not require altering 
 	 */
 	public function PROPERTY($request, $replace = [], $forceDefault = false){
 		return $this->GET($request, $replace, $forceDefault);
