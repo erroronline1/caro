@@ -21,10 +21,24 @@ class NOTIFICATION extends API {
 
 	public $_requestedMethod = REQUEST[1];
 	public $_cronOverride = REQUEST[2] ?? false;
+	public $_users = [];
+	public $_unit_members = [];
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
+	}
+
+	public function unit_members(){
+		// construct unit-member lists to iterate over for summarized messages
+		$unit_members = [];
+		foreach($this->_users as $user){
+			foreach(explode(',', $user['units']) as $unit){
+				if (!isset($unit_members[$unit])) $unit_members[$unit] = [];
+				$unit_members[$unit][] = $user['name'];
+			}
+		}
+		return $unit_members;
 	}
 
 	/**
@@ -35,6 +49,8 @@ class NOTIFICATION extends API {
 	 *
 	 */
 	public function notifs(){
+		if (!$this->_users) $this->_users =  SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 		$result = [
 			// first call is cron, for tidying up and occasionally creating items
 			'cron' => $this->cron(),
@@ -49,7 +65,7 @@ class NOTIFICATION extends API {
 			'measure_unclosed' => $this->measures(),
 			'responsibilities' => $this->responsibilities(),
 			// make the following calls last no matter what to include all possible previous calendar entries and messages
-			'calendar_uncompletedtasks' => $this->tasks(),
+			'calendar_uncompletedtasks' => $this->tasks(true),
 			'calendar_uncompletedworklists' => $this->worklists(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen(),
@@ -147,17 +163,8 @@ class NOTIFICATION extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-
-		// construct unit-member lists to iterate over for summarized messages
-		$unit_members = [];
-		foreach($users as $user){
-			foreach(explode(',', $user['units']) as $unit){
-				if (!isset($unit_members[$unit])) $unit_members[$unit] = [];
-				$unit_members[$unit][] = $user['name'];
-			}
-		}
-
+		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 
 		$override = false;
 		if ($this->_cronOverride && PERMISSION::permissionFor('cronoverride')) $override = true;
@@ -169,7 +176,7 @@ class NOTIFICATION extends API {
 					switch($task){
 						case 'SYSTEMDAILY':
 							// delete messages for users with enabled autodeletion
-							foreach($users as $user){
+							foreach($this->_users as $user){
 								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 								if (isset($user['app_settings']['autodeleteMessages'])){
 									$prior_date = clone $this->_date['servertime'];
@@ -217,7 +224,7 @@ class NOTIFICATION extends API {
 								$from = date('Y-m-d', filemtime($logfile));
 								if (!($erpdata = ERPINTERFACE->birthdaymessage($from))) break;
 								foreach ($erpdata as $workmate){
-									if (!array_search($workmate['name'], array_column($users, 'name'))) continue;
+									if (!array_search($workmate['name'], array_column($this->_users, 'name'))) continue;
 									$this->alertUserGroup(
 										['user' => [$workmate['name']]],
 										$this->_lang->GET('erpquery.integrations.user_birthday.' . ($workmate['past'] ? 'past' : 'today'), [
@@ -422,9 +429,9 @@ class NOTIFICATION extends API {
 
 										// iterate over units
 										foreach($units as $unit){
-											if (!$unit || empty($unit_members[$unit])) continue;
+											if (!$unit || empty($this->_unit_members[$unit])) continue;
 											// iterate over unit members to summarize topic
-											foreach($unit_members[$unit] as $unit_member){
+											foreach($this->_unit_members[$unit] as $unit_member){
 												if (!isset($unclosed_notif[$unit_member])) $unclosed_notif[$unit_member] = [];
 												$unclosed_notif[$unit_member][] = $this->_lang->GET('record.reminder_message', [
 													':days' => $last->diff($this->_date['servertime'])->days,
@@ -457,9 +464,9 @@ class NOTIFICATION extends API {
 
 										// iterate over units
 										foreach($units as $unit){
-											if (!$unit || empty($unit_members[$unit])) continue;
+											if (!$unit || empty($this->_unit_members[$unit])) continue;
 											// iterate over unit members to summarize topic
-											foreach($unit_members[$unit] as $unit_member){
+											foreach($this->_unit_members[$unit] as $unit_member){
 												// filter permission
 												$unit_member_permissions = explode(',', $user[array_search($unit_member, array_column($user, 'name'))]);
 												if (!array_intersect($unit_member_permissions, PERMISSION::permissionFor('recordscasestate', true))) continue;
@@ -515,7 +522,7 @@ class NOTIFICATION extends API {
 								}
 							}
 
-							// deliver unclosed message grouped by user units to decrease amount of messages
+							// deliver unclosed message grouped by user to decrease amount of messages 
 							foreach($unclosed_notif as $user_name => $messages){
 								$this->alertUserGroup(
 									['user' => [$user_name]],
@@ -523,7 +530,7 @@ class NOTIFICATION extends API {
 								);
 							}
 
-							// deliver retention setting request message grouped by users unit to decrease amount of messages
+							// deliver retention setting request message grouped by user to decrease amount of messages
 							foreach($missingretention_notif as $user_name => $messages){
 								$this->alertUserGroup(
 									[
@@ -600,7 +607,7 @@ class NOTIFICATION extends API {
 											':name' => $decoded_order_data['productname_label'] ?? '',
 											':vendor' => $decoded_order_data['vendor_label'] ?? '',
 											':commission' => preg_replace('/\*/', '\\*', addslashes(strip_tags($decoded_order_data['commission']))), // add asterisk masking to avoid dob resulting in wrong formatting
-											':orderer' => $users[array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))]['name']
+											':orderer' => $this->_users[array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($this->_users, 'id'))]['name']
 										], true);
 									$update = true;
 								} else $deliver_interval = $order['delivered_notified'];
@@ -614,15 +621,15 @@ class NOTIFICATION extends API {
 
 									$units = [$order['organizational_unit']];
 									// if unit is common, add ordering users units except admin
-									if ($units === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($users, 'id'))){
-										array_push($units, ...array_filter(explode(',', $users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
+									if ($units === 'common' && $user = array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($this->_users, 'id'))){
+										array_push($units, ...array_filter(explode(',', $this->_users[$user]['units']), fn($u) => !in_array($u, ['admin'])));
 									}
 									
 									// iterate over units
 									foreach($units as $unit){
-										if (!$unit || empty($unit_members[$unit])) continue;
+										if (!$unit || empty($this->_unit_members[$unit])) continue;
 										// iterate over unit members to summarize topic
-										foreach($unit_members[$unit] as $unit_member){
+										foreach($this->_unit_members[$unit] as $unit_member){
 											if (!isset($unissued_notif[$unit_member])) $unissued_notif[$unit_member] = [];
 											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
 												':days' => $delivered_full->diff($this->_date['servertime'])->days,
@@ -644,10 +651,9 @@ class NOTIFICATION extends API {
 										':issued_notified' => $issue_interval ?: null,
 										':id' => $order['id']
 									]) . '; ');
-
 							}
 
-							// deliver vendor request message grouped by vendor to decrease amount of messages
+							// deliver vendor request message grouped by user to decrease amount of messages
 							foreach($undelivered_notif as $messages){
 								$this->alertUserGroup(
 									['permission' => ['purchase']],
@@ -655,7 +661,7 @@ class NOTIFICATION extends API {
 								);
 							}
 
-							// deliver single issue request message per unit to decrease amount of messages
+							// deliver single issue request message grouped by user to decrease amount of messages
 							foreach($unissued_notif as $user_name => $messages){
 								$this->alertUserGroup(
 									['user' => [$user_name]],
@@ -704,7 +710,7 @@ class NOTIFICATION extends API {
 						case 'restrict_user_access':
 							// set new token for users that have an expired access date
 							$sqlQueryStack = [];
-							foreach($users as $user){
+							foreach($this->_users as $user){
 								if (!$user['invalidation_date']) continue;
 								if ($user['invalidation_date'] < date('Y-m-d')) {
 									$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_put_auto_restrict',
@@ -882,16 +888,16 @@ class NOTIFICATION extends API {
 						case 'schedule_training_evaluation':
 							// schedule training evaluation
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-								':ids' => array_column($users, 'id')
+								':ids' => array_column($this->_users, 'id')
 							]);
 							foreach ($trainings as $training){
 								if ($training['evaluation'] || !$training['date']) continue;
 								$trainingdate = new \DateTime($training['date']);
 								if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training']['evaluation']){
-									if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+									if (($user = array_search($training['user_id'], array_column($this->_users, 'id'))) !== false) { // no deleted users
 										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 										$subject = $this->_lang->GET('audit.userskills.notification_message', [
-											':user' => $users[$user]['name'],
+											':user' => $this->_users[$user]['name'],
 											':training' => $training['name'],
 											':module' => $this->_lang->GET('audit.navigation.regulatory', [], true),
 											':date' => $this->convertFromServerTime($training['date'], true)
@@ -925,7 +931,7 @@ class NOTIFICATION extends API {
 						case 'schedule_retrainings':
 							// schedule retrainings
 							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-								':ids' => array_column($users, 'id')
+								':ids' => array_column($this->_users, 'id')
 							]);
 							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
 							$sqlQueryStack = [];
@@ -936,8 +942,8 @@ class NOTIFICATION extends API {
 								if (!$training['expires']) continue;
 								$trainingdate = new \DateTime($training['expires']);
 								if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) < CONFIG['lifespan']['training']['renewal']){
-									if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
-										$user = $users[$user];
+									if (($user = array_search($training['user_id'], array_column($this->_users, 'id'))) !== false) { // no deleted users
+										$user = $this->_users[$user];
 										// check for scheduled trainings. if none add a new.
 										$none = true;
 										foreach ($reversetrainings as $scheduled){
@@ -1171,10 +1177,10 @@ class NOTIFICATION extends API {
 		if (!$_SESSION['user']['orderauth']) return 0;
 		$prepared = 0;
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
-		// userlist to decode orderer
-		$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		// minified userlist to decode orderer
+		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$users = [];
-		foreach ($preUsers as $user){
+		foreach ($this->_users as $user){
 			$users[$user['id']] = ['name' => $user['name'], 'units' => $user['units']];
 		}
 
@@ -1274,15 +1280,15 @@ class NOTIFICATION extends API {
 	 */
 	public function scheduledtrainings(){
 		// schedule training evaluation
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			':ids' => array_column($users, 'id')
+			':ids' => array_column($this->_users, 'id')
 		]);
 
 		$unitusers = [];
 		$number = 0;
 		// find all users within current users units
-		foreach ($users as $user){
+		foreach ($this->_users as $user){
 			if (array_intersect(array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) $unitusers[] = $user['id'];
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -1304,24 +1310,44 @@ class NOTIFICATION extends API {
 	 *  |_| |__,|___|_,_|___|
 	 *                       
 	 * alerts a user group if selected
+	 * alert is set to false by default and is supposed to only be triggered on notif call.
+	 * note that if imported as module sending messages will fail if $importmodule->alertUserGroupSubmit() is not explicitly called
 	 */
-	public function tasks(){
+	public function tasks($alert = false){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
+		if (!$this->_users) $this->_users =  SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 
-		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
-		// $alerts = $calendar->alert($today->format('Y-m-d'));
-		$alerts = $calendar->alert(); // given date not supported anymore?
-		foreach ($alerts as $event){
-			// alert current events including workmates pto if alert is set
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')],
-				$this->_lang->GET('calendar.tasks.alert_message', [
-					':content' => strip_tags((isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject'])),
-					':date' => substr($event['span_start'], 0, 10),
-					':author' => $event['author'],
-					':due' => substr($event['span_end'], 0, 10)
-				], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
+		if ($alert) {
+			// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
+			$alerts = $calendar->alert();
+			$task_notif = [];
+			foreach ($alerts as $event){
+				// alert current events including workmates pto if alert is set
+				// iterate over units
+				foreach($event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '') as $unit){
+					if (!$unit || empty($this->_unit_members[$unit])) continue;
+					// iterate over unit members to summarize topic
+					foreach($this->_unit_members[$unit] as $unit_member){
+						if (!isset($task_notif[$unit_member])) $task_notif[$unit_member] = [];
+						$task_notif[$unit_member][] = $this->_lang->GET('calendar.tasks.alert_message', [
+							':content' => strip_tags((isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject'])),
+							':date' => substr($event['span_start'], 0, 10),
+							':author' => $event['author'],
+							':due' => substr($event['span_end'], 0, 10)
+						], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': '');
+					}
+				}
+			}
+			// deliver task reminder messages grouped by user to decrease amount of messages
+			foreach($task_notif as $user_name => $messages){
+				$this->alertUserGroup(
+					['user' => [$user_name]],
+					implode("\n\n", array_unique($messages))
+				);
+			}
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
