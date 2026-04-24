@@ -28,10 +28,14 @@ Things are still in motion. Images may be outdated.
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## to do
-* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
+    * format last order datetime in full view
+    * include order dates in sample check? post with order data, put to actually submit sample check (update api endpoints)
+* notifications, try to concatenate more messages (tasks, cron-schedule_retrainings, cron_alert_unclosed_audits)
+* language on ios still off?
+* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available - recheck, first implementation 2026-04-17!
 
 ## Content
 * [Aims](#aims)
@@ -344,7 +348,11 @@ Set up the manual according to your users comprehension. While editing single en
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)
 
 ### Conversations
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable. [Markdown](#markdown) is available, anchors and direct html is displayed in messages from administrative users only though.
+This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. [Markdown](#markdown) is available, anchors and direct html is displayed in messages from administrative users only though.
+
+The application can send messages to user groups if reasonable. To reduce the risk of dulling due to spamming, regular reminder messages are mostly grouped by topic.
+
+The [configuration](#runtime-variables) has a threshold for a reminder escalation that first displays a small toast-notification, then reads the hint out loud, and finally displays a dialog to read messages, as system-messages most likely contain relevant information and reminders on regulatory issues.
 
 ![conversation screenshot](http://toh.erroronline.one/caro/conversation%20en.png)
 
@@ -621,7 +629,8 @@ Unclosed records will be reminded of periodically after a [defined timespan](#ru
 
 Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states. Users changing the state have the option to inform other users, units or respective supervisors via message. There is also an option to message an inquiry to anybody with a direct link embedded for quick access.  
 Adding a ERP-case-number can match in case of an available [ERP interface](#erp-interface), multiple numbers are possible in case of customs having a calculatory and representative case.  
-The selection of the records lifespan allows for [automated deletion](#cron) for [data safety compliance](#record-deletion).
+The selection of the records lifespan allows for [automated deletion](#cron) for [data safety compliance](#record-deletion).  
+A record can be assigned to a unit. This refines the records overview per selected unit. Without an assigment the intersection of units with the last editing user will define the filter.
 
 If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.  
 Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
@@ -917,6 +926,8 @@ Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values an
 There is a yearly overview available as well that sums up off-duty-days, remaining vacation days and overtime for the current year, which may come in handy to remind employees taking their vacation days in time. Contents for this overview match those of timesheet exports (owning user, unit members for supervisors or all for authorized users).
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
+
+If you have other ways of tracking, just leave the user setting empty.
 
 [Content](#content)
 
@@ -2211,7 +2222,7 @@ length[identifier] = 128 ; characters for identifiers, the longer, the more comp
 length[record_overview] = 1024 ; display of record summaries
 length [products_per_slide] = 6 ; less creates more slides, more grows the respective boxes
 
-messages[reminder] = 20 ; if not diables within the user settings an annoying reminder will be read out loud on more than the configured amount of unread messages
+messages[reminder] = "25, 37, 50" ; up to three thresholds to escalate reminder over unread messages "toast, speechSynthesis, dialog", on values like "25, 50" the most annoying reminders are used e.g. speechSynthesis and dialog
 
 quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 quality[risk_acceptance_level] = 4 ; product of probability times damage to be highlighted, according to count of respective values within the language files
