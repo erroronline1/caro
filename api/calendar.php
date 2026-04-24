@@ -962,7 +962,7 @@ class CALENDAR extends API {
 					':misc' => null,
 					':closed' => null,
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
-					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete'), [':days' => CONFIG['lifespan']['calendar']['autodelete']]) ? 1 : null
+					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']])) ? 1 : null
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
 
@@ -1846,7 +1846,7 @@ class CALENDAR extends API {
 					':misc' => null,
 					':closed' => null,
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
-					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete'), [':days' => CONFIG['lifespan']['calendar']['autodelete']]) ? 1 : null
+					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']])) ? 1 : null
 				];
 
 				if ($event[':id'] && !PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
