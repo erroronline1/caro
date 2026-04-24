@@ -822,7 +822,7 @@
 		"tasks": {
 			"affected_user": "Affected user",
 			"alert": "Message units on due event",
-			"alert_message": ":content is scheduled for :date by :author and due on :due.",
+			"alert_message": "**:content** is scheduled for :date by :author and due on :due.",
 			"alert_product_document_expired": "Following product documents for :vendor have expired. Look after updated ones! Please check for currency or update these.",
 			"alert_responsibility_expired": "The responsibility for :task (:units) has expired and needs to be planned anew.",
 			"alert_vendor_document_expired": "Following documents for :vendor have expired. Look after updated ones!",
@@ -1532,6 +1532,7 @@
 			"by_user": "This article qualifies for a MDR §14 sample check by a personified user account!",
 			"cancel": "No, thank you",
 			"checked": "examined",
+			"checked_order": "Product from order",
 			"failure": "An error occured. Sample check could not be saved, please try again.",
 			"revoked": "Sample check has been revoked",
 			"satisfied": "For :vendor a sample check has already been done within the set timespan. You're good to go, thank you!",

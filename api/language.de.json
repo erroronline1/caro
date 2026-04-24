@@ -822,7 +822,7 @@
 		"tasks": {
 			"affected_user": "Betroffene Mitarbeiter",
 			"alert": "Bereiche benachrichtigen wenn Ereignis fällig ist",
-			"alert_message": ":content ist von :author für den :date geplant und am :due fällig.",
+			"alert_message": "**:content** ist von :author für den :date geplant und am :due fällig.",
 			"alert_product_document_expired": "Folgende Produkt-Dokumente für :vendor sind abgelaufen. Bitte kümmere dich um eine Aktualisierung.",
 			"alert_responsibility_expired": "Die Verantwortlichkeit der Aufgabe :task (:units) ist ausgelaufen und muss neu geplant werden.",
 			"alert_vendor_document_expired": "Folgende Dokumente von :vendor sind abgelaufen. Bitte kümmere dich um eine Aktualisierung!",
@@ -1532,6 +1532,7 @@
 			"by_user": "Dieser Artikel kommt für eine Stichprobenprüfung durch eine persönliche Nutzeranmeldung in Frage!",
 			"cancel": "Nein danke",
 			"checked": "geprüft",
+			"checked_order": "Artikel aus Bestellung",
 			"failure": "Es trat ein Fehler auf, die Stichprobenprüfung konnte nicht gespeichert werden, bitte versuche es erneut.",
 			"revoked": "Die Stichprobenprüfung wurde widerrufen",
 			"satisfied": "Für :vendor wurde bereits eine Stichprobenprüfung innerhalb des festgelegten Zeitraums durchgeführt. Du brauchst nichts weiter zu tun, vielen Dank!",
