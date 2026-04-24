@@ -1760,12 +1760,12 @@ class RECORD extends API {
 
 				// filter results by selected unit
 				if (
-					(!$this->_payload->_unit && !array_intersect(array_filter($record['units'] ?? [], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units']))
-					|| ($this->_payload->_unit === '_unassigned' && ($record['unit'] || $record['units']))
-					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned'
-						&& (
-							!($record['unit'] && $this->_payload->_unit === $record['unit'])
-							xor !($record['units'] && in_array($this->_payload->_unit, $record['units']))
+					(!$this->_payload->_unit && !array_intersect(array_filter($record['units'] ?? [], fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) // my units
+					|| ($this->_payload->_unit === '_unassigned' && ($record['unit'] || $record['units'])) // unassigned
+					|| ($this->_payload->_unit && $this->_payload->_unit !== '_unassigned' // selected unit
+						&& !(
+							($record['unit'] && $this->_payload->_unit === $record['unit']) // unit set for record
+							|| ($record['units'] && in_array($this->_payload->_unit, $record['units'])) // unit determined by last editing user units
 						)
 					)
 				) continue;
