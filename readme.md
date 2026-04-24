@@ -6593,9 +6593,9 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * [ASL 2.0 license](https://github.com/MatheusAvellar/textarea-line-numbers?tab=Apache-2.0-1-ov-file)
     * slightly modified to drop font names, font sizes and colours, .tln-wrapper top padding adjustments within css
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
-    * Markdwown utilities
+    * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v1.2.0
+    * v2.0.0
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
