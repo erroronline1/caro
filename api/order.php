@@ -524,7 +524,7 @@ class ORDER extends API {
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || $unit_intersection,
-						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))]) : null,
+						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, 10))]) : null,
 						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['delivered_full'] && !$row['issued_full'] && ($permission['orderaddinfo'] || $unit_intersection)) ? $statechange : [],
