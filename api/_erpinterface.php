@@ -1362,7 +1362,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 						EMAIL.EMAIL,
 						pat.STERBEDATUM,
 						vorgaenge.LEISTUNG,
-						CAST(vorgaenge.AUFTRAGSWERT_BRUTTO AS decimal(10,2))) AS AUFTRAGSWERT_BRUTTO,
+						CAST(vorgaenge.AUFTRAGSWERT_BRUTTO AS decimal(10,2)) AS AUFTRAGSWERT_BRUTTO,
 						'geliefert' AS GELIEFERT,
 						CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
 						[sys].GENEHMIGT,
