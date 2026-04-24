@@ -515,7 +515,7 @@ class NOTIFICATION extends API {
 								}
 							}
 
-							// deliver vendor request message grouped by vendor to decrease amount of messages
+							// deliver unclosed message grouped by user units to decrease amount of messages
 							foreach($unclosed_notif as $user_name => $messages){
 								$this->alertUserGroup(
 									['user' => [$user_name]],
@@ -523,7 +523,7 @@ class NOTIFICATION extends API {
 								);
 							}
 
-							// deliver single issue request message per unit to decrease amount of messages
+							// deliver retention setting request message grouped by users unit to decrease amount of messages
 							foreach($missingretention_notif as $user_name => $messages){
 								$this->alertUserGroup(
 									[
