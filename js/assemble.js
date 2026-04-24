@@ -1253,7 +1253,6 @@ export class Assemble {
 		if (this.signaturePads) {
 			this.initialize_SignaturePad();
 			for (const [key, data] of Object.entries(this.doodledata)) {
-				console.log(key, data);
 				if (document.getElementById(key)) window.signaturePads[key].fromData(data);
 			}
 		}
@@ -2604,7 +2603,6 @@ export class Assemble {
 						names: this.names,
 					});
 					newInput.initializeSection(null, hint.length ? hint[0] : label);
-					console.log(document.querySelector("[name='" + newInput.currentElement.attributes.name + "']"));
 					document.querySelector("[name='" + newInput.currentElement.attributes.name + "']").focus();
 					window.Masonry.masonry().catch(() => {
 						/*catch error to prevent console error*/
