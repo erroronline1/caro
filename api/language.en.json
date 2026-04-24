@@ -1534,7 +1534,8 @@
 			"checked": "examined",
 			"failure": "An error occured. Sample check could not be saved, please try again.",
 			"revoked": "Sample check has been revoked",
-			"sample_check": "Perform MDR §14 sample check",
+			"satisfied": "For :vendor a sample check has already been done within the set timespan. You're good to go, thank you!",
+			"sample_check": "Perform MDR §14 sample check for :vendor",
 			"submit": "Submit sample check",
 			"success": "Sample check has been saved"
 		},

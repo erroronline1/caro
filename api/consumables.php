@@ -157,7 +157,7 @@ class CONSUMABLES extends API {
 				'type' => 'error'
 			]]);
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-			':ids' => $this->_requestedID
+			':ids' => $vendor['id']
 		]);
 		if (!$products) $this->response([
 			'response' => [
@@ -678,6 +678,29 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
+				// check if sample_check has been already satisfied, for the various frontend display options do currently not allow for an automated update
+				if ($vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					':id' => $product['vendor_name']
+				])){
+					$vendor = $vendor[0];
+					if ($vendor['products'] = json_decode($vendor['products'] ? : '', true)) {
+						$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+							':ids' => intval($product['vendor_id'])
+						]);
+						foreach($vendorproducts as $vendorproduct){
+							if (!$vendorproduct['checked']) continue;
+							$check = new \DateTime($vendorproduct['checked']);
+							if (intval($check->diff($this->_date['servertime'])->format('%a')) < $vendor['products']['samplecheck_interval'])
+								$this->response([
+									'response' => [
+										'msg' =>  $this->_lang->GET('order.sample_check.satisfied', [':vendor' => $vendor['name']]),
+										'type' => 'success'
+									]
+								]);
+						}
+					}
+				}
+
 				$response = ['render' => [
 					'content' => [
 						[
@@ -699,7 +722,8 @@ class CONSUMABLES extends API {
 						$this->_lang->GET('order.sample_check.cancel') => false,
 						$this->_lang->GET('order.sample_check.submit') => ['value' => true, 'class' => 'reducedCTA']
 					],
-					'productid' => $product['id']
+					'productid' => $product['id'],
+					'vendor' => $product['vendor_name']
 				]];
 				$this->response($response);
 				break;

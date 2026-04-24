@@ -1534,7 +1534,8 @@
 			"checked": "geprüft",
 			"failure": "Es trat ein Fehler auf, die Stichprobenprüfung konnte nicht gespeichert werden, bitte versuche es erneut.",
 			"revoked": "Die Stichprobenprüfung wurde widerrufen",
-			"sample_check": "MDR §14 Stichprobenprüfung durchführen",
+			"satisfied": "Für :vendor wurde bereits eine Stichprobenprüfung innerhalb des festgelegten Zeitraums durchgeführt. Du brauchst nichts weiter zu tun, vielen Dank!",
+			"sample_check": "MDR §14 Stichprobenprüfung für :vendor durchführen",
 			"submit": "Stichprobenprüfung übermitteln",
 			"success": "Die Stichprobenprüfung wurde gespeichert"
 		},
