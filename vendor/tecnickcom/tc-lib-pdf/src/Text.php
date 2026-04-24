@@ -579,6 +579,15 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
             $halign = $this->rtl ? 'R' : 'L';
         }
 
+        $firstlinehalign = $halign;
+        if ($halign === 'c') {
+            $halign = 'C';
+            $firstlinehalign = 'L';
+        } elseif ($halign === 'r') {
+            $halign = 'R';
+            $firstlinehalign = 'L';
+        }
+
         $num_lines = \count($lines);
         $lastline = ($num_lines - 1);
 
@@ -600,19 +609,31 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
             ];
 
             $cell_width = ($width - $offset);
+            $line_halign = ($i === 0) ? $firstlinehalign : $halign;
             $txt_posx = $this->toUnit(
                 $this->textHPosFromCell(
                     $this->toPoints($line_posx),
                     $this->toPoints($cell_width),
                     $line_dim['totwidth'],
-                    $halign,
+                    $line_halign,
                     static::ZEROCELL, // @phpstan-ignore argument.type
                 )
             );
 
             $jwidth = 0;
+            $line_ws = $wordspacing;
             if (($halign == 'J') && ($data['septype'] != 'B') && (($i < $lastline) || !$jlast)) {
                 $jwidth = $cell_width;
+            }
+
+            // When custom inline word spacing is active (multi-fragment justified
+            // paragraph), the first line uses the pre-computed word spacing while
+            // wrapped continuation lines use per-line justification instead.
+            if ($wordspacing > 0 && $i > 0) {
+                $line_ws = 0;
+                if (($data['septype'] != 'B') && (($i < $lastline) || !$jlast)) {
+                    $jwidth = $cell_width;
+                }
             }
 
             $out .= $this->getOutTextLine(
@@ -623,7 +644,7 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
                 $line_posy,
                 $jwidth,
                 $strokewidth,
-                $wordspacing,
+                $line_ws,
                 $leading,
                 $rise,
                 $fill,
@@ -927,8 +948,12 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
                 // the current word is a line break or does not fit in the current line
                 if ($overline && ($word > 0)) {
                     // the current word does not fit in the current line
-                    $data = $dim['split'][($word - 1)];
-                    --$word;
+                    $prevword = ($word - 1);
+                    // avoid looping forever when moving back would not advance the line start
+                    if ($dim['split'][$prevword]['pos'] >= $posstart) {
+                        $data = $dim['split'][$prevword];
+                        --$word;
+                    }
                 }
 
                 $posend = $data['pos'];
@@ -1156,6 +1181,7 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
 
         if ((!$this->isunicode) || $this->font->isCurrentByteFont()) {
             if ($this->isunicode) {
+                // @phpstan-ignore argument.type
                 $txt = $this->uniconv->latinArrToStr($this->uniconv->uniArrToLatinArr($ordarr));
             }
             $txt = $this->encrypt->escapeString($txt);
@@ -1659,9 +1685,14 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
      */
     public function addPage(array $data = []): array
     {
-        $ret = $this->page->add($data);
-        $this->setPageContext($ret['pid']);
-        return $ret;
+        $page = $this->page->add($data);
+
+        $this->setPageContext($page['pid']);
+
+        $this->graph->setPageWidth($page['width']);
+        $this->graph->setPageHeight($page['height']);
+
+        return $page;
     }
 
     /**
@@ -1695,22 +1726,32 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
 
         if ($this->defaultfont === null) {
             $this->defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10);
+            $this->font->popLastFont();
         }
+
+        $deffont = $this->font->insert(
+            $this->pon,
+            $this->defaultfont['key'],
+            $this->defaultfont['style'],
+            (int) $this->defaultfont['size'],
+            $this->defaultfont['spacing'],
+            $this->defaultfont['stretching'],
+        );
 
         $page = $this->page->getPage($pid);
 
         // print page number in the footer
         $out = $this->graph->getStartTransform();
-        $out .= $this->defaultfont['out'];
+        $out .= $deffont['out'];
         $out .= $this->color->getPdfColor('black');
         $prevcell = $this->defcell;
         $this->defcell = $this::ZEROCELL; // @phpstan-ignore assign.propertyType
 
         $out .= $this->getTextCell(
             (string) ($pid + 1),
-            $this->toUnit($this->defaultfont['dw']),
-            $page['height'] - (2 * $this->toUnit($this->defaultfont['height'])),
-            $page['width'] - (4 * $this->toUnit($this->defaultfont['dw'])),
+            $this->toUnit($deffont['dw']),
+            $page['height'] - (2 * $this->toUnit($deffont['height'])),
+            $page['width'] - (4 * $this->toUnit($deffont['dw'])),
             0,
             0,
             0,
@@ -1719,6 +1760,7 @@ abstract class Text extends \Com\Tecnick\Pdf\Cell
         );
         $out .= $this->graph->getStopTransform();
         $this->defcell = $prevcell;
+        $this->font->popLastFont();
         return $out;
     }
 

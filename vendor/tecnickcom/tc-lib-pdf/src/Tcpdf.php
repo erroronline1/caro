@@ -80,17 +80,36 @@ class Tcpdf extends \Com\Tecnick\Pdf\ClassObjects
     }
 
     /**
-     * Set the pdf mode.
+     * Set the PDF mode.
      *
-     * @param string $mode Input PDFA mode.
+     * Supported modes:
+     * - 'pdfa1', 'pdfa1a', 'pdfa1b': PDF/A-1 with optional conformance level
+     * - 'pdfa2', 'pdfa2a', 'pdfa2b', 'pdfa2u': PDF/A-2 with optional conformance level
+     * - 'pdfa3', 'pdfa3a', 'pdfa3b', 'pdfa3u': PDF/A-3 with optional conformance level
+     * - 'pdfx': PDF/X mode
+     *
+     * Conformance levels:
+     * - 'a': Accessible (tagged PDF + Unicode)
+     * - 'b': Basic (visual appearance only)
+     * - 'u': Unicode (basic + Unicode mapping, PDF/A-2 and PDF/A-3 only)
+     *
+     * @param string $mode Input PDF/A mode.
      */
     protected function setPDFMode(string $mode): void
     {
         $this->pdfx = ($mode == 'pdfx');
         $this->pdfa = 0;
-        $matches = ['', '0'];
-        if (\preg_match('/^pdfa([1-3])$/', $mode, $matches) === 1) {
+        $this->pdfaConformance = 'B';
+        $matches = [];
+        if (\preg_match('/^pdfa([1-3])([abu])?$/i', $mode, $matches) === 1) {
             $this->pdfa = (int) $matches[1];
+            if (!empty($matches[2])) {
+                $conf = \strtoupper($matches[2]);
+                if (($conf === 'U') && ($this->pdfa === 1)) {
+                    $conf = 'B';
+                }
+                $this->pdfaConformance = $conf;
+            }
         }
     }
 
@@ -347,10 +366,38 @@ class Tcpdf extends \Com\Tecnick\Pdf\ClassObjects
      *        - password (string)
      *        - privkey (string) Private key (string or filename prefixed with 'file://').
      *        - signcert (string) Signing certificate (string or filename prefixed with 'file://').
+     *        - ltv (array) LTV collection options.
+     *            - enabled (bool) Enable validation material collection.
+     *            - embed_ocsp (bool) Allow OCSP material collection.
+     *            - embed_crl (bool) Allow CRL material collection.
+     *            - embed_certs (bool) Embed certificate bytes in validation material.
+     *            - include_dss (bool) Include DSS objects in output.
+     *            - include_vri (bool) Include VRI map in output.
      */
     public function setSignature(array $data): void
     {
         $this->signature = \array_merge($this->signature, $data);
+
+        if (! isset($this->signature['ltv'])) {
+            $this->signature['ltv'] = [
+                'enabled' => false,
+                'embed_ocsp' => true,
+                'embed_crl' => true,
+                'embed_certs' => true,
+                'include_dss' => true,
+                'include_vri' => true,
+            ];
+        }
+
+        if (! \is_array($this->signature['ltv'])) {
+            throw new PdfException('Invalid signature LTV options');
+        }
+
+        foreach (['enabled', 'embed_ocsp', 'embed_crl', 'embed_certs', 'include_dss', 'include_vri'] as $key) {
+            if (! \array_key_exists($key, $this->signature['ltv']) || ! \is_bool($this->signature['ltv'][$key])) {
+                throw new PdfException('Invalid signature LTV option: ' . $key);
+            }
+        }
 
         if (empty($this->signature['signcert'])) {
             throw new PdfException('Invalid signing certificate (signcert)');
@@ -391,6 +438,11 @@ class Tcpdf extends \Com\Tecnick\Pdf\ClassObjects
      *        - username (string) TSA username or authorization PEM file.
      *        - password (string) TSA password.
      *        - cert (string) cURL optional location of TSA certificate for authorization.
+     *        - hash_algorithm (string) Digest algorithm: sha256, sha384, sha512.
+     *        - policy_oid (string) Optional timestamp policy OID.
+     *        - nonce_enabled (bool) Add nonce to the timestamp request.
+     *        - timeout (int) Request timeout in seconds.
+     *        - verify_peer (bool) Validate TSA TLS certificate.
      */
     public function setSignTimeStamp(array $data): void
     {
@@ -398,6 +450,35 @@ class Tcpdf extends \Com\Tecnick\Pdf\ClassObjects
 
         if ($this->sigtimestamp['enabled'] && empty($this->sigtimestamp['host'])) {
             throw new PdfException('Invalid TSA host');
+        }
+
+        if (
+            ! \in_array(
+                \strtolower((string) $this->sigtimestamp['hash_algorithm']),
+                ['sha256', 'sha384', 'sha512'],
+                true
+            )
+        ) {
+            throw new PdfException('Invalid TSA hash algorithm');
+        }
+
+        if (
+            ($this->sigtimestamp['policy_oid'] !== '')
+            && (\preg_match('/^\\d+(?:\\.\\d+)+$/', (string) $this->sigtimestamp['policy_oid']) !== 1)
+        ) {
+            throw new PdfException('Invalid TSA policy OID');
+        }
+
+        if (! \is_bool($this->sigtimestamp['nonce_enabled'])) {
+            throw new PdfException('Invalid TSA nonce setting');
+        }
+
+        if ((int) $this->sigtimestamp['timeout'] < 1) {
+            throw new PdfException('Invalid TSA timeout');
+        }
+
+        if (! \is_bool($this->sigtimestamp['verify_peer'])) {
+            throw new PdfException('Invalid TSA verify peer setting');
         }
     }
 

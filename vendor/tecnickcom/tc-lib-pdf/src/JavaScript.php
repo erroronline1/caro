@@ -101,6 +101,19 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
     protected array $jsobjects = [];
 
     /**
+     * Valid AFRelationship values for PDF/A-3 embedded files.
+     *
+     * @var array<string>
+     */
+    protected const VALID_AF_RELATIONSHIPS = [
+        'Source',
+        'Data',
+        'Alternative',
+        'Supplement',
+        'Unspecified',
+    ];
+
+    /**
      * Deafult Javascript Annotation properties.
      * Possible values are described on official Javascript for Acrobat API reference.
      * Annotation options can be directly specified using the 'aopt' entry.
@@ -594,12 +607,19 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
      * Add an embedded file.
      * If a file with the same name already exists, it will be ignored.
      *
-     * @param string $file File name (absolute or relative path).
+     * @param string $file  File name (absolute or relative path).
+     * @param string $mime  MIME type of the file (e.g., 'application/xml').
+     * @param string $afrel AFRelationship value (Source, Data, Alternative, Supplement, Unspecified).
+     * @param string $desc  Optional description of the file.
      *
      * @throws PdfException in case of error.
      */
-    public function addEmbeddedFile(string $file): void
-    {
+    public function addEmbeddedFile(
+        string $file,
+        string $mime = 'application/octet-stream',
+        string $afrel = 'Source',
+        string $desc = ''
+    ): void {
         if (($this->pdfa == 1) || ($this->pdfa == 2)) {
             throw new PdfException('Embedded files are not allowed in PDF/A mode version 1 and 2');
         }
@@ -607,6 +627,11 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
         if (empty($file)) {
             throw new PdfException('Empty file name');
         }
+
+        if ($this->pdfa === 3 && !\in_array($afrel, self::VALID_AF_RELATIONSHIPS)) {
+            throw new PdfException('afrel must be one of: ' . \implode(', ', self::VALID_AF_RELATIONSHIPS));
+        }
+
         $filekey = \basename((string) $file);
         if (
             ! empty($filekey)
@@ -618,6 +643,11 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
                 'n' => ++$this->pon,
                 'file' => (string) $file,
                 'content' => '',
+                'mimeType' => $mime,
+                'afRelationship' => $afrel,
+                'description' => $desc,
+                'creationDate' => \time(),
+                'modDate' => \time(),
             ];
         }
     }
@@ -626,13 +656,21 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
      * Add string content as an embedded file.
      * If a file with the same name already exists, it will be ignored.
      *
-     * @param string $file File name to be used a key for the embedded file.
-     * @param string $content  Content of the embedded file.
+     * @param string $file    File name to be used a key for the embedded file.
+     * @param string $content Content of the embedded file.
+     * @param string $mime  MIME type of the file (e.g., 'application/xml').
+     * @param string $afrel AFRelationship value (Source, Data, Alternative, Supplement, Unspecified).
+     * @param string $desc  Optional description of the file.
      *
      * @throws PdfException in case of error.
      */
-    public function addContentAsEmbeddedFile(string $file, string $content): void
-    {
+    public function addContentAsEmbeddedFile(
+        string $file,
+        string $content,
+        string $mime = 'application/octet-stream',
+        string $afrel = 'Source',
+        string $desc = ''
+    ): void {
         if (($this->pdfa == 1) || ($this->pdfa == 2)) {
             throw new PdfException('Embedded files are not allowed in PDF/A mode version 1 and 2');
         }
@@ -646,6 +684,11 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
                 'n' => ++$this->pon,
                 'file' => $file,
                 'content' => $content,
+                'mimeType' => $mime,
+                'afRelationship' => $afrel,
+                'description' => $desc,
+                'creationDate' => \time(),
+                'modDate' => \time(),
             ];
         }
     }
@@ -1235,36 +1278,31 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
             $opt['mk'] = [];
         }
         $oid = ($this->pon + 1); // from setAnnotation
-        if (!empty($action) && !\is_array($action)) {
-            ++$oid; // from addRawJavaScriptObj
-        }
         $opt['mk']['ca'] = $this->getOutTextString($caption, $oid, true);
         $opt['mk']['rc'] = $this->getOutTextString($caption, $oid, true);
         $opt['mk']['ac'] = $this->getOutTextString($caption, $oid, true);
         if (!empty($action)) {
             if (\is_string($action)) {
-                // raw javascript action
-                $jsoid = $this->addRawJavaScriptObj($action);
-                if ($jsoid > 0) {
-                    $opt['aa'] = '/D ' . $jsoid . ' 0 R';
+                if ($this->pdfa <= 0) {
+                    $opt['a'] = '/S /JavaScript /JS ' . $this->getOutTextString($action, $oid, true);
                 }
             } elseif (\is_array($action)) {
                 // form action options as in section 12.7.5 of PDF32000_2008.
-                $opt['aa'] = '/D <<';
+                $opt['a'] = '/S';
                 $bmode = ['SubmitForm', 'ResetForm', 'ImportData'];
                 foreach ($action as $key => $val) {
                     if (($key == 'S') && \is_string($val) && \in_array($val, $bmode)) {
-                        $opt['aa'] .= ' /S /' . $val;
+                        $opt['a'] = '/S /' . $val;
                     } elseif (($key == 'F') && (!empty($val)) && \is_string($val)) {
-                        $opt['aa'] .= ' /F ' . $this->encrypt->escapeDataString($val, $oid);
+                        $opt['a'] .= ' /F ' . $this->encrypt->escapeDataString($val, $oid);
                     } elseif (($key == 'Fields') && !empty($val) && \is_array($val)) {
-                        $opt['aa'] .= ' /Fields [';
+                        $opt['a'] .= ' /Fields [';
                         foreach ($val as $field) {
                             if (\is_string($field)) {
-                                $opt['aa'] .= ' ' . $this->getOutTextString($field, $oid);
+                                $opt['a'] .= ' ' . $this->getOutTextString($field, $oid);
                             }
                         }
-                        $opt['aa'] .= ']';
+                        $opt['a'] .= ']';
                     } elseif (($key == 'Flags')) {
                         $flg = 0;
                         if (\is_array($val)) {
@@ -1289,10 +1327,9 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
                         } elseif (\is_numeric($val)) {
                             $flg = intval($val);
                         }
-                        $opt['aa'] .= ' /Flags ' . $flg;
+                        $opt['a'] .= ' /Flags ' . $flg;
                     }
                 }
-                $opt['aa'] .= ' >>';
             }
         }
         unset(
@@ -1435,6 +1472,7 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
         $this->exitXObjectTemplate();
         $opt['ap']['n'] .= $this->xobjects[$tid]['outdata'];
         $opt['ap']['n'] .= 'Q EMC';
+        $opt['subtype'] = 'Widget';
         $opt['Subtype'] = 'Widget';
         $opt['ft'] = 'Ch';
         $opt['t'] = $name;
@@ -1513,6 +1551,7 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
         $this->exitXObjectTemplate();
         $opt['ap']['n'] .= $this->xobjects[$tid]['outdata'];
         $opt['ap']['n'] .= 'Q EMC';
+        $opt['subtype'] = 'Widget';
         $opt['Subtype'] = 'Widget';
         $opt['ft'] = 'Ch';
         $opt['t'] = $name;
@@ -1683,6 +1722,7 @@ abstract class JavaScript extends \Com\Tecnick\Pdf\CSS
         $this->exitXObjectTemplate();
         $opt['ap']['n'] .= $this->xobjects[$tid]['outdata'];
         $opt['ap']['n'] .= 'Q EMC';
+        $opt['subtype'] = 'Widget';
         $opt['Subtype'] = 'Widget';
         $opt['ft'] = 'Tx';
         $opt['t'] = $name;
