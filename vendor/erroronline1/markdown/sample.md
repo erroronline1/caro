@@ -1,3 +1,12 @@
+# Markdown
+* [Text formatting](#text-formatting-atx-h1-header)
+* [Tasks and definitions](#tasks-and-definitions-setx-h1-header)
+* [Links](#links)
+* [Lists](#withcustomid)
+* [Tables](#tables-h3-header)
+* [Blockquotes and code](#blockquotes-and-code-h4-header)
+* [Nesting](#nesting)
+
 # Text formatting (ATX h1 header)
 
 This is a markdown flavour for basic text styling.  
@@ -12,7 +21,7 @@ Some escaping of formatting characters is possible with a leading \ as in
 Subscript like H~2~O and superscript like X^2^ and ==marked text==  
 Custom markdown for this engine for making ^^font larger^^
 
-Task lists and definitions (SETX h1 header)
+Tasks and definitions (SETX h1 header)
 ======================
 
 Task lists can be created a well  
@@ -20,8 +29,13 @@ Task lists can be created a well
 [x] accomplished
 
 Definition list containing
-: first definition
-: second definition
+: first definition line
+: second definition line
+
+### Other substitutions
+
+(c) (C) (r) (R) (tm) (TM) (p) (P) +- -> will be replaced by their symbol  
+unless escaped: \(c) (C\) \(r\) \(R) (tm\) \(TM\) \(p) (P\) +\- \->
 
 ## Links
 http://some.url, not particularly styled  
@@ -38,10 +52,24 @@ some@mail.address and escaped\@mail.address
 Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
 
 [^1]: This is the first footnote.
-[^bignote]: Here's one with multiple paragraphs and code.
-    Indent paragraphs to include them in the footnote.
-    `code`
-    Add as many paragraphs as you like.
+[^bignote]: Here's one with multiple lines and other elements.
+    Indent the content to include it in the current footnote.  
+    Add as many lines as you like.
+    ~~~
+    code blocks
+    are supported
+    ~~~
+    
+    > as well as
+    >> blockquotes
+    >
+    
+    | and | of |
+    | --- | ----- |
+    | course | tables|
+    
+        1. and lists
+        2. if additionally indented
 
 [referencelink]: http://some.web.site
 
@@ -75,7 +103,8 @@ multiple lines
     1. of ordered lists
     2. actually don't
     3. matter at all
-	 * but the indentation does
+        12. unless the start number is other than 1
+        25. then you'll have an offset
 
 123\. escaped period avoiding a list
 
@@ -84,9 +113,10 @@ Nested ordered lists cycle through arabic numerals, roman numerals uppercase, ro
 ## Tables (h3 header)
 
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
-| --- | --- | --- | --- |
+| --- | ---: | :---: | :--- |
 | *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | not | though<br />without HTML `<br />` |
+| linebreaks | are | not | though without<br /> HTML `<br />` |
+| and | aligning | text | columnwise |
 
 #### Blockquotes and code (h4 header)
 
@@ -131,12 +161,11 @@ and some `code with <brackets>` and `code with an escaped \`-character`.
 > ~~~
 > Code within blockquote
 > ~~~
->> Blockquote within blockquote
+> > Blockquote within blockquote
 > 
 > | Tables nested | within | blockquotes |
 > | :---------- | :-----: | ---: |
 > | are | possible | as well |
-> | like | aligning | colums |
 > 
 > definition list
 > : first definition

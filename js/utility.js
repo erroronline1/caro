@@ -960,7 +960,7 @@ export const _client = {
 						}) + (element.ordertext ? "\n" + element.ordertext : ""),
 					mdrestrictions: {
 						safeMode: true,
-						limitTo: ["list", "emphasis", "larger", "br"],
+						limitTo: ["list", "emphasis", "larger", "linebreak"],
 					},
 					attributes: {
 						name: api._lang.GET("order.ordertype." + element.ordertype),

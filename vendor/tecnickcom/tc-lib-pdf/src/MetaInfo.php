@@ -151,13 +151,27 @@ abstract class MetaInfo extends \Com\Tecnick\Pdf\HTML
      */
     public function setPDFVersion(string $version = '1.7'): static
     {
-        if ($this->pdfa == 1) { // PDF/A 1 mode
+        // PDF/A-1 is based on and require the PDF 1.4.
+        if ($this->pdfa === 1) {
             $this->pdfver = '1.4';
             return $this;
         }
 
+        // PDF/A-2 (ISO 19005-2:2011) and PDF/A-3 (ISO 19005-3:2012)
+        // are based on and require the PDF 1.7 standard (ISO 32000-1:2008)
+        if ($this->pdfa === 2 || $this->pdfa === 3) {
+            $this->pdfver = '1.7';
+            return $this;
+        }
+
+        // // PDF/A-4 is based on and require the PDF 2.0 (ISO 32000-2)
+        if ($this->pdfa === 4) {
+            $this->pdfver = '2.0';
+            return $this;
+        }
+
         $isvalid = \preg_match('/^[1-9]+[.]\d+$/', $version);
-        if ($isvalid === false) {
+        if ($isvalid !== 1) {
             throw new PdfException('Invalid PDF version format');
         }
 
@@ -302,7 +316,8 @@ abstract class MetaInfo extends \Com\Tecnick\Pdf\HTML
 
         // @codingStandardsIgnoreStart
         $xmp = '<?xpacket begin="' . $this->uniconv->chr(0xfeff) . '" id="W5M0MpCehiHzreSzNTczkc9d"?>' . "\n"
-        . '<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 4.2.1-c043 52.372728, 2009/01/18-15:08:04">' . "\n"
+        . '<x:xmpmeta xmlns:x="adobe:ns:meta/"'
+        . ' x:xmptk="Adobe XMP Core 4.2.1-c043 52.372728, 2009/01/18-15:08:04">' . "\n"
         . "\t" . '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' . "\n"
         . "\t\t" . '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n"
         . "\t\t\t" . '<dc:format>application/pdf</dc:format>' . "\n"
@@ -345,12 +360,14 @@ abstract class MetaInfo extends \Com\Tecnick\Pdf\HTML
         if ($this->pdfa !== 0) {
             $xmp .= '		<rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">' . "\n"
             . "\t\t\t" . '<pdfaid:part>' . $this->pdfa . '</pdfaid:part>' . "\n"
-            . "\t\t\t" . '<pdfaid:conformance>B</pdfaid:conformance>' . "\n"
+            . "\t\t\t" . '<pdfaid:conformance>' . $this->pdfaConformance . '</pdfaid:conformance>' . "\n"
             . "\t\t" . '</rdf:Description>' . "\n";
         }
 
         // XMP extension schemas
-        $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#">' . "\n"
+        $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/"'
+            . ' xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#"'
+            . ' xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#">' . "\n"
         . "\t\t\t" . '<pdfaExtension:schemas>' . "\n"
         . "\t\t\t\t" . '<rdf:Bag>' . "\n"
         . "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n"
@@ -366,7 +383,8 @@ abstract class MetaInfo extends \Com\Tecnick\Pdf\HTML
         . "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n"
-        . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>UUID based identifier for specific incarnation of a document</pdfaProperty:description>' . "\n"
+        . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>UUID based identifier'
+        . ' for specific incarnation of a document</pdfaProperty:description>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>InstanceID</pdfaProperty:name>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>URI</pdfaProperty:valueType>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n"
@@ -387,13 +405,15 @@ abstract class MetaInfo extends \Com\Tecnick\Pdf\HTML
         . "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n"
-        . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Amendment of PDF/A standard</pdfaProperty:description>' . "\n"
+        . "\t\t\t\t\t\t\t\t\t"
+        . '<pdfaProperty:description>Amendment of PDF/A standard</pdfaProperty:description>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>amd</pdfaProperty:name>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n"
-        . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Conformance level of PDF/A standard</pdfaProperty:description>' . "\n"
+        . "\t\t\t\t\t\t\t\t\t"
+        . '<pdfaProperty:description>Conformance level of PDF/A standard</pdfaProperty:description>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>conformance</pdfaProperty:name>' . "\n"
         . "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n"
         . "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n"

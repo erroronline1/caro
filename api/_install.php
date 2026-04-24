@@ -329,13 +329,13 @@ define('DEFAULTSQL', [
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`units` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`token` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`orderauth` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`image` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`app_settings` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`skills` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`permissions` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`units` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`token` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`orderauth` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`image` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`app_settings` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`skills` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`invalidation_date` date NULL DEFAULT NULL," .
 				"	`two_factor` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -677,13 +677,13 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_user (" .
 				"	id int NOT NULL IDENTITY(1,1) PRIMARY KEY," .
 				"	name nvarchar(255) NOT NULL," .
-				"	permissions varchar(MAX) NOT NULL," .
-				"	units varchar(MAX) NOT NULL," .
-				"	token varchar(MAX) NOT NULL," .
-				"	orderauth varchar(255) NOT NULL," .
-				"	image varchar(MAX) NOT NULL," .
-				"	app_settings nvarchar(MAX) NOT NULL," .
-				"	skills varchar(MAX) NOT NULL" .
+				"	permissions varchar(MAX) NULL DEFAULT NULL," .
+				"	units varchar(MAX) NULL DEFAULT NULL," .
+				"	token varchar(MAX) NULL DEFAULT NULL," .
+				"	orderauth varchar(255) NULL DEFAULT NULL," .
+				"	image varchar(MAX) NULL DEFAULT NULL," .
+				"	app_settings nvarchar(MAX) NULL DEFAULT NULL," .
+				"	skills varchar(MAX) NULL DEFAULT NULL" .
 				"	invalidation_date date NULL DEFAULT NULL," .
 				"	two_factor varchar(255) NULL DEFAULT NULL," .
 				");"

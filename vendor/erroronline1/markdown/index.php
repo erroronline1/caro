@@ -1,31 +1,33 @@
 <?php
-
+/*
+quick preview and benchmark for markdown libraries in two languages
+*/
 $defaultSample = file_get_contents('./sample.md');
 
 $methods = [
-	"footnote", // should come first to avoid mishandling indentation and reutilizing list and sup
+	"footnote", // should come first to avoid mishandling indentation and reutilizing list and superscript
 	"blockquote", // should come second to enable nesting
 	"reference", // before a and footnote to not mess up with similar patterns
-	"a", // safeMode can not render anchors to avoid malicious scripts
+	"anchor", // safeMode can not render anchors to avoid malicious scripts
 	"code",
 	"headings", // before hr avoiding conversion of ----
-	"hr", // before emphasis avoiding matching *** as emphasis
+	"horizontal_rule", // before emphasis avoiding matching *** as emphasis
 	"definition",
 	"emphasis",
-	"img",
+	"image",
 	"task", // before list otherwise only the first occasionally nested item is converted
 	"list",
-	"mail", // safeMode can not render anchors to avoid malicious scripts
+	"mailto", // safeMode can not render anchors to avoid malicious scripts
 	"mark",
-	"pre",
-	"s",
-	"larger", // before sup for using the same character twice
-	"sub",
-	"sup",
+	"strikethrough",
+	"larger", // before superscript for using the same character twice
+	"subscript",
+	"superscript",
 	"table",
-	"p", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-	"br",
-	"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
+	"typographs",
+	"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+	"linebreak",
+	//"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
 ];
 
 $selectedMethods = [];
@@ -55,30 +57,30 @@ sort($methods);
 
 <html>
 <style>
-	label {
-		display:inline-block;
-		min-width: 30%;
-	}
-	textarea {
-		width: 100%;
-		height: 70vh;
-		border-color: rgba(0, 0, 0, .5);
-	}
-
-	td:not([class]) {
+	tr:not([class]), td:not([class]) {
+		width:33vw;
 		vertical-align: top;
 		padding: 2em;
 		border-right: 1px solid rgba(0, 0, 0, .8);
 	}
 
-	body>table{
-		tr, td {
-			width:32%;
-		}
+	textarea {
+		width: 100%;
+		height: 60vh;
+		border-color: rgba(0, 0, 0, .5);
+	}
+	label {
+		display:inline-block;
+		padding:.3em;
+		width: 10rem;
+	}
+	input[type="submit"] {
+		margin:.5em;
+		padding:.3em;
+		width: 10rem;
 	}
 
 	table.eol1_md {
-
 		th,
 		td:not([class]) {
 			border: 1px solid gray;

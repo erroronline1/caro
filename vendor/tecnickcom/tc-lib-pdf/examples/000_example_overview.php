@@ -1,6 +1,6 @@
 <?php
 /**
- * index.php
+ * 000_example_overview.php
  *
  * @since       2017-05-08
  * @category    Library
@@ -32,7 +32,7 @@ $pdf = new \Com\Tecnick\Pdf\Tcpdf(
     'mm', // string $unit = 'mm',
     true, // bool $isunicode = true,
     false, // bool $subsetfont = false,
-    false, // bool $compress = true,
+    true, // bool $compress = true,
     '', // string $mode = '',
     null, // ?ObjEncrypt $objEncrypt = null,
 );
@@ -41,11 +41,11 @@ $pdf = new \Com\Tecnick\Pdf\Tcpdf(
 
 
 $pdf->setCreator('tc-lib-pdf');
-$pdf->setAuthor('John Doe');
-$pdf->setSubject('tc-lib-pdf generic example');
+$pdf->setAuthor('Nicola Asuni');
+$pdf->setSubject('tc-lib-pdf example: 000');
 $pdf->setTitle('Example');
-$pdf->setKeywords('TCPDF tc-lib-pdf generic example');
-$pdf->setPDFFilename('test_index.pdf');
+$pdf->setKeywords('TCPDF tc-lib-pdf example');
+$pdf->setPDFFilename('000_example_overview.pdf');
 
 $pdf->setViewerPreferences(['DisplayDocTitle' => true]);
 
@@ -125,6 +125,10 @@ $pdf->page->addContent($svgid01_out);
 $svgid02 = $pdf->addSVG('./images/testsvg.svg', 10, 160, 120, 60, $page01['height']);
 $svgid02_out = $pdf->getSetSVG($svgid02);
 $pdf->page->addContent($svgid02_out);
+
+$svgid03 = $pdf->addSVG('./images/testsvgblend.svg', 100, 220, 90, 60, $page01['height']);
+$svgid03_out = $pdf->getSetSVG($svgid03);
+$pdf->page->addContent($svgid03_out);
 
 // The copyright holder of the tux.svg image is Larry Ewing,
 // allows anyone to use it for any purpose, provided that the copyright holder is properly attributed.
@@ -251,9 +255,6 @@ $style7 = [
     'lineColor' => 'darkorange',
     'fillColor' => 'palegreen',
 ];
-
-$pdf->graph->setPageWidth($page02['width']);
-$pdf->graph->setPageHeight($page02['height']);
 
 // Line
 
@@ -434,9 +435,6 @@ $pdf->page->addContent($arrow4);
 $page03 = $pdf->addPage();
 $pdf->setBookmark('Ellipse', '', 1);
 
-$pdf->graph->setPageWidth($page03['width']);
-$pdf->graph->setPageHeight($page03['height']);
-
 // center of ellipse
 $xc = 100;
 $yc = 100;
@@ -468,9 +466,6 @@ $pdf->page->addContent($arc6);
 $page04 = $pdf->addPage();
 $pdf->setBookmark('Pie Chart', '', 1);
 
-$pdf->graph->setPageWidth($page04['width']);
-$pdf->graph->setPageHeight($page04['height']);
-
 $xc = 105;
 $yc = 100;
 $r = 50;
@@ -490,11 +485,6 @@ $pdf->page->addContent($pie3);
 
 $page05 = $pdf->addPage();
 $pdf->setBookmark('Crop Marks and Color Maps', '', 1);
-
-$pdf->graph->setPageWidth($page05['width']);
-$pdf->graph->setPageHeight($page05['height']);
-
-
 
 $pdf->graph->add($style7);
 
@@ -703,10 +693,6 @@ $pdf->page->addContent($colreg4);
 $page06 = $pdf->addPage();
 $pdf->setBookmark('Color Gradients', '', 1);
 
-$pdf->graph->setPageWidth($page06['width']);
-$pdf->graph->setPageHeight($page06['height']);
-
-
 // Linear gradient
 $lingrad = $pdf->graph->getLinearGradient(20, 45, 80, 80, 'red', 'blue', [0, 0, 1, 0]);
 $pdf->page->addContent($lingrad);
@@ -763,9 +749,6 @@ $pdf->page->addContent($coonspatchmesh2);
 
 $page07 = $pdf->addPage();
 $pdf->setBookmark('Color gradient mesh', '', 1);
-
-$pdf->graph->setPageWidth($page07['width']);
-$pdf->graph->setPageHeight($page07['height']);
 
 // first patch: f = 0
 $patch_array[0]['f'] = 0;
@@ -851,9 +834,6 @@ $pdf->page->addContent($coonspatchmesh3);
 
 $page08 = $pdf->addPage();
 $pdf->setBookmark('Transformations', '', 1);
-
-$pdf->graph->setPageWidth($page08['width']);
-$pdf->graph->setPageHeight($page08['height']);
 
 // Geometric Transformations
 
@@ -982,9 +962,6 @@ $pdf->setBookmark('Barcodes', '', 0, -1, 0, 0, 'B', '');
 
 $dest_barcode_page = $pdf->setNamedDestination('barcode');
 
-$pdf->graph->setPageWidth($page09['width']);
-$pdf->graph->setPageHeight($page09['height']);
-
 // Barcode
 
 $barcode_style = [
@@ -1028,9 +1005,6 @@ $pdf->page->addContent($barcode2);
 $page10 = $pdf->addPage();
 $pdf->setBookmark('Image Clipping', '', 0, -1, 0, 0, 'B', '');
 
-$pdf->graph->setPageWidth($page10['width']);
-$pdf->graph->setPageHeight($page10['height']);
-
 // Clipping Mask
 
 $cnz = $pdf->graph->getStartTransform();
@@ -1050,9 +1024,6 @@ $pdf->setBookmark('Text', '', 0, -1, 0, 0, 'B', '');
 
 // Add an internal link to this page
 $page11_link = $pdf->addInternalLink();
-
-$pdf->graph->setPageWidth($page11['width']);
-$pdf->graph->setPageHeight($page11['height']);
 
 $styletxt = [
     'lineWidth' => 0.25,
@@ -1567,7 +1538,7 @@ $sigdata = [
     'cert_type' => 2,
     // 'extracerts' => null,
     'info' => [
-        'ContactInfo' => 'http://www.tcpdf.org',
+        'ContactInfo' => 'https://tcpdf.org',
         'Location' => 'Office',
         'Name' => 'tc-lib-pdf',
         'Reason' => 'PDF signature test',
@@ -1781,26 +1752,592 @@ $pdf->page->addAnnotRef($lnk2);
 
 // ----------
 
-// HTML
+// HTML A
 
 $pageV01 = $pdf->addPage();
 $pdf->setBookmark('HTML', '', 0, -1, 0, 0, 'B', '');
 
-$pdf->page->addContent($bfont5['out']);
+$bfont6 = $pdf->font->insert($pdf->pon, 'dejavusans', '', 10);
 
-/*
-$html_01 = '<h1>HTML H1 Test</h1> <h2>HTML H2 Test</h2>';
+$pdf->page->addContent($bfont6['out']);
 
-$pdf-> getHTMLCell(
+
+$html_01 = '<h1>HTML Example A</h1>
+Some special characters: &lt; € &euro; &#8364; &amp; è &egrave; &copy; &gt; \\slash \\\\double-slash \\\\\\triple-slash
+<h2>List</h2>
+List example:
+<ol>
+	<li><b>bold text</b></li>
+	<li><i>italic text</i></li>
+	<li><u>underlined text</u></li>
+	<li><b>b<i>bi<u>biu</u>bi</i>b</b></li>
+	<li><a href="https://tcpdf.org" dir="ltr">link to https://tcpdf.org</a></li>
+	<li>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.<br />Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</li>
+	<li>SUBLIST
+		<ol>
+			<li>row one
+				<ul>
+					<li>sublist</li>
+				</ul>
+			</li>
+			<li>row two</li>
+		</ol>
+	</li>
+	<li><b>T</b>E<i>S</i><u>T</u> <del>line through</del></li>
+	<li><font size="+3">font + 3</font></li>
+	<li><small>small text</small> normal <small>small text</small> normal <sub>subscript</sub> normal <sup>superscript</sup> normal</li>
+</ol>
+<dl>
+	<dt>Coffee</dt>
+	<dd>Black hot drink</dd>
+	<dt>Milk</dt>
+	<dd>White cold drink</dd>
+</dl>
+
+<div style="text-align:center">The words &#8220;<span dir="rtl">&#1502;&#1494;&#1500; [mazel] &#1496;&#1493;&#1489; [tov]</span>&#8221; mean &#8220;Congratulations!&#8221;</div>
+
+<p>This is just an example of html code to demonstrate some supported CSS inline styles.
+<span style="font-weight: bold;">bold text</span>
+<span style="text-decoration: line-through;">line-trough</span>
+<span style="text-decoration: underline line-through;">underline and line-trough</span>
+<span style="color: rgb(0, 128, 64);">color</span>
+<span style="background-color: rgb(255, 0, 0); color: rgb(255, 255, 255);">background color</span>
+<span style="font-weight: bold;">bold</span>
+<span style="font-size: xx-small;">xx-small</span>
+<span style="font-size: x-small;">x-small</span>
+<span style="font-size: small;">small</span>
+<span style="font-size: medium;">medium</span>
+<span style="font-size: large;">large</span>
+<span style="font-size: x-large;">x-large</span>
+<span style="font-size: xx-large;">xx-large</span>
+</p>';
+
+
+$pdf->addHTMLCell(
     $html_01, // string $html,
     20, // float $posx = 0,
-    120, // float $posy = 0,
+    10, // float $posy = 0,
     150, // float $width = 0,
     0, // float $height = 0,
     null, // ?array $cell = null,
     $style_cell, // array $styles = [],
 );
-*/
+
+// ----------
+
+// HTML B
+
+$pageV02 = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$textcolors = '<h2>Text</h1>';
+$bgcolors = '<h2>Background</h2>';
+
+foreach($pdf->color::WEBHEX as $k => $v) {
+	$textcolors .= '<span color="#'.$v.'">'.$k.'</span> ';
+    $bgcolors .= '<span bgcolor="#'.$v.'" color="#333333">'.$k.'</span> ';
+}
+
+$html_02 = '<h1>HTML Colors</h1>'.$textcolors.'<hr />'.$bgcolors;
+
+$pdf->addHTMLCell(
+    $html_02, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML C
+
+$pageV03 = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_03 = '<h1>Various HTML Tests</h1>
+<font face="courier"><b>thisisaverylongword</b></font> <font face="helvetica"><i>thisisanotherverylongword</i></font> <font face="times"><b>thisisaverylongword</b></font> thisisanotherverylongword <font face="times">thisisaverylongword</font> <font face="courier"><b>thisisaverylongword</b></font> <font face="helvetica"><i>thisisanotherverylongword</i></font> <font face="times"><b>thisisaverylongword</b></font> thisisanotherverylongword <font face="times">thisisaverylongword</font> <font face="courier"><b>thisisaverylongword</b></font> <font face="helvetica"><i>thisisanotherverylongword</i></font> <font face="times"><b>thisisaverylongword</b></font> thisisanotherverylongword <font face="times">thisisaverylongword</font> <font face="courier"><b>thisisaverylongword</b></font> <font face="helvetica"><i>thisisanotherverylongword</i></font> <font face="times"><b>thisisaverylongword</b></font> thisisanotherverylongword <font face="times">thisisaverylongword</font> <font face="courier"><b>thisisaverylongword</b></font> <font face="helvetica"><i>thisisanotherverylongword</i></font> <font face="times"><b>thisisaverylongword</b></font> thisisanotherverylongword <font face="times">thisisaverylongword</font>';
+
+
+
+// Test fonts nesting
+$htmlt1 = 'Default <font face="courier">Courier <font face="helvetica">Helvetica <font face="times">Times <font face="dejavusans">dejavusans </font>Times </font>Helvetica </font>Courier </font>Default';
+$htmlt2 = '<small>small text</small> normal <small>small text</small> normal <sub>subscript</sub> normal <sup>superscript</sup> normal';
+$htmlt3 = '<font size="10" color="#ff7f50">The</font> <font size="10" color="#6495ed">quick</font> <font size="14" color="#dc143c">brown</font> <font size="18" color="#008000">fox</font> <font size="22"><a href="https://tcpdf.org">jumps</a></font> <font size="22" color="#a0522d">over</font> <font size="18" color="#da70d6">the</font> <font size="14" color="#9400d3">lazy</font> <font size="10" color="#4169ef">dog</font>.';
+
+$html_03 .= '<br />'.$htmlt1.'<br />'.$htmlt2.'<br />'.$htmlt3.'<br />'.$htmlt3.'<br />'.$htmlt2;
+
+$html_03 .= <<<EOF
+<hr />
+<h2>Div Blocks</h2>
+<div style="background-color:#880000;color:white;">
+Hello World!<br />
+Hello
+</div>
+<pre style="background-color:#336699;color:white;">
+int main() {
+    printf("HelloWorld");
+    return 0;
+}
+</pre>
+<tt>Monospace font</tt>, normal font, <tt>monospace font</tt>, normal font.
+<br />
+<div style="background-color:#880000;color:white;">DIV LEVEL 1<div style="background-color:#008800;color:white;">DIV LEVEL 2</div>DIV LEVEL 1</div>
+<br />
+<span style="background-color:#880000;color:white;">SPAN LEVEL 1 <span style="background-color:#008800;color:white;">SPAN LEVEL 2</span> SPAN LEVEL 1</span>
+EOF;
+
+$pdf->addHTMLCell(
+    $html_03, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML D-A
+
+$pageV04A = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$subtable = '<table border="1" cellspacing="6" cellpadding="4"><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>';
+
+$html_04A = '<h2>HTML TABLES (A)</h2>
+<table border="1" cellspacing="3" cellpadding="4">
+	<tr>
+		<th align="center">#</th>
+		<th align="right">RIGHT align</th>
+		<th align="left">LEFT align</th>
+		<th>4A</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td bgcolor="#cccccc" align="center" colspan="2">A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> column span. One two tree four five six seven eight nine ten.<br />line after br<br /><small>small text</small> normal <sub>subscript</sub> normal <sup>superscript</sup> normal  bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla<ol><li>first<ol><li>sublist</li><li>sublist</li></ol></li><li>second</li></ol><small color="#FF0000" bgcolor="#FFFF00">small small small small small small small small small small small small small small small small small small small small</small></td>
+		<td>4B</td>
+	</tr>
+	<tr>
+		<td>'.$subtable.'</td>
+		<td bgcolor="#0000FF" color="yellow" align="center">A2 € &euro; &#8364; &amp; è &egrave;<br/>A2 € &euro; &#8364; &amp; è &egrave;</td>
+		<td bgcolor="#FFFF00" align="left"><span color="#FF0000">Red</span> Yellow BG</td>
+		<td>4C</td>
+	</tr>
+	<tr>
+		<td>1A</td>
+		<td rowspan="2" colspan="2" bgcolor="#FFFFCC">2AA<br />2AB<br />2AC</td>
+		<td bgcolor="#FF0000">4D</td>
+	</tr>
+	<tr>
+		<td>1B</td>
+		<td>4E</td>
+	</tr>
+	<tr>
+		<td>1C</td>
+		<td>2C</td>
+		<td>3C</td>
+		<td>4F</td>
+	</tr>
+</table>';
+
+$pdf->addHTMLCell(
+    $html_04A, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML D-B
+
+$pageV04B = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_04B = '<h2>HTML TABLES (B)</h2>
+<table border="1" cellspacing="3" cellpadding="4">
+	<tr>
+		<td align="left"><span>1L</span> <span>Alfa</span> <span>Bravo</span> <span>Charlie</span> <span>Delta</span> <span>Echo</span> <span>Foxtrot</span> <span>Golf</span> <span>Hotel</span> <span>India</span> <span>Juliett</span> <span>Kilo</span> <span>Lima</span> <span>Mike</span> <span>November</span> <span>Oscar</span> <span>Papa</span> <span>Quebec</span> <span>Romeo</span> <span>Sierra</span> <span>Tango</span> <span>Uniform</span> <span>Victor</span> <span>Whiskey</span> <span>Xray</span> <span>Yankee</span> <span>Zulu</span></td>
+	</tr>
+	<tr>
+		<td align="center"><span>1C</span> <span>Alfa</span> <span>Bravo</span> <span>Charlie</span> <span>Delta</span> <span>Echo</span> <span>Foxtrot</span> <span>Golf</span> <span>Hotel</span> <span>India</span> <span>Juliett</span> <span>Kilo</span> <span>Lima</span> <span>Mike</span> <span>November</span> <span>Oscar</span> <span>Papa</span> <span>Quebec</span> <span>Romeo</span> <span>Sierra</span> <span>Tango</span> <span>Uniform</span> <span>Victor</span> <span>Whiskey</span> <span>Xray</span> <span>Yankee</span> <span>Zulu</span></td>
+	</tr>
+	<tr>
+		<td align="right"><span>1R</span> <span>Alfa</span> <span>Bravo</span> <span>Charlie</span> <span>Delta</span> <span>Echo</span> <span>Foxtrot</span> <span>Golf</span> <span>Hotel</span> <span>India</span> <span>Juliett</span> <span>Kilo</span> <span>Lima</span> <span>Mike</span> <span>November</span> <span>Oscar</span> <span>Papa</span> <span>Quebec</span> <span>Romeo</span> <span>Sierra</span> <span>Tango</span> <span>Uniform</span> <span>Victor</span> <span>Whiskey</span> <span>Xray</span> <span>Yankee</span> <span>Zulu</span></td>
+	</tr>
+	<tr>
+		<td align="left"><span>2L</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> column span. Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu.</td>
+	</tr>
+	<tr>
+		<td align="center"><span>2C</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> column span. Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu.</td>
+	</tr>
+	<tr>
+		<td align="right"><span>2R</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> column span. Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu.</td>
+	</tr>
+	<tr>
+		<td align="left"><small>3L small text</small> Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu</td>
+	</tr>
+	<tr>
+		<td align="center"><small>3C small text</small> Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu</td>
+	</tr>
+	<tr>
+		<td align="right"><small>3R small text</small> Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu</td>
+	</tr>
+</table>
+<table border="1" cellspacing="3" cellpadding="4">
+	<tr>
+		<td align="left"><img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="60" height="20" border="0" /></td>
+	</tr>
+	<tr>
+		<td align="center"><img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="60" height="20" border="0" /></td>
+	</tr>
+	<tr>
+		<td align="right"><img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="60" height="20" border="0" /></td>
+	</tr>
+</table>';
+
+$pdf->addHTMLCell(
+    $html_04B, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML D-C
+
+$pageV04C = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_04C = <<<EOD
+<h2>HTML TABLES (C)</h2>
+<table cellspacing="0" cellpadding="1" border="1" style="font-size:x-small;">
+	<tr>
+		<td rowspan="3">COL 1 - ROW 1<br />COLSPAN 3</td>
+		<td>COL 2 - ROW 1</td>
+		<td>COL 3 - ROW 1</td>
+	</tr>
+	<tr>
+		<td rowspan="2">COL 2 - ROW 2 - COLSPAN 2<br />text line<br />text line<br />text line<br />text line</td>
+		<td>COL 3 - ROW 2</td>
+	</tr>
+	<tr>
+		<td>COL 3 - ROW 3</td>
+	</tr>
+</table>
+<hr />
+<table cellspacing="0" cellpadding="1" border="1" style="font-size:x-small;">
+	<tr>
+		<td rowspan="3">COL 1 - ROW 1<br />COLSPAN 3<br />text line<br />text line<br />text line<br />text line<br />text line<br />text line</td>
+		<td>COL 2 - ROW 1</td>
+		<td>COL 3 - ROW 1</td>
+	</tr>
+	<tr>
+		<td rowspan="2">COL 2 - ROW 2 - COLSPAN 2<br />text line<br />text line<br />text line<br />text line</td>
+		<td>COL 3 - ROW 2</td>
+	</tr>
+	<tr>
+		<td>COL 3 - ROW 3</td>
+	</tr>
+</table>
+<hr />
+<table cellspacing="0" cellpadding="1" border="1" style="font-size:x-small;">
+	<tr>
+		<td rowspan="3">COL 1 - ROW 1<br />COLSPAN 3<br />text line<br />text line<br />text line<br />text line<br />text line<br />text line</td>
+		<td>COL 2 - ROW 1</td>
+		<td>COL 3 - ROW 1</td>
+	</tr>
+	<tr>
+		<td rowspan="2">COL 2 - ROW 2 - COLSPAN 2<br />text line<br />text line<br />text line<br />text line</td>
+		<td>COL 3 - ROW 2<br />text line<br />text line</td>
+	</tr>
+	<tr>
+		<td>COL 3 - ROW 3</td>
+	</tr>
+</table>
+<hr />
+<table border="1" style="font-size:x-small;">
+	<tr>
+		<th rowspan="3">Left column</th>
+		<th colspan="5">Heading Column Span 5</th>
+		<th colspan="9">Heading Column Span 9</th>
+	</tr>
+	<tr>
+		<th rowspan="2">Rowspan 2<br />This is some text that fills the table cell.</th>
+		<th colspan="2">span 2</th>
+		<th colspan="2">span 2</th>
+		<th rowspan="2">2 rows</th>
+		<th colspan="8">Colspan 8</th>
+	</tr>
+	<tr>
+		<th>1a</th>
+		<th>2a</th>
+		<th>1b</th>
+		<th>2b</th>
+		<th>1</th>
+		<th>2</th>
+		<th>3</th>
+		<th>4</th>
+		<th>5</th>
+		<th>6</th>
+		<th>7</th>
+		<th>8</th>
+	</tr>
+</table>
+EOD;
+
+$pdf->addHTMLCell(
+    $html_04C, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML E-A
+
+$pageV05A = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_05A = '<h2>HTML Text Alignment (A)</h2>
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. <em>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?</em> <em>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</em><br /><br /><b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i> -&gt; &nbsp;&nbsp; <b>A</b> + <b>B</b> = <b>C</b> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>B</i> = <i>A</i> &nbsp;&nbsp; -&gt; &nbsp;&nbsp; <i>C</i> - <i>A</i> = <i>B</i><br /><br /><b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u> <b>Bold</b><i>Italic</i><u>Underlined</u>';
+
+
+$pdf->addHTMLCell(
+    $html_05A, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML E-B
+
+$pageV05B = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_05B = '<h2>HTML Text Alignment (B)</h2>
+<div style="text-align:justify;">JUSTIFY: Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa
+Quebec Romeo</div>
+<br />
+<div style="text-align:left;">LEFT: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:center;">CENTER: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:right;">RIGHT: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:justify;">JUSTIFY: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:justify;">JUSTIFY: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="89" height="30" border="0" /><img src="images/tcpdf_box.svg" alt="TCPDF box" width="100" height="67" border="0" /> <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:left;">LEFT: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="89" height="30" border="0" /><img src="images/tcpdf_box.svg" alt="TCPDF box" width="100" height="67" border="0" /> <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:center;">CENTER: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="89" height="30" border="0" /><img src="images/tcpdf_box.svg" alt="TCPDF box" width="100" height="67" border="0" /> <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>
+<br />
+<div style="text-align:right;">RIGHT: Alfa <i>Bravo</i> Charlie <i>Delta</i> Echo <img src="images/tcpdf_logo.jpg" alt="TCPDF logo" width="89" height="30" border="0" /><img src="images/tcpdf_box.svg" alt="TCPDF box" width="100" height="67" border="0" /> <i>Foxtrot</i> Golf <i>Hotel</i> India <i>Juliett</i> Kilo <i>Lima</i> Mike <i>November</i> Oscar <i>Papa</i> Quebec <i>Romeo</i> Sierra <i>Tango</i> Uniform <i>Victor</i> Whiskey <i>Xray</i> Yankee <i>Zulu</i></div>';
+
+
+$pdf->addHTMLCell(
+    $html_05B, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML F
+
+$pageV06 = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_06 = <<<EOF
+<!-- EXAMPLE OF CSS STYLE -->
+<style>
+	h1 {
+		color: navy;
+		font-family: times;
+		font-size: 24pt;
+		text-decoration: underline;
+	}
+	p.first {
+		color: #003300;
+		font-family: helvetica;
+		font-size: 12pt;
+	}
+	p.first span {
+		color: #006600;
+		font-style: italic;
+	}
+	p#second {
+		color: rgb(00,63,127);
+		font-family: times;
+		font-size: 12pt;
+		text-align: justify;
+	}
+	p#second > span {
+		background-color: #FFFFAA;
+	}
+	table.first {
+		color: #003300;
+		font-family: helvetica;
+		font-size: 8pt;
+		border-left: 3px solid red;
+		border-right: 3px solid #FF00FF;
+		border-top: 3px solid green;
+		border-bottom: 3px solid blue;
+		background-color: #ccffcc;
+	}
+	td {
+		border: 2px solid blue;
+		background-color: #ffffee;
+	}
+	td.second {
+		border: 2px dashed green;
+	}
+	div.test {
+		color: #CC0000;
+		background-color: #FFFF66;
+		font-family: helvetica;
+		font-size: 10pt;
+		border-style: solid solid solid solid;
+		border-width: 2px 2px 2px 2px;
+		border-color: green #FF00FF blue red;
+		text-align: center;
+	}
+	.lowercase {
+		text-transform: lowercase;
+	}
+	.uppercase {
+		text-transform: uppercase;
+	}
+	.capitalize {
+		text-transform: capitalize;
+	}
+</style>
+
+<h1 class="title">Example of <i style="color:#990000">XHTML + CSS</i></h1>
+
+<p class="first">Example of paragraph with class selector. <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed imperdiet lectus. Phasellus quis velit velit, non condimentum quam. Sed neque urna, ultrices ac volutpat vel, laoreet vitae augue. Sed vel velit erat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Cras eget velit nulla, eu sagittis elit. Nunc ac arcu est, in lobortis tellus. Praesent condimentum rhoncus sodales. In hac habitasse platea dictumst. Proin porta eros pharetra enim tincidunt dignissim nec vel dolor. Cras sapien elit, ornare ac dignissim eu, ultricies ac eros. Maecenas augue magna, ultrices a congue in, mollis eu nulla. Nunc venenatis massa at est eleifend faucibus. Vivamus sed risus lectus, nec interdum nunc.</span></p>
+
+<p id="second">Example of paragraph with ID selector. <span>Fusce et felis vitae diam lobortis sollicitudin. Aenean tincidunt accumsan nisi, id vehicula quam laoreet elementum. Phasellus egestas interdum erat, et viverra ipsum ultricies ac. Praesent sagittis augue at augue volutpat eleifend. Cras nec orci neque. Mauris bibendum posuere blandit. Donec feugiat mollis dui sit amet pellentesque. Sed a enim justo. Donec tincidunt, nisl eget elementum aliquam, odio ipsum ultrices quam, eu porttitor ligula urna at lorem. Donec varius, eros et convallis laoreet, ligula tellus consequat felis, ut ornare metus tellus sodales velit. Duis sed diam ante. Ut rutrum malesuada massa, vitae consectetur ipsum rhoncus sed. Suspendisse potenti. Pellentesque a congue massa.</span></p>
+
+<div class="test">example of DIV with border and fill.
+<br />Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+<br /><span class="lowercase">text-transform <b>LOWERCASE</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+<br /><span class="uppercase">text-transform <b>uppercase</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+<br /><span class="capitalize">text-transform <b>cAPITALIZE</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+</div>
+
+<br />
+
+<table class="first" cellpadding="4" cellspacing="6">
+ <tr>
+  <td width="30" align="center"><b>No.</b></td>
+  <td width="140" align="center" bgcolor="#FFFF00"><b>XXXX</b></td>
+  <td width="140" align="center"><b>XXXX</b></td>
+  <td width="80" align="center"> <b>XXXX</b></td>
+  <td width="80" align="center"><b>XXXX</b></td>
+  <td width="45" align="center"><b>XXXX</b></td>
+ </tr>
+ <tr>
+  <td width="30" align="center">1.</td>
+  <td width="140" rowspan="6" class="second">BRDD<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX</td>
+  <td width="140">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td width="80">XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+ <tr>
+  <td width="30" align="center" rowspan="3">2.</td>
+  <td width="140" rowspan="3">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+ <tr>
+  <td width="80">XXXX<br />XXXX<br />XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+ <tr>
+  <td width="80" rowspan="2" >XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+ <tr>
+  <td width="30" align="center">3.</td>
+  <td width="140">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+ <tr bgcolor="#FFFF80">
+  <td width="30" align="center">4.</td>
+  <td width="140" bgcolor="#00CC00" color="#FFFF00">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td width="80">XXXX<br />XXXX</td>
+  <td align="center" width="45">XXXX<br />XXXX</td>
+ </tr>
+</table>
+EOF;
+
+$pdf->addHTMLCell(
+    $html_06, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
+
+// ----------
+
+// HTML G
+
+$pageV07 = $pdf->addPage();
+
+$pdf->page->addContent($bfont6['out']);
+
+$html_07 = <<<EOD
+<h1>XHTML Form Example</h1>
+<form method="post" action="http://localhost/printvars.php" enctype="multipart/form-data">
+<label for="name">name:</label> <input type="text" name="name" value="" size="20" maxlength="30" /><br />
+<label for="password">password:</label> <input type="password" name="password" value="" size="20" maxlength="30" /><br /><br />
+<label for="infile">file:</label> <input type="file" name="userfile" size="20" /><br /><br />
+<input type="checkbox" name="agree" value="1" checked="checked" /> <label for="agree">I agree </label><br /><br />
+<input type="radio" name="radioquestion" id="rqa" value="1" /> <label for="rqa">one</label><br />
+<input type="radio" name="radioquestion" id="rqb" value="2" checked="checked"/> <label for="rqb">two</label><br />
+<input type="radio" name="radioquestion" id="rqc" value="3" /> <label for="rqc">three</label><br /><br />
+<label for="selection">select:</label>
+<select name="selection" size="0">
+	<option value="0">zero</option>
+	<option value="1">one</option>
+	<option value="2">two</option>
+	<option value="3">three</option>
+</select><br /><br />
+<label for="selection">select:</label>
+<select name="multiselection" size="2" multiple="multiple">
+	<option value="0">zero</option>
+	<option value="1">one</option>
+	<option value="2">two</option>
+	<option value="3">three</option>
+</select><br /><br /><br />
+<label for="text">text area:</label><br />
+<textarea cols="40" rows="3" name="text">line one
+line two</textarea><br />
+<br /><br /><br />
+<input type="reset" name="reset" value="Reset" />
+<input type="submit" name="submit" value="Submit" />
+<input type="button" name="print" value="Print" onclick="print()" />
+<input type="hidden" name="hiddenfield" value="OK" />
+<br />
+</form>
+EOD;
+
+$pdf->addHTMLCell(
+    $html_07, // string $html,
+    20, // float $posx = 0,
+    10, // float $posy = 0,
+);
 
 // ----------
 

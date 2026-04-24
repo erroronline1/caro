@@ -71,6 +71,12 @@ PATHDEBPKG=$(TARGETDIR)/DEB
 # BZ2 Packaging path (where BZ2s will be stored)
 PATHBZ2PKG=$(TARGETDIR)/BZ2
 
+# sed argument for in-place substitutions
+SEDINPLACE=-i
+ifeq ($(shell uname -s),Darwin)
+	SEDINPLACE=-i ''
+endif
+
 # Default port number for the example server
 PORT?=8000
 
@@ -84,7 +90,7 @@ COMPOSER=$(PHP) -d "apc.enable_cli=0" $(shell which composer)
 PHPDOC=$(shell which phpDocumentor)
 
 # phpstan version
-PHPSTANVER=2.1.33
+PHPSTANVER=2.1.40
 
 # List of fonts to process
 FONTLIST=core pdfa cid0 freefont unifont dejavu noto
@@ -98,28 +104,10 @@ help:
 	@echo "$(PROJECT) Makefile."
 	@echo "The following commands are available:"
 	@echo ""
-	@echo "  make buildall : Build and test everything from scratch"
-	@echo "  make bz2      : Package the library in a compressed bz2 archive"
-	@echo "  make clean    : Delete the vendor and target directories"
-	@echo "  make codefix  : Fix code style violations"
-	@echo "  make deb      : Build a DEB package for Debian-like Linux distributions"
-	@echo "  make deps     : Download all dependencies"
-	@echo "  make doc      : Generate source code documentation"
-	@echo "  make lint     : Test source code for coding standard violations"
-	@echo "  make qa       : Run all tests and reports"
-	@echo "  make report   : Generate various reports"
-	@echo "  make rpm      : Build an RPM package for RedHat-like Linux distributions"
-	@echo "  make server   : Start the development server"
-	@echo "  make test     : Run unit tests"
-	@echo "  make versionup: Increase the version patch number"
+	@awk '/^## /{desc=substr($$0,4)} /^\.PHONY:/{if(NF>1) {target=$$2; if(desc) printf "  make %-15s: %s\n",target,desc; desc=""}}' Makefile
 	@echo ""
-	@echo "  make fonts    : Import and convert fonts"
-	@echo "  make rpm_fonts: Build fonts RPM packages"
-	@echo "  make deb_fonts: Build fonts DEB packages"
-	@echo "  make bz2_fonts: Build fonts tar bz2 (tbz2) compressed archives"
-	@echo ""
-	@echo "To test and build everything from scratch:"
-	@echo "make buildall"
+	@echo "To test and build everything from scratch, use the shortcut:"
+	@echo "    make x"
 	@echo ""
 
 # alias for help target
@@ -130,24 +118,24 @@ all: help
 .PHONY: x
 x: buildall
 
-# Full build and test sequence
+## Full build and test sequence
 .PHONY: buildall
 buildall: deps codefix fonts qa bz2 rpm deb
 
-# Package the library in a compressed bz2 archive
+## Package the library in a compressed bz2 archive
 .PHONY: bz2
 bz2:
 	rm -rf $(PATHBZ2PKG)
 	make install DESTDIR=$(PATHBZ2PKG)
 	tar -jcvf $(PATHBZ2PKG)/$(PKGNAME)-$(VERSION)-$(RELEASE).tbz2 -C $(PATHBZ2PKG) $(DATADIR)
 
-# Delete the vendor and target directories
+## Delete the vendor and target directories
 .PHONY: clean
 clean:
 	rm -rf ./vendor $(TARGETDIR)
 	cd util	&& make clean
 
-# Fix code style violations
+## Fix code style violations
 .PHONY: codefix
 codefix:
 	./vendor/bin/phpcbf --config-set ignore_non_auto_fixable_on_exit 1
@@ -156,7 +144,7 @@ codefix:
 	--standard=psr12 \
 	src test
 
-# Build a DEB package for Debian-like Linux distributions
+## Build a DEB package for Debian-like Linux distributions
 .PHONY: deb
 deb:
 	rm -rf $(PATHDEBPKG)
@@ -164,12 +152,12 @@ deb:
 	rm -f $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/$(DOCPATH)LICENSE
 	tar -zcvf $(PATHDEBPKG)/$(PKGNAME)_$(VERSION).orig.tar.gz -C $(PATHDEBPKG)/ $(PKGNAME)-$(VERSION)
 	cp -rf ./resources/debian $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#DATE#~/`date -R`/" {} \;
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#VENDOR#~/$(VENDOR)/" {} \;
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#PROJECT#~/$(PROJECT)/" {} \;
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#PKGNAME#~/$(PKGNAME)/" {} \;
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#VERSION#~/$(VERSION)/" {} \;
-	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed --in-place=.bak "s/~#RELEASE#~/$(RELEASE)/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#DATE#~/`date -R`/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#VENDOR#~/$(VENDOR)/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#PROJECT#~/$(PROJECT)/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#PKGNAME#~/$(PKGNAME)/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#VERSION#~/$(VERSION)/" {} \;
+	find $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/ -type f -exec sed $(SEDINPLACE) "s/~#RELEASE#~/$(RELEASE)/" {} \;
 	echo $(LIBPATH) > $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/$(PKGNAME).dirs
 	echo "$(LIBPATH)* $(LIBPATH)" > $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/install
 	echo $(DOCPATH) >> $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/$(PKGNAME).dirs
@@ -181,7 +169,7 @@ endif
 	echo "new-package-should-close-itp-bug" > $(PATHDEBPKG)/$(PKGNAME)-$(VERSION)/debian/$(PKGNAME).lintian-overrides
 	cd $(PATHDEBPKG)/$(PKGNAME)-$(VERSION) && debuild -us -uc
 
-# Clean all artifacts and download all dependencies
+## Clean all artifacts and download all dependencies
 .PHONY: deps
 deps: ensuretarget
 	rm -rf ./vendor/* $(TARGETDIR)/fonts
@@ -190,13 +178,13 @@ deps: ensuretarget
 	&& chmod +x ./vendor/phpstan.phar
 	cd util && make deps
 
-# Generate source code documentation
+## Generate source code documentation
 .PHONY: doc
 doc: ensuretarget
 	rm -rf $(TARGETDIR)/doc
 	$(PHPDOC) -d ./src -t $(TARGETDIR)/doc/
 
-# Create missing target directories for test and build artifacts
+## Create missing target directories for test and build artifacts
 .PHONY: ensuretarget
 ensuretarget:
 	mkdir -p $(TARGETDIR)/test
@@ -204,7 +192,7 @@ ensuretarget:
 	mkdir -p $(TARGETDIR)/doc
 	mkdir -p $(TARGETDIR)/fonts
 
-# Install this application
+## Install this application
 .PHONY: install
 install: uninstall
 	mkdir -p $(PATHINSTBIN)
@@ -226,26 +214,26 @@ ifneq ($(strip $(CONFIGPATH)),)
 	find $(PATHINSTCFG) -type f -exec chmod 644 {} \;
 endif
 
-# Test source code for coding standard violations
+## Test source code for coding standard violations
 .PHONY: lint
 lint:
-	./vendor/bin/phpcbf --config-set ignore_non_auto_fixable_on_exit 1
+	#./vendor/bin/phpcbf --config-set ignore_non_auto_fixable_on_exit 1
 	./vendor/bin/phpcs --standard=phpcs.xml
 	./vendor/bin/phpmd src text codesize,unusedcode,naming,design --exclude vendor
 	./vendor/bin/phpmd test text unusedcode,naming,design --exclude vendor
 	php -r 'exit((int)version_compare(PHP_MAJOR_VERSION, "7", ">"));' || ./vendor/phpstan.phar analyse
 
-# Run all tests and reports
+## Run all tests and reports
 .PHONY: qa
 qa: ensuretarget lint test report
 
-# Generate various reports
+## Generate various reports
 .PHONY: report
 report: ensuretarget
 	./vendor/bin/pdepend --jdepend-xml=$(TARGETDIR)/report/dependencies.xml --summary-xml=$(TARGETDIR)/report/metrics.xml --jdepend-chart=$(TARGETDIR)/report/dependecies.svg --overview-pyramid=$(TARGETDIR)/report/overview-pyramid.svg --ignore=vendor ./src
 	#./vendor/bartlett/php-compatinfo/bin/phpcompatinfo --no-ansi analyser:run src/ > $(TARGETDIR)/report/phpcompatinfo.txt
 
-# Build the RPM package for RedHat-like Linux distributions
+## Build the RPM package for RedHat-like Linux distributions
 .PHONY: rpm
 rpm:
 	rm -rf $(PATHRPMPKG)
@@ -263,12 +251,12 @@ rpm:
 	--define "_configpath /$(CONFIGPATH)" \
 	-bb resources/rpm/rpm.spec
 
-# Start the development server
+## Start the development server
 .PHONY: server
 server:
 	$(PHP) -t example -S localhost:$(PORT)
 
-# Tag this GIT version
+## Tag this GIT version
 .PHONY: tag
 tag:
 	git checkout main && \
@@ -276,46 +264,45 @@ tag:
 	git push origin --tags && \
 	git pull
 
-# Run unit tests
+## Run unit tests
 .PHONY: test
 test:
 	cp phpunit.xml.dist phpunit.xml
 	#./vendor/bin/phpunit --migrate-configuration || true
 	XDEBUG_MODE=coverage ./vendor/bin/phpunit --stderr test
 
-# Remove all installed files
+## Remove all installed files
 .PHONY: uninstall
 uninstall:
 	rm -rf $(PATHINSTBIN)
 	rm -rf $(PATHINSTDOC)
 
-# Increase the version patch number
+## Increase the version patch number
 .PHONY: versionup
 versionup:
 	echo ${VERSION} | gawk -F. '{printf("%d.%d.%d\n",$$1,$$2,(($$3+1)));}' > VERSION
 
 # ----------
 
-# import and convert fonts
+## import and convert fonts
 fonts:
 	cd util && ($(COMPOSER) install -vvv --no-interaction)
 	cd util && make build
 	
-# Build fonts RPM packages for RedHat-like Linux distributions
+## Build fonts RPM packages for RedHat-like Linux distributions
 rpm_fonts:
 	$(foreach PKGFONTDIR,$(FONTLIST), \
 		cd ${CURRENTDIR}/util && make rpm PKGFONTDIR=${PKGFONTDIR} ; \
 	)
 
-# Build fonts DEB packages for Debian-like Linux distributions
+## Build fonts DEB packages for Debian-like Linux distributions
 deb_fonts:
 	$(foreach PKGFONTDIR,$(FONTLIST), \
 		cd ${CURRENTDIR}/util && make deb PKGFONTDIR=${PKGFONTDIR} ; \
 	)
 
-# build fonts compressed bz2 archives
+## build fonts compressed bz2 archives
 bz2_fonts:
 	$(foreach PKGFONTDIR,$(FONTLIST), \
 		cd ${CURRENTDIR}/util && make bz2 PKGFONTDIR=${PKGFONTDIR} ; \
 	)
-

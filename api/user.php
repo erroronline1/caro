@@ -93,7 +93,7 @@ class USER extends API {
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
 					':image' => $user['image'],
-					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
+					':app_settings' => json_decode($user['app_settings'] ?? '', true),
 					':skills' => $user['skills'],
 					':invalidation_date' => $user['invalidation_date'],
 					':two_factor' => $user['two_factor']
@@ -707,10 +707,10 @@ class USER extends API {
 					':name' => $submittedName,
 					':permissions' => null,
 					':units' => null,
-					':token' => $user['token'] ?? '',
-					':orderauth' => $user['orderauth'] ?? '',
+					':token' => $user['token'] ?? null,
+					':orderauth' => $user['orderauth'] ?? null,
 					':image' => $user['image'] ?? '',
-					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
+					':app_settings' => json_decode($user['app_settings'] ?? '', true),
 					':skills' => [],
 					':invalidation_date' => $user['invalidation_date'] ?? null,
 					':two_factor' => $user['two_factor'] ?? null

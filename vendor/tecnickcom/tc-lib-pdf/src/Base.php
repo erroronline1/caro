@@ -180,7 +180,7 @@ abstract class Base
     /**
      * TCPDF version.
      */
-    protected string $version = '8.4.10';
+    protected string $version = '8.7.1';
 
     /**
      * Time is seconds since EPOCH when the document was created.
@@ -374,6 +374,14 @@ abstract class Base
     protected int $pdfa = 0;
 
     /**
+     * PDF/A conformance level:
+     * - 'A' (Accessible): Full compliance including tagged PDF and Unicode mapping.
+     * - 'B' (Basic): Visual appearance preservation.
+     * - 'U' (Unicode): Basic + Unicode character mapping (PDF/A-2 and PDF/A-3 only).
+     */
+    protected string $pdfaConformance = 'B';
+
+    /**
      * Enable stream compression.
      */
     protected bool $compress = true;
@@ -480,6 +488,7 @@ abstract class Base
     protected array $objid = [
         'catalog' => 0,
         'dests' => 0,
+        'dss' => 0,
         'form' => [],
         'info' => 0,
         'pages' => 0,
@@ -537,6 +546,14 @@ abstract class Base
         'password' => '',
         'privkey' => '',
         'signcert' => '',
+        'ltv' => [
+            'enabled' => false,
+            'embed_ocsp' => true,
+            'embed_crl' => true,
+            'embed_certs' => true,
+            'include_dss' => true,
+            'include_vri' => true,
+        ],
     ];
 
     /**
@@ -550,6 +567,11 @@ abstract class Base
         'username' => '',
         'password' => '',
         'cert' => '',
+        'hash_algorithm' => 'sha256',
+        'policy_oid' => '',
+        'nonce_enabled' => true,
+        'timeout' => 5,
+        'verify_peer' => true,
     ];
 
     /**

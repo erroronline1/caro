@@ -14,16 +14,20 @@ error_reporting(E_ALL);
 
 require(__DIR__ . '/../vendor/autoload.php');
 define('K_PATH_FONTS', realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+require_once('./_filehandler.php');
 
 class PDF{
 	private $_setup = [];
 	private $_pdf = null;
+	public $_pdo = null;
+	private $_markdown_css = null;
 
-	public function __construct($setup){
+	public function __construct($setup, $pdo = null){
+		error_reporting(E_ALL ^ E_DEPRECATED);
 		$this->_setup = [
 			'format' => $setup['format'] ?? 'A4',
 			'unit' => $setup['unit'] ?? 'mm',
-			'orientation' => $setup['orientation'] ?? NULL,
+			'orientation' => $setup['orientation'] ?? 'portrait',
 			'margintop' => isset($setup['margintop']) ? intval($setup['margintop']) : 30,
 			'marginright' => isset($setup['marginright']) ? intval($setup['marginright']) : 15,
 			'marginbottom' => isset($setup['marginbottom']) ? intval($setup['marginbottom']) : 20,
@@ -44,6 +48,24 @@ class PDF{
 		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
 			$this->_setup['format'] = [$customsetup[0], $customsetup[1]];
 		}
+		$this->_pdo = $pdo;
+		$this->_markdown_css = <<<END
+		<style>
+			.eol1_odd {
+				background-color: #eee;
+			}
+			td {
+				border-right:1px solid #ddd;
+				padding: 5px;
+			}
+			blockquote{
+				border-left: 3px solid #ddd;
+			}
+			ul, ol {
+				list-style-position: outside;
+			}
+		</style>
+		END;
 	}
 
 	private function init($content){
@@ -84,21 +106,23 @@ class PDF{
 		$this->_pdf->lastPage();
 		$this->_pdf->setProtection(['modify'], '', null, 1);
 
-		$this->_pdf->Output(__DIR__ . '/' . FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(FILEHANDLER::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		$_filehandler = new FILEHANDLER();
+		$this->_pdf->Output(__DIR__ . '/' . $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf';
 	}
 
 	public function auditPDF($content){
 		// create a pdf for a record summary
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$markdown = new MARKDOWN();
+		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
+		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		
 		foreach ($content['content'] as $key => $value){
-			$this->_pdf->Bookmark($key, 0);
+			$this->_pdf->setBookmark($key, 0);
 			// name column
 			$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 			$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
@@ -111,19 +135,28 @@ class PDF{
 			}
 
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value), 0, 1, 0, true, '', true);
-			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			if (str_starts_with($value, '::CODE::')) {
+				// this is not directly implemented as markdown by default, for the codeblock to have a smaller font size
+				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] - 4);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), '<pre>' . substr($value, 8) . '</pre>', 0, 1, 0, true, '', true);
+			}
+			else {
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value), 0, 1, 0, true, '', true);
+			}
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 			$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
 		}
+		$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
 		if (isset ($content['files'])){
 			$_lang = new LANG();
 			foreach($content['files'] as $file){
 				// file attachment
+				$_filehandler->serve($file, false);
+
 				$this->_pdf->MultiCell(140, 4, $file, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 				// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $file));
+				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $file));
 			}
 		}
 
@@ -134,8 +167,9 @@ class PDF{
 		// create a pdf for a document export
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 5, 5, 5);
-		$markdown = new MARKDOWN();
+		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
+		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
 
@@ -148,7 +182,7 @@ class PDF{
 		];
 
 		foreach ($content['content'] as $document => $entries){
-			$this->_pdf->Bookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
+			$this->_pdf->setBookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2);
 			$this->_pdf->MultiCell(145, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			foreach ($entries as $key => $value){
@@ -172,7 +206,7 @@ class PDF{
 					continue;
 				}
 
-				$this->_pdf->Bookmark($key, 1);
+				$this->_pdf->setBookmark($key, 1);
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
@@ -188,14 +222,16 @@ class PDF{
 						break;
 					case 'markdown':
 						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value['value']), 0, 1, 0, true, '', true);
+						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value['value']), 0, 1, 0, true, '', true);
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
 						if (isset($content['images'][$document]) && in_array($value['value'], $content['images'][$document])) {
-							$value['value'] = str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
+							$value['value'] = '.' . str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
+							$_filehandler->serve($value['value'], false); // make available
+							
 							$imagedata = pathinfo($value['value']);
-							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
+							list($img_width, $img_height, $img_type, $img_attr) = getimagesize($value['value']);
 							$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
 							$outputsize = [
 								'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
@@ -203,7 +239,7 @@ class PDF{
 							];
 							$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 							$this->_pdf->MultiCell(50, $this->_setup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, $this->_pdf->GetY() + $nameLines * 5, true, 0, false, true, 0, 'T', false);
-							$this->_pdf->Image('.' . $value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+							$this->_pdf->Image($value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
 							$this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
 						}
 						break;
@@ -274,8 +310,8 @@ class PDF{
 		// create a pdf for order output with pagebreaks per organizational unit for delivery notes
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 1, 5, 1);
-		$markdown = new MARKDOWN();
+		$this->_pdf->setDefaultCellPadding(5, 1, 5, 1);
+		$_markdown = new \erroronline1\Markdown\Markdown(true);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
@@ -297,7 +333,7 @@ class PDF{
 				}
 
 				// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->md2html($value), 0, 1, 0, true, '', true);
+				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value, true, ["list", "emphasis", "larger", "br"]), 0, 1, 0, true, '', true);
 				//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -315,7 +351,7 @@ class PDF{
 		$this->init($content);
 
 		// set cell padding
-		$this->_pdf->setCellPaddings(0, 0, 0, 0);
+		$this->_pdf->setDefaultCellPadding(0, 0, 0, 0);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$format = [$this->_pdf->getPageWidth(), $this->_pdf->getPageheight()];
@@ -344,10 +380,11 @@ class PDF{
 
 	public function recordsPDF($content){
 		$_lang = new LANG();
+		$_filehandler = new FILEHANDLER($this->_pdo);
 		// create a pdf for a record summary
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 5, 5, 5);
+		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
 
 		if ($content['erp_case_number']){
 			// name column
@@ -361,11 +398,11 @@ class PDF{
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		foreach ($content['content'] as $document => $entries){
-			$this->_pdf->Bookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
+			$this->_pdf->setBookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2); 
 			$this->_pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			foreach ($entries as $key => $values){
-				$this->_pdf->Bookmark($key, 1);
+				$this->_pdf->setBookmark($key, 1);
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
@@ -382,28 +419,33 @@ class PDF{
 							$valueLines += $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
 							continue;
 						}
-						preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value with contributor for full export
+						preg_match("/(.+?) (\(.+?\))$/", $value, $link); // attachment value with contributor for full export
 						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
-						$path = substr(FILEHANDLER::directory('record_attachments'), 1) . '/' . $link[1];
-						if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
-							$file = pathinfo($path);
-							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-								// inline image embedding
-								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-								list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $path);
-								$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
-								$outputsize = [
-									'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
-									'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
-								];
-								$this->_pdf->Image('.' . $path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
-								$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
-							}
-							else {
-								// file attachment
-								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-								// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-								$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $path));
+
+						$possibleFiles = explode(', ', $link[1]);
+						if (isset($content['attachments'][$document]) && array_intersect($possibleFiles, $content['attachments'][$document])){
+							foreach($possibleFiles as $filename){
+								$path = $_filehandler->directory('record_attachments') . '/' . $filename;
+								$_filehandler->serve($path, false);
+								$file = pathinfo($path);
+								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+									// inline image embedding
+									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+									list($img_width, $img_height, $img_type, $img_attr) = getimagesize($path); 
+									$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+									$outputsize = [
+										'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
+										'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
+									];
+									$this->_pdf->Image($path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+									$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
+								}
+								else {
+									// file attachment
+									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+									// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
+									$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $path));
+								}	
 							}
 						}
 						// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
@@ -411,9 +453,10 @@ class PDF{
 					}
 				}
 				elseif (str_starts_with($values, '::MARKDOWN::')){
-					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
-					$markdown = new MARKDOWN();
-					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
+					// textsection on full export with enabled markdown for documents textsection widget
+					// with prefix PDF can decide better over HTMLCell vs MultiCell
+					$_markdown = new \erroronline1\Markdown\Markdown(true);
+					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
 				}
 				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
@@ -424,6 +467,7 @@ class PDF{
 
 		$this->_pdf->SetFont('helvetica', '', 8); 
 		if (isset($content['recenthash'])) $this->_pdf->MultiCell(140, 4, $content['recenthash'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+
 		return $this->return($content);
 	}
 
@@ -431,7 +475,7 @@ class PDF{
 		// create a pdf for a table output
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 1, 5, 1);
+		$this->_pdf->setDefaultCellPadding(5, 1, 5, 1);
 		
 		if (array_is_list($content['content'])) $content['content'] = [$content['content']];
 
@@ -477,7 +521,7 @@ class PDF{
 		// create a pdf for a timesheet output
 		$this->init($content);
 		// set cell padding
-		$this->_pdf->setCellPaddings(5, 1, 5, 1);
+		$this->_pdf->setDefaultCellPadding(5, 1, 5, 1);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size

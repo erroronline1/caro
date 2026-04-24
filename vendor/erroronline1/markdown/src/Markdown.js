@@ -5,14 +5,13 @@
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
  * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
- * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-class ListTypeGenerator{
+class ListTypeGenerator {
 	/**
 	 * being able to assign/instatiate a new generator function
 	 */
-	* generator() {
+	*generator() {
 		while (true) {
 			yield "1";
 			yield "I";
@@ -21,51 +20,58 @@ class ListTypeGenerator{
 			yield "a";
 		}
 	}
-};
+}
 
 export class Markdown {
-	_a_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,"'>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
-	_a_md = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))(?!\))/gm; // regular md links
+	_anchor_auto = /(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,"'>]+)(?:\>{0,1})/gi; // auto url linking, including some schemes
+	_anchor_md = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))(?!\))/gm; // regular md links
 	_blockquote = /(^>{1,}.*?\n$)+/gms;
-	_br = / +\n/g;
-	_code_block = /^ {0,3}([`~]{3})(.*?)\n((?:.|\n)+?)\n^ {0,3}\1\n/gm;
+	_code_block = /^ {0,3}([`~]{3})(.*?)\n((?:.|\n)+?)\n^ {0,3}\1\n|^ {4}([^\*\-\d].+)+/gm;
 	_code_inline = /(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/g;
 	_compress = />\n+|\n *<|[^>]\n+<[^\/]/gm;
 	_definition = /(^.+?\n)((?:^: .+?\n)+)/gm;
 	_emphasis = /(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/g;
-	_escape = /\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\|)/g;
+	_escape = /\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/g;
 	_footnote = /\[\^(.+?)\](:.+?\n(?: {4}.*?\n)*)*/g;
 	_headings = /(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/gm; // must be first line or have a linebreak before
-	_hr = /^ {0,3}(?:\-|\- |\*|\* ){3,}$/gm;
-	_img = /(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/g;
+	_horizontal_rule = /^ {0,3}(?:\-|\- |\*|\* ){3,}$/gm;
+	_image = /(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/g;
 	_inlineEvents = /on\w+?=('|").+?(?<!\\)\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|href=(\'|")javascript:.+?(?<!\\)\3/gi;
 	_larger = /(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/g;
+	_linebreak = / +\n/g;
 	_list = /((?:^)(\*|\-|\+|\d+\.) {1,3}(?:.|\n)+?)(?:\n$)/gm;
-	_mail = /([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/g;
+	_mailto = /([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/g;
 	_mark = /==(.+?)==/g;
-	_p = /(?:^$\n)((?<!^<)(?:(\n|.)(?!>$))+?)(?:\n^$)/gim;
-	_pre = /^ {4}([^\*\-\d].+)+/gm;
+	_paragraph = /(?:^$\n)((?<!^<)(?:(\n|.)(?!>$))+?)(?:\n^$)/gim;
 	_reference = /(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/gm;
-	_s = /(?<!\\)~{2}([^\n]+?)(?<!\\| |\n)~{2}/g;
-	_sub = /(?<!\\)~{1}([^\n]+?)(?<!\\| |\n)~{1}/g;
-	_sup = /(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/g;
+	_strikethrough = /(?<!\\)~{2}([^\n]+?)(?<!\\| |\n)~{2}/g;
+	_subscript = /(?<!\\)~{1}([^\n]+?)(?<!\\| |\n)~{1}/g;
+	_superscript = /(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/g;
 	_table = /^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n((?:(?:\|.+?){1,}\|(?:\n|$))+)/gm;
 	_task = /\[(\s*x{0,1}\s*)\] (.+?(?:\n))/gim;
-
-	// allowed characters for headers
-	_headerchars = /[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/;
+	_typographer = /(?<!\\)\((?:c|r|tm|p)(?<!\\)\)|(?<!\\)\+-|(?<!\\)->/gi;
 
 	// class properties to use over multiple methods
 	_headers = [];
 	_references = {};
+	_limitTo = [];
 
-	// predefined characters to escape if required
+	// predefined character-sets to replace if required
 	_escaped = {
 		"&": "&amp;",
 		"<": "&lt;",
 		">": "&gt;",
 		'"': "&quot;",
 		"'": "&#039;",
+	};
+
+	_typographs = {
+		"(c)": "&copy;",
+		"(r)": "&reg;",
+		"(tm)": "&trade;",
+		"(p)": "&#9413;",
+		"+-": "&#177;",
+		"->": "&rarr;",
 	};
 
 	/**
@@ -77,36 +83,37 @@ export class Markdown {
 	 * @returns {string}
 	 */
 	md2html(text = "", safeMode = false, limitTo = []) {
+		this._limitTo = limitTo;
 		text = text.replaceAll(/\r/g, "").replaceAll(/\t/g, "    ") + "\n"; // add a new line for improved pattern matching by default
 
 		// ensure a proper processing order
 		[
-			"footnote", // should come first to avoid mishandling indentation and reutilizing list and sup
+			"footnote", // should come first to avoid mishandling indentation and reutilizing list and superscript
 			"blockquote", // should come second to enable nesting
 			"reference", // before a and footnote to not mess up with similar patterns
-			"a", // safeMode can not render anchors to avoid malicious scripts
-			"code",
 			"headings", // before hr avoiding conversion of ----
-			"hr", // before emphasis avoiding matching *** as emphasis
+			"horizontal_rule", // before emphasis avoiding matching *** as emphasis
 			"definition",
-			"emphasis",
-			"img",
 			"task", // before list otherwise only the first occasionally nested item is converted
 			"list",
-			"mail", // safeMode can not render anchors to avoid malicious scripts
+			"code", // after list to avoid erroneous indentation matching
+			"anchor", // safeMode can not render anchors to avoid malicious scripts
+			"mailto", // safeMode can not render anchors to avoid malicious scripts
+			"emphasis",
+			"image",
 			"mark",
-			"pre",
-			"s",
-			"larger", // before sup for using the same character twice
-			"sub",
-			"sup",
+			"strikethrough",
+			"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+			"subscript",
+			"superscript",
 			"table",
-			"p", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-			"br",
+			"typographer",
+			"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+			"linebreak",
 			"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
 		].forEach((method) => {
-			if (!limitTo.length || limitTo.includes(method) || (safeMode && ["a", "inlineEvents", "reference", "mail"].includes(method))) {
-				if (["a", "inlineEvents", "reference", "mail"].includes(method)) text = this[method](text, safeMode);
+			if (!limitTo.length || limitTo.includes(method) || (safeMode && ["anchor", "inlineEvents", "reference", "mailto"].includes(method))) {
+				if (["anchor", "inlineEvents", "reference", "mailto"].includes(method)) text = this[method](text, safeMode);
 				else text = this[method](text);
 			}
 		});
@@ -157,18 +164,18 @@ export class Markdown {
 	 * @param {boolean} safeMode
 	 * @returns string
 	 */
-	a(content, safeMode = false) {
+	anchor(content, safeMode = false) {
 		// replace links in this order
 		const _references = this._references;
 		return content
-			.replaceAll(this._a_auto, (...match) => {
+			.replaceAll(this._anchor_auto, (...match) => {
 				if (Object.values(_references).indexOf(match[1]) > -1) return match[1]; // avoid duplication of link creation from references
-				if (match[1].startsWith("#")) return '<a href="' + match[1] + '" class="eol1_md">' + match[1] + "</a>";
+				if (match[1].startsWith("#")) return `<a href="${match[1]}" class="eol1_md">${match[1]}</a>`;
 				if (safeMode) return this.escapeHtml(match[0]);
-				return '<a href="' + match[1] + '" class="eol1_md">' + this.escapeHtml(match[1]) + "</a>";
+				return `<a href="${match[1]}" class="eol1_md">${this.escapeHtml(match[1])}</a>`;
 			})
-			.replaceAll(this._a_md, (...match) => {
-				if (match[2].startsWith("#")) return '<a href="' + match[2] + '" class="eol1_md">' + this.escapeHtml(match[1]) + "</a>";
+			.replaceAll(this._anchor_md, (...match) => {
+				if (match[2].startsWith("#")) return `<a href="${match[2]}" class="eol1_md">${this.escapeHtml(match[1])}</a>`;
 				if (safeMode) return this.escapeHtml(match[0]);
 				let url = "";
 				if (match[2].startsWith("javascript:")) url = match[2];
@@ -181,7 +188,7 @@ export class Markdown {
 					//url += '" target="_blank';
 				}
 				if (match[3]) url += '" title="' + match[3].substring(2, match[3].length - 1);
-				return '<a href="' + url + '" class="eol1_md">' + match[1] + "</a>";
+				return `<a href="${url}" class="eol1_md">${match[1]}</a>`;
 			});
 	}
 
@@ -194,24 +201,14 @@ export class Markdown {
 	 */
 	blockquote(content, recursion = false) {
 		return content.replaceAll(this._blockquote, (...match) => {
-			match[0] = this.blockquote(match[0].replaceAll(/^\n|\n$/g, "").replaceAll(/^> {0,1}|^ /gm, ""), true); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
-			if (recursion) return '<blockquote class="eol1_md"><p>' + match[0] + "</p></blockquote>"; // fence with tags
-			return '<blockquote class="eol1_md"><p>\n' + match[0] + "\n</p></blockquote>\n";
+			match[0] = this.blockquote(match[0].replaceAll(/^> {0,1}|^ /gm, ""), true); // remove blockquote character and possible whitespace and check recursively for nested blockquotes
+			if (recursion) return `<blockquote class="eol1_md"><p>${match[0]}</p></blockquote>`; // fence with tags
+			return `<blockquote class="eol1_md"><p>\n${match[0]}\n</p></blockquote>\n`;
 		});
 	}
 
 	/**
-	 * replace linebreaks
-	 *
-	 * @param {string} content
-	 * @returns string
-	 */
-	br(content) {
-		return content.replaceAll(this._br, "<br />");
-	}
-
-	/**
-	 * replace fenced or quoted code
+	 * replace indentated, fenced or quoted code
 	 *
 	 * @param {string} content
 	 * @returns string
@@ -219,11 +216,13 @@ export class Markdown {
 	code(content) {
 		return content
 			.replaceAll(this._code_block, (...match) => {
-				// $match[2] would be a specified language, not sure what to do with that yet
-				return '<pre class="eol1_md"><code class="eol1_md">' + this.escapeHtml(match[3]).replaceAll("    ", "\t") + "</code></pre>"; // replace 4 spaces within code with tabs to avoid collision with pre
+				// match[2] for fenced code would be a specified language, not sure what to do with that yet
+				// if match[4] code blocks are written with pure indentation
+				let code = match[4] ? match[0].replaceAll(/^ {4}/gm, "") : match[3];
+				return `<pre class="eol1_md"><code class="eol1_md">${this.escapeHtml(code).replaceAll("    ", "\t")}</code></pre>`; // replace 4 spaces within code with tabs to avoid collision with pre
 			})
 			.replaceAll(this._code_inline, (...match) => {
-				return '<code class="eol1_md">' + this.escapeHtml(match[2]) + "</code>";
+				return `<code class="eol1_md">${this.escapeHtml(match[2])}</code>`;
 			});
 	}
 
@@ -239,7 +238,7 @@ export class Markdown {
 			match[2].split("\n").forEach((d) => {
 				if (d.length) definitions.push(d.substring(2));
 			});
-			return '<dl class="eol1_md"><dt>' + match[1] + "</dt><dd>" + definitions.join("</dd><dd>") + "</dd></dl>";
+			return `<dl class="eol1_md"><dt>${match[1]}</dt><dd>${definitions.join("</dd><dd>")}</dd></dl>`;
 		});
 	}
 
@@ -284,16 +283,25 @@ export class Markdown {
 		// find all footnotes
 		const footnotes = [...content.matchAll(this._footnote)];
 		let _footnotes = {},
-			key;
+			key,
+			footnote_block;
 		for (const value of footnotes) {
-			_footnotes[value[1]] = (value[2] || "").replaceAll(/\n/gm, "<br />").replaceAll(/^: |^ {4}/gm, "");
+			footnote_block = (value[2] || "").trim().replaceAll(/^: |^ {4}/gm, "");
+			// replace possible nested blocks in footnote item
+			["blockquote", "code", "definition", "table"].forEach((method) => {
+				if (!this._limitTo.length || this._limitTo.includes(method))
+					if (["blockquote"].includes(method)) footnote_block = this[method](footnote_block, true);
+					else footnote_block = this[method](footnote_block);
+			});
+
+			_footnotes[value[1]] = footnote_block;
 		}
 		content = content.replaceAll(this._footnote, (...match) => {
 			// inline links if available as md superscript
 			if (!match[2]) {
 				if (!_footnotes[match[1]]) return "^" + match[1] + "^";
 				key = Object.keys(_footnotes).indexOf(match[1]) + 1;
-				return '^<a id="fnref:' + key + '" href="#fn:' + key + '" class="eol1_md">' + key + "</a>^";
+				return `^<a id="fnref:${key}" href="#fn:${key}" class="eol1_md">[${key}]</a>^`;
 			}
 			// delete actual footnote
 			return "";
@@ -302,9 +310,9 @@ export class Markdown {
 		let footnote_appendix = "";
 		for (const [link, footnote] of Object.entries(_footnotes)) {
 			key = Object.keys(_footnotes).indexOf(link) + 1;
-			footnote_appendix += '1. <a id="fn:' + key + '" class="eol1_md"></a>' + footnote.trim() + ' <a href="#fnref:' + key + '" class="eol1_md">&crarr;</a>' + "  \n";
+			footnote_appendix += `1. <a id="fn:${key}" class="eol1_md"></a>${footnote.trim()} <a href="#fnref:${key}" class="eol1_md">&crarr;</a>\n`;
 		}
-		return content + (footnote_appendix ? "\n<hr>\n" + footnote_appendix + "\n" : "");
+		return content + (footnote_appendix ? `\n<hr>\n${footnote_appendix}\n` : "");
 	}
 
 	/**
@@ -315,7 +323,7 @@ export class Markdown {
 	 */
 	headings(content) {
 		return content.replaceAll(this._headings, (...match) => {
-			let size, heading;
+			let size, heading, id;
 			if (!match[4]) {
 				// atx heading starting with #
 				size = Math.min(match[1].length - 1, 6);
@@ -325,9 +333,9 @@ export class Markdown {
 				size = match[5].startsWith("=") ? 1 : 2;
 				heading = match[4].trim();
 			}
-			let id = heading.match(this._headerchars);
-			if (match[3] || id[0]) {
-				id = (match[3] || id[0]).trim().replaceAll(/\s/g, "-").toLowerCase();
+			id = heading.replaceAll(/[^\w\d\s]/ug, "");
+			if (match[3] || id) {
+				id = (match[3] || id).trim().replaceAll(/\s/g, "-").toLowerCase();
 				// enumerate
 				let existing = this._headers.filter((e) => e.startsWith(id));
 				if (existing.length) {
@@ -339,7 +347,7 @@ export class Markdown {
 				}
 				this._headers.push(id);
 			}
-			return "\n<h" + size + ' id="' + id + '">' + heading + "</h" + size + ">";
+			return `\n<h${size} id="${id}">${heading}</h${size}>`;
 		});
 	}
 
@@ -349,8 +357,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	hr(content) {
-		return content.replaceAll(this._hr, "<hr>");
+	horizontal_rule(content) {
+		return content.replaceAll(this._horizontal_rule, "<hr>");
 	}
 
 	/**
@@ -359,8 +367,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	img(content) {
-		return content.replaceAll(this._img, '<img alt="$1" src="$2" class="eol1_md" />');
+	image(content) {
+		return content.replaceAll(this._image, '<img alt="$1" src="$2" class="eol1_md" />');
 	}
 
 	/**
@@ -391,6 +399,16 @@ export class Markdown {
 	}
 
 	/**
+	 * replace linebreaks
+	 *
+	 * @param {string} content
+	 * @returns string
+	 */
+	linebreak(content) {
+		return content.replaceAll(this._linebreak, "<br />");
+	}
+
+	/**
 	 * detects list and replaces list items recursively with available nested blocks
 	 *
 	 * @param {string} content
@@ -403,7 +421,9 @@ export class Markdown {
 			// passed recursion is mutable between each callback function appliance
 			recursion = passed_recursion;
 			// first list item decides for the type
-			let li_type = parseInt(match[2]) > 0 ? "ol" : "ul",
+			let bullet = parseInt(match[2]);
+			let li_type = bullet > 0 ? "ol" : "ul",
+				offset = bullet < 2 ? "" : ` start="${bullet}"`,
 				entries = [],
 				item_split,
 				type;
@@ -414,7 +434,7 @@ export class Markdown {
 						recursion = new ListTypeGenerator();
 						recursion = recursion.generator();
 					}
-					type = ' type="' + recursion.next().value + '"';
+					type = ` type="${recursion.next().value}"`;
 					break;
 				case "ul":
 					item_split = /^[\*|\-|\+] */m;
@@ -429,15 +449,15 @@ export class Markdown {
 					entries.push(list_entry.trim());
 				}
 			}
-			return "<" + li_type + type + ' class="eol1_md"><li>' + entries.join("</li><li>") + "</li></" + li_type + ">";
+			return `<${li_type} ${type} ${offset} class="eol1_md"><li>` + entries.join("</li><li>") + `</li></${li_type}>`;
 		});
 		if (recursion) {
 			// replace possible nested blocks in list item
-			content = this.blockquote(content, true);
-			content = this.code(content);
-			content = this.definition(content);
-			content = this.table(content);
-			content = this.pre(content);
+			["blockquote", "code", "definition", "table"].forEach((method) => {
+				if (!this._limitTo.length || this._limitTo.includes(method))
+					if (["blockquote"].includes(method)) content = this[method](content, true);
+					else content = this[method](content);
+			});
 		}
 		return content;
 	}
@@ -450,14 +470,14 @@ export class Markdown {
 	 * @param {boolean} safeMode
 	 * @returns string
 	 */
-	mail(content, safeMode = false) {
+	mailto(content, safeMode = false) {
 		if (safeMode)
-			return content.replaceAll(this._mail, (...match) => {
+			return content.replaceAll(this._mailto, (...match) => {
 				return this.escapeHtml(match[0]);
 			});
 
-		return content.replaceAll(this._mail, (...match) => {
-			return '<a href="mailto:' + match[0] + '">' + match[0] + "</a>";
+		return content.replaceAll(this._mailto, (...match) => {
+			return `<a href="mailto:${match[0]}">${match[0]}</a>`;
 		});
 	}
 
@@ -477,20 +497,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	p(content) {
-		return content.replaceAll(this._p, "<p>$1</p>\n");
-	}
-
-	/**
-	 * replace indented code / preformatted text
-	 *
-	 * @param {string} content
-	 * @returns string
-	 */
-	pre(content) {
-		return content.replaceAll(this._pre, (...match) => {
-			return '<pre class="eol1_md">' + this.escapeHtml(match[0].replaceAll(/^ {4}/gm, "")) + "</pre>";
-		});
+	paragraph(content) {
+		return content.replaceAll(this._paragraph, "<p>$1</p>\n");
 	}
 
 	/**
@@ -514,13 +522,13 @@ export class Markdown {
 			if (safeMode) {
 				// i don't know if this is canon, but i assume this might be a practical solution for safe mode to link to the escaped reference
 				if (match[2]) {
-					if (match[2] in _references) return '<a href="#ref:' + match[2] + '">' + match[1] + "</a>";
+					if (match[2] in _references) return `<a href="#ref:${match[2]}">${match[1]}</a>`;
 					else return match[1];
-				} else if (match[4]) return '<a id="ref:' + match[3] + '" class="eol1_md"></a>(' + this.escapeHtml(match[4]) + ")";
+				} else if (match[4]) return `<a id="ref:${match[3]}" class="eol1_md"></a>(${this.escapeHtml(match[4]).trim()})`;
 			} else {
 				// return link with reference
 				if (match[2]) {
-					if (match[2] in _references) return '<a href="' + _references[match[2]] + '">' + match[1] + "</a>";
+					if (match[2] in _references) return `<a href="${_references[match[2]]}">${match[1]}</a>`;
 					else return match[1];
 				}
 				// strip reference from text
@@ -536,8 +544,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	s(content) {
-		return content.replaceAll(this._s, "<s>$1</s>");
+	strikethrough(content) {
+		return content.replaceAll(this._strikethrough, "<s>$1</s>");
 	}
 
 	/**
@@ -546,8 +554,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	sub(content) {
-		return content.replaceAll(this._sub, "<sub>$1</sub>");
+	subscript(content) {
+		return content.replaceAll(this._subscript, "<sub>$1</sub>");
 	}
 
 	/**
@@ -556,8 +564,8 @@ export class Markdown {
 	 * @param {string} content
 	 * @returns string
 	 */
-	sup(content) {
-		return content.replaceAll(this._sup, "<sup>$1</sup>");
+	superscript(content) {
+		return content.replaceAll(this._superscript, "<sup>$1</sup>");
 	}
 
 	/**
@@ -575,9 +583,9 @@ export class Markdown {
 				align;
 			columns.forEach((column) => {
 				align = column.trim().match(/(:{0,1})-+(:{0,1})/);
-				if (align[1] && align[2]) alignment.push(' align="center"');
-				else if (align[1]) alignment.push(' align="left"');
-				else if (align[2]) alignment.push(' align="right"');
+				if (align[1] && align[2]) alignment.push('align="center"');
+				else if (align[1]) alignment.push('align="left"');
+				else if (align[2]) alignment.push('align="right"');
 				else alignment.push("");
 			});
 			let output = '<table class="eol1_md">',
@@ -592,14 +600,14 @@ export class Markdown {
 					case 0:
 						output += "<tr>";
 						for (let i = 0; i < columns.length; i++) {
-							output += "<th" + (alignment[i] || "") + ">" + columns[i].trim() + "</th>";
+							output += `<th ${alignment[i] || ""}>${columns[i].trim()}</th>`;
 						}
 						output += "</tr>";
 						break;
 					default:
 						output += "<tr>";
 						for (let i = 0; i < columns.length; i++) {
-							output += "<td" + (alignment[i] || "") + ">" + columns[i].trim() + "</td>";
+							output += `<td ${alignment[i] || ""}>${columns[i].trim()}</td>`;
 						}
 						output += "</tr>";
 						break;
@@ -618,7 +626,19 @@ export class Markdown {
 	 */
 	task(content) {
 		return content.replaceAll(this._task, (...match) => {
-			return '<input type="checkbox" disabled' + (match[1].trim().length ? " checked" : "") + ' class="eol1_md"> ' + match[2];
+			return `<input type="checkbox" disabled ${match[1].trim().length ? "checked" : ""} class="eol1_md"> ${match[2]}`;
+		});
+	}
+
+	/**
+	 * replace certain strings with their symbol
+	 *
+	 * @param {string} content
+	 * @returns string
+	 */
+	typographer(content) {
+		return content.replaceAll(this._typographer, (...match) => {
+			return this._typographs[match[0].toLowerCase()];
 		});
 	}
 }
