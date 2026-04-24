@@ -282,7 +282,7 @@ export const _client = {
 				de: "de-de",
 				en: "en-gb",
 			}[lang];
-			if (Polyfill.isIOS() && api._settings.config && api._settings.config.application.language === api._settings.config.application.defaultlanguage) return null; // as tested ios does not list german as a language in a german environment. this likely does the trick for the intended usecase.
+			if (Polyfill.isIOS() && api._settings.config && api._settings.config.application.language === navigator.language.split("-")[0]) return null; // as tested ios does not list german as a language in a german environment. this likely does the trick for the intended usecase.
 			// for (let i = 0; i < voices.length; i++) {
 			for (let i = voices.length - 1; i > 0; i--) {
 				// the later the more advanced/natural? don't know about the browsers order

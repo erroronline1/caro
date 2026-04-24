@@ -271,7 +271,7 @@ class API {
 					],
 					'config' => [
 						'application' => [
-							'defaultlanguage' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
+							'language' => $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
 							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'] ?? false,
 							'debugging' => CONFIG['application']['debugging'] ?? false,
 							'is_development' => CONFIG['application']['is_development'] ?? false,
@@ -318,7 +318,6 @@ class API {
 			],
 			'config' => [
 				'application' => [
-					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
 					'language' =>  $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
 					'debugging' => CONFIG['application']['debugging'] ?? false,
 					'is_development' => CONFIG['application']['is_development'] ?? false,
