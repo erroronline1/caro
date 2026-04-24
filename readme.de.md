@@ -255,7 +255,11 @@ Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenhe
 ![sample communication menu](http://toh.erroronline.one/caro/kommunikation%20menu%20de.png)
 
 ### Unterhaltungen
-Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeitende. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung, Links und HTML wird jedoch nur von administrativen Nutzern angezeigt.
+Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeitende. Neue Nachrichten lösen eine Systembenachrichtigung aus. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung, Links und HTML wird jedoch nur von administrativen Nutzern angezeigt.
+
+Die Anwendung sendet im Bedarfsfall Nachrichten an Nutzergruppen. Um das Risiko des Abstumpfens aufgrund einer Überzahl an Nachrichten zu reduzieren werden wiederkehrende Erinnerungen weitestgehend thematisch gruppiert.
+
+Die [Einstellungen](#laufzeitvariablen) beinhalten einen Schwellenwert für eine Erinnerungseskalation die zuerst eine kleine Toast-Benachrichtigung anzeigt, dann den Hinweis laut vorliest und zuletzt einen Dialog anzeigt, da Systemnachrichten meist relevante Informationen und Erinnerungen bezüglich regulatorischer Anforderungen beinhalten.
 
 ![conversation screenshot](http://toh.erroronline.one/caro/conversation%20de.png)
 
@@ -523,7 +527,8 @@ An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abstän
 
 Versorgungsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeitende, die den Status ändern, haben die Wahl andere Mitarbeitende, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren. Es gibt auch die Möglichkeit eine Rückfrage zum Fall an einen beliebigen Nutzer zu senden, wobei eine direkte Verknüpfung für einen schnellen Zugriff beinhaltet ist.  
 Die Ergänzung einer Vorgangsnummer aus dem ERP-System erlaubt den Abgleich bei verfügbarer [ERP Anbindung](#erp-anbindung), mehrere Nummern sind möglich im Falle von Gepflogenheiten eines kalkulatorischen und repräsentativen Vorgangs.  
-Die Auswahl der Aufbewahrungsfrist ermöglicht die [automatische Löschung](#cron) von Aufzeichnungen zur Erfüllung der [Anforderungen an die Datensparsamkeit](#löschung-von-aufzeichnungen).
+Die Auswahl der Aufbewahrungsfrist ermöglicht die [automatische Löschung](#cron) von Aufzeichnungen zur Erfüllung der [Anforderungen an die Datensparsamkeit](#löschung-von-aufzeichnungen).  
+Eine Versorgungsdokumentation kann einem Bereich zugeordnet werden. Dies präsiziert die Übersicht bei der Filterung bereichbezogener Aufzeichnungen. Ohne eine Zuordnung wird der Filter durch die Schnittmenge der Bereiche des letzten eintragenden Nutzers festgelegt. 
 
 Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen den Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.  
 Aufzeichnungen können ein neues Kennzeichen erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sofern das neue Kennzeichen bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Kennzeichens werden ebenfalls dokumentiert.
@@ -817,6 +822,8 @@ Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte si
 Es ist auch ein Jahresüberblick verfügbar, der dienstfreie Tage, Resturlaub und Überstunden für das laufende Jahr darstellt, was beispielsweise praktisch ist um Mitarbeiter daran zu erinnern den Urlaub rechtzeitig zu planen. Die Inhalte dieser Übersicht entsprechen denen der Arbeitszeitübersichten (betroffener Nutzer, Bereichtmitarbeiter für Bereichsleiter oder alle für berechtige Nutzer).
 
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
+
+Falls andere Methoden der Zeiterfassung genutzt werden, können die Nutzereinstellungen einfach frei gelassen werden.
 
 [Übersicht](#übersicht)
 
@@ -2114,7 +2121,7 @@ length[identifier] = 128 ; Zeichenlänge für Kennzeichen, je länger desto komp
 length[record_overview] = 1024 ; maximal angezeigte offene Dokumentationen
 length [products_per_slide] = 6 ; weniger erzeugt mehr Slides, mehr vergößert die jeweiligen Boxen
 
-messages[reminder] = 20 ; sofern nicht in den Nutzereinstellungen deaktiviert wird eine nervige Erinnerung laut vorgelesen, sobald mehr als die eingestellte Anzahl ungelesener Nachrichten vorliegen
+messages[reminder] = "25, 37, 50" ; bis zu drei Schwellenwerte für die Eskalation von Erinnerungen für das Lesen von Nachrichten "Toast, speechSynthesis, Dialog", bei Werten wie  "25, 50" werden die aufdringlichsten Erinnerung genutzt z.B. speechSynthesis und Dialog
 
 quality[qr_errorlevel] = 'L' ; `'L'`, `'M'`, `'Q'` or `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 quality[risk_acceptance_level] = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe, gemäß der Anzahl entsprechender Einträge in den Sprachdateien
