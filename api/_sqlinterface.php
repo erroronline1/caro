@@ -504,7 +504,7 @@ class SQLQUERY {
 		],
 		'consumables_get_vendor' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id",
-			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, name) = :id OR id = (CASE WHEN ISNUMERIC(:id) = 1 THEN :id ELSE NULL END)"
 		],
 		'consumables_get_vendor_search' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)",
@@ -540,7 +540,7 @@ class SQLQUERY {
 		],
 		'consumables_put_sample_check' => [
 			'mysql' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0",
-			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = N:sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0"
+			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = (CASE WHEN :sample_checks IS NULL THEN NULL ELSE N':sample_checks' END) WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0"
 		],
 		'consumables_put_incorporation' => [
 			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id = :id",
