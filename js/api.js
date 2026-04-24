@@ -1801,7 +1801,7 @@ export const api = {
 									},
 									"FormData"
 								).then((response) => {
-									if (response) api.purchase("post", "mdrsamplecheck", data.render.productid, response);
+									if (response) api.purchase("put", "mdrsamplecheck", data.render.productid, response);
 									else new Toast(api._lang.GET("order.sample_check.failure"), "error");
 								});
 							}
@@ -1879,22 +1879,47 @@ export const api = {
 						payload = request[3]; // form data object passed by utility.js
 						delete request[3];
 						successFn = function (data) {
-							new Toast(data.response.msg, data.response.type);
-						};
+							if (data.render) {
+								new Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("order.sample_check.sample_check", { ":vendor": data.render.vendor }),
+										render: data.render.content,
+										options: data.render.options,
+									},
+									"FormData"
+								).then((response) => {
+									if (response) api.purchase("put", "mdrsamplecheck", data.render.productid, response);
+									else new Toast(api._lang.GET("order.sample_check.failure"), "error");
+								});
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						}
 						break;
 					default:
 						payload = _.getInputs("[data-usecase=purchase]", true);
 				}
 				break;
 			case "put":
-				if (request[1] == "prepared") {
-					successFn = function (data) {
-						new Toast(data.response.msg, data.response.type);
-						if (data.data) _serviceWorker.notif.consumables(data.data);
-						api.purchase("get", "prepared");
-					};
-				}
-				payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				switch(request[1]){
+					case "prepared": 
+						successFn = function (data) {
+							new Toast(data.response.msg, data.response.type);
+							if (data.data) _serviceWorker.notif.consumables(data.data);
+							api.purchase("get", "prepared");
+						};
+						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+					case "incorporation":
+					case "mdrsamplecheck":
+						payload = request[3]; // form data object passed by utility.js
+						delete request[3];
+						successFn = function (data) {
+							new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					default:
+						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				}		
 				break;
 			case "patch":
 				if (request[4] instanceof FormData) {

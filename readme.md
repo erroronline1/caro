@@ -31,10 +31,6 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * orders
     * check if similar items have been ordered recently?
-    * format last order datetime in full view
-    * include order dates in sample check? post with order data, put to actually submit sample check (update api endpoints)
-* notifications, try to concatenate more messages (tasks, cron-schedule_retrainings, cron_alert_unclosed_audits)
-* language on ios still off?
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available - recheck, first implementation 2026-04-17!
 
 ## Content
@@ -3773,13 +3769,13 @@ Sample response
 {"links":{"Download 1726252272testlieferantproductlist.csv":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist.csv","download":"1726252272testlieferantproductlist.csv"},"Download 1726252272testlieferantprocudtlist_filefilter.txt":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist_filefilter.txt","download":"1726252272testlieferantproductlist_filefilter.txt"}}}
 ```
 
-> GET ./api/api.php/consumables/incorporation
+> GET/POST ./api/api.php/consumables/incorporation
 
 Stores the incorporation to product and selected similar, system message to defined users.
 
 Similar to mdrsamplecheck.
 
-> POST ./api/api.php/consumables/incorporation
+> PUT ./api/api.php/consumables/incorporation
 
 Returns the current document for an incorporation.
 
@@ -3799,7 +3795,7 @@ Sample response
 {"response":{"msg":"Sample check has been revoked","type":"success"}}
 ```
 
-> GET ./api/api.php/consumables/mdrsamplecheck/{id}
+> GET/POST ./api/api.php/consumables/mdrsamplecheck/{id}
 
 Returns the current document for a sample check.
 
@@ -3807,13 +3803,14 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | required | product database id |
+| payload | form data | optional | order details for checked product |
 
 Sample response
 ```
 {"render":{"content":[[{"type":"textsection","attributes":{"name":160O10=1 Fingerorthese Otto Bock"}}],[{"attributes":[],"type":"checkbox","attributes":{"name":"sample check"},"content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
 ```
 
-> POST ./api/api.php/consumables/mdrsamplecheck/{id}
+> PUT ./api/api.php/consumables/mdrsamplecheck/{id}
 
 Stores the sample check to records, mark product as checked, system message to defined users.
 
