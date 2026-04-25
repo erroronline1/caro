@@ -16,10 +16,10 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require(__DIR__ . '/../vendor/autoload.php');
+require(__DIR__ . '/../../../../vendor/autoload.php');
 
 // define fonts directory
-\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');
@@ -58,7 +58,7 @@ $bfont1 = $pdf->font->insert($pdf->pon, 'dejavusans', '', 10);
 
 // Factur-X 1.07 / ZUGFeRD 2.3
 
-$pageF01 = $pdf->addPage();
+$pageF01 = $pdf->addPage(['autobreak'=>true]);
 $pdf->setBookmark('Factur', '', 0, -1, 0, 0, 'B', '');
 
 $pdf->page->addContent($bfont1['out']);
@@ -116,6 +116,184 @@ Musterstr. 18<br/>
     <td>122.50</td>
     <td>122.50</td>
   </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">01</td>
+    <td style="text-align:left;">TGA Obermonteur/Monteur<br/><i>Beamermontage</i></td>
+    <td>3</td>
+    <td>HUR</td>
+    <td>43.20</td>
+    <td>129.60</td>
+  </tr>
+  <tr>
+    <td style="text-align:left;">02</td>
+    <td style="text-align:left;">Beamer-Deckenhalterung<br/><i>Außerhalb Angebot</i></td>
+    <td>1</td>
+    <td>H87</td>
+    <td>122.50</td>
+    <td>122.50</td>
+  </tr>
+
+
 </table>
 <br/>
 <table border="0" cellspacing="0" cellpadding="2" style="width:100%;">
@@ -140,7 +318,7 @@ Musterstr. 18<br/>
 <i>Factur-X 1.07 / ZUGFeRD 2.3 — embedded XML attachment: factur-x.xml</i>
 ';
 
-$pdf->page->addContent($pdf->getHTMLCell($invoiceHTML, 15, 15, 180));
+$pdf->addHTMLCell($invoiceHTML, 15, 15, 180);
 
 $invoiceXML = <<<XML
 <?xml version='1.0' encoding='UTF-8' ?>

@@ -23,7 +23,7 @@ class PDF{
 	private $_markdown_css = null;
 
 	public function __construct($setup, $pdo = null){
-		error_reporting(E_ALL ^ E_DEPRECATED);
+		error_reporting(E_ALL);
 		$this->_setup = [
 			'format' => $setup['format'] ?? 'A4',
 			'unit' => $setup['unit'] ?? 'mm',
@@ -77,6 +77,7 @@ class PDF{
 		$this->_pdf->SetCreator(CONFIG['system']['caroapp']);
 		$this->_pdf->SetAuthor($_SESSION['user']['name']);
 		$this->_pdf->SetTitle($content['title']);
+		$this->_pdf->setPDFFilename($content['filename'] . '.pdf');
 
 		// set margins
 /*		if ($this->_setup['header']){
@@ -103,11 +104,12 @@ class PDF{
 	private function return($content){
 		// export pdf to temp and return link
 		// move pointer to last page
-		$this->_pdf->lastPage();
-		$this->_pdf->setProtection(['modify'], '', null, 1);
+		//$this->_pdf->lastPage();
+		//$this->_pdf->setProtection(['modify'], '', null, 1);
+		$this->_pdf->pageNumeration();
 
 		$_filehandler = new FILEHANDLER();
-		$this->_pdf->Output(__DIR__ . '/' . $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		$this->_pdf->savePDF(__DIR__.'/' .$_filehandler->directory('tmp'), $this->_pdf->getOutPDFString());
 		return $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf';
 	}
 
@@ -120,34 +122,56 @@ class PDF{
 		$_filehandler = new FILEHANDLER($this->_pdo);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		
+		$font_bold = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', 'B', $this->_setup['fontsize']);
+		$font_regular = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $this->_setup['fontsize']);
+		$font_small = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $this->_setup['fontsize'] - 4);
+		$bbox = [
+			'y' => 50,
+			'h' => 0
+		];
 		foreach ($content['content'] as $key => $value){
 			$this->_pdf->setBookmark($key, 0);
+
 			// name column
-			$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
-			$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-			$this->_pdf->applyCustomPageBreak($nameLines, $this->_setup['fontsize']);
+			$this->_pdf->page->addContent($font_bold['out']);
+			$this->_pdf->addHTMLCell(
+				html: $key,
+				posx: $this->_setup['marginleft'],
+				posy: $bbox['y'] + $bbox['h'],
+				width: 50);
+			//$this->_pdf->applyCustomPageBreak($nameLines, $this->_setup['fontsize']);
 
 			// values column
-			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
 			if (gettype($value) === 'array') {
 				$value = implode("  \n", array_keys($value));
 			}
 
 			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-			if (str_starts_with($value, '::CODE::')) {
+			if (str_starts_with($value ?: '', '::CODE::')) {
 				// this is not directly implemented as markdown by default, for the codeblock to have a smaller font size
-				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] - 4);
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), '<pre>' . substr($value, 8) . '</pre>', 0, 1, 0, true, '', true);
+				$this->_pdf->page->addContent($font_small['out']);
+				$this->_pdf->addHTMLCell(
+					html: '<pre>' . substr($value, 8) . '</pre>',
+					posx: $this->_setup['marginleft'] + 50,
+					posy: $bbox['y'] + $bbox['h'],
+					width: 145
+				);
 			}
 			else {
-				$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value), 0, 1, 0, true, '', true);
+				$this->_pdf->page->addContent($font_regular['out']);
+				$this->_pdf->addHTMLCell(
+					html: $this->_markdown_css . $_markdown->md2html($value),
+					posx: 60,
+					posy: $bbox['y'] + $bbox['h'],
+					width: 145
+				);
 			}
+			//$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+			//$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
+            $bbox = $this->_pdf->getLastBBox();
 
-			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
-			$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
-		}
-		$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
+			}
+		/**$this->_pdf->page->addContent($font_regular['out']);
 		if (isset ($content['files'])){
 			$_lang = new LANG();
 			foreach($content['files'] as $file){
@@ -159,6 +183,7 @@ class PDF{
 				$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $file, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $file));
 			}
 		}
+*/
 
 		return $this->return($content);
 	}
@@ -555,10 +580,15 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		'top' => null,
 		'bottom' => null
 	];
+	public $_pageSettings = [];
 
 	public function __construct($setup, $unicode = true, $encoding = 'UTF-8', $diskcache = false, $pdfa = false, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
 //		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
-		parent::__construct($setup['unit']);
+		parent::__construct(
+			unit: $setup['unit'],
+			isunicode: $unicode,
+			compress: true
+		);
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
 		$this->header = $header;
@@ -569,6 +599,33 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 
 		$this->setDefaultCellMargin(0, 0, 0, 0);
 		$this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+		
+		// create a page with defaultPageContent to determine the top and bottom content boundaries
+		$page = $this->addPage([
+			'orientation' => $this->_setup['orientation']
+		]);
+		$this->page->pop();
+		$this->_pageSettings = [
+			'autobreak' => true,
+			'margin' => [
+				'PL' => $this->_setup['marginleft'],
+				'PR' => $this->_setup['marginright'],
+				'CT' => $this->_contentCoordinates['top'],
+				'CB' => $this->_contentCoordinates['bottom']
+			],
+			'region' => [
+				[
+					'RX' => $this->_setup['marginleft'],
+					'RY' => $this->_contentCoordinates['top'],
+					'RW' => $page['width'] - $this->_setup['marginleft'] - $this->_setup['marginright'],
+					'RH' => $this->_contentCoordinates['bottom']
+				]
+			],
+			'orientation' => $this->_setup['orientation']
+		];
+//var_dump($this->_contentCoordinates,$this->_pageSettings); die();
+		// add the actual first page
+		$page = $this->addPage($this->_pageSettings);
 
 	}
 
@@ -604,11 +661,12 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// footer
 		// insert footer image to the right
 		$imageMargin = 0;
+		$footerHeights = [10];
 		if ($image = $this->_setup['footer_image'] ?? null){
 			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
-				$footer_image = $this->image->add($image);
+				$footer_image = $this->image->add(realpath($image));
 				$footer_image_out = $this->image->getSetImage(
 					$footer_image,
 					$page['width'] - $width / $height * 10 - $this->_setup['marginright'],
@@ -618,6 +676,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					$page['height']);
 				$out .= $footer_image_out;
 				$imageMargin = $width * 10 / $height + $this->_setup['marginright'] + 3;
+				$footerHeights[] = $height + $this->_setup['marginright'] + 3;
 			}
 		}
 
@@ -660,7 +719,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			// given the image will always be 20mm high
 			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
-				$header_image = $this->image->add($image);
+				$header_image = $this->image->add(realpath($image));
 				$header_image_out = $this->image->getSetImage(
 					$header_image,
 					$page['width'] - $width / $height * 20 - $this->_setup['marginright'],
@@ -677,9 +736,6 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// insert identifier to the left
 		// readeable content inherits footer font size which is suitable
 
-		////////////////////////////////////////////
-		// WHY YOU NO DISPLAYING ON FIRST PAGE!?!?!?
-		////////////////////////////////////////////
 		if ($this->qrcodecontent){
 			$barcode_style = [
 				'lineWidth' => 0,
@@ -822,7 +878,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// determine the max top and bottom y-coordinates for further use
 		$this->_contentCoordinates = [
 			'top' => max(...$headerHeights),
-			'bottom' => 10 + $this->_setup['marginbottom']
+			'bottom' => max(...$footerHeights)
 		];
 
 		return $out;
