@@ -1977,7 +1977,7 @@ class CONSUMABLES extends API {
 					]
 				];
 		}
-
+		$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unissued');
 		foreach ($search as $key => $row) {
 			foreach ($row as $key => $value){
 				$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
@@ -1987,7 +1987,7 @@ class CONSUMABLES extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
+							'name' => $this->_lang->GET('order.add_product_search.matches', [':number' => count($search)])
 						],
 					]
 				];
@@ -2018,7 +2018,7 @@ class CONSUMABLES extends API {
 					if (!isset($slides[$slide][$tiles][1])) $slides[$slide][$tiles][] = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
+							'name' => $this->_lang->GET('order.add_product_search.matches', [':number' => count($search)])
 						],
 						'content' => []
 					];
@@ -2036,6 +2036,20 @@ class CONSUMABLES extends API {
 						if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 						elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 					}
+					$currentOrders = '';
+					if (count($search) > 50) $currentOrders = $this->_lang->GET('order.add_product_search.oversized');
+					else {
+						$your = $other = 0;
+						$unissued_by_article = array_filter($unissued, Fn($v) => preg_match('/"productid":"*' . $row['id'] . '\D/', $v['order_data'], $match));
+						$_your = array_filter($unissued_by_article, Fn($v) => in_array($v['organizational_unit'], ['common', ...$_SESSION['user']['units']]));
+						$commissions = array_map(function($v){
+							preg_match('/"commission":"(.+?)(?<!' . preg_quote('\\', '/') . ')"/', $v['order_data'], $match);
+							return $match[1];
+						}, $_your);
+						$your = count($_your);
+						$other = count(array_filter($unissued_by_article, Fn($v) => !in_array($v['organizational_unit'], $_SESSION['user']['units'])));
+						if ($your || $other) $currentOrders = $this->_lang->GET('order.add_product_search.current_orders', [':your' =>$your, ':commissions' => implode(', ', $commissions),':other' => $other]);
+					}
 					$slides[$slide][$tiles][] = [
 						'type' => 'tile',
 						'attributes' => [
@@ -2052,8 +2066,13 @@ class CONSUMABLES extends API {
 									'name' => ($row['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') : '') . ($incorporationState && $row['stock_item'] ? ' - ' : '') . $incorporationState,
 									'data-type' => 'cart'
 								],
-								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
-									. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
+								'mdcontent' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
+									. ($row['erp_id'] ? "  \n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
+									. ($currentOrders ? "  \n~" . $currentOrders ."~" : ''),
+								'mdrestrictions' => [
+									'safeMode' => true,
+									'limitTo' => ['subscript', 'linebreak']
+								]
 							]
 						]
 					];

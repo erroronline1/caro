@@ -1393,7 +1393,11 @@
 		"add_manually_warning": "Manuell hinzugefügte Artikel können unter Umständen nicht systematisch im Sinne des Einführungsstatus und der Stichprobenprüfung:erp_interface überwacht werden. Bitte gib bei den Anmerkungen an, ob der Artikel Hautkontakt oder ein Verfallsdatum hat und ob es sich um eine Handelware handelt.",
 		"add_manually_warning_erpinterface": ", sowie dem automatische Abgleich der Bestelldaten",
 		"add_manually_warning_header": "Bitte beachten",
-		"add_product_search_matches": "Füge einen Artikel aus :number Treffern hinzu",
+		"add_product_search":{
+			"current_orders":":your für :commissions (deine Bereiche und Allgemein), :other für andere Bereiche, sind unterwegs",
+			"matches": "Füge einen Artikel aus :number Treffern hinzu",
+			"oversized": "zu viele Ergebnisse für Abgleich mit laufenden Bestellungen"
+		},
 		"added_confirmation": ":name wurde zur Bestellung hinzugefügt.",
 		"added_product": ":unit :number :name von :vendor",
 		"additional_info": "Zusätzliche Informationen",

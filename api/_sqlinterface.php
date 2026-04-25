@@ -874,6 +874,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (delivered_full IS NULL OR issued_full IS NULL)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (delivered_full IS NULL OR issued_full IS NULL)",
 		],
+		'order_get_approved_unissued' => [ // for order process
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full IS NULL",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE issued_full IS NULL",
+		],
 		'order_get_approved_archived' => [ // for system message reminders
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
