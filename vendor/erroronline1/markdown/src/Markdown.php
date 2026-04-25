@@ -33,7 +33,7 @@ class Markdown {
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_compress = '/>\n+|\n *<|[^>]\n+<[^\/]/m';
 	private $_definition = '/(^.+?\n)((?:^: .+?\n)+)/m';
-		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_emphasis = '/(?<!\\)((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/m'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_footnote = '/\[\^(.+?)\](:.+?\n(?: {4}.*?\n)*)*/';
 	private $_headings = '/(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
@@ -60,7 +60,7 @@ class Markdown {
 	private $_limitTo = [];
 
 	// predefined character-sets to replace if required
-	private $_escaped = [
+	public $_escaped = [
 		"&" => "&amp;",
 		"<" => "&lt;",
 		">" => "&gt;",
@@ -68,13 +68,47 @@ class Markdown {
 		"'" => "&#039;",
 	];
 
-	private $_typographs = [
+	public $_typographs = [
 		"(c)" => "&copy;",
 		"(r)" => "&reg;",
 		"(tm)" => "&trade;",
 		'(p)' => "&#9413;",
 		"+-" => "&#177;",
 		"->" => "&rarr;"
+	];
+
+	// modifiable lists for using as extended class
+	public $_methodsInProcessingOrder = [
+		"emphasis", // should come first to avoid to avoid modifying custom class insertions having unserscore in their name
+		"footnote", // should come second to avoid mishandling indentation and reutilizing list and superscript
+		"blockquote", // should come thirs to enable nesting
+		"reference", // before a and footnote to not mess up with similar patterns
+		"headings", // before hr avoiding conversion of ----
+		"horizontal_rule", // before emphasis avoiding matching *** as emphasis
+		"definition",
+		"task", // before list otherwise only the first occasionally nested item is converted
+		"list",
+		"code", // after list to avoid erroneous indentation matching
+		"anchor", // safeMode can not render anchors to avoid malicious scripts
+		"mailto", // safeMode can not render anchors to avoid malicious scripts
+		"image",
+		"mark",
+		"strikethrough",
+		"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+		"subscript",
+		"superscript",
+		"table",
+		"typographer",
+		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		"linebreak",
+		"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
+	];
+
+	public $_nested_blocks = [
+		'blockquote',
+		'code',
+		'definition',
+		'table',
 	];
 
 	// convert some tags currently not supported by the mentioned library
@@ -90,7 +124,7 @@ class Markdown {
 		// rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_anchor_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))(?!\))/m'; // regular md links
 		$this->_code_inline = '/(?<!' . preg_quote('\\', '/') . ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1/';
-		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
+		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/m';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/';
 		$this->_mailto = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
 		$this->_inlineEvents = '/on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|(\'|")javascript:.+?(?<!' . preg_quote('\\', '/') . ')\3/mi';
@@ -211,31 +245,7 @@ class Markdown {
 		$this->_limitTo = $limitTo;
 		$text = preg_replace(['/\r/','/\t/'], ['', '    '], $text ?: '') . "\n"; // add a new line for improved pattern matching by default
 
-		foreach ([
-			"footnote", // should come first to avoid mishandling indentation and reutilizing list and superscript
-			"blockquote", // should come second to enable nesting
-			"reference", // before a and footnote to not mess up with similar patterns
-			"headings", // before hr avoiding conversion of ----
-			"horizontal_rule", // before emphasis avoiding matching *** as emphasis
-			"definition",
-			"task", // before list otherwise only the first occasionally nested item is converted
-			"list",
-			"code", // after list to avoid erroneous indentation matching
-			"anchor", // safeMode can not render anchors to avoid malicious scripts
-			"mailto", // safeMode can not render anchors to avoid malicious scripts
-			"emphasis",
-			"image",
-			"mark",
-			"strikethrough",
-			"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
-			"subscript",
-			"superscript",
-			"table",
-			"typographer",
-			"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-			"linebreak",
-			"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
-		] as $method) {
+		foreach ($this->_methodsInProcessingOrder as $method) {
 			if (!$limitTo || in_array($method, $limitTo) || ($safeMode && in_array($method, ["anchor", "inlineEvents", "reference", "mailto"]))) {
 				if (in_array($method, ["anchor", "inlineEvents", "reference", "mailto"])) $text = $this->$method($text, $safeMode);
 				else $text = $this->$method($text);
@@ -247,6 +257,22 @@ class Markdown {
 		$text = preg_replace(['/\t/'], ['    '], $text); // revert code indentation
 
 		return "<!-- Markdown parsing by error on line 1, https://github.com/erroronline1/markdown -->\n" . $text;
+	}
+
+	/**
+	 * methods to run within nested elements like lists and footnotes
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
+	private function nested_blocks($content){
+		foreach($this->_nested_blocks as $method){
+			if (!$this->_limitTo || in_array($method, $this->_limitTo)){
+				if (in_array($method, ["blockquote"])) $content = $this->$method($content, true);
+				else $content = $this->$method($content);
+			}
+		};
+		return $content;
 	}
 
 	/**
@@ -447,17 +473,7 @@ class Markdown {
 		foreach($footnotes[1] as $key => $value){
 			$footnote_block = preg_replace('/^: |^ {4}/m', '', trim($footnotes[2][$key] ?: ''));
 			// replace possible nested blocks in footnote item
-			foreach([
-				'blockquote',
-				'code',
-				'definition',
-				'table',
-			] as $method){
-				if (!$this->_limitTo || in_array($method, $this->_limitTo)){
-					if (in_array($method, ["blockquote"])) $footnote_block = $this->$method($footnote_block, true);
-					else $footnote_block = $this->$method($footnote_block);
-				}
-			};
+			$footnote_block = $this->nested_blocks($footnote_block);
 
 			$_footnotes[strval($value)] = $footnote_block;
 		}
@@ -644,17 +660,7 @@ class Markdown {
 		);
 		if ($recursion){
 			// replace possible nested blocks in list item
-			foreach([
-				'blockquote',
-				'code',
-				'definition',
-				'table',
-			] as $method){
-				if (!$this->_limitTo || in_array($method, $this->_limitTo)){
-					if (in_array($method, ["blockquote"])) $content = $this->$method($content, true);
-					else $content = $this->$method($content);
-				}
-			};
+			$content = $this->nested_blocks($content);
 		}
 		return $content;
 	}

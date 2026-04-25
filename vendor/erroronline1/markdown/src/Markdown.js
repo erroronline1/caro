@@ -30,7 +30,7 @@ export class Markdown {
 	_code_inline = /(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/g;
 	_compress = />\n+|\n *<|[^>]\n+<[^\/]/gm;
 	_definition = /(^.+?\n)((?:^: .+?\n)+)/gm;
-	_emphasis = /(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/g;
+	_emphasis = /(?<!\\)((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/gm;
 	_escape = /\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/g;
 	_footnote = /\[\^(.+?)\](:.+?\n(?: {4}.*?\n)*)*/g;
 	_headings = /(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/gm; // must be first line or have a linebreak before
@@ -74,6 +74,40 @@ export class Markdown {
 		"->": "&rarr;",
 	};
 
+	// modifiable lists for using as extended class
+	_methodsInProcessingOrder = [
+		"emphasis", // should come first to avoid to avoid modifying custom class insertions having unserscore in their name
+		"footnote", // should come second to avoid mishandling indentation and reutilizing list and superscript
+		"blockquote", // should come thirs to enable nesting
+		"reference", // before a and footnote to not mess up with similar patterns
+		"headings", // before hr avoiding conversion of ----
+		"horizontal_rule", // before emphasis avoiding matching *** as emphasis
+		"definition",
+		"task", // before list otherwise only the first occasionally nested item is converted
+		"list",
+		"code", // after list to avoid erroneous indentation matching
+		"anchor", // safeMode can not render anchors to avoid malicious scripts
+		"mailto", // safeMode can not render anchors to avoid malicious scripts
+		"image",
+		"mark",
+		"strikethrough",
+		"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+		"subscript",
+		"superscript",
+		"table",
+		"typographer",
+		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		"linebreak",
+		"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
+	];
+
+	_nested_blocks = [
+		'blockquote',
+		'code',
+		'definition',
+		'table',
+	];
+
 	/**
 	 * entry method to convert a text to markdown
 	 *
@@ -87,31 +121,7 @@ export class Markdown {
 		text = text.replaceAll(/\r/g, "").replaceAll(/\t/g, "    ") + "\n"; // add a new line for improved pattern matching by default
 
 		// ensure a proper processing order
-		[
-			"footnote", // should come first to avoid mishandling indentation and reutilizing list and superscript
-			"blockquote", // should come second to enable nesting
-			"reference", // before a and footnote to not mess up with similar patterns
-			"headings", // before hr avoiding conversion of ----
-			"horizontal_rule", // before emphasis avoiding matching *** as emphasis
-			"definition",
-			"task", // before list otherwise only the first occasionally nested item is converted
-			"list",
-			"code", // after list to avoid erroneous indentation matching
-			"anchor", // safeMode can not render anchors to avoid malicious scripts
-			"mailto", // safeMode can not render anchors to avoid malicious scripts
-			"emphasis",
-			"image",
-			"mark",
-			"strikethrough",
-			"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
-			"subscript",
-			"superscript",
-			"table",
-			"typographer",
-			"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-			"linebreak",
-			"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
-		].forEach((method) => {
+		this._methodsInProcessingOrder.forEach((method) => {
 			if (!limitTo.length || limitTo.includes(method) || (safeMode && ["anchor", "inlineEvents", "reference", "mailto"].includes(method))) {
 				if (["anchor", "inlineEvents", "reference", "mailto"].includes(method)) text = this[method](text, safeMode);
 				else text = this[method](text);
@@ -125,6 +135,20 @@ export class Markdown {
 		return "<!-- Markdown parsing by error on line 1, https://github.com/erroronline1/markdown -->\n" + text;
 	}
 
+	/**
+	 * methods to run within nested elements like lists and footnotes
+	 * 
+	 * @param {string} content 
+	 * @returns string
+	 */
+	nested_blocks(content){
+		this._nested_blocks.forEach((method) => {
+			if (!this._limitTo.length || this._limitTo.includes(method))
+				if (["blockquote"].includes(method)) content = this[method](content, true);
+				else content = this[method](content);
+		});
+		return content;
+	}
 	/**
 	 * escape special chars for code, pre and in case of safeMode
 	 *
@@ -288,11 +312,7 @@ export class Markdown {
 		for (const value of footnotes) {
 			footnote_block = (value[2] || "").trim().replaceAll(/^: |^ {4}/gm, "");
 			// replace possible nested blocks in footnote item
-			["blockquote", "code", "definition", "table"].forEach((method) => {
-				if (!this._limitTo.length || this._limitTo.includes(method))
-					if (["blockquote"].includes(method)) footnote_block = this[method](footnote_block, true);
-					else footnote_block = this[method](footnote_block);
-			});
+			footnote_block = this.nested_blocks(footnote_block);
 
 			_footnotes[value[1]] = footnote_block;
 		}
@@ -453,11 +473,7 @@ export class Markdown {
 		});
 		if (recursion) {
 			// replace possible nested blocks in list item
-			["blockquote", "code", "definition", "table"].forEach((method) => {
-				if (!this._limitTo.length || this._limitTo.includes(method))
-					if (["blockquote"].includes(method)) content = this[method](content, true);
-					else content = this[method](content);
-			});
+			content = this.nested_blocks(content);
 		}
 		return content;
 	}

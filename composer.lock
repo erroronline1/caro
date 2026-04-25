@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "erroronline1/markdown",
-            "version": "v2.0.0",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/erroronline1/markdown.git",
-                "reference": "cd3922746be23123c80439994cf15f054c59278f"
+                "reference": "80f88e45f674420b40ebd671d48c001719237439"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/cd3922746be23123c80439994cf15f054c59278f",
-                "reference": "cd3922746be23123c80439994cf15f054c59278f",
+                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/80f88e45f674420b40ebd671d48c001719237439",
+                "reference": "80f88e45f674420b40ebd671d48c001719237439",
                 "shasum": ""
             },
             "require": {
@@ -42,9 +42,9 @@
             "description": "Markdown compiler for PHP and ECMA-script.",
             "support": {
                 "issues": "https://github.com/erroronline1/markdown/issues",
-                "source": "https://github.com/erroronline1/markdown/tree/v2.0.0"
+                "source": "https://github.com/erroronline1/markdown/tree/v2.1.0"
             },
-            "time": "2026-04-24T17:17:31+00:00"
+            "time": "2026-04-25T16:47:12+00:00"
         },
         {
             "name": "openspout/openspout",

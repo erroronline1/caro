@@ -29,9 +29,9 @@ Things are still in motion. Images may be outdated.
 
 ## to do
 * review openspout ods cell formatting
-* orders
-    * check if similar items have been ordered recently?
-* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available - recheck, first implementation 2026-04-17!
+* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available!
+* update documentation images
+* csvprocessor regex/u
 
 ## Content
 * [Aims](#aims)
@@ -6592,7 +6592,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v2.0.0
+    * v2.1.0
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
