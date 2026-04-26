@@ -28,9 +28,9 @@ class PDF{
 			'format' => $setup['format'] ?? 'A4',
 			'unit' => $setup['unit'] ?? 'mm',
 			'orientation' => $setup['orientation'] ?? 'portrait',
-			'margintop' => isset($setup['margintop']) ? intval($setup['margintop']) : 30,
-			'marginright' => isset($setup['marginright']) ? intval($setup['marginright']) : 15,
-			'marginbottom' => isset($setup['marginbottom']) ? intval($setup['marginbottom']) : 20,
+			'margintop' => isset($setup['margintop']) ? intval($setup['margintop']) : 10,
+			'marginright' => isset($setup['marginright']) ? intval($setup['marginright']) : 10,
+			'marginbottom' => isset($setup['marginbottom']) ? intval($setup['marginbottom']) : 10,
 			'marginleft' => isset($setup['marginleft']) ? intval($setup['marginleft']) : 20,
 			'header_image' => $setup['header_image'] ?? null,
 			'footer_image' => $setup['footer_image'] ?? null,
@@ -70,7 +70,7 @@ class PDF{
 
 	private function init($content){
 		// create new PDF document and set initial properties
-		$this->_pdf = new RECORDTCPDF($this->_setup, true, 'UTF-8', false, false,
+		$this->_pdf = new RECORDTCPDF($this->_setup, true, 
 		20, $content['identifier'] ?? null, ['title' => $content['title'] ?? '', 'date' => $content['date'] ?? '']);
 
 		// set document information
@@ -107,7 +107,9 @@ class PDF{
 		//$this->_pdf->lastPage();
 		//$this->_pdf->setProtection(['modify'], '', null, 1);
 		$this->_pdf->pageNumeration();
-
+$rawpdf = $this->_pdf->getOutPDFString();
+$this->_pdf->renderPDF($rawpdf);
+die();
 		$_filehandler = new FILEHANDLER();
 		$this->_pdf->savePDF(__DIR__.'/' .$_filehandler->directory('tmp'), $this->_pdf->getOutPDFString());
 		return $_filehandler->directory('tmp') . '/' .$content['filename'] . '.pdf';
@@ -568,6 +570,98 @@ class PDF{
 		return $this->return($content);
 	}
 
+	public function test($content){
+		$this->init($content);
+
+		$contents = [
+			'sgfsdfgäöü sdfgs dfgsf g' => '<style>h1{color:red;}</style><h1>Lorem ipsum dolor sit amet,</h1> consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+			'wtert db xcfxcvbe ht' => 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
+			'werowpt puehwp98 jkfd' => 'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
+			'hsdlfghewprt kreg' => 'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
+			'gjkshdlg' => '<h1>At vero eos et accusam et justo duo dolores et ea rebum.</h1> Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
+			'rg hwo4t5jnerlgku serglks jg' => 'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.',
+			'shlriguhowhtjerglksjdflkj lskjdhfgsf' => 'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+			'gsdfbs dfgsdfg' => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. ',
+			'sfmnsldfglkjsöldkfgöshögrihpe5nm ' => 'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit ameLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua',
+			'sfmnsldfglkjsöldkfgöshögrihpe5nm erjk dfsjlk jgl nsdjfg  sfgl jsgk slfjgklsnfgjnlskj    sf sgjlskdnfg sfdg sfjg sfg sndgjsd fgslfg sjdfglsldkjfg  s fgknskgf ls gkglsnglk sfg sfklg skdf g sdf sfmnsldfglkjsöldkfgöshögrihpe5nm erjk dfsjlk jgl nsdjfg  sfgl jsgk slfjgklsnfgjnlskj    sf sgjlskdnfg sfdg sfjg sfg sndgjsd fgslfg sjdfglsldkjfg  s fgknskgf ls gkglsnglk sfg sfklg skdf g sdf' => 'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit ameLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua',
+			'sgsdfgsd f' => 'Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat',
+			'ertdgb cvcb rt' => 'At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
+		];
+
+		$caption_font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', 'B', 10);
+		$content_font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10);
+
+		for($i = 0; $i < count(array_keys($contents)); $i++){
+			$name = array_keys($contents)[$i];
+			$content = $contents[$name];
+
+			$page = $this->_pdf->page->getPage();
+			$this->_pdf->page->setY(($this->_pdf->page->getY()<$this->_pdf->_contentCoordinates['top'] ?$this->_pdf->_contentCoordinates['top'] : $this->_pdf->page->getY()) + $previousBox['h']);
+			$this->_pdf->page->addContent($caption_font['out']);
+			$this->_pdf->addHTMLCell(
+				html: $name, // string content
+				posx:$page['margin']['PL'] + 10, // float x
+				//posy:$this->_pdf->page->getY(), // float y
+				width: $page['width'] - $page['margin']['PL'] - $page['margin']['PR'] - 30, // float width
+				styles:[
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				]
+			);
+			// set current y coordinate and check if a pagebreak is applicable
+			$previousBox = $this->_pdf->getLastBBox();
+
+			$this->_pdf->page->setY($this->_pdf->page->getY() + $previousBox['h']);
+			if (false && !$pagebreak && $this->_pdf->page->getY() > $page['height'] - $this->_pdf->_contentCoordinates['bottom']){
+				$previousBox = $pageStart;
+				$page = $this->_pdf->addPage($this->_pdf->_pageSettings);
+				$this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10); // add default font
+				$i--;
+				$pagebreak = true;
+				continue;
+			}
+
+			$this->_pdf->page->addContent($content_font['out']);
+			$this->_pdf->addHTMLCell(
+				html: $content,// string content
+				posx: $page['margin']['PL'] + 20, // float x
+				//posy: $this->_pdf->page->getY(), // float y
+				width: $page['width'] - $page['margin']['PL'] - $page['margin']['PR'] - 20, // float width
+				styles: [
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'red',
+						'fillColor' => 'blue',
+					]
+				]
+			);
+			// set current y coordinate and check if a pagebreak is applicable
+			$previousBox = $this->_pdf->getLastBBox();
+			$this->_pdf->page->setY($this->_pdf->page->getY() + $previousBox['h']);
+			if (false && !$pagebreak &&  $this->_pdf->page->getY() > $page['height'] - $this->_pdf->_contentCoordinates['bottom']){
+				$previousBox = $pageStart;
+				$page = $pthis->_pdfdf->addPage($this->_pdf->_pageSettings);
+				$this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10); // add default font
+				$i--;
+				$pagebreak = true;
+				continue;
+			}
+		}
+	return $this->return($content);
+	}
 }
 
 class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
@@ -576,29 +670,33 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	public $qrcodecontent = null;
 	public $header = null;
 	public $_setup = null;
+	public $_defaultfont = null;
 	public $_contentCoordinates = [
 		'top' => null,
 		'bottom' => null
 	];
 	public $_pageSettings = [];
 
-	public function __construct($setup, $unicode = true, $encoding = 'UTF-8', $diskcache = false, $pdfa = false, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
+	public function __construct($setup, $unicode = true, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
 //		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
 		parent::__construct(
 			unit: $setup['unit'],
 			isunicode: $unicode,
 			compress: true
 		);
+		$this->_setup = $setup;
+		$this->header = $header;
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
-		$this->header = $header;
-		$this->_setup = $setup;
 
 		$this->enableDefaultPageContent();
 		$this->enableZeroWidthBreakPoints(true);
+		$this->setViewerPreferences(['DisplayDocTitle' => true]);
 
 		$this->setDefaultCellMargin(0, 0, 0, 0);
-		$this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+		if ($this->_defaultfont === null) {
+			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+		}
 		
 		// create a page with defaultPageContent to determine the top and bottom content boundaries
 		$page = $this->addPage([
@@ -618,12 +716,11 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					'RX' => $this->_setup['marginleft'],
 					'RY' => $this->_contentCoordinates['top'],
 					'RW' => $page['width'] - $this->_setup['marginleft'] - $this->_setup['marginright'],
-					'RH' => $this->_contentCoordinates['bottom']
+					'RH' =>  $this->_contentCoordinates['bottom'] - $this->_contentCoordinates['top']
 				]
 			],
 			'orientation' => $this->_setup['orientation']
 		];
-//var_dump($this->_contentCoordinates,$this->_pageSettings); die();
 		// add the actual first page
 		$page = $this->addPage($this->_pageSettings);
 
@@ -645,23 +742,156 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	public function defaultPageContent(int $pid = -1): string
 	{
 		$_lang = new LANG();
-		if ($pid < 0) {
-			$pid = $this->page->getPageId();
-		}
-		$page = $this->page->getPage($pid);
-		if ($this->defaultfont === null) {
-			$this->defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10);
-		}
-		$this->setDefaultCellPadding(3, 3, 3, 3);
-		$out = $this->graph->getStartTransform();
-		$out .= $this->color->getPdfColor('black');
+		$page = $this->page->getPage();
+//		$this->setDefaultCellPadding(3, 3, 3, 3);
+		$this->setDefaultCellPadding(0, 3, 0, 3);
 
-		$this->page->addContent($this->defaultfont['out'], $pid);
+		$out = '';//$this->graph->getStartTransform();
+		$out .= $this->color->getPdfColor('black');
+		$out .= $this->_defaultfont['out'];
+
+		//header
+		$widths = [
+			'headerimage' => 0,
+			'identifier' => 0,
+			'footerimage' => 0
+		];
+		$heights = [
+			'header' => [],
+			'footer' => []
+		];
+		// insert header image to the right
+		if ($image = $this->_setup['header_image'] ?? null){
+			// given the image will always be 20mm high
+			list($width, $height, $type, $attr) = getimagesize($image);
+			if ($width && $height){ // avoid division by zero error for faulty input
+				$header_image = $this->image->add(realpath($image));
+				$header_image_out = $this->image->getSetImage(
+					$header_image,
+					$page['width'] - $width / $height * 20 - $this->_setup['marginright'],
+					0 + $this->_setup['margintop'],
+					$width / $height * 20,
+					20,
+					$page['height']);
+				$out .= $header_image_out;
+				$heights['header'][] = 0 + 20;
+				$widths['headerimage'] = $width * 20 / $height + 5;
+			}
+		}
+
+		// insert identifier to the left
+		// readeable content inherits footer font size which is suitable
+
+		if ($this->qrcodecontent){
+			$identifier = $this->getBarcode(
+				type: 'QRCODE,H' . CONFIG['limits']['quality']['qr_errorlevel'],
+				code: $this->qrcodecontent,
+				posx: min(10, $this->_setup['marginleft']),
+				posy: $this->_setup['margintop'],
+				width: $this->qrcodesize,
+				height: $this->qrcodesize,
+				style: [
+					'lineWidth' => 0,
+					'lineCap' => 'butt',
+					'lineJoin' => 'miter',
+					'dashArray' => [],
+					'dashPhase' => 0,
+					'lineColor' => 'black',
+					'fillColor' => 'black',
+				]
+			);
+			$out .= $identifier;
+
+			$txtbox = $this->getTextCell(
+				txt: $this->qrcodecontent,
+				posx: 0  + $this->qrcodesize + min(10, $this->_setup['marginleft']),
+				posy: 0 + $this->_setup['margintop'],
+				width: 40,
+				height: 0,
+				valign: 'T',
+				halign: 'J',
+				styles: [
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				]
+			);
+			$out .= $txtbox;
+			$identifierBox = $this->getLastBBox();
+			$heights['header'][] = $this->qrcodesize + 6;
+			$heights['header'][] = $identifierBox['h'];
+			$widths['identifier'] = $this->qrcodesize + 40 + 5;
+		}
+
+		// insert title into remaining space between
+		$titleBox = null;
+		if ($this->header['title']) {
+			$titlefont = $this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
+			$out .= $titlefont['out'];
+			$txtbox = $this->getTextCell(
+				txt: $this->header['title'],
+				posx: min(10, $this->_setup['marginleft']) + $widths['identifier'],
+				posy: $this->_setup['margintop'],
+				width: max(40, $page['width'] - $widths['identifier'] - $widths['headerimage'] - min(10, $this->_setup['marginleft']) - $this->_setup['marginright']),
+				valign: 'T',
+				halign: 'R',
+				styles: [
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				]
+			);
+			$out .= $txtbox;
+			$out .= $this->_defaultfont['out'];
+			$titleBox = $this->getLastBBox();
+			$heights['header'][] = $titleBox['h'];
+		}
+		var_dump($heights['header']);
+		// subtitle, typically a date goes right below the title 
+		if ($this->header['date']){
+			$txtbox = $this->getTextCell(
+				txt: $this->header['date'].'sdf adf adsfsfd  ad',
+				posx: min(10, $this->_setup['marginleft']) + $widths['identifier'],
+				posy: $titleBox ? ($titleBox['y'] + $titleBox['h']) : $this->_setup['margintop'],
+				width: max(40, $page['width'] - $widths['identifier'] - $widths['headerimage'] - min(10, $this->_setup['marginleft']) - $this->_setup['marginright']),
+				linespace: -1,
+				valign: 'T',
+				halign: 'R', // string $halign = 'C', WHY YOU NO ALIGNING RIGHT!?!?!?
+				styles: [
+					'all' => [
+						'lineWidth' => 1,
+						'lineCap' => 'round',
+						'lineJoin' => 'round',
+						'miterLimit' => 1,
+						'dashArray' => [],
+						'dashPhase' => 0,
+						'lineColor' => 'green',
+						'fillColor' => 'yellow',
+					],
+				]
+			);
+			$out .= $txtbox;
+			$dateBox = $this->getLastBBox();
+			$heights['header'][] = ($titleBox['h'] ?? 0) + $dateBox['h'];
+		}
 
 		// footer
 		// insert footer image to the right
 		$imageMargin = 0;
-		$footerHeights = [10];
 		if ($image = $this->_setup['footer_image'] ?? null){
 			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
@@ -676,9 +906,9 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					$page['height']);
 				$out .= $footer_image_out;
 				$imageMargin = $width * 10 / $height + $this->_setup['marginright'] + 3;
-				$footerHeights[] = $height + $this->_setup['marginright'] + 3;
 			}
 		}
+		$footerHeights = [10];
 
 		// insert footer text into the remaining space
 		$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
@@ -709,177 +939,19 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			],
 			true
 		);
+		$footerBox = $this->getLastBBox();
+		$footerHeights[] = $footerBox['h'] + $this->_setup['marginbottom'];
 		$out .= $txtbox;
-		
-		//header
-		$imageMargin = $identifierMargin = 0;
-		$headerHeights = [];
-		// insert header image to the right
-		if ($image = $this->_setup['header_image'] ?? null){
-			// given the image will always be 20mm high
-			list($width, $height, $type, $attr) = getimagesize($image);
-			if ($width && $height){ // avoid division by zero error for faulty input
-				$header_image = $this->image->add(realpath($image));
-				$header_image_out = $this->image->getSetImage(
-					$header_image,
-					$page['width'] - $width / $height * 20 - $this->_setup['marginright'],
-					0 + $this->_setup['margintop'],
-					$width / $height * 20,
-					20,
-					$page['height']);
-				$out .= $header_image_out;
-				$headerHeights[] = 0 + 20;
-				$imageMargin = $width * 20 / $height + 5;
-			}
-		}
 
-		// insert identifier to the left
-		// readeable content inherits footer font size which is suitable
-
-		if ($this->qrcodecontent){
-			$barcode_style = [
-				'lineWidth' => 0,
-				'lineCap' => 'butt',
-				'lineJoin' => 'miter',
-				'dashArray' => [],
-				'dashPhase' => 0,
-				'lineColor' => 'black',
-				'fillColor' => 'black',
-			];
-
-			$identifier = $this->getBarcode(
-				'QRCODE,H' . CONFIG['limits']['quality']['qr_errorlevel'],
-				$this->qrcodecontent,
-				$this->_setup['marginleft'],
-				$this->_setup['margintop'],
-				$this->qrcodesize,
-				$this->qrcodesize,
-				[3, 0, 3, 0],
-				$barcode_style
-			);
-			$out .= $identifier;
-
-			$txtbox = $this->getTextCell(
-				$this->qrcodecontent, // string $txt,
-				0  + $this->qrcodesize + $this->_setup['marginleft'], // float $posx = 0,
-				0 + $this->_setup['margintop'], // float $posy = 0,
-				40, // float $width = 0,
-				0, // float $height = 0,
-				0, // float $offset = 0,
-				1, // float $linespace = 0,
-				'T', // string $valign = 'C',
-				'J' // string $halign = 'C',
-				,
-				null,
-				[
-					'all' => [
-						'lineWidth' => 1,
-						'lineCap' => 'round',
-						'lineJoin' => 'round',
-						'miterLimit' => 1,
-						'dashArray' => [],
-						'dashPhase' => 0,
-						'lineColor' => 'green',
-						'fillColor' => 'yellow',
-					],
-				],
-				true
-			);
-			$out .= $txtbox;
-			$identifierMargin = $this->qrcodesize + 50 + $this->_setup['marginleft'];
-			$headerHeights[] = $this->qrcodesize + 6 + $this->_setup['margintop'];
-			$identifierBox = $this->getLastBBox();
-			$headerHeights[] = $identifierBox['y'] + $identifierBox['h'];
-		}
-
-		// insert title into remaining space between
-		$titleBox = null;
-		if ($this->header['title']) {
-			$titlefont = $this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
-			$out .= $titlefont['out'];
-			$txtbox = $this->getTextCell(
-				$this->header['title'], // string $txt,
-				$identifierMargin, // float $posx = 0,
-				$this->_setup['margintop'], // float $posy = 0,
-				max(40, $page['width'] - $imageMargin - $identifierMargin), // float $width = 0,
-				0, // float $height = 0,
-				0, // float $offset = 0,
-				0, // float $linespace = 0,
-				'T', // string $valign = 'C',
-				'R' // string $halign = 'C',
-				,
-				null,
-				[
-					'all' => [
-						'lineWidth' => 1,
-						'lineCap' => 'round',
-						'lineJoin' => 'round',
-						'miterLimit' => 1,
-						'dashArray' => [],
-						'dashPhase' => 0,
-						'lineColor' => 'green',
-						'fillColor' => 'yellow',
-					],
-				],
-				true
-			);
-//			$this->page->addContent($txtbox);
-			$out .= $txtbox;
-//			$this->page->addContent($this->defaultfont['out']);
-			$out .= $this->defaultfont['out'];
-			$titleBox = $this->getLastBBox();
-			$headerHeights[] = $titleBox['y'] + $titleBox['h'];
-
-		}
-		// subtitle, typically a date goes right below the title 
-		if ($this->header['date']){
-			$posy = 0;
-			$width = max(40, $page['width'] - $imageMargin - $identifierMargin);
-			if ($titleBox) {
-				$posy = $titleBox['y'] + $titleBox['h'];
-			}
-			$txtbox = $this->getTextCell(
-				$this->header['date'].'sdf adf adsfsfd  ad', // string $txt,
-				$identifierMargin, // float $posx = 0,
-				$posy, // float $posy = 0,
-				$width, // float $width = 0,
-				0, // float $height = 0,
-				0, // float $offset = 0,
-				- ($this->defaultfont['height'] * .3), // float $linespace = 0,
-				'T', // string $valign = 'C',
-				////////////////////////////////////////////
-				'R' // string $halign = 'C', WHY YOU NO ALIGNING RIGHT!?!?!?
-				////////////////////////////////////////////
-				, // string $halign = 'C',
-				null,
-				[
-					'all' => [
-						'lineWidth' => 1,
-						'lineCap' => 'round',
-						'lineJoin' => 'round',
-						'miterLimit' => 1,
-						'dashArray' => [],
-						'dashPhase' => 0,
-						'lineColor' => 'green',
-						'fillColor' => 'yellow',
-					],
-				],
-				true
-			);
-			//$this->page->addContent($txtbox);
-			$out .= $txtbox;
-			$dateBox = $this->getLastBBox();
-			$headerHeights[] = $dateBox['y'] + $dateBox['h'];
-		}
-
-		$out .= $this->graph->getStopTransform();
+		//$out .= $this->graph->getStopTransform();
 		$this->setDefaultCellPadding(5, 3, 3, 3);
 
 		// determine the max top and bottom y-coordinates for further use
 		$this->_contentCoordinates = [
-			'top' => max(...$headerHeights),
-			'bottom' => max(...$footerHeights)
+			'top' => max(...$heights['header']),
+			'bottom' => $page['height'] - max(...$footerHeights)
 		];
+		$this->page->setY($this->_contentCoordinates['top'] ?: 0);
 
 		return $out;
 	}
