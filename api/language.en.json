@@ -1394,7 +1394,7 @@
 		"add_manually_warning_erpinterface": ", as well as automated matching with order state",
 		"add_manually_warning_header": "Please consider",
 		"add_product_search":{
-			"current_orders":":your for :commissions (your units and common), :other from other units, are on their way",
+			"current_orders":":your for :commissions (your units and common), :other from other units, are being processed",
 			"matches": "Add article from :number matches",
 			"oversized": "too many results for current order matching"
 		},
