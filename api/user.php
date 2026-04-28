@@ -475,14 +475,14 @@ class USER extends API {
 				$languages = [];
 				foreach (glob('language.*.json') as $file){
 					$lang = explode('.', $file);
-					$languages[$lang[1]] = ((isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) || (!isset($user['app_settings']['language']) && $lang[1] == CONFIG['application']['defaultlanguage'])) ? ['selected' => true] : [];
+					$languages[$lang[1]] = ((isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) || (!isset($user['app_settings']['language']) && $lang[1] === CONFIG['application']['defaultlanguage'])) ? ['selected' => true] : [];
 				}
 				// preset available themes
 				$theme = [];
 				foreach (glob('../*.css') as $file){
 					$name = pathinfo($file)['filename'];
 					if (in_array($name, ['style'])) continue;
-					$theme[ucfirst($name)] = ((!isset($user['app_settings']['theme']) && $name === 'light') || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
+					$theme[ucfirst($name)] = ((isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === $name) || (!isset($user['app_settings']['theme']) && $name === 'light')) ? ['checked' => true, 'value' => $name] : ['value' => $name];
 				}
 				// available timezones
 				$timezones = [];
