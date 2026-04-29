@@ -870,6 +870,7 @@ class USER extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', $user) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					if (!$user[':id']){
 						// create welcome message
+						// don't need to filter out patients, just leave this to alertUserGroup()
 						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 						$appname = 'Caro App';
 						$roles = [
@@ -898,9 +899,10 @@ class USER extends API {
 							$values = array_unique($values);
 							$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('message.message.message_to', [':user' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
 						}
-
+						preg_match('/[^ ]*caro/m', $user[':name'], $name_cousin);
 						$message = [
 							':name' => $user[':name'],
+							':welcome_name_cousin' => $name_cousin ? $this->_lang->GET('user.welcome_name_cousin'): '',
 							':appname' => $appname,
 							':supervisor' => implode(', ', $roles['supervisor']),
 							':qmo' => implode(', ', $roles['qmo']),

@@ -2016,7 +2016,8 @@
 		"user_not_deleted": "User :name could not be deleted",
 		"user_not_saved": "User could not be saved",
 		"user_saved": "User :name has been saved",
-		"welcome_message": "Hello :name,  \nwelcome to the :appname. A brief summary:  \nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.  \nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.  \nI hope the app does make things easier at work, good luck!"
+		"welcome_message": "Hello :name,  \nwelcome to the :appname.:welcome_name_cousin A brief summary:  \nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.  \nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.  \nI hope the app does make things easier at work, good luck!",
+		"welcome_name_cousin":" Hey, I actually like your name :)"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 General quality management requirements",

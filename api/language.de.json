@@ -2016,7 +2016,8 @@
 		"user_not_deleted": "Der Nutzer :name konnte nicht gelöscht werden",
 		"user_not_saved": "Der nutzer konnte nicht gespeichert werde",
 		"user_saved": "Der Nutzer :name wurde gespeichert",
-		"welcome_message": "Hallo :name,  \nwillkommen in der :appname. Hier eine kurze Zusammenfassung:  \nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo, bei der Produktsicherheit unterstützt dich :prrc und bei Fragen zu Gefahrstoffen :hazardous_materials. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.  \nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.  \nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
+		"welcome_message": "Hallo :name,  \nwillkommen in der :appname.:welcome_name_cousin Hier eine kurze Zusammenfassung:  \nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo, bei der Produktsicherheit unterstützt dich :prrc und bei Fragen zu Gefahrstoffen :hazardous_materials. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.  \nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.  \nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!",
+		"welcome_name_cousin": " Hey, ich mag deinen namen :)"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem",
