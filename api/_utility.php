@@ -158,12 +158,12 @@ class UTILITY {
 	 * wrapper for easier harmonization of cross api behaviour
 	 * 
 	 * @param array $array input
-	 * @param flags normal bitmasked json_encode flags
+	 * @param null $flags normal bitmasked json_encode flags
 	 * 
 	 * @return string output
 	 */
 	public static function json_encode($array = [], $flags = null){
-		return json_encode($array, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | $flags);
+		return json_encode($array, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | $flags);
 	}
 
 
