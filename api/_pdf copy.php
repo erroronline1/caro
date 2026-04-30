@@ -107,6 +107,7 @@ class PDF{
 		//$this->_pdf->lastPage();
 		//$this->_pdf->setProtection(['modify'], '', null, 1);
 		$this->_pdf->pageNumeration();
+//die();
 $rawpdf = $this->_pdf->getOutPDFString();
 $this->_pdf->renderPDF($rawpdf);
 die();
@@ -578,7 +579,7 @@ die();
 			'wtert db xcfxcvbe ht' => 'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
 			'werowpt puehwp98 jkfd' => 'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
 			'hsdlfghewprt kreg' => 'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
-			'gjkshdlg' => '<h1>At vero eos et accusam et justo duo dolores et ea rebum.</h1> Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
+			//'gjkshdlg' => '<h1>At vero eos et accusam et justo duo dolores et ea rebum.</h1> Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
 			'rg hwo4t5jnerlgku serglks jg' => 'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.',
 			'shlriguhowhtjerglksjdflkj lskjdhfgsf' => 'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
 			'gsdfbs dfgsdfg' => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. ',
@@ -588,21 +589,22 @@ die();
 			'ertdgb cvcb rt' => 'At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
 		];
 
-		$caption_font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', 'B', 10);
+		$name_font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', 'B', 10);
 		$content_font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10);
 
+		$page = $this->_pdf->page->getPage();
+		$init = true;
 		for($i = 0; $i < count(array_keys($contents)); $i++){
 			$name = array_keys($contents)[$i];
 			$content = $contents[$name];
 
-			$page = $this->_pdf->page->getPage();
-			$this->_pdf->page->setY(($this->_pdf->page->getY() < $this->_pdf->_contentCoordinates['top'] ? $this->_pdf->_contentCoordinates['top'] : $this->_pdf->page->getY()) + ($previousBox['h'] ?? 0));
-			$this->_pdf->page->addContent($caption_font['out']);
-			$this->_pdf->addHTMLCell(
-				html: $name, // string content
-				posx:$page['margin']['PL'] + 10, // float x
-				//posy:$this->_pdf->page->getY(), // float y
-				width: $page['width'] - $page['margin']['PL'] - $page['margin']['PR'] - 30, // float width
+			$bbox = $init ? ['y' =>  $this->_pdf->page->getY(), 'h' => 0] : $this->_pdf->getLastBBox();
+			$init = false;
+			$_name = $this->_pdf->getHTMLCell(
+				html: $name,
+				posx: $page['region'][0]['RX'],
+				posy: $bbox['y'] + $bbox['h'],
+				width: $page['region'][0]['RW'],
 				styles:[
 					'all' => [
 						'lineWidth' => 1,
@@ -616,25 +618,12 @@ die();
 					],
 				]
 			);
-			// set current y coordinate and check if a pagebreak is applicable
-			$previousBox = $this->_pdf->getLastBBox();
-
-			$this->_pdf->page->setY($this->_pdf->page->getY() + $previousBox['h']);
-			if (false && !$pagebreak && $this->_pdf->page->getY() > $page['height'] - $this->_pdf->_contentCoordinates['bottom']){
-				$previousBox = $pageStart;
-				$page = $this->_pdf->addPage($this->_pdf->_pageSettings);
-				$this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10); // add default font
-				$i--;
-				$pagebreak = true;
-				continue;
-			}
-
-			$this->_pdf->page->addContent($content_font['out']);
-			$this->_pdf->addHTMLCell(
-				html: $content,// string content
-				posx: $page['margin']['PL'] + 20, // float x
-				//posy: $this->_pdf->page->getY(), // float y
-				width: $page['width'] - $page['margin']['PL'] - $page['margin']['PR'] - 20, // float width
+			$bbox = $this->_pdf->getLastBBox();
+			$_content = $this->_pdf->getHTMLCell(
+				html: $content,
+				posx: $page['region'][0]['RX'] + 20,
+				posy: $bbox['y'] + $bbox['h'],
+				width: $page['region'][0]['RW'] - 20,
 				styles: [
 					'all' => [
 						'lineWidth' => 1,
@@ -648,19 +637,13 @@ die();
 					]
 				]
 			);
-			// set current y coordinate and check if a pagebreak is applicable
-			$previousBox = $this->_pdf->getLastBBox();
-			$this->_pdf->page->setY($this->_pdf->page->getY() + $previousBox['h']);
-			if (false && !$pagebreak &&  $this->_pdf->page->getY() > $page['height'] - $this->_pdf->_contentCoordinates['bottom']){
-				$previousBox = $pageStart;
-				$page = $pthis->_pdfdf->addPage($this->_pdf->_pageSettings);
-				$this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 10); // add default font
-				$i--;
-				$pagebreak = true;
-				continue;
-			}
+			$this->_pdf->page->addContent($name_font['out']);
+			$this->_pdf->page->addContent($_name);
+			$this->_pdf->page->addContent($content_font['out']);
+			$this->_pdf->page->addContent($_content);
+			//var_dump($page['region']);
 		}
-	return $this->return($content);
+		return $this->return($content);
 	}
 }
 
@@ -675,10 +658,8 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		'top' => null,
 		'bottom' => null
 	];
-	public $_pageSettings = [];
 
 	public function __construct($setup, $unicode = true, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
-//		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
 		parent::__construct(
 			unit: $setup['unit'],
 			isunicode: $unicode,
@@ -698,32 +679,30 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
 		}
 		
-		// create a page with defaultPageContent to determine the top and bottom content boundaries
+		// create a page with defaultPageContent to determine the top and bottom content boundaries after applying defaultPageContent()
 		$page = $this->addPage([
 			'orientation' => $this->_setup['orientation']
 		]);
 		$this->page->pop();
-		$this->_pageSettings = [
+		$pageSetup = [
 			'autobreak' => true,
 			'margin' => [
 				'PL' => $this->_setup['marginleft'],
 				'PR' => $this->_setup['marginright'],
 				'CT' => $this->_contentCoordinates['top'],
-				'CB' => $this->_contentCoordinates['bottom']
+				'CB' => $page['height'] - $this->_contentCoordinates['bottom']
 			],
-			'region' => [
-				[
-					'RX' => $this->_setup['marginleft'],
-					'RY' => $this->_contentCoordinates['top'],
-					'RW' => $page['width'] - $this->_setup['marginleft'] - $this->_setup['marginright'],
-					'RH' =>  $this->_contentCoordinates['bottom'] - $this->_contentCoordinates['top']
-				]
-			],
+	        'region' => [[
+				'RX' =>  $this->_setup['marginleft'],
+				'RY' =>  $this->_contentCoordinates['top'],
+				'RW' => $page['width'] - $this->_setup['marginleft'] - $this->_setup['marginright'],
+				'RH' =>  $this->_contentCoordinates['bottom'] - $this->_contentCoordinates['top'],
+			]],
 			'orientation' => $this->_setup['orientation']
 		];
-		// add the actual first page
-		$page = $this->addPage($this->_pageSettings);
-
+		// add the actual first page with determined settings
+		$page = $this->addPage($pageSetup);
+		//var_dump( $pageSetup, $page['region']);
 	}
 
 	// forces pagebreak if content exceeds name or page height
@@ -743,13 +722,8 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	{
 		$_lang = new LANG();
 		$page = $this->page->getPage();
-//		$this->setDefaultCellPadding(3, 3, 3, 3);
 		$this->setDefaultCellPadding(0, 3, 0, 3);
 
-		$out = $this->graph->getStartTransform();
-		$out .= $this->color->getPdfColor('black');
-
-		//header
 		$widths = [
 			'headerimage' => 0,
 			'identifier' => 0,
@@ -757,8 +731,16 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		];
 		$heights = [
 			'header' => [],
-			'footer' => []
+			'footer' => [8]
 		];
+
+		$out = $this->graph->getStartTransform();
+		$out .= $this->color->getPdfColor('black');
+
+		// warning: this has taken me some hours:
+		//  $this->getLastBBox() returns granular, not necessarily the whole added element but the last added boundary box for a line
+
+		// header
 		// insert header image to the right
 		if ($image = $this->_setup['header_image'] ?? null){
 			// given the image will always be 20mm high
@@ -779,7 +761,6 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 
 		// insert identifier to the left
 		// readeable content inherits footer font size which is suitable
-
 		if ($this->qrcodecontent){
 			$out .= $this->getBarcode(
 				type: 'QRCODE,H' . CONFIG['limits']['quality']['qr_errorlevel'],
@@ -798,31 +779,20 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					'fillColor' => 'black',
 				]
 			);
+			$heights['header'][] = $this->qrcodesize + 6;
 
-			$out .= $this->_defaultfont['out'];
+			$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
+			$out .= $footerfont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->qrcodecontent,
-				posx: 0  + $this->qrcodesize + min(10, $this->_setup['marginleft']),
+				posx: 0 + $this->qrcodesize + min(10, $this->_setup['marginleft']),
 				posy: 0 + $this->_setup['margintop'],
-				width: 40,
+				width: 35, // does overflow to the right because of reasons, reduced width accordingly
 				valign: 'T',
 				halign: 'J',
-				styles: [
-					'all' => [
-						'lineWidth' => 1,
-						'lineCap' => 'round',
-						'lineJoin' => 'round',
-						'miterLimit' => 1,
-						'dashArray' => [],
-						'dashPhase' => 0,
-						'lineColor' => 'green',
-						'fillColor' => 'yellow',
-					],
-				]
 			);
-			$identifierBox = $this->getLastBBox();
-			$heights['header'][] = $this->qrcodesize + 6;
-			$heights['header'][] = $identifierBox['h'];
+			$bbox = $this->getLastBBox();
+			$heights['header'][] =  $bbox['y'] + $bbox['h'];
 			$widths['identifier'] = $this->qrcodesize + 40 + 5;
 		}
 
@@ -838,7 +808,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				width: max(40, $page['width'] - $widths['identifier'] - $widths['headerimage'] - min(10, $this->_setup['marginleft']) - $this->_setup['marginright']),
 				valign: 'T',
 				halign: 'R',
-				styles: [
+				/*styles: [
 					'all' => [
 						'lineWidth' => 1,
 						'lineCap' => 'round',
@@ -849,43 +819,30 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 						'lineColor' => 'green',
 						'fillColor' => 'yellow',
 					],
-				]
+				]*/
 			);
 			$titleBox = $this->getLastBBox();
-			$heights['header'][] = $titleBox['h'];
+			$heights['header'][] = $titleBox['y'] + $titleBox['h'];
 		}
-		//var_dump($heights['header']);
 		// subtitle, typically a date goes right below the title 
 		if ($this->header['date']){
+			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
 			$out .= $this->_defaultfont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->header['date'].'sdf adf adsfsfd  ad',
 				posx: min(10, $this->_setup['marginleft']) + $widths['identifier'],
-				posy: $titleBox ? ($titleBox['y'] + $titleBox['h']) : $this->_setup['margintop'],
+				posy: $titleBox ? $titleBox['y'] + $titleBox['h'] : $this->_setup['margintop'],
 				width: max(40, $page['width'] - $widths['identifier'] - $widths['headerimage'] - min(10, $this->_setup['marginleft']) - $this->_setup['marginright']),
 				linespace: -1,
 				valign: 'T',
-				halign: 'R', // string $halign = 'C', WHY YOU NO ALIGNING RIGHT!?!?!?
-				styles: [
-					'all' => [
-						'lineWidth' => 1,
-						'lineCap' => 'round',
-						'lineJoin' => 'round',
-						'miterLimit' => 1,
-						'dashArray' => [],
-						'dashPhase' => 0,
-						'lineColor' => 'green',
-						'fillColor' => 'yellow',
-					],
-				]
+				halign: 'R',
 			);
-			$dateBox = $this->getLastBBox();
-			$heights['header'][] = ($titleBox['h'] ?? 0) + $dateBox['h'];
+			$bbox = $this->getLastBBox();
+			$heights['header'][] = $bbox['y'] + $bbox['h'];
 		}
 
 		// footer
 		// insert footer image to the right
-		$footerHeights = [8];
 		if ($image = $this->_setup['footer_image'] ?? null){
 			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
@@ -898,9 +855,9 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 					$width / $height * 10,
 					10,
 					$page['height']);
-				$widths['footerimage'] = $width * 10 / $height + $this->_setup['marginright'] + 3;
+				$widths['footerimage'] = $width * 10 / $height  + 3;
 			}
-			$footerHeights[] = 10;
+			$heights['footer'][] = 10;
 		}
 
 		// insert footer text into the remaining space
@@ -913,32 +870,21 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			width: $page['width'] - $widths['footerimage'] - 20 - $this->_setup['marginleft'] - $this->_setup['marginright'],
 			valign: 'B',
 			halign: 'R',
-			styles: [
-				'all' => [
-					'lineWidth' => 1,
-					'lineCap' => 'round',
-					'lineJoin' => 'round',
-					'miterLimit' => 1,
-					'dashArray' => [],
-					'dashPhase' => 0,
-					'lineColor' => 'green',
-					'fillColor' => 'yellow',
-				],
-			]
 		);
-		$footerBox = $this->getLastBBox();
-		$footerHeights[] = $footerBox['h'] + $this->_setup['marginbottom'];
+		$bbox = $this->getLastBBox();
+		$heights['footer'][] = $bbox['h'];
 
 		$out .= $this->_defaultfont['out'];
 		$out .= $this->graph->getStopTransform();
 		$this->setDefaultCellPadding(5, 3, 3, 3);
 
 		// determine the max top and bottom y-coordinates for further use
-		$this->_contentCoordinates = [
-			'top' => max(...$heights['header']),
-			'bottom' => $page['height'] - max(...$footerHeights)
+		if (!$this->_contentCoordinates['top']) $this->_contentCoordinates = [
+			'top' => max(...$heights['header']) + $this->_setup['margintop'],
+			'bottom' => $page['height'] - max(...$heights['footer']) - $this->_setup['marginbottom'] - 10
 		];
 		$this->page->setY($this->_contentCoordinates['top'] ?: 0);
+//		var_dump($this->_contentCoordinates);
 		return $out;
 	}
 

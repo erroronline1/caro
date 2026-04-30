@@ -1510,7 +1510,7 @@ $pdf->addTextCell(
 // ----------
 
 // Page signature
-
+/*
 $pageC01 = $pdf->addPage();
 $pdf->setBookmark('Signature', '', 0, -1, 0, 0, 'B', 'red');
 
@@ -1522,7 +1522,7 @@ NOTES:
    openssl pkcs12 -export -in tcpdf.crt -out tcpdf.p12
  - To convert pfx certificate to pem:
    openssl pkcs12 -in tcpdf.pfx -out tcpdf.crt -nodes
-*/
+* /
 
 // set certificate file
 $cert = 'file://data/cert/tcpdf.crt';
@@ -1558,7 +1558,7 @@ $pdf->setSignatureAppearance(30, 30, 20, 20, -1, 'test');
 
 $pdf->addEmptySignatureAppearance(30, 60, 20, 20, -1, 'test');
 
-
+*/
 // ----------
 
 // XOBject template

@@ -16,10 +16,10 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require(__DIR__ . '/../vendor/autoload.php');
+require(__DIR__ . '/../../../../vendor/autoload.php');
 
 // define fonts directory
-\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');
@@ -140,14 +140,14 @@ $content = "Two columns with automatic region/page breaks\n\n"
 $region = $pdf->page->getRegion($page['pid']);
 $regionWidth = (float) $region['RW'];
 
-$pdf->addTextCell(
+$pdf->addHTMLCell(
     $content,
-    $page['pid'],
+   // $page['pid'],
     0, // float $posx = 0,
     12, // float $posy = 0,
     $regionWidth, // float $width = 0,
     0, // float $height = 0,
-    0, // float $offset = 0,
+    /*0, // float $offset = 0,
     1, // float $linespace = 0,
     'T', // string $valign = 'T',
     'J', // string $halign = '',
@@ -164,7 +164,7 @@ $pdf->addTextCell(
     false, // bool $linethrough = false,
     false, // bool $overline = false,
     false, // bool $clip = false,
-    false, // bool $drawcell = true,
+    false, // bool $drawcell = true,*/
 );
 
 // =============================================================

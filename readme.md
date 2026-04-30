@@ -30,6 +30,7 @@ Things are still in motion. Images may be outdated.
 ## to do
 * review openspout ods cell formatting
 * further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available!
+    * vendor\tecnickcom\tc-lib-pdf\examples\019_example_page_regions.php
 * update documentation images
 * csvprocessor regex/u
 
