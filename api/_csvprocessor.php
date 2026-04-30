@@ -292,7 +292,7 @@ class Listprocessor {
 				$this->_list[$row] = $values;  // SplFixedArray has problems accessing nested elements, must assign array to key directly
 				if (isset($this->_setting['evaluate'])){
 					foreach ($this->_setting['evaluate'] as $column => $pattern){
-						if (boolval($values[$column]) && boolval(preg_match($this->_delimiter . $pattern . $this->_delimiter . 'mi', $values[$column]))){
+						if (boolval($values[$column]) && boolval(preg_match($this->_delimiter . $pattern . $this->_delimiter . 'miu', $values[$column]))){
 							if (isset($evaluate_warning[$column])) $evaluate_warning[$column]++;
 							else $evaluate_warning[$column] = 1;
 						}			
@@ -538,7 +538,7 @@ class Listprocessor {
 							'value' => $row[$column],
 							'filtered_by' => $filter];
 						$keep = !$rule['keep'];
-						if (boolval(preg_match($this->_delimiter . $filter . $this->_delimiter . 'mi', $row[$column]))){
+						if (boolval(preg_match($this->_delimiter . $filter . $this->_delimiter . 'miu', $row[$column]))){
 							$keep = $rule['keep'];
 							break;
 						}
@@ -552,7 +552,7 @@ class Listprocessor {
 							'value' => $row[$column],
 							'filtered_by' => $filter];
 						$keep = $rule['keep'];
-						if (!boolval(preg_match($this->_delimiter . $filter . $this->_delimiter . 'mi', $row[$column]))){
+						if (!boolval(preg_match($this->_delimiter . $filter . $this->_delimiter . 'miu', $row[$column]))){
 							$keep = !$rule['keep'];
 							break;
 						}
@@ -692,7 +692,7 @@ class Listprocessor {
 				$columns = array_keys($rule['data']['columns']);
 				for($c = 0; $c < count($columns); $c++){
 					$column = $columns[$c];
-					$match = boolval(preg_match($this->_delimiter . $rule['data']['columns'][$column] . $this->_delimiter . 'mi', $row[$column]));
+					$match = boolval(preg_match($this->_delimiter . $rule['data']['columns'][$column] . $this->_delimiter . 'miu', $row[$column]));
 					if (!$match) break;
 				}
 				if (!$match) continue;
@@ -839,9 +839,9 @@ class Listprocessor {
 							foreach ($row as $column => $value) {
 								for ($replacement = 2; $replacement < count($rule); $replacement++){
 									$replacementLimit = 0;
-									if ((!$rule[0] || $rule[0] == $column) && preg_match($this->_delimiter . $rule[1]. $this->_delimiter . 'm', $value)){
+									if ((!$rule[0] || $rule[0] == $column) && preg_match($this->_delimiter . $rule[1]. $this->_delimiter . 'mu', $value)){
 										$replaced_value = preg_replace_callback(
-											$this->_delimiter . $rule[1]. $this->_delimiter . 'm',
+											$this->_delimiter . $rule[1]. $this->_delimiter . 'mu',
 											function($matches) use ($rule, $replacement){
 												// plain replacement of first match
 												if (count($matches)<2) return $rule[$replacement];
@@ -894,7 +894,7 @@ class Listprocessor {
 
 							foreach ($modifications as $translate => $translation){
 								if (isset($this->_setting['translations'][$rule][$row[$rule]]))
-									$row[$key] = trim(preg_replace($this->_delimiter . '^' . $row[$rule] . '$' . $this->_delimiter . 'm', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
+									$row[$key] = trim(preg_replace($this->_delimiter . '^' . $row[$rule] . '$' . $this->_delimiter . 'mu', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
 							// SplFixedArray has problems accessing nested elements, must assign array to key directly
 							$this->_list[$i] = $row;
@@ -907,7 +907,7 @@ class Listprocessor {
 								$this->_setting['filesetting']['columns'][] = $rule[0];
 							$matches = 0;
 							for ($condition = 2; $condition < count($rule); $condition++){
-								if (isset($row[$rule[$condition][0]]) && boolval(preg_match($this->_delimiter . $rule[$condition][1] . $this->_delimiter . 'mi', $row[$rule[$condition][0]]))) $matches++;
+								if (isset($row[$rule[$condition][0]]) && boolval(preg_match($this->_delimiter . $rule[$condition][1] . $this->_delimiter . 'miu', $row[$rule[$condition][0]]))) $matches++;
 							}
 							if (!isset($row[$rule[0]])) $row[$rule[0]] = '';
 							if ($matches == (count($rule) - 2)) $row[$rule[0]] = $rule[1];
@@ -922,7 +922,7 @@ class Listprocessor {
 								$this->_setting['filesetting']['columns'][] = $rule[0];
 							$matches = 0;
 							for ($condition = 2; $condition < count($rule); $condition++){
-								if (isset($row[$rule[$condition][0]]) && boolval(preg_match($this->_delimiter . $rule[$condition][1] . $this->_delimiter . 'mi', $row[$rule[$condition][0]]))) $matches++;
+								if (isset($row[$rule[$condition][0]]) && boolval(preg_match($this->_delimiter . $rule[$condition][1] . $this->_delimiter . 'miu', $row[$rule[$condition][0]]))) $matches++;
 							}
 							if (!isset($row[$rule[0]])) $row[$rule[0]] = '';
 							if ($matches) $row[$rule[0]] = $rule[1];
@@ -1016,7 +1016,7 @@ class Listprocessor {
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
 				foreach ($this->_setting['split'] as $key => $pattern){
-					preg_match_all($this->_delimiter . $pattern . $this->_delimiter . 'mi', $row[$key], $match, PREG_OFFSET_CAPTURE);
+					preg_match_all($this->_delimiter . $pattern . $this->_delimiter . 'miu', $row[$key], $match, PREG_OFFSET_CAPTURE);
 					// "special company" matched by (special).+(company).+ or by .*
 					// (.+) may be critical for matching line end as well and having indifferent results
 					foreach ($match as $index => $submatch){
