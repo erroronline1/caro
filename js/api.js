@@ -1909,6 +1909,7 @@ export const api = {
 							api.purchase("get", "prepared");
 						};
 						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+						break;
 					case "incorporation":
 					case "mdrsamplecheck":
 						payload = request[3]; // form data object passed by utility.js
