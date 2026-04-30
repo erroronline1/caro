@@ -1236,7 +1236,7 @@
 				"probability_mismatch": "The probability :probability did not match with the language files of the application and has been set to the current maximum value as precaution.",
 				"risk_mismatch": "The risk relation :risk did not match with the language files of the application and could not be assigned."
 			},
-			"description": "Upload a proper prepared template file for the selected process. New risks will be added.\nTables for risks and characteristics must match the templates structure.\nRisk relation, probability and damage will be updated on entries with the same cause, effect, measure and remaining measures, a new entry will be set otherwise.",
+			"description": "Upload a proper prepared template file in the systems language (:language) for the selected process. New risks will be added.\nTables for risks and characteristics must match the templates structure.\nRisk relation, probability and damage will be updated on entries with the same cause, effect, measure and remaining measures, a new entry will be set otherwise.",
 			"file": "Template file",
 			"file_error": "No file provided",
 			"response": "Import finished. :new new entries have been made, :update entries have been updated.",

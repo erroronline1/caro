@@ -876,7 +876,7 @@ class MAINTENANCE extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.navigation.riskupdate'),
 					],
-					'content' => $this->_lang->GET('maintenance.riskupdate.description'),
+					'content' => $this->_lang->GET('maintenance.riskupdate.description', [':language' =>  CONFIG['application']['defaultlanguage']]),
 				];
 				$response['render']['content'][] = [
 					'type' => 'text',
