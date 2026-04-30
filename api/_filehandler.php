@@ -383,6 +383,7 @@ class FILEHANDLER{
 	 * @return string filepaths
 	 */
 	public function getFileLink($path){
+		if (!$path) return "#";
 		if (file_exists($path)) return './api/api.php/file/stream/' . substr($path, 1);
 		if (self::isInFilesystem($path)) return '';
 		
