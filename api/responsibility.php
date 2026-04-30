@@ -262,9 +262,7 @@ class RESPONSIBILITY extends API {
 				}
 				$responsibility[':proxy_users'] = UTILITY::json_encode($responsibility[':proxy_users']);
 				// insert responsibility into database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', [
-					'values' => $responsibility
-				])) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', $responsibility)) {
 					$responsibility[':assigned_users'] = json_decode($responsibility[':assigned_users'], true);
 					$responsibility[':proxy_users'] = json_decode($responsibility[':proxy_users'], true);
 					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
