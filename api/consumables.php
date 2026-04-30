@@ -2484,7 +2484,7 @@ class CONSUMABLES extends API {
 				$vendor = [];
 				if ($this->_requestedID){
 					$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-						':id' => $this->_requestedID
+						':id' => $this->_requestedID 
 					]);
 					$vendor = $vendor ? $vendor[0] : null;
 					if (!$vendor) $this->response(null, 406);
@@ -2742,7 +2742,7 @@ class CONSUMABLES extends API {
 				
 				// select single vendor based on id or name
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					':id' => $this->_requestedID
+					':id' => $this->_requestedID ?: ''
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 
