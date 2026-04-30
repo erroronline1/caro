@@ -16,13 +16,13 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require(__DIR__ . '/../../../../vendor/autoload.php');
+require(__DIR__ . '/../vendor/autoload.php');
 
 
 \define('OUTPUT_FILE', \realpath(__DIR__ . '/../target') . '/example.pdf');
 
 // define fonts directory
-\define('K_PATH_FONTS', \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');
@@ -58,7 +58,7 @@ $bfont1 = $pdf->font->insert($pdf->pon, 'helvetica', '', 12);
 
 
 // test images directory
-$imgdir = \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-image/test/images/');
+$imgdir = \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-image/test/images/');
 
 
 // ----------
@@ -1510,7 +1510,7 @@ $pdf->addTextCell(
 // ----------
 
 // Page signature
-/*
+
 $pageC01 = $pdf->addPage();
 $pdf->setBookmark('Signature', '', 0, -1, 0, 0, 'B', 'red');
 
@@ -1522,7 +1522,7 @@ NOTES:
    openssl pkcs12 -export -in tcpdf.crt -out tcpdf.p12
  - To convert pfx certificate to pem:
    openssl pkcs12 -in tcpdf.pfx -out tcpdf.crt -nodes
-* /
+*/
 
 // set certificate file
 $cert = 'file://data/cert/tcpdf.crt';
@@ -1558,7 +1558,7 @@ $pdf->setSignatureAppearance(30, 30, 20, 20, -1, 'test');
 
 $pdf->addEmptySignatureAppearance(30, 60, 20, 20, -1, 'test');
 
-*/
+
 // ----------
 
 // XOBject template
@@ -1814,7 +1814,7 @@ List example:
 
 
 $pdf->addHTMLCell(
-    $html_01 . $html_01, // string $html,
+    $html_01, // string $html,
     20, // float $posx = 0,
     10, // float $posy = 0,
     150, // float $width = 0,

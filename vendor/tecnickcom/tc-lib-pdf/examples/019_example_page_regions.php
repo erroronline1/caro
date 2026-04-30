@@ -147,7 +147,7 @@ $pdf->addHTMLCell(
     12, // float $posy = 0,
     $regionWidth, // float $width = 0,
     0, // float $height = 0,
-    /*0, // float $offset = 0,
+    /* 0, // float $offset = 0,
     1, // float $linespace = 0,
     'T', // string $valign = 'T',
     'J', // string $halign = '',
@@ -164,7 +164,8 @@ $pdf->addHTMLCell(
     false, // bool $linethrough = false,
     false, // bool $overline = false,
     false, // bool $clip = false,
-    false, // bool $drawcell = true,*/
+    false, // bool $drawcell = true,
+    */
 );
 
 // =============================================================
