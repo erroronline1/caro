@@ -37,8 +37,7 @@ class SQLQUERY {
 		
 		// handle unfortunate sqlsrv unicode implementation that is very much unsupportive of tokenized replacements on NULL-values
 		$quote = substr($_pdo->quote('.'), 0, 1);
-		$query = preg_replace("/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", 'ELSE N$1 END', $query);
-
+		$query = preg_replace(["/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $query);
 		return $query;
 	}
 
@@ -231,6 +230,10 @@ class SQLQUERY {
 					$replace = self::typehandler($_pdo, $replace);
 				}
 				$item = strtr($values, $item);
+				// handle unfortunate sqlsrv unicode implementation that is very much unsupportive of tokenized replacements on NULL-values
+				$quote = substr($_pdo->quote('.'), 0, 1);
+				$item = preg_replace(["/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $item);
+
 				if (count($packageitems)){
 					$index = count($packageitems) - 1;
 					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$packageitems[$index]])) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']){
