@@ -1112,13 +1112,13 @@ class NOTIFICATION extends API {
 			$user = [
 				':id' => $_SESSION['user']['id'],
 				':name' => $_SESSION['user']['name'],
-				':permissions' => implode(',', $_SESSION['user']['permissions']),
-				':units' => implode(',', $_SESSION['user']['units']),
+				':permissions' => gettype($_SESSION['user']['permissions']) === 'array' && $_SESSION['user']['permissions'] ? implode(',', $_SESSION['user']['permissions']) : ($_SESSION['user']['permissions'] ?: null),
+				':units' => gettype($_SESSION['user']['units']) === 'array' && $_SESSION['user']['units'] ? implode(',', $_SESSION['user']['units']) : ($_SESSION['user']['units'] ?: null),
 				':token' => $_SESSION['user']['token'],
 				':orderauth' => $_SESSION['user']['orderauth'],
 				':image' => $_SESSION['user']['image'],
-				':app_settings' => isset($_SESSION['user']['app_settings']) ? UTILITY::json_encode($_SESSION['user']['app_settings']) : null,
-				':skills' => implode(',', $_SESSION['user']['skills']),
+				':app_settings' => gettype($_SESSION['user']['app_settings']) === 'array' && $_SESSION['user']['app_settings'] ? UTILITY::json_encode($_SESSION['user']['app_settings']) : ($_SESSION['user']['app_settings'] ?: null),
+				':skills' => gettype($_SESSION['user']['skills']) === 'array' && $_SESSION['user']['skills'] ? implode(',', $_SESSION['user']['skills']) : ($_SESSION['user']['skills'] ?: null),
 				':invalidation_date' => $_SESSION['user']['invalidation_date'],
 				':two_factor' => $_SESSION['user']['two_factor']
 			];
@@ -1291,13 +1291,15 @@ class NOTIFICATION extends API {
 		foreach ($this->_users as $user){
 			if (array_intersect(array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) $unitusers[] = $user['id'];
 		}
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			':ids' => $unitusers
-		]);
-		foreach ($trainings as $training){
-			if ($training['planned']) {
-				$number++;
-				continue;
+		if ($unitusers){
+			$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+				':ids' => $unitusers
+			]);
+			foreach ($trainings as $training){
+				if ($training['planned']) {
+					$number++;
+					continue;
+				}
 			}
 		}
 		return $number;
