@@ -519,11 +519,11 @@ class FILEHANDLER{
 		$result = [];
 		if (!file_exists($directory)) return $result;
 		switch ($order){
-			case 'desc':
-				$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
-				break;
 			case 'asc':
 				$dir = scandir($directory);
+				break;
+			default: //case 'desc':
+				$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
 				break;
 		}
 		foreach ($dir as $file){
@@ -542,6 +542,7 @@ class FILEHANDLER{
 	 * 
 	 * @param string $directory directory to scan
 	 * @param string $order asc|desc by default
+	 * @param array $temp temp valid directories required for tidydir() cleanup
 	 * 
 	 * @return array file list 
 	 */
@@ -550,11 +551,11 @@ class FILEHANDLER{
 		if (self::isInFilesystem($directory, $temp)){
 			if (!file_exists($directory)) return $result;
 			switch ($order){
-				case 'desc':
-					$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
-					break;
 				case 'asc':
 					$dir = scandir($directory);
+					break;
+				default: //case 'desc':
+					$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
 					break;
 			}
 			foreach ($dir as $file){
@@ -600,6 +601,9 @@ class FILEHANDLER{
 	 *  |___|___|_|  \_/|___|  
 	 *   
 	 * make a file available either as stream or just writing from database
+	 * 
+	 * @param string $path full file path with filename and extension as found either in file system or database as path and name
+	 * @param bool $stream direct stream ressource or just ensure file exists within filesystem
 	 */
 	public function serve($path, $stream = true){		
 		if (!file_exists($path)){
@@ -733,9 +737,9 @@ class FILEHANDLER{
 	}
 	/**
 	 * @param string $tmpname temporary file
-	 * @param string destination expected path with full filename and extension
+	 * @param string $destination expected path with full filename and extension
 	 * @param bool $replace overwrite existing file or enumerate if already present
-	 * @param array $imageoptions
+	 * @param array $imageoptions, see storeUploadedFiles()
 	 * 
 	 * @return string filename, occasionally enumerated
 	 */
@@ -764,7 +768,6 @@ class FILEHANDLER{
 	 * @param object $_pdo an active pdo instance
 	 * @param string $tmpname temporary file
 	 * @param string $destination expected path
-	 * @param string $filename
 	 * @param string $mime_type
 	 * @param array $imageoptions
 	 * 

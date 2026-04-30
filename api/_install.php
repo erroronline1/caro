@@ -11,6 +11,8 @@
 
 namespace CARO\API;
 
+use DateTime;
+
 // actions require an application user with admin permission to be logged in onve the database has been installed
 session_set_cookie_params([
 	'domain' => $_SERVER['HTTP_HOST'],
@@ -779,8 +781,8 @@ class INSTALL {
 			case "DELETE":
 				$inputstream = $_SERVER['QUERY_STRING'];
 				break;
-			case "POST":
-			case "PUT":
+			default: //case "POST":
+					 //case "PUT":
 				$inputstream = file_get_contents('php://input');
 				break;
 		}
@@ -1122,7 +1124,7 @@ class INSTALL {
 		/**
 		 * recursively verify input names for not being forbidden
 		 * @param array $elements
-		 * @return bool
+		 * @return bool|array
 		 * 
 		 * also see frontend compose_helper.importComponent()
 		 */
