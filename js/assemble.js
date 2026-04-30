@@ -953,7 +953,7 @@ export class Dialog {
 				a.href = this.render.url;
 				a.download = this.render.name || this.render.url;
 				a = Polyfill.a(a);
-				if (this.render.downloadurl){
+				if (this.render.downloadurl) {
 					a.draggable = true;
 					a.dataset.downloadurl = this.render.downloadurl;
 					_.file.dragout(a);
@@ -974,7 +974,7 @@ export class Dialog {
 		a.download = this.render.name || this.render.content;
 		a.dataset.type = "downloadlink";
 		a.append(document.createTextNode(this.render.name || this.render.content));
-		if (this.render.downloadurl){
+		if (this.render.downloadurl) {
 			a.draggable = true;
 			a.dataset.downloadurl = this.render.downloadurl;
 			_.file.dragout(a);
@@ -1286,7 +1286,9 @@ export class Assemble {
 		if (document.querySelector("[autofocus]")) {
 			const focused = document.querySelector("[autofocus]");
 			focused.focus();
-			setTimeout(function(){ focused.selectionStart = focused.selectionEnd = focused.value.length + 100; }, 0);
+			setTimeout(function () {
+				focused.selectionStart = focused.selectionEnd = focused.value.length + 100;
+			}, 0);
 		}
 	}
 
@@ -1691,7 +1693,10 @@ export class Assemble {
 					if (typeof attribute === "function") attribute = attribute.toString();
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|\t{1,}|\n/gm, " ").slice(0, -1);
 					if (attribute.startsWith("(")) attribute = attribute.replace(/^.*?\{|\t{1,}|\n|\}$/g, " ").slice(0, -1);
-					attribute = attribute.replace(/^\s.?/gm, "");
+					attribute = attribute
+						.replace(/^\s.?/gm, "")
+						.replace(/(?<!\\)'/gm, "\'")
+						.replace(/\\\\/gm, "\\");
 					try {
 						node[key] = new Function(attribute);
 					} catch (e) {
@@ -2142,7 +2147,7 @@ export class Assemble {
 
 		result = result.concat(this.hint());
 		delete this.currentElement.hint;
-		
+
 		this.currentElement.attributes = {};
 		this.currentElement.content = {};
 		this.currentElement.content[api._lang.GET("message.whiteboard.doodle_draw")] = { checked: true, onchange: `if (this.checked) window.signaturePads['${canvas.id}'].compositeOperation="source-over";` };
@@ -3649,7 +3654,7 @@ export class Assemble {
 			for (let column = 0; column < this.currentElement.content[row].length; column++) {
 				cell = this.currentElement.content[row][column];
 				td = document.createElement(row > 0 ? "td" : "th");
-				
+
 				md = mds = false; // reset markdown modes
 				if (cell.a) {
 					md = "md" in cell.a;
@@ -3918,11 +3923,12 @@ export class Assemble {
 		if (this.currentElement.mdcontent) {
 			p = document.createElement("p");
 			p.id = getNextElementID();
-			let safeMode = false, limitTo=[];
-			if (this.currentElement.mdrestrictions){
+			let safeMode = false,
+				limitTo = [];
+			if (this.currentElement.mdrestrictions) {
 				safeMode = this.currentElement.mdrestrictions.safeMode || false;
 				limitTo = this.currentElement.mdrestrictions.limitTo || [];
-			} 
+			}
 			p.innerHTML = this.Markdown.md2html(this.currentElement.mdcontent, safeMode, limitTo);
 			result.push(p);
 		}
