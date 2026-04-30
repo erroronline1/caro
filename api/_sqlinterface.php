@@ -201,10 +201,10 @@ class SQLQUERY {
 		if ($query){
 			$packageIndex = count($packages) - 1;
 			if (isset($packages[$packageIndex])){
-				if (strlen($packages[$packageIndex] . $query) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $packages[$packageIndex] .= $query;
-				else $packages[] = $query;
+				if (strlen($packages[$packageIndex] . $query . ';') < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $packages[$packageIndex] .= $query . ';';
+				else $packages[] = $query . ';';
 			}
-			else $packages[] = $query;
+			else $packages[] = $query . ';';
 		}
 		return $packages;
 	}
