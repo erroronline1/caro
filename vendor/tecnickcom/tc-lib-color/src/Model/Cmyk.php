@@ -182,10 +182,8 @@ class Cmyk extends \Com\Tecnick\Color\Model
      */
     public function toGrayArray(): array
     {
-        return [
-            'gray' => $this->cmp_key,
-            'alpha' => $this->cmp_alpha,
-        ];
+        $rgb = new \Com\Tecnick\Color\Model\Rgb($this->toRgbArray());
+        return $rgb->toGrayArray();
     }
 
     /**
@@ -228,6 +226,17 @@ class Cmyk extends \Com\Tecnick\Color\Model
             'key' => $this->cmp_key,
             'alpha' => $this->cmp_alpha,
         ];
+    }
+
+    /**
+     * Get an array with Lab color components
+     *
+     * @return array<string, float> with keys ('lstar', 'astar', 'bstar', 'alpha')
+     */
+    public function toLabArray(): array
+    {
+        $rgb = new \Com\Tecnick\Color\Model\Rgb($this->toRgbArray());
+        return $rgb->toLabArray();
     }
 
     /**

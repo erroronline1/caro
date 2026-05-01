@@ -8,9 +8,9 @@
 [![License](https://poser.pugx.org/tecnickcom/tc-lib-color/license)](https://packagist.org/packages/tecnickcom/tc-lib-color)
 [![Downloads](https://poser.pugx.org/tecnickcom/tc-lib-color/downloads)](https://packagist.org/packages/tecnickcom/tc-lib-color)
 
-[![Donate via PayPal](https://img.shields.io/badge/donate-paypal-87ceeb.svg)](https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ)
+[![Sponsor on GitHub](https://img.shields.io/badge/sponsor-github-EA4AAA.svg?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/tecnickcom)
 
-If this library helps your graphics workflow, please consider [supporting development via PayPal](https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ).
+If this project is useful to you, please consider [supporting development via GitHub Sponsors](https://github.com/sponsors/tecnickcom).
 
 ---
 
@@ -33,13 +33,17 @@ The library is designed to centralize color logic so applications avoid ad-hoc c
 ## Features
 
 ### Color Models
-- RGB/RGBA and hexadecimal color handling
-- HSL/HSLA and CMYK conversion workflows
-- Grayscale and spot color support
+- Grayscale (GRAY)
+- RGB/RGBA and hexadecimal color handling (RGB)
+- HSL/HSLA conversion workflows (HSL)
+- CMYK conversion workflows (CMYK)
+- CIE Lab color handling and conversion workflows (LAB)
+- Spot colors (Separation), with DeviceCMYK and Lab alternate color-space support for PDF output
 
 ### Integration Helpers
 - CSS-ready color output
 - PDF-oriented color conversion helpers
+- Cross-model conversion helpers on all color models
 - Named web color lookup and normalization
 
 ---

@@ -18,25 +18,25 @@ Requires:  php(language) >= 8.1.0
 Requires:  php-date
 Requires:  php-pcre
 Requires:  php-composer(%{c_vendor}/tc-lib-barcode) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-barcode) >= 2.4.34
+Requires:  php-composer(%{c_vendor}/tc-lib-barcode) >= 2.4.39
 Requires:  php-composer(%{c_vendor}/tc-lib-color) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-color) >= 2.3.14
+Requires:  php-composer(%{c_vendor}/tc-lib-color) >= 2.5.3
 Requires:  php-composer(%{c_vendor}/tc-lib-pdf-image) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-pdf-image) >= 2.1.39
+Requires:  php-composer(%{c_vendor}/tc-lib-pdf-image) >= 2.2.2
 Requires:  php-composer(%{c_vendor}/tc-lib-pdf-font) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-pdf-font) >= 2.6.39
+Requires:  php-composer(%{c_vendor}/tc-lib-pdf-font) >= 2.7.3
 Requires:  php-composer(%{c_vendor}/tc-lib-file) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-file) >= 2.3.7
+Requires:  php-composer(%{c_vendor}/tc-lib-file) >= 2.5.2
 Requires:  php-composer(%{c_vendor}/tc-lib-pdf-encrypt) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-pdf-encrypt) >= 2.1.41
+Requires:  php-composer(%{c_vendor}/tc-lib-pdf-encrypt) >= 2.2.2
 Requires:  php-composer(%{c_vendor}/tc-lib-unicode-data) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-unicode-data) >= 2.0.49
+Requires:  php-composer(%{c_vendor}/tc-lib-unicode-data) >= 2.0.53
 Requires:  php-composer(%{c_vendor}/tc-lib-unicode) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-unicode) >= 2.0.50
+Requires:  php-composer(%{c_vendor}/tc-lib-unicode) >= 2.1.2
 Requires:  php-composer(%{c_vendor}/tc-lib-pdf-page) < 5.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-pdf-page) >= 4.3.18
+Requires:  php-composer(%{c_vendor}/tc-lib-pdf-page) >= 4.3.23
 Requires:  php-composer(%{c_vendor}/tc-lib-pdf-graph) < 3.0.0
-Requires:  php-composer(%{c_vendor}/tc-lib-pdf-graph) >= 2.4.18
+Requires:  php-composer(%{c_vendor}/tc-lib-pdf-graph) >= 2.4.23
 
 Provides:  php-composer(%{c_vendor}/%{gh_project}) = %{version}
 Provides:  php-%{gh_project} = %{version}
@@ -48,12 +48,8 @@ PHP library to generate PDF documents
 #(cd %{_current_directory} && make build)
 
 %install
-rm -rf $RPM_BUILD_ROOT
-(cd %{_current_directory} && make install DESTDIR=$RPM_BUILD_ROOT)
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-#(cd %{_current_directory} && make clean)
+rm -rf %{buildroot}
+(cd %{_current_directory} && make install DESTDIR=%{buildroot})
 
 %files
 %attr(-,root,root) %{_libpath}

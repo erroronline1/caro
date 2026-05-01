@@ -929,6 +929,97 @@ class HTMLTest extends TestUtil
         $this->assertStringContainsString(' re', $content);
     }
 
+    public function testAddHTMLCellFlowsIntoSecondColumnRegionNotFirstColumn(): void
+    {
+        // Regression: after a region break, originx must be updated to the new
+        // region's RX so content renders in the second column, not overlapping
+        // the first column again.
+        $obj = $this->getTestObject();
+        self::setUpFontsPath();
+
+        /** @var \Com\Tecnick\Pdf\Page\Page $page */
+        $page = $this->getObjectProperty($obj, 'page');
+        /** @var int $pon */
+        $pon = $this->getObjectProperty($obj, 'pon');
+        /** @var \Com\Tecnick\Pdf\Font\Stack $font */
+        $font = $this->getObjectProperty($obj, 'font');
+        $fontfile = (string) \realpath(
+            __DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts/core/helvetica.json'
+        );
+        $font->insert($pon, 'helvetica', '', 10, null, null, $fontfile);
+
+        $leftMargin   = 15.0;
+        $rightMargin  = 15.0;
+        $topMargin    = 20.0;
+        $bottomMargin = 20.0;
+        $columnGap    = 8.0;
+        $contentWidth  = 210.0 - $leftMargin - $rightMargin;
+        $contentHeight = 297.0 - $topMargin - $bottomMargin;
+        $columnWidth   = ($contentWidth - $columnGap) / 2.0;
+
+        $obj->addPage([
+            'margin' => [
+                'PL' => $leftMargin,
+                'PR' => $rightMargin,
+                'CT' => $topMargin,
+                'CB' => $bottomMargin,
+            ],
+            'region' => [
+                [
+                    'RX' => $leftMargin,
+                    'RY' => $topMargin,
+                    'RW' => $columnWidth,
+                    'RH' => $contentHeight,
+                ],
+                [
+                    'RX' => $leftMargin + $columnWidth + $columnGap,
+                    'RY' => $topMargin,
+                    'RW' => $columnWidth,
+                    'RH' => $contentHeight,
+                ],
+            ],
+        ]);
+
+        $chunk = '<p>Lorem ipsum dolor sit amet consectetur adipiscing elit.'
+            . ' Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>';
+        $html = \str_repeat($chunk, 60);
+
+        // Enough content to overflow the first column and flow into the second.
+        $obj->addHTMLCell($html, $leftMargin, $topMargin, $columnWidth, 0);
+
+        $pages = $page->getPages();
+        $allContent = '';
+        foreach ($pages as $pdata) {
+            if (isset($pdata['content']) && \is_array($pdata['content'])) {
+                $allContent .= \implode("\n", $pdata['content']);
+            }
+        }
+
+        // The second column's X is $leftMargin + $columnWidth + $columnGap ≈ 109 mm.
+        // Convert to points to find PDF Td commands: 1mm ≈ 2.8346 pt.
+        $col2x = ($leftMargin + $columnWidth + $columnGap) * 2.8346;
+        $col2xMin = $col2x - 2.0;
+
+        // After the fix, at least one text Td command must have an X component
+        // inside the second column (x > col2xMin). Before the fix, all Td X
+        // values stayed in the first column (around 42–72 pt).
+        $tdMatches = [];
+        \preg_match_all('/\b([\d.]+) [\d.-]+ Td\b/', $allContent, $tdMatches);
+        $foundSecondCol = false;
+        foreach ($tdMatches[1] as $xVal) {
+            if ((float) $xVal >= $col2xMin) {
+                $foundSecondCol = true;
+                break;
+            }
+        }
+
+        $this->assertTrue(
+            $foundSecondCol,
+            'Expected text to flow into the second column (X ≥ ' . \round($col2xMin, 1) . ' pt),'
+            . ' but all Td X values stayed in the first column.',
+        );
+    }
+
     public function testAddHTMLCellAutoFlowSpansMultiplePages(): void
     {
         $obj = $this->getTestObject();
@@ -1062,6 +1153,52 @@ class HTMLTest extends TestUtil
         $afterPages = \count($page->getPages());
 
         $this->assertGreaterThan($beforePages, $afterPages);
+    }
+
+    public function testAddHTMLCellTwelvePointMixedInlineTableDoesNotBreakAfterFirstRow(): void
+    {
+        $obj = $this->getTestObject();
+        $this->initFontAndPage($obj);
+
+        $fontfile = (string) \realpath(
+            __DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts/dejavu/dejavusans.json'
+        );
+        $font = $obj->font->insert($obj->pon, 'dejavusans', '', 12, null, null, $fontfile);
+        $obj->page->addContent($font['out']);
+
+        /** @var \Com\Tecnick\Pdf\Page\Page $page */
+        $page = $this->getObjectProperty($obj, 'page');
+        $beforePages = \count($page->getPages());
+        $spanWords = '<span>Alfa</span> <span>Bravo</span> <span>Charlie</span> <span>Delta</span> '
+            . '<span>Echo</span> <span>Foxtrot</span> <span>Golf</span> <span>Hotel</span> '
+            . '<span>India</span> <span>Juliett</span> <span>Kilo</span> <span>Lima</span> '
+            . '<span>Mike</span> <span>November</span> <span>Oscar</span> <span>Papa</span> '
+            . '<span>Quebec</span> <span>Romeo</span> <span>Sierra</span> <span>Tango</span> '
+            . '<span>Uniform</span> <span>Victor</span> <span>Whiskey</span> <span>Xray</span> '
+            . '<span>Yankee</span> <span>Zulu</span>';
+        $plainWords = 'Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike '
+            . 'November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey Xray Yankee Zulu';
+
+        $html = '<table border="1" cellspacing="3" cellpadding="4">'
+            . '<tr><td align="left"><span>1L</span> ' . $spanWords . '</td></tr>'
+            . '<tr><td align="center"><span>1C</span> ' . $spanWords . '</td></tr>'
+            . '<tr><td align="right"><span>1R</span> ' . $spanWords . '</td></tr>'
+            . '<tr><td align="left"><span>2L</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> '
+            . 'column span. ' . $plainWords . '.</td></tr>'
+            . '<tr><td align="center"><span>2C</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> '
+            . 'column span. ' . $plainWords . '.</td></tr>'
+            . '<tr><td align="right"><span>2R</span> A1 ex<i>amp</i>le <a href="https://tcpdf.org">link</a> '
+            . 'column span. ' . $plainWords . '.</td></tr>'
+            . '<tr><td align="left"><small>3L small text</small> ' . $plainWords . '</td></tr>'
+            . '<tr><td align="center"><small>3C small text</small> ' . $plainWords . '</td></tr>'
+            . '<tr><td align="right"><small>3R small text</small> ' . $plainWords . '</td></tr>'
+            . '</table>';
+
+        $obj->addHTMLCell($html, 20, 10, 180, 0);
+
+        $afterPages = \count($page->getPages());
+
+        $this->assertSame($beforePages, $afterPages);
     }
 
     public function testAddHTMLCellStyledBlockSpansMultiplePages(): void
@@ -1766,6 +1903,145 @@ class HTMLTest extends TestUtil
             ['center'],
             ['right'],
         ];
+    }
+
+    public function testGetHTMLCellContinuesInlineEmAfterMultiLineWrappedTextOnSameLine(): void
+    {
+        // Regression: a long plain-text fragment that internally wraps to a new
+        // visual line must not push the immediately following inline content
+        // (here "(<em>Sierra-Tango</em>)") onto a third line. The "(" already
+        // landed on the second line and "Sierra-Tango" must continue right
+        // after it, keeping the whole paragraph on two lines.
+        $obj = $this->getBBoxProbeTestObject();
+        $this->initFontAndPage($obj);
+
+        $html = '<p>Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo. '
+            . 'Lima Mike November Oscar Papa Quebec Romeo (<em>Sierra-Tango</em>) Uniform Victor '
+            . 'Whiskey (<em>Xray-Yankee</em>). Zulu.</p>';
+
+        $obj->exposeResetBBoxTrace();
+        $obj->getHTMLCell($html, 20, 100, 180, 0);
+
+        $trace = $obj->exposeGetBBoxTrace();
+        $this->assertNotSame([], $trace);
+
+        $sierraIdx = null;
+        $xrayIdx = null;
+        foreach ($trace as $idx => $entry) {
+            $txt = (string) $entry['txt'];
+            if (($sierraIdx === null) && \str_contains($txt, 'Sierra-Tango')) {
+                $sierraIdx = $idx;
+            }
+
+            if (($xrayIdx === null) && \str_contains($txt, 'Xray-Yankee')) {
+                $xrayIdx = $idx;
+            }
+        }
+
+        $this->assertNotNull($sierraIdx, 'Sierra-Tango fragment must be present in the trace');
+        $this->assertNotNull($xrayIdx, 'Xray-Yankee fragment must be present in the trace');
+        $this->assertGreaterThan(0, (int) $sierraIdx);
+
+        $prevEntry = $trace[(int) $sierraIdx - 1];
+        $sierraEntry = $trace[(int) $sierraIdx];
+        $xrayEntry = $trace[(int) $xrayIdx];
+
+        // Em fragment must continue on the same visual line as the "(" prefix
+        // produced by the previous wrapped fragment, not on a new line below.
+        $this->assertEqualsWithDelta(
+            (float) $prevEntry['bbox_y'],
+            (float) $sierraEntry['bbox_y'],
+            0.01,
+            'Em fragment "Sierra-Tango" must stay on the same line as the preceding "(" prefix.',
+        );
+        $this->assertGreaterThanOrEqual(
+            (float) $prevEntry['bbox_end_x'] - 0.01,
+            (float) $sierraEntry['bbox_x'],
+            'Em fragment "Sierra-Tango" must continue right after the preceding "(" prefix.',
+        );
+
+        // The whole paragraph should fit on two visual lines: every fragment's
+        // bbox_y reports the y of the last visual line touched by getTextCell,
+        // so for a 2-line paragraph all five fragments share the same y.
+        /** @var array<string, bool> $linekeys */
+        $linekeys = [];
+        foreach ($trace as $entry) {
+            $linekeys[\sprintf('%.3f', (float) $entry['bbox_y'])] = true;
+        }
+
+        $this->assertCount(
+            1,
+            $linekeys,
+            'Paragraph must render on exactly two lines: the em-wrapped continuation must not start a third line.',
+        );
+
+        // Both em fragments and their surrounding parentheses share the second line.
+        $this->assertEqualsWithDelta(
+            (float) $sierraEntry['bbox_y'],
+            (float) $xrayEntry['bbox_y'],
+            0.01,
+            'Both em fragments must share the second line.',
+        );
+    }
+
+    public function testGetHTMLCellContinuesPlainTextAfterEmFollowedByLongMultiLineRun(): void
+    {
+        // Regression: when an inline <em> ends mid-line and the next plain-text
+        // fragment is long enough to internally wrap to multiple lines, its
+        // leading non-space chunk (here ")") must continue right after the
+        // <em> on the SAME line. The previous logic considered the line
+        // "deep" because the italic <em> bumped linebottom by a sub-millimeter
+        // font-metric drift, and force-wrapped the whole continuation
+        // fragment to a fresh line — pushing ")" to a new line by itself.
+        $obj = $this->getBBoxProbeTestObject();
+        $this->initFontAndPage($obj);
+
+        $html = '<p>This document demonstrates PDF encryption and permission controls using tc-lib-pdf. '
+            . 'The file is protected with a user password (<em>demo-user</em>) and an owner password '
+            . '(<em>demo-owner</em>). Encryption restricts unauthorized access while the owner password '
+            . 'grants full control.</p>';
+
+        $obj->exposeResetBBoxTrace();
+        $obj->getHTMLCell($html, 20, 100, 180, 0);
+
+        $trace = $obj->exposeGetBBoxTrace();
+        $this->assertNotSame([], $trace);
+
+        // Find the demo-owner em fragment and the immediately following plain
+        // continuation that starts with ")".
+        $ownerIdx = null;
+        foreach ($trace as $idx => $entry) {
+            if (\str_contains((string) $entry['txt'], 'demo-owner')) {
+                $ownerIdx = $idx;
+                break;
+            }
+        }
+
+        $this->assertNotNull($ownerIdx, 'demo-owner fragment must be present in the trace.');
+        $this->assertArrayHasKey(
+            (int) $ownerIdx + 1,
+            $trace,
+            'Continuation fragment after demo-owner must be present.',
+        );
+
+        $ownerEntry = $trace[(int) $ownerIdx];
+        $contEntry = $trace[(int) $ownerIdx + 1];
+
+        // The continuation MUST start with the closing parenthesis "glued" to
+        // demo-owner: it must be passed to getTextCell with the same in_y as
+        // demo-owner (i.e., on the same line cursor) so that its leading ")"
+        // is rendered right after the em fragment, not on a fresh new line.
+        $this->assertStringStartsWith(
+            ')',
+            \ltrim((string) $contEntry['txt']),
+            'Continuation fragment must start with the closing parenthesis ").".',
+        );
+        $this->assertEqualsWithDelta(
+            (float) $ownerEntry['in_y'],
+            (float) $contEntry['in_y'],
+            0.01,
+            'Closing ")" after demo-owner must stay on the same line cursor as demo-owner.',
+        );
     }
 
     public function testParseHTMLTextWrapsLargeInlineFragmentBeforeItOverflowsRemainingWidth(): void
@@ -7791,6 +8067,47 @@ class HTMLTest extends TestUtil
         }
     }
 
+    public function testGetHTMLliBulletFallbackShapesAlignToFontBoxWithBaselineInput(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $page = $this->initFontAndPage($obj);
+
+        $this->setObjectProperty($obj, 'isunicode', false);
+        $this->setObjectProperty($obj, 'rtl', false);
+
+        /** @var \Com\Tecnick\Pdf\Font\Stack $fontstack */
+        $fontstack = $this->getObjectProperty($obj, 'font');
+        /** @var array<string, mixed> $font */
+        $font = $fontstack->getCurrentFont();
+        $ascent = \is_numeric($font['ascent'] ?? null) ? (float) $font['ascent'] : 0.0;
+        $pageHeightRaw = \is_numeric($page['height'] ?? null) ? (float) $page['height'] : 0.0;
+        $fontHeight = \is_numeric($font['height'] ?? null) ? (float) $font['height'] : 0.0;
+        $fontSizeRaw = \is_numeric($font['usize'] ?? null) ? (float) $font['usize'] : 0.0;
+
+        $baseline = $obj->toUnit($ascent);
+        $pageHeight = $obj->toPoints($pageHeightRaw);
+        $sizePt = $obj->toPoints($fontSizeRaw);
+
+        $discOut = $obj->exposeGetHTMLliBullet(1, 2, 0, $baseline, 'disc');
+        $this->assertMatchesRegularExpression('/\\n-?\\d+\\.\\d+\\s+(-?\\d+\\.\\d+)\\s+m\\n/', $discOut);
+        $this->assertSame(1, \preg_match('/\\n-?\\d+\\.\\d+\\s+(-?\\d+\\.\\d+)\\s+m\\n/', $discOut, $discMatch));
+        $this->assertEqualsWithDelta($pageHeight - ($fontHeight / 2), (float) $discMatch[1], 0.001);
+
+        $circleOut = $obj->exposeGetHTMLliBullet(1, 2, 0, $baseline, 'circle');
+        $this->assertSame(1, \preg_match('/\\n-?\\d+\\.\\d+\\s+(-?\\d+\\.\\d+)\\s+m\\n/', $circleOut, $circleMatch));
+        $this->assertEqualsWithDelta($pageHeight - ($fontHeight / 2), (float) $circleMatch[1], 0.001);
+
+        $squareOut = $obj->exposeGetHTMLliBullet(1, 2, 0, $baseline, 'square');
+        $squarePattern = '/\\n-?\\d+\\.\\d+\\s+(-?\\d+\\.\\d+)\\s+'
+            . '-?\\d+\\.\\d+\\s+-?\\d+\\.\\d+\\s+re\\n/';
+        $this->assertSame(
+            1,
+            \preg_match($squarePattern, $squareOut, $squareMatch),
+        );
+        $squareTop = ($fontHeight - ($sizePt / 2)) / 2;
+        $this->assertEqualsWithDelta($pageHeight - $squareTop, (float) $squareMatch[1], 0.001);
+    }
+
     public function testGetHTMLliBulletRendersSvgImageBullet(): void
     {
         $obj = $this->getInternalTestObject();
@@ -9081,6 +9398,24 @@ class HTMLTest extends TestUtil
         $this->assertGreaterThan(0, \strlen($result));
     }
 
+    public function testGetHTMLliBulletUsesGraphicFallbackForUnicodeByteFonts(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->initFontAndPage($obj); // Loads core Helvetica (byte font)
+        $this->setObjectProperty($obj, 'isunicode', true);
+
+        $disc = $obj->exposeGetHTMLliBullet(1, 1, 0, 0, 'disc');
+        $circle = $obj->exposeGetHTMLliBullet(1, 1, 0, 0, 'circle');
+        $square = $obj->exposeGetHTMLliBullet(1, 1, 0, 0, 'square');
+
+        $this->assertNotSame('', $disc);
+        $this->assertNotSame('', $circle);
+        $this->assertNotSame('', $square);
+        $this->assertStringNotContainsString('Tj', $disc);
+        $this->assertStringNotContainsString('Tj', $circle);
+        $this->assertStringNotContainsString('Tj', $square);
+    }
+
     #[DataProvider('htmlLiBulletNumericFormatProvider')]
     public function testGetHTMLliBulletNumericFormats(string $type, int $count, string $expectedFragment): void
     {
@@ -9574,6 +9909,36 @@ class HTMLTest extends TestUtil
             . '<img src="' . $src . '" width="4" height="4" />'
             . '<img src="' . $src . '" width="4" height="4" />'
             . '</div>';
+
+        $outCenter = $obj->getHTMLCell($htmlCenter, 0, 0, 40, 20);
+
+        $obj2 = $this->getTestObject();
+        $this->initFontAndPage($obj2);
+        $outLeft = $obj2->getHTMLCell($htmlLeft, 0, 0, 40, 20);
+
+        $this->assertNotSame('', $outCenter);
+        $this->assertNotSame('', $outLeft);
+        $this->assertNotSame($outLeft, $outCenter);
+    }
+
+    public function testGetHTMLCellCentersSingleInlineImageInsideTableCell(): void
+    {
+        $obj = $this->getTestObject();
+        $this->initFontAndPage($obj);
+
+        $img = \imagecreate(4, 4);
+        \imagecolorallocate($img, 0, 0, 0);
+        \ob_start();
+        \imagepng($img);
+        $raw = \ob_get_clean();
+        $src = 'data:image/png;base64,' . \base64_encode((string) $raw);
+
+        $htmlCenter = '<table border="1" cellspacing="0" cellpadding="4">'
+            . '<tr><td align="center"><img src="' . $src . '" width="8" height="8" /></td></tr>'
+            . '</table>';
+        $htmlLeft = '<table border="1" cellspacing="0" cellpadding="4">'
+            . '<tr><td align="left"><img src="' . $src . '" width="8" height="8" /></td></tr>'
+            . '</table>';
 
         $outCenter = $obj->getHTMLCell($htmlCenter, 0, 0, 40, 20);
 
@@ -11228,5 +11593,180 @@ class HTMLTest extends TestUtil
             'rtl-circle' => ['circle', false, true, 10.0, 5.0],
             'rtl-square' => ['square', false, true, 10.0, 5.0],
         ];
+    }
+
+    public function testSanitizeHTMLWithOptgroupProcessesClosingAndOpeningTags(): void
+    {
+        $obj = $this->getInternalTestObject();
+
+        $html = '<select name="x"><optgroup label="Group A">'
+            . '<option value="a1">Alpha 1</option>'
+            . '</optgroup><optgroup label="Group B">'
+            . '<option value="b1">Beta 1</option>'
+            . '</optgroup></select>';
+
+        $result = $obj->exposeSanitizeHTML($html);
+
+        // Options should be packed with group-label prefix.
+        $this->assertStringContainsString('opt=', $result);
+        $this->assertStringContainsString('Group A - Alpha 1', $result);
+        $this->assertStringContainsString('Group B - Beta 1', $result);
+    }
+
+    public function testGetHTMLDOMHandlesUnquotedAttributeValues(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->initFontAndPage($obj);
+
+        // Build DOM from HTML with an unquoted attribute value.
+        $dom = $obj->exposeGetHTMLDOM('<div data-count=42>text</div>');
+
+        // Find the div node and check the unquoted attribute was parsed.
+        $divNode = null;
+        foreach ($dom as $node) {
+            if (isset($node['value']) && $node['value'] === 'div') {
+                $divNode = $node;
+                break;
+            }
+        }
+        $this->assertNotNull($divNode);
+        $this->assertSame('42', $divNode['attribute']['data-count'] ?? null);
+    }
+
+    public function testIsValidCSSSelectorMatchingClassAndIdTokensContinueToNextToken(): void
+    {
+        $obj = $this->getTestObject();
+        $dom = [
+            0 => $this->makeHtmlNode(['value' => 'root']),
+            1 => $this->makeHtmlNode([
+                'value' => 'div',
+                'attribute' => ['id' => 'main', 'class' => 'hero card'],
+                'parent' => 0,
+                'tag' => true,
+                'opening' => true,
+            ]),
+        ];
+
+        // Selector with both class AND id suffix tokens — both must match and continue.
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 1, ' div.hero#main'));
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 1, ' div.card#main'));
+        // Class present but id wrong → false.
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 1, ' div.hero#other'));
+    }
+
+    public function testParseHTMLStyleDeclarationMapHandlesQuotesAndParens(): void
+    {
+        $obj = $this->getInternalTestObject();
+
+        // Quoted value with semicolons inside should not be split.
+        $style = "background-image: url('data:image/png;base64,abc'); color: red;";
+        $result = $obj->exposeParseHTMLStyleDeclarationMap($style);
+
+        $this->assertArrayHasKey('background-image', $result);
+        $this->assertArrayHasKey('color', $result);
+        $this->assertStringContainsString('url(', $result['background-image']);
+        $this->assertSame('red', $result['color']);
+    }
+
+    public function testParseHTMLStyleDeclarationMapWithDoubleQuotes(): void
+    {
+        $obj = $this->getInternalTestObject();
+
+        // Declaration with double-quoted content.
+        $style = 'content: "hello; world"; font-weight: bold';
+        $result = $obj->exposeParseHTMLStyleDeclarationMap($style);
+
+        $this->assertArrayHasKey('content', $result);
+        $this->assertArrayHasKey('font-weight', $result);
+        $this->assertStringContainsString('hello; world', $result['content']);
+    }
+
+    public function testParseHTMLStyleDeclarationMapSkipsDeclarationWithNoColon(): void
+    {
+        $obj = $this->getInternalTestObject();
+
+        // A declaration without a colon must be silently skipped.
+        $style = 'invalid-no-colon; color: blue';
+        $result = $obj->exposeParseHTMLStyleDeclarationMap($style);
+
+        $this->assertArrayNotHasKey('invalid-no-colon', $result);
+        $this->assertSame('blue', $result['color'] ?? '');
+    }
+
+    public function testParseHTMLStyleAttributesSkipsNodeWithNoStyleAttribute(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $dom = [
+            0 => $this->makeHtmlNode(['value' => 'root']),
+            1 => $this->makeHtmlNode(['value' => 'div']),
+        ];
+
+        // Should not throw or modify dom when no style attribute.
+        $obj->exposeParseHTMLStyleAttributesWithDom($dom, 1, 0);
+
+        $node = $dom[1] ?? [];
+        $this->assertEmpty($node['style'] ?? []);
+    }
+
+    public function testParseHTMLStyleAttributesSkipsNodeWithEmptyParsedStyles(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $dom = [
+            0 => $this->makeHtmlNode(['value' => 'root']),
+            1 => $this->makeHtmlNode(['value' => 'div', 'attribute' => ['style' => 'bad-declaration-only']]),
+        ];
+
+        // A style with no valid colon-delimited declarations must result in empty styles.
+        $obj->exposeParseHTMLStyleAttributesWithDom($dom, 1, 0);
+
+        $node = $dom[1] ?? [];
+        $this->assertEmpty($node['style'] ?? []);
+    }
+
+    public function testIsValidCSSSelectorNthChildNegativeFactorFormula(): void
+    {
+        $obj = $this->getTestObject();
+        $dom = [
+            0 => $this->makeHtmlNode(['value' => 'root']),
+            1 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+            2 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+            3 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+            4 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+        ];
+
+        // -n+3 selects first 3 elements (positions 1, 2, 3).
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(-n+3)'));
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 2, ' li:nth-child(-n+3)'));
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 3, ' li:nth-child(-n+3)'));
+        // 4th element is not selected by -n+3.
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 4, ' li:nth-child(-n+3)'));
+
+        // -2n+4 selects elements at positions 4, 2.
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 4, ' li:nth-child(-2n+4)'));
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 2, ' li:nth-child(-2n+4)'));
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(-2n+4)'));
+    }
+
+    public function testIsValidCSSSelectorPseudoClassWithExactPositionArg(): void
+    {
+        $obj = $this->getTestObject();
+        $dom = [
+            0 => $this->makeHtmlNode(['value' => 'root']),
+            1 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+            2 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+            3 => $this->makeHtmlNode(['value' => 'li', 'parent' => 0, 'tag' => true, 'opening' => true]),
+        ];
+
+        // :nth-child(0) is never true.
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(0)'));
+        // :nth-child(1) is the first child only.
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(1)'));
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 2, ' li:nth-child(1)'));
+        // :nth-child(+n) selects all.
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(+n)'));
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 3, ' li:nth-child(+n)'));
+        // :nth-child with zero factor: 0n+2 selects exactly position 2.
+        $this->assertTrue($obj->isValidCSSSelectorForTag($dom, 2, ' li:nth-child(0n+2)'));
+        $this->assertFalse($obj->isValidCSSSelectorForTag($dom, 1, ' li:nth-child(0n+2)'));
     }
 }

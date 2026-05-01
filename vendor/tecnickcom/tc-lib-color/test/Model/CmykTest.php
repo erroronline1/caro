@@ -178,7 +178,7 @@ class CmykTest extends TestUtil
         $res = $cmyk->toGrayArray();
         $this->bcAssertEqualsWithDelta(
             [
-                'gray' => 0.25,
+                'gray' => 0.46518510,
                 'alpha' => 0.85,
             ],
             $res
@@ -228,6 +228,22 @@ class CmykTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $res
+        );
+    }
+
+    public function testToLabArray(): void
+    {
+        $cmyk = $this->getTestObject();
+        $res = $cmyk->toLabArray();
+        $this->bcAssertEqualsWithDelta(
+            [
+                'lstar' => 52,
+                'astar' => 0,
+                'bstar' => -39,
+                'alpha' => 0.85,
+            ],
+            $res,
+            1.5
         );
     }
 

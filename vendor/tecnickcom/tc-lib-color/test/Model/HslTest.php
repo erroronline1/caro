@@ -175,7 +175,7 @@ class HslTest extends TestUtil
         $res = $hsl->toGrayArray();
         $this->bcAssertEqualsWithDelta(
             [
-                'gray' => 0.5,
+                'gray' => 0.46561520,
                 'alpha' => 0.85,
             ],
             $res
@@ -301,6 +301,22 @@ class HslTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $res
+        );
+    }
+
+    public function testToLabArray(): void
+    {
+        $hsl = $this->getTestObject();
+        $res = $hsl->toLabArray();
+        $this->bcAssertEqualsWithDelta(
+            [
+                'lstar' => 52,
+                'astar' => 0,
+                'bstar' => -39,
+                'alpha' => 0.85,
+            ],
+            $res,
+            1.5
         );
     }
 

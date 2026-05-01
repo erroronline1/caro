@@ -29,6 +29,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         'cellctx' => [
             'originx' => 0.0,
             'originy' => 0.0,
+            'lineoriginx' => 0.0,
             'maxwidth' => 0.0,
             'maxheight' => 0.0,
             'lineadvance' => 0.0,
@@ -615,5 +616,19 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $this->testhrc['dom'] = [$root];
 
         return $this->normalizeHTMLText($this->testhrc, $text, 0);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function exposeParseHTMLStyleDeclarationMap(string $style): array
+    {
+        return $this->parseHTMLStyleDeclarationMap($style);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleAttributesWithDom(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleAttributes($dom, $key, $parentkey);
     }
 }

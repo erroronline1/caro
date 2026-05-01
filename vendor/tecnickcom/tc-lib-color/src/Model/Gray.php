@@ -180,8 +180,8 @@ class Gray extends \Com\Tecnick\Color\Model
     public function toHslArray(): array
     {
         return [
-            'hue' => 0,
-            'saturation' => 0,
+            'hue' => 0.0,
+            'saturation' => 0.0,
             'lightness' => $this->cmp_gray,
             'alpha' => $this->cmp_alpha,
         ];
@@ -201,6 +201,17 @@ class Gray extends \Com\Tecnick\Color\Model
             'key' => $this->cmp_gray,
             'alpha' => $this->cmp_alpha,
         ];
+    }
+
+    /**
+     * Get an array with Lab color components
+     *
+     * @return array<string, float> with keys ('lstar', 'astar', 'bstar', 'alpha')
+     */
+    public function toLabArray(): array
+    {
+        $rgb = new \Com\Tecnick\Color\Model\Rgb($this->toRgbArray());
+        return $rgb->toLabArray();
     }
 
     /**
