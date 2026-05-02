@@ -1361,7 +1361,9 @@ class USER extends API {
 			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, __DIR__ . '/../media/UbuntuMono-R.ttf', $line);
 		}
 		if ($PIN) {
-			imagefttext($image, $font_size, 90, $dimensions[0] - 2 * $font_size, $dimensions[1], $pin_color, __DIR__ . '/../media/UbuntuMono-R.ttf', str_repeat('.', 25));
+			$scissor = imagecreatefrompng('../media/scissor.png');
+			imagecopyresampled($image, $scissor, $dimensions[0] - 2 * $font_size - 28, $dimensions[1] - 70, 0, 0, 50, 50, 448, 448);
+			imagefttext($image, $font_size, 90, $dimensions[0] - 2 * $font_size, $dimensions[1] - 60, $pin_color, __DIR__ . '/../media/UbuntuMono-R.ttf', str_repeat('.', 25));
 			imagefttext($image, $font_size, 90, $dimensions[0] - $font_size, $dimensions[1]-$margin['qr']['y'], $pin_color, __DIR__ . '/../media/UbuntuMono-R.ttf', $PIN);
 		}
 
