@@ -1242,73 +1242,131 @@ Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu n
 Unterstütze Formatierungsoptionen beinhalten:
 
 ```
-# Einfacher Text (h1 Überschrift)
-(ATX)
+# Markdown
+* [Textformatierung](#textformatierung-atx-h1-überschrift)
+* [Ersetzungen](#ersetzungen-setx-h1-überschrift)
+* [Links](#links-atx-h2-überschrift)
+* [Listen](#listen-setx-h2-überschrift)
+* [Tabellen](#mitangepassterid)
+* [Zitate, Code und Definitionen](#zitate-code-und-definitionen)
+* [Verschaltelung](#verschachtelung)
+
+# Textformatierung (ATX h1 Überschrift)
 
 Dies ist eine Markdown-Variante für einfache Textgestaltung.  
 Zeilen sollten mit zwei oder mehr Leerzeichen enden  
 um einen beabsichtigten Zeilenumbruch zu erzeugen
 und nicht einfach fortgeführt zu werden.
 
-Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
+Text kann *kursiv*, **fett mit Sternchen**, __und Unterstrichen__, ***kursiv und fett** und ~~durchgestrichen~~ dargestellt werden.  
+Durch das Hinzufügen von Formatierungszeichen an der richtigen Stelle kann eine Formatierung mitten*im*Wort oder __eine *Kombination* erreicht__ werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `Code mit einem \`-Zeichen`.  
-Außerdem ``Code mit ` maskiert durch umgebende doppelte Gravis'`` und ==markierter Text==  
-Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
-Individuelles Markdown für diese Engine um ^Ŝchrift zu vergrößern^^  
-[ ] Aufgabe  
-[x] erledigt
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~.  
+Tiefgestellt wie H~2~O und hochgestellt wie X^2^ und ==markierter Text== stehen zur Verfügung.  
+Ein individuelles Markdown für diese Engine kann ^^Schrift vergrößern^^  
 
-http://eine.url, nicht besonders gestaltet  
+Ersetzungen (SETX h1 Überschrift)
+======================
+
+Aufgabenlisten können erstellt werden  
+[ ] bei denen \[ ] und \[x]  
+[x] durch HTML Checkboxen ersetzt werden
+
+(c) (C) (r) (R) (tm) (TM) (p) (P) +- -> werden durch das jeweilige Symbol ersetzt  
+Außer die Zeichen sind maskiert: \(c) (C\) \(r\) \(R) (tm\) \(TM\) \(p) (P\) +\- \->
+
+## Links (ATX h2 Überschrift)
+Links werden ersetzt, sofern nicht im safeMode, es sei den es sind interne Verweise
+
+http://eine.url, nicht besonders gestaltet, nur ein erkanntes Protokoll  
 eine Telefonnummer: tel:012345678  
 [Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)  
+<http://eine.andere.url> mit Klammern  
+[URL-codierter Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello there'))  
+eine@email.adresse in mailto: umgewandelt und eine maskierte\@email.adresse  
+![ein Bild](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) sofern erreichbar
+
+### Interne Verweise (h3 Überschrift)
+
+[Dies ist ist ein Verweis mit einer Übereinstimmung irgendwo][referenzlink]  
+[und ein Versuch bei dem die Verknüpfung vergessen wurde][fehlenderreferenzlink]
+
+Dies ist eine einfache Fußnote[^1] und hier eine längere[^fussnote]. Fußnoten tauchen später am Ende auf.
+
+[^1]: Dies ist die erste Fußnote.
+[^fussnote]: Diese hat mehrere Zeilen und andere Elemente.
+    Durch Einrückung kann weiterer Inhalt eingefügt werden.  
+    Darunter auch
+    ~~~
+    Quelltext
+    Blöcke
+    ~~~
+    
+    > sowie
+    > Zitate
+    
+    | und | natürlich |
+    | --- | --- |
+    | auch | Tabellen |
+    
+        1. und Listen
+        2. mit einer zusätzlichen Einrückung
+
+[referenzlink]: http://valide.internet.adresse
+
+#### Weitere interne Navigation (h4 Überschrift)
+
+* [erste Überschrift](#textformatierung-atx-h1-überschrift)
+* [zweite Überschrift](#ersetzungen-setx-h1-überschrift)
+* [fünfte Überschrift](#mitangepassterid)
 
 --------
 
-## Listen (h2 Überschrift) {#miteigenerid}
+Listen (SETX h2 Überschrift)
 
 1. Geordnete Listeneinträge beginnen mit einer Zahl und einem Punkt
     * Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
     * Verschachtelte Listen
     * sind möglich
     * mit einer Einrückung von vier Leerzeichen
-        1. und Listenarten
+        1. Listenarten
         2. können kombiniert werden
+        1. und
+            2. können
+                3. bis
+                    4. zur
+                        5. Erschöpfung
+                            6. verschachtelt
+                                8. werden  
 2. geordneter Listeneintrag
 mit  
 mehreren Zeilen
+    1. die Nummern
+    1. geordneter Listen
+    2. spielen keine
+    3. Rolle
+        12. es sei denn die erste Zahl ist größer als 1
+        25. dann kommt zu zu einem Versatzwert
 
-### Verschachtelte Elemente in Listen
+123\. mit einem maskierten Punkt vermeidet eine Liste
 
-1. Listeneintrag mit
-    > Zitatblock
-2. Ein weiterer Listeneintrag mit einer
-    |Tabelle|Spalte 2|
-    |---|---|
-    |Z1S1|Z1S2|
-4. Listeneintrag mit
-    ~~~
-     Code mit
-    mehreren Zeilen
-    ~~~
-8. Listeneintrag mit  
-[x] erledigter Aufgabe  
-[ ] unerledigter Aufgabe
+Verschachtelte geordnete Listen rotieren durch arabische Nummern, große römische Nummern, kleine römische Nummern, große und kleine lateinische Buchstaben als Aufzählungszeichen.
 
-### Tabellen (h3 Überschrift)
+# Tabellen {#mitangepassterid}
 
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
-| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl `<br />` |
+| Zeilenumbrüche | sind es | **^^jedoch^^** | nicht<br />ohne den<br />HTML-Befehl `<br />` |
+| aber | eine | spaltenweise | Ausrichtung |
 
-- - -
-
-#### Zitatblöcke und Code (h4 Überschrift)
+# Zitate, Code und Definitionen
 
 > Zitatblock  
 > mit *mehreren*  
 > Zeilen
+> wie man sie aus eMail-Programmen kennt
+> beginnen mit einem >
 
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
@@ -1318,49 +1376,48 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-### Verschachtelte Elemente in Zitatblöcken
+`Code mit mehr als zwei Zeichen zwischen den Formatierungssymbolen`, ``sowie Code mit ` maskiert durch zwei Gravis'``,  
+`Code mit <Klammern>` und `Code mit einem maskierten \`-Zeichen` werden in der Zeile angezeigt.
 
-> * Listeneintrag innerhalb eines Zitatblocks 1
-> * Listeneintrag innerhalb eines Zitatblocks 2
->     * Unterliste
-> 
+Definitionslisten
+: beinhalten Zeilen, die 
+: mit einem : beginnen
+
+# Verschaltelung
+
+1. Listeneinträge können
+    > Zitatblöcke enthalten
+2. oder
+    |Tabellen|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. aber auch
+    ~~~
+    Code mit
+    mehreren Zeilen
+    ~~~
+8. und natürlich  
+[x] erledigte und  
+[ ] unerledigte Aufgaben
+
+- - -
+
 > ~~~
-> Code innerhalb eines Zitatblocks
+> Das gilt auch
 > ~~~
->> Zitatblock im Zitatblock
+> > für Zitatblöcke
 > 
+> 1. mit
+> 2. verschachtelten
+>     * Listen
+>
+> Definitionslisten
+> : mit mehreren
+> : Zeilen
+>
 > | In Zitatblöcken | verschachtelte | Tabellen |
 > | :---------- | :-----: | -----: |
 > | sind | auch | möglich |
-> | so wie | spaltenweise | Ausrichtung |
-> 
-> Definitionsliste
-> : erste Definition
-> : zweite Definition
-
-## Definitionen und Fußnoten
-Definitionsliste
-: erste Definition
-: zweite Definition
-
-Eine einfache Fußnote[^1], und eine längere Fußnote[^bignote]. Fußnoten tauchen automatisch am Ende auf.
-
-[^1]: Dies ist die erste Fußnote.
-[^bignote]: Hier ist eine andere mit meheren Zeilen und Code.
-    Rücke Absätze ein um sie in der Fußnote einzubinden.
-    `code`
-    Füge so viele Zeilen ein, wie du willst.
-
-## Sonstige Funktionen:  
-<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
-ein `code mit <Klammern>`  
-Betonung*im*Wort und __Betonung mit Unterstrich__  
-eine@email.addresse und maskierte\@email.addresse  
-![ein externes Bild](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) falls ladbar  
-123\. maskierter Punkt um eine Liste zu vermeiden  
-
-[erste Überschrift](#einfacher-text)  
-[zweite Überschrift](#miteigenerid)
 ```
 
 und werden in etwa folgendermaßen angezeigt:
