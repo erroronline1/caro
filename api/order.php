@@ -750,7 +750,7 @@ class ORDER extends API {
 	 * export a printable list from approved orders of stock items
 	 */
 	public function export(){
-		require_once('./_pdf.php');
+		require_once('./_tcpdfinterface.php');
 
 		$approved = $this->approved(true);
 

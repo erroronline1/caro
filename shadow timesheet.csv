@@ -404,7 +404,7 @@
 28.03.26,10,"database type maintenance, notification-api, ui"
 29.03.26,2,ui
 02.04.26,7,"sql-interface, stress-test, filehandler"
-03.04.26,12,"sql-interface, filehandler, ui, csvfilter"
+03.04.26,12,"sql-interface, filehandler, ui, csv-processor"
 04.04.26,6,"maintenance-api, document-api"
 06.04.26,6,markdown
 07.04.26,9,markdown
@@ -421,3 +421,6 @@
 24.04.26,8,"user-api, ui, consumables-api, pdf-library"
 25.05.26,5,"pdf-library, order-api"
 26.04.26,3,pdf-library
+30.04.26,6,"csv-processor, documentation, code maintenance"
+01.05.26,5,"user-api, documentation, pdf-library"
+02.05.26,7,pdf-library

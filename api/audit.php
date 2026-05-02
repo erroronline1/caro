@@ -12,7 +12,7 @@
 namespace CARO\API;
 
 // audit overview and export
-require_once('./_pdf.php');
+require_once('./_tcpdfinterface.php');
 require_once('./_calendarutility.php');
 
 class AUDIT extends API {
@@ -556,7 +556,7 @@ class AUDIT extends API {
 			}
 		}
 		$summary['content'][$this->_lang->GET('audit.audit.execute.summary', [], true)] = $audit['content']['summary'];
-		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary') . '*';
+		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary', [], true) . '*';
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
@@ -1948,7 +1948,7 @@ class AUDIT extends API {
 			$key = $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] ?? $issue;
 			$summary['content'][$key] = $review . "\n";
 		}
-		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary') . '*';
+		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary', [], true) . '*';
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
