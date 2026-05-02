@@ -34,7 +34,7 @@ class Markdown {
 	private $_compress = '/>\n+|\n *<|[^>]\n+<[^\/]/m';
 	private $_definition = '/(^.+?\n)((?:^: .+?\n)+)/m';
 		private $_emphasis = '/(?<!\\)((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/m'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_escape = '/\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_escape = '/\\(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=|_)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_footnote = '/\[\^(.+?)\](:.+?\n(?: {4}.*?\n)*)*/';
 	private $_headings = '/(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_horizontal_rule = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
@@ -125,7 +125,7 @@ class Markdown {
 		$this->_anchor_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))(?!\))/m'; // regular md links
 		$this->_code_inline = '/(?<!' . preg_quote('\\', '/') . ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1/';
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/m';
-		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=)/';
+		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=|_)/';
 		$this->_mailto = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
 		$this->_inlineEvents = '/on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|(\'|")javascript:.+?(?<!' . preg_quote('\\', '/') . ')\3/mi';
 		$this->_larger = '/(?<!' . preg_quote('\\', '/') . ')\^{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{2}/';
