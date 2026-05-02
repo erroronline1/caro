@@ -29,9 +29,14 @@ Things are still in motion. Images may be outdated.
 
 ## to do
 * review openspout ods cell formatting
-* further implementation of tc-lib-pdf, refactor _pdf.php as soon as html is available!
-    * vendor\tecnickcom\tc-lib-pdf\examples\019_example_page_regions.php
-* update documentation images
+* further implementation of tc-lib-pdf, set up tcpdfinterface.php
+    * set page dimensions
+    * review default css
+    * image size handling
+    * documentsPDF
+    * qrcodePDF
+    * recordsPDF
+    * tablePDF
 
 ## Content
 * [Aims](#aims)
@@ -6585,7 +6590,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf)
     * creates PDF-files on the server side, successor of [TCPDF](https://github.com/tecnickcom/tcpdf)
     * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v8.7.1
+    * v8.11.3
     * \> 1.8k stars
     * \> 200 forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
@@ -6646,7 +6651,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v2.1.0
+    * v2.1.1
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
