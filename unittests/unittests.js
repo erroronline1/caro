@@ -13,214 +13,310 @@ import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 
 const markdown = {
 	en: `
-# Plain text (h1 header)
-(ATX)
+# Markdown
+* [Text formatting](#text-formatting-atx-h1-header)
+* [Substitutions](#substitutions-setx-h1-header)
+* [Links](#links-atx-h2-header)
+* [Lists](#lists-setx-h2-header)
+* [Tables](#withcustomid)
+* [Blockquotes, code and definition lists](#blockquotes-code-and-definition-lists)
+* [Nesting](#nesting)
 
-This is a markdown flavour for basic text styling.  
+# Text formatting (ATX h1 header)
+
+This is a flavored markdown processor for basic text styling.  
 Lines should end with two or more spaces  
 to have an intentional linebreak
 and not just continuing.
 
-Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
+Text can be *italic*, **bold with asterisks** and __underscores__, ***italic and bold***, ~~striked through~~.  
+By adding decorators in the right place you achieve mid*word*emphasis and *also __mixed__ up* emphasis.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.  
-also \`\`code with \` escaped by double backticks\`\` and ==marked text==  
-Subscript like H~2~O and superscript like X^2^  
-Custom markdown for this engine for making ^^font bigger^^ 
-[ ] task  
-[x] accomplished
+**bold \* asterisk** or ~~striked \~~ through~~.  
+Subscript like H~2~O, superscript like X^2^ and ==marked text== are available.  
+A custom markdown for this processor can make ^^font larger^^
 
-http://some.url, not particularly styled  
-a phone number: tel:012345678  
-[Styled link to markdown information](https://www.markdownguide.org)
-
-Plain text (h1 header)
+Substitutions (SETX h1 header)
 ======================
-(SETX)
+
+Task lists can be created a well  
+[ ] where \[ ] and \[x]  
+[x] are converted to html checkboxes
+
+(c) (C) (r) (R) (tm) (TM) (p) (P) +- -> will be replaced by their symbol  
+unless escaped: \(c) (C\) \(r\) \(R) (tm\) \(TM\) \(p) (P\) +\- \->
+
+## Links (ATX h2 header)
+Links will be replaced if not in safeMode, unless they are internal references
+
+http://some.url, not particularly styled, just a detected protocol  
+a phone number: tel:012345678  
+[Styled link to markdown information](https://www.markdownguide.org)  
+<http://some.other.url> with brackets  
+[urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
+some@mail.address converted to mailto: and an escaped\@mail.address  
+![an image](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) if loadable  
+
+### Internal references (h3 header)
+
+[this is a reference link with a match somwhere][referencelink]
+[and an attempt where the actual reference has been forgotten][noreferencelink]
+
+Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
+
+[^1]: This is the first footnote.
+[^bignote]: Here's one with multiple lines and other elements.
+    Indent the content to include it in the current footnote.  
+    Add as many lines as you like.
+    ~~~
+    code blocks
+    are supported
+    ~~~
+    
+    > as well as
+    >> blockquotes
+    >
+    
+    | and | of |
+    | --- | ----- |
+    | course | tables|
+    
+        1. and lists
+        2. if additionally indented
+
+[referencelink]: http://valid.reference.match
+
+#### Other internal navigation (h4 header)
+[top header](#text-formatting-atx-h1-header)  
+[second header](#substitutions-setx-h1-header)  
+[fifth header](#withcustomid)  
 
 --------
 
-## Lists (h2 header) {#withcustomid}
+Lists (SETX h2 header)
+----
 
 1. Ordered list items start with a number and a period
-	* Unordered list items start with asterisk or dash
+    * Unordered list items start with asterisk or dash
     * Sublist nesting
     * is possible
     * by indentating with four spaces
         1. and list types
         2. are interchangeable
+        1. and
+            2. can
+                3. be
+                    4. nested
+                        5. until
+                            6. you're
+                                8. tired
 2. Ordered list item
 with  
 multiple lines
-    1. the number
+    1. the numbers
     1. of ordered lists
-    2. actually doesn't
+    2. actually don't
     3. matter at all
+        12. unless the start number is other than 1
+        25. then you'll have an offset
 
-### Nested items in lists
+123\. with an escaped period avoids a list
 
-1. List item with
-    > Blockquote as item
-2. Next list item with
-    |Table|Column2|
-    |---|---|
-    |R1C1|R1C2|
-4. List item with
-    ~~~
-     code with
-	multiple line
-    ~~~
-8. List item with  
-[x] accomplished task  
-[ ] unaccomplished task
+Nested ordered lists cycle through arabic numerals, roman numerals uppercase, roman numerals lowercase, latin alphabet uppercase and latin alphabet lowercase as numeration. 
 
-## Tables (h3 header)
+# Tables {#withcustomid}
 
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
-| --- | --- | --- | --- |
+| --- | ---: | :---: | :--- |
 | *emphasis* | **is** | ***possible*** | \`too\` |
-| linebreaks | are | not | though<br />without HTML \`<br />\` |
+| linebreaks | are | **^^not^^** | though without<br /> HTML \`<br />\` |
+| and | aligning | text | columnwise |
 
-- - -
-
-#### Blockquotes and code (h4 header)
+# Blockquotes, code and definition lists
 
 > Blockquote  
-> with *multiple*  
-> lines
+> with *multiple*
+> lines  
+> as seen in many email programs  
+> start with a >
 
-    preformatted text/code must
+    preformatted text/code can
     start with 4 spaces <code>
 
 ~~~
 or being surrounded by
-three backticks or tilde-signs
+three \` or ~
 ~~~
 
-#### Nested items in blockquotes
+Inline \`code with two ore more characters between the symbols\`, also \`\`code with \` escaped by double backticks\`\`  
+and some \`code with <brackets>\` and \`code with an escaped \\\`-character\` render inline.
 
-> * List within blockquote 1
-> * List within blockquote 2
->     * Nested list
-> 
+Definition list containing
+: definition lines that
+: start with a :
+
+# Nesting
+
+1. List items can contain
+    > Blockquotes
+2. or 
+    |Tables|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. also
+    ~~~
+    code with
+    multiple lines
+    ~~~
+8. and  
+[x] accomplished and  
+[ ] unaccomplished tasks
+
+- - -
+
 > ~~~
-> Code within blockquote
+> Same goes for
 > ~~~
->> Blockquote within blockquote
+> > blockquotes
+>
+> 1. with
+> 2. nested
+>     * lists
 > 
+> definition lists
+> : with multiple
+> : lines
+>
 > | Tables nested | within | blockquotes |
 > | :---------- | :-----: | ---: |
 > | are | possible | as well |
-> | like | aligning | colums |
-> 
-> definition list
-> : first definition
-> : second definition
-
-## Definitions and footnotes
-definition list
-: first definition
-: second definition
-
-Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
-
-[^1]: This is the first footnote.
-[^bignote]: Here's one with multiple paragraphs and code.
-    Indent paragraphs to include them in the footnote.
-    \`code\`
-    Add as many paragraphs as you like.
-
-## Other features:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
-some \`code with <brackets>\`  
-mid*word*emphasis and __underscore emphasis__  
-some@mail.address and escaped\\@mail.address  
-![an image](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) if loadable  
-123\\. escaped period avoiding a list
-
-[top header](#plain-text)  
-[second header](#plain-text-1)  
-[third header](#withcustomid)  
-
-### Safety related content that should pose lesser thread with safeMode
-
-<script>alert('script injection')</script>  
-<a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
-<a href="javascript:alert('click event')">href with click event</a>  
-[mdscript js href](javascript:alert('js href'))  
-<div onclick="alert('you clicked!')">clickable div</div>
 `,
 	de: `
-# Einfacher Text (h1 Überschrift)
-(ATX)
+# Markdown
+* [Textformatierung](#textformatierung-atx-h1-überschrift)
+* [Ersetzungen](#ersetzungen-setx-h1-überschrift)
+* [Links](#links-atx-h2-überschrift)
+* [Listen](#listen-setx-h2-überschrift)
+* [Tabellen](#mitangepassterid)
+* [Zitate, Code und Definitionen](#zitate-code-und-definitionen)
+* [Verschaltelung](#verschachtelung)
+
+# Textformatierung (ATX h1 Überschrift)
 
 Dies ist eine Markdown-Variante für einfache Textgestaltung.  
 Zeilen sollten mit zwei oder mehr Leerzeichen enden  
 um einen beabsichtigten Zeilenumbruch zu erzeugen
 und nicht einfach fortgeführt zu werden.
 
-Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
+Text kann *kursiv*, **fett mit Sternchen**, __und Unterstrichen__, ***kursiv und fett** und ~~durchgestrichen~~ dargestellt werden.  
+Durch das Hinzufügen von Formatierungszeichen an der richtigen Stelle kann eine Formatierung mitten*im*Wort oder __eine *Kombination* erreicht__ werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.  
-Außerdem \`\`Code mit \` maskiert durch umgebende doppelte Gravis'\`\` und ==markierter Text==  
-Tiefgestellt wie H~2~O und hochgestellt wie X^2^  
-Individuelles Markdown für diese Engine um ^^Schrift zu vergrößern^^  
-[ ] Aufgabe  
-[x] erledigt
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~.  
+Tiefgestellt wie H~2~O und hochgestellt wie X^2^ und ==markierter Text== stehen zur Verfügung.  
+Ein individuelles Markdown für diese Engine kann ^^Schrift vergrößern^^  
 
-http://eine.url, nicht besonders gestaltet  
+Ersetzungen (SETX h1 Überschrift)
+======================
+
+Aufgabenlisten können erstellt werden  
+[ ] bei denen \[ ] und \[x]  
+[x] durch HTML Checkboxen ersetzt werden
+
+(c) (C) (r) (R) (tm) (TM) (p) (P) +- -> werden durch das jeweilige Symbol ersetzt  
+Außer die Zeichen sind maskiert: \(c) (C\) \(r\) \(R) (tm\) \(TM\) \(p) (P\) +\- \->
+
+## Links (ATX h2 Überschrift)
+Links werden ersetzt, sofern nicht im safeMode, es sei den es sind interne Verweise
+
+http://eine.url, nicht besonders gestaltet, nur ein erkanntes Protokoll  
 eine Telefonnummer: tel:012345678  
-[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)
+[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)  
+<http://eine.andere.url> mit Klammern  
+[URL-codierter Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello there'))  
+eine@email.adresse in mailto: umgewandelt und eine maskierte\@email.adresse  
+![ein Bild](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) sofern erreichbar
+
+### Interne Verweise (h3 Überschrift)
+
+[Dies ist ist ein Verweis mit einer Übereinstimmung irgendwo][referenzlink]  
+[und ein Versuch bei dem die Verknüpfung vergessen wurde][fehlenderreferenzlink]
+
+Dies ist eine einfache Fußnote[^1] und hier eine längere[^fussnote]. Fußnoten tauchen später am Ende auf.
+
+[^1]: Dies ist die erste Fußnote.
+[^fussnote]: Diese hat mehrere Zeilen und andere Elemente.
+    Durch Einrückung kann weiterer Inhalt eingefügt werden.  
+    Darunter auch
+    ~~~
+    Quelltext
+    Blöcke
+    ~~~
+    
+    > sowie
+    > Zitate
+    
+    | und | natürlich |
+    | --- | --- |
+    | auch | Tabellen |
+    
+        1. und Listen
+        2. mit einer zusätzlichen Einrückung
+
+[referenzlink]: http://valide.internet.adresse
+
+#### Weitere interne Navigation (h4 Überschrift)
+
+* [erste Überschrift](#textformatierung-atx-h1-überschrift)
+* [zweite Überschrift](#ersetzungen-setx-h1-überschrift)
+* [fünfte Überschrift](#mitangepassterid)
 
 --------
 
-## Listen (h2 Überschrift) {#miteigenerid}
+Listen (SETX h2 Überschrift)
 
 1. Geordnete Listeneinträge beginnen mit einer Zahl und einem Punkt
     * Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
     * Verschachtelte Listen
     * sind möglich
     * mit einer Einrückung von vier Leerzeichen
-        1. und Listenarten
+        1. Listenarten
         2. können kombiniert werden
+        1. und
+            2. können
+                3. bis
+                    4. zur
+                        5. Erschöpfung
+                            6. verschachtelt
+                                8. werden  
 2. geordneter Listeneintrag
 mit  
 mehreren Zeilen
+    1. die Nummern
+    1. geordneter Listen
+    2. spielen keine
+    3. Rolle
+        12. es sei denn die erste Zahl ist größer als 1
+        25. dann kommt zu zu einem Versatzwert
 
-### Verschachtelte Elemente in Listen
+123\. mit einem maskierten Punkt vermeidet eine Liste
 
-1. Listeneintrag mit
-    > Zitatblock
-2. Ein weiterer Listeneintrag mit einer
-    |Tabelle|Spalte 2|
-    |---|---|
-    |Z1S1|Z1S2|
-4. Listeneintrag mit
-    ~~~
-     Code mit
-    mehreren Zeilen
-    ~~~
-8. Listeneintrag mit  
-[x] erledigter Aufgabe  
-[ ] unerledigter Aufgabe
+Verschachtelte geordnete Listen rotieren durch arabische Nummern, große römische Nummern, kleine römische Nummern, große und kleine lateinische Buchstaben als Aufzählungszeichen.
 
-
-***
-
-### Tabellen (h3 Überschrift)
+# Tabellen {#mitangepassterid}
 
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
-| Zeilenumbrüche | sind es | jedoch | nicht<br />ohne den<br />HTML-Befehl \`<br />\` |
+| Zeilenumbrüche | sind es | **^^jedoch^^** | nicht<br />ohne den<br />HTML-Befehl \`<br />\` |
+| aber | eine | spaltenweise | Ausrichtung |
 
-- - -
-
-#### Zitatblöcke und Code (h4 Überschrift)
+# Zitate, Code und Definitionen
 
 > Zitatblock  
 > mit *mehreren*  
 > Zeilen
+> wie man sie aus eMail-Programmen kennt
+> beginnen mit einem >
 
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
@@ -230,49 +326,48 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-### Verschachtelte Elemente in Zitatblöcken
+\`Code mit mehr als zwei Zeichen zwischen den Formatierungssymbolen\`, \`\`sowie Code mit \` maskiert durch zwei Gravis'\`\`,  
+\`Code mit <Klammern>\` und \`Code mit einem maskierten \\\`-Zeichen\` werden in der Zeile angezeigt.
 
-> * Listeneintrag innerhalb eines Zitatblocks 1
-> * Listeneintrag innerhalb eines Zitatblocks 2
->     * Unterliste
-> 
+Definitionslisten
+: beinhalten Zeilen, die 
+: mit einem : beginnen
+
+# Verschaltelung
+
+1. Listeneinträge können
+    > Zitatblöcke enthalten
+2. oder
+    |Tabellen|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. aber auch
+    ~~~
+    Code mit
+    mehreren Zeilen
+    ~~~
+8. und natürlich  
+[x] erledigte und  
+[ ] unerledigte Aufgaben
+
+- - -
+
 > ~~~
-> Code innerhalb eines Zitatblocks
+> Das gilt auch
 > ~~~
->> Zitatblock im Zitatblock
+> > für Zitatblöcke
 > 
+> 1. mit
+> 2. verschachtelten
+>     * Listen
+>
+> Definitionslisten
+> : mit mehreren
+> : Zeilen
+>
 > | In Zitatblöcken | verschachtelte | Tabellen |
 > | :---------- | :-----: | -----: |
 > | sind | auch | möglich |
-> | so wie | spaltenweise | Ausrichtung |
-> 
-> Definitionsliste
-> : erste Definition
-> : zweite Definition
-
-## Definitionen und Fußnoten
-Definitionsliste
-: erste Definition
-: zweite Definition
-
-Eine einfache Fußnote[^1], und eine längere Fußnote[^bignote]. Fußnoten tauchen automatisch am Ende auf.
-
-[^1]: Dies ist die erste Fußnote.
-[^bignote]: Hier ist eine andere mit meheren Zeilen und Code.
-    Rücke Absätze ein um sie in der Fußnote einzubinden.
-    \`code\`
-    Füge so viele Zeilen ein, wie du willst.
-
-## Sonstige Funktionen:  
-<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
-ein \`code mit <Klammern>\`  
-Betonung*im*Wort und __Betonung mit Unterstrich__  
-eine@email.addresse und maskierte\\@email.addresse  
-![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
-123\\. maskierter Punkt um eine Liste zu vermeiden
-
-[erste Überschrift](#einfacher-text)  
-[zweite Überschrift](#miteigenerid)
 `,
 };
 
@@ -2127,22 +2222,22 @@ export async function screenshot(lang = null, distinct = null) {
 		const targets = [
 			/* 12 */ { en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
 			/* 13 */ { en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
-			/* 14 */ { en: "api.audit('get', 'audit', 12)", de: "api.audit('get', 'audit', 11)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
-			/* 15 */ { en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
+			/* 14 */ { en: "api.audit('get', 'audit', 4)", de: "api.audit('get', 'audit', 2)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
+			/* 15 */ { en: "api.audit('get', 'audittemplate', 4)", de: "api.audit('get', 'audittemplate', 2)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
 			/* 16 */ { en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
 			/* 17 */ { en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
 			/* 18 */ { en: "api.calendar('get', 'tasks')", de: "", screenshot: `:screenshot --fullpage --filename "tasks ${lang}.png"` },
-			/* 19 */ { en: "api.document('get', 'document_editor', 3168)", de: "api.document('get', 'document_editor', 127)", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
+			/* 19 */ { en: "api.document('get', 'document_editor', 'Basic data')", de: "api.document('get', 'document_editor', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
 			/* 20 */ { en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
 			/* 21 */ { en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
 			/* 22 */ { en: "api.record('get', 'document', 'Basic data')", de: "api.record('get', 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
 			/* 23 */ { en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
-			/* 24 */ { en: "api.texttemplate('get', 'text', 40)", de: "api.texttemplate('get', 'text', 38)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
+			/* 24 */ { en: "api.texttemplate('get', 'text', 39)", de: "api.texttemplate('get', 'text', 37)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
 			/* 25 */ { en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
 			/* 26 */ { en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
 			/* 27 */ {
-				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO #t548po')",
-				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese #t548y0')",
+				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO #tebvz0')",
+				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc')",
 				screenshot: `:screenshot --fullpage --filename "record screen ${lang}.png"`,
 			}, // customize identifier
 		];
@@ -2231,8 +2326,7 @@ export async function screenshot(lang = null, distinct = null) {
 				en: async function () {
 					api.calendar("get", "appointment");
 					await _.sleep(2000);
-					document.getElementsByName(api._lang.GET("calendar.appointment.date"))[0].value = "2025-07-27";
-					document.getElementsByName(api._lang.GET("calendar.appointment.time"))[0].value = "10:00";
+					document.getElementsByName(api._lang.GET("calendar.appointment.datetime"))[0].value = "2025-07-27T10:00";
 					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Cast for orthosis";
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Remember bringing shoes";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
@@ -2243,8 +2337,7 @@ export async function screenshot(lang = null, distinct = null) {
 				de: async function () {
 					api.calendar("get", "appointment");
 					await _.sleep(2000);
-					document.getElementsByName(api._lang.GET("calendar.appointment.date"))[0].value = "2025-07-27";
-					document.getElementsByName(api._lang.GET("calendar.appointment.time"))[0].value = "10:00";
+					document.getElementsByName(api._lang.GET("calendar.appointment.datetime"))[0].value = "2025-07-27T10:00";
 					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Gipsabdruck für Orthese";
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Bringen Sie Schuhe mit";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
@@ -2255,24 +2348,24 @@ export async function screenshot(lang = null, distinct = null) {
 			},
 			/* 32 */ {
 				en: async function () {
-					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO #t548po"); // customize identifier
+					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #t548y0"); // customize identifier
+					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 			},
 			/* 33 */ {
 				en: async function () {
-					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO #t548po"); // customize identifier
+					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #t548y0"); // customize identifier
+					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
