@@ -289,7 +289,7 @@
 				},
 				{
 					"apply": "filter_by_comparison_file",
-					"comment": "Ausschluss falls in den letzten 6 Monaten bereits ein Kontakt stattfand (Anlage)",
+					"comment": "Ausschluss falls in den letzten 7 Monaten bereits ein Kontakt stattfand (Anlage)",
 					"keep": false,
 					"filesetting": {
 						"source": "SELF",
@@ -299,12 +299,12 @@
 					"filter": [
 						{
 							"apply": "filter_by_monthdiff",
-							"comment": "Vorgänge in den letzten 6 Monaten angelegt?",
+							"comment": "Vorgänge in den letzten7 Monaten angelegt?",
 							"keep": true,
 							"date": {
 								"column": "ANLAGEDATUM",
 								"format": "d.m.Y",
-								"threshold": 6,
+								"threshold": 7,
 								"bias": "<"
 							}
 						}
@@ -317,7 +317,7 @@
 				},
 				{
 					"apply": "filter_by_comparison_file",
-					"comment": "Ausschluss falls in den letzten 6 Monaten bereits ein Kontakt stattfand (Lieferung)",
+					"comment": "Ausschluss falls in den letzten 7 Monaten bereits ein Kontakt stattfand (Lieferung)",
 					"keep": false,
 					"filesetting": {
 						"source": "SELF",
@@ -327,12 +327,12 @@
 					"filter": [
 						{
 							"apply": "filter_by_monthdiff",
-							"comment": "Vorgänge in den letzten 6 Monaten geliefert?",
+							"comment": "Vorgänge in den letzten 7 Monaten geliefert?",
 							"keep": true,
 							"date": {
 								"column": "GELIEFERT_DATUM",
 								"format": "d.m.Y",
-								"threshold": 6,
+								"threshold": 7,
 								"bias": "<"
 							}
 						}
