@@ -47,7 +47,6 @@ class CALENDAR extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (count((array_keys((array) $this->_payload)))){
-					require_once('./_pdf.php');
 					$downloadfiles = [];
 					$PDF = new PDF(CONFIG['pdf']['appointment']);
 

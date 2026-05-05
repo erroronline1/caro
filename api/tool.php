@@ -509,6 +509,7 @@ class TOOL extends API {
 
 		$downloadfiles = [];
 		require_once('./_pdf.php');
+		//require_once('./_tcpdfinterface.php');
 		$PDF = new PDF(CONFIG['label'][$code_label ? : 'sheet']);
 		$content = [
 			'title' => $this->_lang->GET('record.create_identifier', [], true),

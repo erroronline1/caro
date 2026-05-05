@@ -12,6 +12,7 @@
 namespace CARO\API;
 
 // add and edit document components and documents
+//require_once('./_tcpdfinterface.php');
 require_once('./_pdf.php');
 
 class DOCUMENT extends API {
