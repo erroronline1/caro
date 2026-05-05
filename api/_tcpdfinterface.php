@@ -199,7 +199,7 @@ class PDF{
 	 * final operation to write file and return the saving path 
 	 */
 	private function return(){
-		$this->_pdf->pageNumeration();
+		if ($this->_pageSetup['footer']) $this->_pdf->pageNumeration();
 
 		$_filehandler = new FILEHANDLER();
 		$this->_pdf->savePDF(__DIR__.'/' .$_filehandler->directory('tmp'), $this->_pdf->getOutPDFString());
@@ -410,15 +410,17 @@ class PDF{
 		return $this->return();
 	}
 
+	/**
+	 * create a pdf for a label sheet with qr code and plain text  
+	 * or label for label printer as selected or other available type as per config.ini  
+	 * or an appointment handout  
+	 * $fileContent['content'] is an array of [qrcode content, written text beside]  
+	 * @param array $fileContent
+	 */
 	public function qrcodePDF($fileContent){
-		// create a pdf for a label sheet with qr code and plain text
-		// or label for label printer as selected or other available type as per config.ini
-		// or an appointment handout
-		// $fileContent['content'] is an array of [qrcode content, written text beside]
 		$this->init($fileContent);
-		//var_dump($this->_pdf->_pageSetup, $fileContent);
 
-		// set cell padding
+		// override default cell padding
 		$this->_pdf->setDefaultCellPadding(1, 1, 1, 1);
 
 		$page = $this->_pdf->page->getPage();
@@ -426,7 +428,7 @@ class PDF{
 		$columnwidth = intval(($page['width'] - ($this->_pageSetup['marginleft'] + $this->_pageSetup['marginright'])) / $this->_pageSetup['columns']);
 		$rowheight = intval(($page['height'] - ($this->_pageSetup['margintop'] + $this->_pageSetup['marginbottom'])) / $this->_pageSetup['rows']);
 
-		$codesize = intval(min($columnwidth, $rowheight, $this->_pageSetup['codesizelimit'] ? : $rowheight) *.9);
+		$codesize = intval(min($columnwidth, $rowheight, $this->_pageSetup['codesizelimit'] ? : $rowheight * .7));
 		for ($row = 0; $row < $this->_pageSetup['rows']; $row++){
 			for ($column = 0; $column < $this->_pageSetup['columns']; $column++){
 				$this->_pdf->page->addContent($this->_pdf->getBarcode(
@@ -446,13 +448,18 @@ class PDF{
 						'fillColor' => 'black',
 					]
 				));
-				$this->_pdf->addHTMLCell(
-					html: $fileContent['content'][1],
+				$footerfont = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 8); // font size
+				$this->_pdf->page->addContent($footerfont['out']);
+				$text = $this->_pdf->getTextCell(
+					txt: $fileContent['content'][1],
 					posx: $column * $columnwidth + $codesize + $this->_pageSetup['marginleft'] + $this->_pageSetup['codepadding'],
 					posy: $row * $rowheight + $this->_pageSetup['margintop'],
 					width: $columnwidth - $codesize - $this->_pageSetup['codepadding'],
-					height: $rowheight
+					height: $rowheight,
+					valign: 'T',
+					halign: 'J'
 				);
+				$this->_pdf->page->addContent($text);
 			}
 		}
 
@@ -683,8 +690,9 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// create a page with defaultPageContent to determine the top and bottom content boundaries after applying defaultPageContent()
 		$pageSetup = [
 			'orientation' => $this->_pageSetup['orientation'],
-			'width' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][0] : null,
-			'height' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][1] : null
+			'pwidth' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][0] : null,
+			'pheight' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][1] : null,
+			'format' => !is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'] : null
 		];
 		$page = $this->addPage($pageSetup);
 		$this->page->pop();
@@ -731,8 +739,8 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			'footerimage' => 0
 		];
 		$heights = [
-			'header' => [0, 0],
-			'footer' => [8]
+			'header' => [0],
+			'footer' => [$this->_pageSetup['footer'] ? 8 : 0]
 		];
 
 		$out = $this->graph->getStartTransform();
@@ -779,7 +787,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		}
 
 		// insert header image to the right
-		if ($image = $this->_pageSetup['header_image'] ?? null){
+		if ($this->_pageSetup['header'] && $image = $this->_pageSetup['header_image'] ?? null){
 			// given the image will always be 20mm high
 			list($width, $height, $type, $attr) = getimagesize($image);
 			if ($width && $height){ // avoid division by zero error for faulty input
@@ -798,7 +806,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 
 		// insert title into remaining space between
 		$titleBox = null;
-		if ($this->header['title']) {
+		if ($this->_pageSetup['header'] && $this->header['title']) {
 			$titlefont = $this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
 			$out .= $titlefont['out'];
 			$out .= $this->getTextCell(
@@ -859,18 +867,20 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		}
 
 		// insert footer text into the remaining space
-		$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
-		$out .= $footerfont['out'];
-		$out .= $this->getTextCell(
-			txt: $this->_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'],
-			posx: $this->_pageSetup['marginleft'] + 20,
-			posy: $page['height'] - 10 - $this->_pageSetup['marginbottom'],
-			width: $page['width'] - $widths['footerimage'] - 20 - $this->_pageSetup['marginleft'] - $this->_pageSetup['marginright'],
-			valign: 'B',
-			halign: 'R',
-		);
-		$bbox = $this->getLastBBox();
-		$heights['footer'][] = $bbox['h'];
+		if ($this->_pageSetup['footer'] ?? false) {
+			$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
+			$out .= $footerfont['out'];
+			$out .= $this->getTextCell(
+				txt: $this->_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'],
+				posx: $this->_pageSetup['marginleft'] + 20,
+				posy: $page['height'] - 10 - $this->_pageSetup['marginbottom'],
+				width: $page['width'] - $widths['footerimage'] - 20 - $this->_pageSetup['marginleft'] - $this->_pageSetup['marginright'],
+				valign: 'B',
+				halign: 'R',
+			);
+			$bbox = $this->getLastBBox();
+			$heights['footer'][] = $bbox['h'];
+		}
 
 		$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
 		$out .= $this->_defaultfont['out'];
@@ -879,8 +889,8 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 
 		// determine the max top and bottom y-coordinates for further use
 		if (!$this->_contentCoordinates['top']) $this->_contentCoordinates = [
-			'top' => max(...$heights['header']) + $this->_pageSetup['margintop'],
-			'bottom' => $page['height'] - max(...$heights['footer']) - $this->_pageSetup['marginbottom'] - 10
+			'top' => max($heights['header']) + $this->_pageSetup['margintop'],
+			'bottom' => $page['height'] - max($heights['footer']) - $this->_pageSetup['marginbottom'] - 10
 		];
 		$this->page->setY($this->_contentCoordinates['top'] ?: 0);
 		return $out;
