@@ -468,7 +468,7 @@ class NOTIFICATION extends API {
 											// iterate over unit members to summarize topic
 											foreach($this->_unit_members[$unit] as $unit_member){
 												// filter permission
-												$unit_member_permissions = explode(',', $user[array_search($unit_member, array_column($user, 'name'))]);
+												$unit_member_permissions = explode(',', $this->_users[array_search($unit_member, array_column($this->_users, 'name'))]['permissions'] ?? '');
 												if (!array_intersect($unit_member_permissions, PERMISSION::permissionFor('recordscasestate', true))) continue;
 
 												if (!isset($missingretention_notif[$unit_member])) $missingretention_notif[$unit_member] = [];
