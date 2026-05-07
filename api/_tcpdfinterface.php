@@ -690,13 +690,13 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// create a page with defaultPageContent to determine the top and bottom content boundaries after applying defaultPageContent()
 		$pageSetup = [
 			'orientation' => $this->_pageSetup['orientation'],
-			'pwidth' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][0] : null,
-			'pheight' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][1] : null,
+			'width' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][0] : null,
+			'height' => is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'][1] : null,
 			'format' => !is_array($this->_pageSetup['format']) ? $this->_pageSetup['format'] : null
 		];
 		$page = $this->addPage($pageSetup);
 		$this->page->pop();
-		$pageSetup = [
+		$pageSetup = array_merge($pageSetup, [
 			'autobreak' => true,
 			'margin' => [
 				'PL' => $this->_pageSetup['marginleft'],
@@ -710,8 +710,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				'RW' => $page['width'] - $this->_pageSetup['marginleft'] - $this->_pageSetup['marginright'],
 				'RH' =>  $this->_contentCoordinates['bottom'] - $this->_contentCoordinates['top'],
 			]],
-			'orientation' => $this->_pageSetup['orientation']
-		];
+		]);
 		// add the actual first page with determined settings
 		$page = $this->addPage($pageSetup);
 	}
