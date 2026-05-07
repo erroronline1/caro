@@ -13,8 +13,7 @@ namespace CARO\API;
 
 // scheduling, contributing to calendar
 require_once('./_calendarutility.php');
-//require_once('./_tcpdfinterface.php');
-require_once('./_pdf.php');
+require_once('./_tcpdfinterface.php');
 
 class CALENDAR extends API {
 
@@ -99,7 +98,7 @@ class CALENDAR extends API {
 						],
 						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false))
 					];
-					$file = $PDF->qrcodePDF($content);
+					$file = $PDF->qrcodePDF($content, 12);
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => $this->_filehandler->getFileLink($file),
 						'download' => pathinfo($file)['basename']
@@ -253,6 +252,7 @@ class CALENDAR extends API {
 	 */
 
 	 public function longtermplanning(){
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
@@ -423,9 +423,6 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'GET':
-				$response = ['render' => [
-					'content' => []]
-				];
 				if (PERMISSION::permissionFor('longtermplanning')) $response['render']['form'] = [
 						'data-usecase' => 'longtermplanning',
 						'action' => "javascript:api.calendar('post', 'longtermplanning')"
@@ -1265,6 +1262,7 @@ class CALENDAR extends API {
 	 */
 	public function timesheet(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$response = ['render' => ['content' => []]];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1351,7 +1349,6 @@ class CALENDAR extends API {
 				break;
 
 			case 'GET':
-				$response = ['render' => ['content' => []]];
 				// set up calendar
 				$month = $calendar->render('month', ['timesheet'], $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler

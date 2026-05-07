@@ -35,7 +35,7 @@ class PDF{
 		$this->_pageSetup = [
 			'format' => $pageSetup['format'] ?? 'A4',
 			'unit' => $pageSetup['unit'] ?? 'mm',
-			'orientation' => $pageSetup['orientation'] ?? 'portrait',
+			'orientation' => isset($pageSetup['orientation']) && $pageSetup['orientation'] === 'landscape' ? 'L'  : 'P',
 			'margintop' => isset($pageSetup['margintop']) ? intval($pageSetup['margintop']) : 10,
 			'marginright' => isset($pageSetup['marginright']) ? intval($pageSetup['marginright']) : 10,
 			'marginbottom' => isset($pageSetup['marginbottom']) ? intval($pageSetup['marginbottom']) : 10,
@@ -416,8 +416,9 @@ class PDF{
 	 * or an appointment handout  
 	 * $fileContent['content'] is an array of [qrcode content, written text beside]  
 	 * @param array $fileContent
+	 * @param float $fontSize defaults to 8 but can be overridden, e.g. by calendar appointment handout
 	 */
-	public function qrcodePDF($fileContent){
+	public function qrcodePDF($fileContent, $fontSize = 8){
 		$this->init($fileContent);
 
 		// override default cell padding
@@ -434,8 +435,8 @@ class PDF{
 				$this->_pdf->page->addContent($this->_pdf->getBarcode(
 					type: 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'],
 					code: $fileContent['content'][0],
-					posx: $column * $columnwidth + $this->_pageSetup['marginleft'],
-					posy: $row * $rowheight + $this->_pageSetup['margintop'],
+					posx: $column * $columnwidth + $page['region'][0]['RX'],//$this->_pageSetup['marginleft'],
+					posy: $row * $rowheight + $page['region'][0]['RY'], //$this->_pageSetup['margintop'],
 					width: $codesize,
 					height: $codesize,
 					style: [
@@ -448,12 +449,12 @@ class PDF{
 						'fillColor' => 'black',
 					]
 				));
-				$footerfont = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', 8); // font size
-				$this->_pdf->page->addContent($footerfont['out']);
+				$font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $fontSize); // font size
+				$this->_pdf->page->addContent($font['out']);
 				$text = $this->_pdf->getTextCell(
 					txt: $fileContent['content'][1],
-					posx: $column * $columnwidth + $codesize + $this->_pageSetup['marginleft'] + $this->_pageSetup['codepadding'],
-					posy: $row * $rowheight + $this->_pageSetup['margintop'],
+					posx: $column * $columnwidth + $codesize + $this->_pageSetup['codepadding'] + $page['region'][0]['RX'],
+					posy: $row * $rowheight + $page['region'][0]['RY'], //$this->_pageSetup['margintop'],
 					width: $columnwidth - $codesize - $this->_pageSetup['codepadding'],
 					height: $rowheight,
 					valign: 'T',
