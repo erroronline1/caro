@@ -11,7 +11,6 @@
 
 namespace CARO\API;
 
-DEFINE ('REQUESTSTART', microtime(true));
 session_set_cookie_params([
 	'domain' => $_SERVER['HTTP_HOST'],
 	'secure' => true,
@@ -625,7 +624,7 @@ class API {
 			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
 				':id' => $_SESSION['request']['id'],
 				':response_code' => $response,
-				':execution_time' => microtime(true) - REQUESTSTART
+				':execution_time' => microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]
 			]);
 			return;
 		}
