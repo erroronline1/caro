@@ -30,13 +30,20 @@ Things are still in motion. Images may be outdated.
 ## to do
 * review openspout ods cell formatting
 * further implementation of tc-lib-pdf, set up tcpdfinterface.php
-    * set page dimensions
     * review default css
     * image size handling
     * documentsPDF
-    * qrcodePDF
     * recordsPDF
     * tablePDF
+* [dynamic fileserver approach](#rejected-requirements)
+    * prefixes: fileserver keys as strtr-tokens, e.g. :audit_attachments/ with trailing slash just to be sure
+    * no storage of paths in records, for altering will compromise blockchain
+    * no later necessity of hack if implemented from the start
+* how does the application react on database timeout (sql cluster switch)?
+* sqlsqrv 16->19->22 migration compatibility?
+* recommend fileserver strategy (as operator of infrastructure did)
+* consider SQLQUERY as instatiated object property of api instead of singleton being self referable and reinstatiate its own pdo on exceptions?
+    * on repeated failure parent::response(203|207)?
 
 ## Content
 * [Aims](#aims)
@@ -2925,6 +2932,8 @@ Stakeholder identification:
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 | Does already work this way. Unprocessed orders show up irregardless of other set states; 2026-03-14 |
 | QR-code catalogue for easier ordering | CEO | 2026-03-13 | Labels can be exported from products view, combine erp-number or article number and vendor; 2026-03-14 |
+| Dynamic fileserver approach, no paths but references in documentation | Operator of infrastructure | 2026-05-04 | |
+| Application must handle delays during SQL cluster node switch | Operator of infrastructure | 2026-05-04 | |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
