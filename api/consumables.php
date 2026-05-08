@@ -17,9 +17,9 @@ require_once('./_csvprocessor.php');
 class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_usecase = '';
-	private $filefiltersample = <<<'END'
+	private mixed $_requestedID = null;
+	private mixed $_usecase = '';
+	private string $filefiltersample = <<<'END'
 	{
 		"filesetting": {
 			"headerrow": 1,
@@ -113,7 +113,7 @@ class CONSUMABLES extends API {
 		}
 	}
 	END;
-	private $erpfiltersample = <<<'END'
+	private string $erpfiltersample = <<<'END'
 	{
 		"modify": {
 			"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
@@ -128,6 +128,7 @@ class CONSUMABLES extends API {
 	END;
 	/**
 	 * init parent class and set private requests
+	 * @param array $_class_vars
 	 */
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -242,7 +243,13 @@ class CONSUMABLES extends API {
 						'type' => 'error'
 					]]);
 
-				// recursively retrieve input names
+				/**
+				 * recursively retrieve input names
+				 * @param array $element
+				 * @param array $result
+				 * 
+				 * @return array
+				 */
 				function inputnames($element, $result = []){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -578,7 +585,13 @@ class CONSUMABLES extends API {
 						'type' => 'error'
 					]]);
 
-				// recursively retrieve input names, alter as url format (see language->PROPERTY)
+				/**
+				 * recursively retrieve input names
+				 * @param array $element
+				 * @param array $result
+				 * 
+				 * @return array
+				 */
 				function inputnames($element, $result = []){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -1704,12 +1717,11 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.availability')
 								],
-								'hint' => $this->_lang->GET('consumables.product.similar_hint'),
+								'hint' => ($hidden ?: '') . ' ' . $this->_lang->GET('consumables.product.similar_hint'),
 								'content' => [
 									$this->_lang->GET('consumables.product.available') => $isactive,
 									$this->_lang->GET('consumables.product.hidden') => $isinactive
 								],
-								'hint' => $hidden
 							], [
 								'type' => 'hidden',
 								'attributes' => [
@@ -1835,7 +1847,6 @@ class CONSUMABLES extends API {
 		if ($reassemble) {
 			$parameter['search'] = implode(' ', array_map(Fn($v) => ($v['operator'] ?: '') . ($v['column'] ? ':' . $v['column'] : '') . (strstr($v['term'], ' ') ? '"' . $v['term'] . '"' : $v['term']), $expressions));
 		}
-
 
 		if ($parameter['search']) {
 			// get matches
@@ -1979,8 +1990,8 @@ class CONSUMABLES extends API {
 		}
 		$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unissued');
 		foreach ($search as $key => $row) {
-			foreach ($row as $key => $value){
-				$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
+			foreach ($row as $key2 => $value){
+				$row[$key2] = $value ? str_replace("\n", ' ', $value) : '';
 			}
 			if (empty($productsPerSlide++ % CONFIG['limits']['length']['products_per_slide'])){
 				$slides[] = [
@@ -2188,7 +2199,7 @@ class CONSUMABLES extends API {
 	 * @param string|array $substring start or [start, end]
 	 * @param string $type input destination for js-dialog class
 	 * 
-	 * @param string js event
+	 * @return string js inline event
 	 */
 	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
 		if (!$similarproducts) return '';
@@ -2213,6 +2224,10 @@ class CONSUMABLES extends API {
 	 * updates all protected entries based on vendor name and order number
 	 * 
 	 * chunkifies requests to avoid overflow
+	 * @param string $filter
+	 * @param string|int $vendorID
+	 * @param bool $erp_match match imported pricelist with erp database
+	 * @param bool $purge delete all unprotected entries prior to readding or just add new
 	 */
 	public function update_productlist($filter, $vendorID, $erp_match = false, $purge = true){
 		$filter = json_decode($filter, true);
