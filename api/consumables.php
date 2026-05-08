@@ -148,7 +148,7 @@ class CONSUMABLES extends API {
 	public function exportproductlist(){
 		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 		$products = $downloadfiles = [];
-		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+		$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 			':id' => intval($this->_requestedID)
 		]);
 		$vendor = $vendor ? $vendor[0] : [];
@@ -157,7 +157,7 @@ class CONSUMABLES extends API {
 				'msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found'),
 				'type' => 'error'
 			]]);
-		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+		$products = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 			':ids' => $vendor['id']
 		]);
 		if (!$products) $this->response([
@@ -234,7 +234,7 @@ class CONSUMABLES extends API {
 				if ($_batchupdate){
 					$batchids = explode(',', $_batchupdate);
 				}
-				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$products = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 						':ids' => [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)]
 				]);
 				if (!$products) $this->response([
@@ -305,7 +305,7 @@ class CONSUMABLES extends API {
 								$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 								$product['sample_checks'][] = ['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 				
-								if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
+								if ($this->_sqlinterface->EXECUTE('consumables_put_sample_check', [
 									':ids' => $product['id'],
 									':sample_checks' => UTILITY::json_encode($product['sample_checks']),
 									':checked' => 'CURRENT_TIMESTAMP'
@@ -383,7 +383,7 @@ class CONSUMABLES extends API {
 						);
 					}
 					// set has_files
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+					$this->_sqlinterface->EXECUTE('consumables_put_batch', [
 							':value' => 1,
 							':ids' => intval($this->_requestedID),
 							':field' => 'has_files',
@@ -395,12 +395,12 @@ class CONSUMABLES extends API {
 				foreach($products as $product){
 					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 					$product['incorporated'][] = $approve;
-					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
+					$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_incorporation', [
 						':id' => $product['id'],
 						':incorporated' => UTILITY::json_encode($product['incorporated'])
 					]));
 				}
-				if (array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
+				if (array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
 					$this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('order.incorporation.failure'),
@@ -418,7 +418,7 @@ class CONSUMABLES extends API {
 			case "POST":
 			case 'GET':
 				$response = [];
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
@@ -433,7 +433,7 @@ class CONSUMABLES extends API {
 				])['content']);
 
 				// select similar products by article number from selected vendor
-				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+				$vendorproducts = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 					':ids' => intval($product['vendor_id'])
 				]);
 				$similarproducts = [];
@@ -575,7 +575,7 @@ class CONSUMABLES extends API {
 		$document = new DOCUMENT(get_class_vars(get_class($this)));
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
@@ -670,14 +670,14 @@ class CONSUMABLES extends API {
 						);
 					}
 					// set has_files
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+					$this->_sqlinterface->EXECUTE('consumables_put_batch', [
 							':value' => 1,
 							':ids' => intval($this->_requestedID),
 							':field' => 'has_files',
 					]);
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
+				if ($this->_sqlinterface->EXECUTE('consumables_put_sample_check', [
 					':ids' => $product['id'],
 					':sample_checks' => UTILITY::json_encode($product['sample_checks']),
 					':checked' => 'CURRENT_TIMESTAMP'
@@ -701,19 +701,19 @@ class CONSUMABLES extends API {
 				break;
 			case 'POST':
 			case 'GET':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// check if sample_check has been already satisfied, for the various frontend display options do currently not allow for an automated update
-				if ($vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+				if ($vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $product['vendor_name']
 				])){
 					$vendor = $vendor[0];
 					if ($vendor['products'] = json_decode($vendor['products'] ? : '', true)) {
-						$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+						$vendorproducts = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 							':ids' => intval($product['vendor_id'])
 						]);
 						foreach($vendorproducts as $vendorproduct){
@@ -767,7 +767,7 @@ class CONSUMABLES extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
 				// get product
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
@@ -782,7 +782,7 @@ class CONSUMABLES extends API {
 				// remove last element
 				array_pop($product['sample_checks']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
+				if ($this->_sqlinterface->EXECUTE('consumables_put_sample_check', [
 					':checked' => null,
 					':sample_checks' => count($product['sample_checks']) ? UTILITY::json_encode($product['sample_checks']) : null,
 					':ids' => intval($this->_requestedID)
@@ -812,7 +812,7 @@ class CONSUMABLES extends API {
 		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 		$response = ['render' => ['content' => []]];
 		$links = [];
-		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		$allproducts = $this->_sqlinterface->EXECUTE('consumables_get_products');
 		foreach ($allproducts as $product) {
 			if (!$product['incorporated']) continue;
 			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
@@ -877,7 +877,7 @@ class CONSUMABLES extends API {
 				];
 
 				// validate vendor
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
@@ -889,7 +889,7 @@ class CONSUMABLES extends API {
 					$product['has_files'] = 1;
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', $product)) {
+				if ($this->_sqlinterface->EXECUTE('consumables_post_product', $product)) {
 					// save documents
 					$filenamewarning = [];
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
@@ -923,7 +923,7 @@ class CONSUMABLES extends API {
 
 					$this->response([
 					'response' => [
-						'id' => intval($this->_pdo->lastInsertId()),
+						'id' => intval($this->_sqlinterface->_pdo->lastInsertId()),
 						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 					]]);
@@ -939,7 +939,7 @@ class CONSUMABLES extends API {
 			case 'PUT':
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 				// prepare product-array to update, return error if not found
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 						':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
@@ -989,7 +989,7 @@ class CONSUMABLES extends API {
 				}
 
 				// validate vendor
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
@@ -1035,7 +1035,7 @@ class CONSUMABLES extends API {
 				$_batchhidden = UTILITY::propertySet($this->_payload, '_batchhidden');
 				if (PERMISSION::permissionFor('products') && $_batchhidden){
 					$batchids = explode(',', $_batchhidden);
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
+					$this->_sqlinterface->EXECUTE('consumables_put_batch_nvarchar', [
 						':value' => $product['hidden'],
 						':field' => 'hidden',
 						':ids' => array_map(Fn($id) => intval($id), $batchids),	
@@ -1049,7 +1049,7 @@ class CONSUMABLES extends API {
 					$batchids = explode(',', $_batchalias);
 
 					// alias is allowed to be updated by purchase assistants as well
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
+					$this->_sqlinterface->EXECUTE('consumables_put_batch_nvarchar', [
 							':value' => $product['article_alias'],
 							':field' => 'article_alias',
 							':ids' => array_map(Fn($id) => intval($id), $batchids),	
@@ -1061,14 +1061,14 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('products') && $_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate')){
 					$batchids = explode(',', $_batchupdate);
 
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch_nvarchar', [
+					$this->_sqlinterface->EXECUTE('consumables_put_batch_nvarchar', [
 						':value' => $product['article_alias'],
 						':field' => 'article_alias',
 						':ids' => array_map(Fn($id) => intval($id), $batchids),	
 					]);	
 
 					foreach (['trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order'] as $field){ // apply setting to selected similar products
-						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						$this->_sqlinterface->EXECUTE('consumables_put_batch', [
 							':value' => $product[$field],
 							':field' => $field,
 							':ids' => array_map(Fn($id) => intval($id), $batchids),	
@@ -1081,7 +1081,7 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('incorporation') && $_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation')){
 					$batchids = explode(',', $_batchincorporation);
 
-					$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					$products = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 						':ids' => array_map(Fn($id) => intval($id), $batchids)
 					]);
 					$sqlQueryStack = [];
@@ -1109,19 +1109,19 @@ class CONSUMABLES extends API {
 						}
 						else $similarproduct['incorporated'] = null;
 
-						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation', [
+						$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_incorporation', [
 							':id' => $similarproduct['id'],
 							':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
 						]));
 					}
-					SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+					$this->_sqlinterface->EXECUTE($sqlQueryStack);
 				}
 
 				require_once('./notification.php');
 				$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
 				// update product
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_product', [
+				if ($this->_sqlinterface->EXECUTE('consumables_put_product', [
 					':id' => $this->_requestedID,
 					':vendor_id' => $product['vendor_id'],
 					':article_no' => $product['article_no'],
@@ -1164,7 +1164,7 @@ class CONSUMABLES extends API {
 				$vendors = [];
 
 				// select single product based on id or name
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
@@ -1213,7 +1213,7 @@ class CONSUMABLES extends API {
 				}
 
 				// select all products from selected vendor, retrieve similar products
-				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+				$vendorproducts = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 					':ids' => intval($product['vendor_id'])
 				]);
 				$similarproducts = [];
@@ -1246,7 +1246,7 @@ class CONSUMABLES extends API {
 				}
 
 				// prepare existing vendor lists
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 
@@ -1259,7 +1259,7 @@ class CONSUMABLES extends API {
 				ksort($options);
 
 				// prepare existing delivery unit lists
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_product_units');
 				foreach ($vendor as $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
@@ -1400,7 +1400,7 @@ class CONSUMABLES extends API {
 						];
 
 						// userlist
-						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+						$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 						// get purchase member names
 						// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
 						$purchasemembers = [];
@@ -1787,12 +1787,12 @@ class CONSUMABLES extends API {
 		case 'DELETE':
 			if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 			// prefetch to return proper name after deletion
-			$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+			$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 				':ids' => intval($this->_requestedID)
 			]);
 			$product = $product ? $product[0] : ['id' => null];
 
-			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_unprotected_product', [
+			if ($this->_sqlinterface->EXECUTE('consumables_delete_unprotected_product', [
 				':id' => $product['id']
 			])) $this->response([
 				'response' => [
@@ -1827,7 +1827,7 @@ class CONSUMABLES extends API {
 	public function productsearch($usecase = '', $parameter = []){
 		$slides = [];
 		// keys of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 
 		$search = [];
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
@@ -1850,7 +1850,7 @@ class CONSUMABLES extends API {
 
 		if ($parameter['search']) {
 			// get matches
-			$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? 'consumables_get_product_search' : 'order_get_product_search', [
+			$search = $this->_sqlinterface->EXECUTE(in_array($usecase, ['product']) ? 'consumables_get_product_search' : 'order_get_product_search', [
 				':SEARCH' => $parameter['search'],
 				':vendor' => $parameter['vendor'] ? ('%' . $parameter['vendor'] . '%') : '%',
 				],
@@ -1912,7 +1912,7 @@ class CONSUMABLES extends API {
 				}
 
 				// prepare existing sales unit lists
-				$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
+				$product_units = $this->_sqlinterface->EXECUTE('consumables_get_product_units');
 				foreach ($product_units as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
@@ -1988,7 +1988,7 @@ class CONSUMABLES extends API {
 					]
 				];
 		}
-		$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unissued');
+		$unissued = $this->_sqlinterface->EXECUTE('order_get_approved_unissued');
 		foreach ($search as $key => $row) {
 			foreach ($row as $key2 => $value){
 				$row[$key2] = $value ? str_replace("\n", ' ', $value) : '';
@@ -2247,12 +2247,12 @@ class CONSUMABLES extends API {
 			}
 		if (count($productlist->_list[1])){
 			// purge all unprotected products for a fresh data set
-			if ($purge) SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+			if ($purge) $this->_sqlinterface->EXECUTE('consumables_delete_all_unprotected_products', [
 				':id' => $vendorID
 			]);
 			// retrieve left items
 			$remainder = [];
-			$remained = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+			$remained = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 				':ids' => intval($vendorID)
 			]);
 
@@ -2303,7 +2303,7 @@ class CONSUMABLES extends API {
 			// update remainders where imported match with remainders
 			foreach (array_intersect(array_keys($imported), array_keys($remainder)) as $key){
 				// prepare query
-				$query = SQLQUERY::PREPARE($this->_pdo, 'consumables_put_product_productlist_import');
+				$query = $this->_sqlinterface->PREPARE('consumables_put_product_productlist_import');
 				$replace = [
 					':id' => $remainder[$key]['id'],
 					':article_name' => $imported[$key]['article_name'] ?? ($remainder[$key]['article_name'] ? : null),
@@ -2339,7 +2339,7 @@ class CONSUMABLES extends API {
 						$query = preg_replace('/' . $column . ' = (?::' . $column . '|\(CASE.+?:' . $column . '.+?END\)),/', '', $query);
 					}
 				}
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, $query, $replace) . '; ');
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE($query, $replace) . '; ');
 
 			}
 
@@ -2374,11 +2374,11 @@ class CONSUMABLES extends API {
 					':thirdparty_order' => !empty($imported[$key]['thirdparty_order']) ? 1 : null,
 				];
 			}
-			$sqlQueryStack = array_merge($sqlQueryStack, SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_product'), $insertions));
+			$sqlQueryStack = array_merge($sqlQueryStack, $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('consumables_post_product'), $insertions));
 
 			// update entries with data from erp interface if available and selected
 			if ($erp_match && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $vendorID
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
@@ -2394,13 +2394,13 @@ class CONSUMABLES extends API {
 				}
 
 				if (isset($erp_dump[$vendor['name']]) && $erp_dump[$vendor['name']]){
-					$query = SQLQUERY::PREPARE($this->_pdo, 'consumables_put_product_productlist_erp_amendment');
+					$query = $this->_sqlinterface->PREPARE('consumables_put_product_productlist_erp_amendment');
 					foreach($erp_dump[$vendor['name']] as $article){
 						// update articles based on same vendor and article_no
 						// CAVEAT: there may be shitty vendors with the same order number for different versions. currently i have no clue on how to address that
 						// since i consider it a better idea in general being able to update the product name too
 						if (!$article['article_no']) continue;
-						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_product_productlist_erp_amendment', [
+						$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_product_productlist_erp_amendment', [
 							':article_unit' => $article['article_unit'] ? preg_replace('/\n/', '', $article['article_unit']) : null,
 							':article_ean' => $article['article_ean'] ? preg_replace('/\n/', '', $article['article_ean']) : null,
 							':trading_good' => !empty($article['trading_good']) ? 1 : null,
@@ -2430,17 +2430,17 @@ class CONSUMABLES extends API {
 						$_batchhidden[] = $remainder[$key]['id'];
 					}
 					if ($_batchhidden){
-						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_batch', [
 							':field' => 'erp_id',
 							':value' => null,
 							':ids' => $_batchhidden
 						]) . '; ');
-						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_batch', [
 							':field' => 'stock_item',
 							':value' => null,
 							':ids' => $_batchhidden
 						]) . '; ');
-						$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_batch', [
+						$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_batch', [
 							':field' => 'hidden',
 							':value' => UTILITY::json_encode(['name' => $this->_lang->GET('erpquery.integrations.update_via_erp_interface', [':systemuser' => CONFIG['system']['caroapp']], true), 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]),
 							':ids' => $_batchhidden
@@ -2449,7 +2449,7 @@ class CONSUMABLES extends API {
 				}
 			}
 
-			SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+			$this->_sqlinterface->EXECUTE($sqlQueryStack);
 			return [$this->_date['servertime']->format('Y-m-d'), $log];
 		}
 		return '';
@@ -2498,7 +2498,7 @@ class CONSUMABLES extends API {
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
 				$vendor = [];
 				if ($this->_requestedID){
-					$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 						':id' => $this->_requestedID 
 					]);
 					$vendor = $vendor ? $vendor[0] : null;
@@ -2603,7 +2603,7 @@ class CONSUMABLES extends API {
  
 				// tidy up consumable products database if inactive
 				if ($vendor[':id'] && $vendor[':hidden']){
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+					$this->_sqlinterface->EXECUTE('consumables_delete_all_unprotected_products', [
 						':id' => $vendor[':id']
 					]);
 					unset ($vendor[':products']['validity']);
@@ -2683,9 +2683,9 @@ class CONSUMABLES extends API {
 				$vendor[':evaluation'] = $vendor[':evaluation'] ? UTILITY::json_encode($vendor[':evaluation']) : null;
 
 				// save vendor to database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', $vendor)) {
+				if ($this->_sqlinterface->EXECUTE('consumables_post_vendor', $vendor)) {
 					// file handling only after successful insertion/update especially for evaluation document files
-					$vendor[':id'] = $vendor[':id'] ? : $this->_pdo->lastInsertId();
+					$vendor[':id'] = $vendor[':id'] ? : $this->_sqlinterface->_pdo->lastInsertId();
 
 					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
 					$filenamewarning = [];
@@ -2756,7 +2756,7 @@ class CONSUMABLES extends API {
 				$response = [];
 				
 				// select single vendor based on id or name
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $this->_requestedID ?: ''
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
@@ -2780,7 +2780,7 @@ class CONSUMABLES extends API {
 				$isinactive = $vendor['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
 				// prepare existing vendor lists
-				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+				$vendorlist = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 				foreach ($vendorlist as $key => $row) {
 					$datalist[] = $row['name'];
 					$display = $row['name'];
@@ -2812,7 +2812,7 @@ class CONSUMABLES extends API {
 				$available = 0;
 				$ordered = 0;
 				if ($vendor['id']) {
-					$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+					$vendorproducts = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 						':ids' => intval($vendor['id'])
 					]);
 					// count available products for this vendor

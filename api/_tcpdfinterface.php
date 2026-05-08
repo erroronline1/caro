@@ -19,7 +19,7 @@ require_once(__DIR__ . '/../api/_filehandler.php');
 class PDF{
 	private $_pageSetup = [];
 	private $_pdf = null;
-	public $_pdo = null;
+	public $_sqlinterface = null;
 	public $_filehandler = null;
 	private $_markdown = null;
 	private $_markdown_css = null;
@@ -57,7 +57,7 @@ class PDF{
 			$this->_pageSetup['format'] = [$customsetup[0], $customsetup[1]];
 		}
 
-		$this->_pdo = $pdo;
+		$this->_sqlinterface = $pdo;
 		$this->_filehandler = new FILEHANDLER($pdo);
 
 		$this->_markdown = new \erroronline1\Markdown\Markdown(true);
@@ -250,7 +250,7 @@ class PDF{
 		// set cell padding
 		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
 		$_markdown = new \erroronline1\Markdown\Markdown(true);
-		$_filehandler = new FILEHANDLER($this->_pdo);
+		$_filehandler = new FILEHANDLER($this->_sqlinterface);
 
 		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
 
@@ -469,7 +469,7 @@ class PDF{
 
 	public function recordsPDF($fileContent){
 		$_lang = new LANG();
-		$_filehandler = new FILEHANDLER($this->_pdo);
+		$_filehandler = new FILEHANDLER($this->_sqlinterface);
 		// create a pdf for a record summary
 		$this->init($fileContent);
 		// set cell padding

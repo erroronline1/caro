@@ -39,10 +39,10 @@ Things are still in motion. Images may be outdated.
     * prefixes: fileserver keys as strtr-tokens, e.g. :audit_attachments/ with trailing slash just to be sure
     * no storage of paths in records, for altering will compromise blockchain
     * no later necessity of hack if implemented from the start
-* how does the application react on database timeout (sql cluster switch)?
 * sqlsqrv 16->19->22 migration compatibility?
 * recommend fileserver strategy (as operator of infrastructure did)
-* consider SQLQUERY as instatiated object property of api instead of singleton being self referable and reinstatiate its own pdo on exceptions?
+* consider SQLINTERFACE reinstatiate its own pdo on exceptions
+    * in case sql cluster switch raises issues
     * on repeated failure parent::response(203|207)?
 
 ## Content
@@ -3097,7 +3097,7 @@ There are MARKDOWN, SEARCH and TABLE classes for
 
 Using these methods (./api/_utility.php) and (./api/_table.php) is strongly advised for consistency.
 
-There is an SQLQUERY class handling
+There is an SQLINTERFACE class handling
 * database connections
 * query preparation
 * masking user input (avoiding injections)

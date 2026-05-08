@@ -189,7 +189,7 @@ class CALENDAR extends API {
 	 * $this->_requestedId string with eventually comma separated integers
 	 */
 	public function complete(){
-		$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+		$calendarentry = $this->_sqlinterface->EXECUTE('calendar_get_by_id', [
 			':id' => $this->_requestedId
 		]);
 		$calendarentry = $calendarentry ? $calendarentry[0] : null;
@@ -217,7 +217,7 @@ class CALENDAR extends API {
 		$alert = null;
 		if ($this->_requestedCalendarType === 'tasks') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
 
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
@@ -297,7 +297,7 @@ class CALENDAR extends API {
 					$schedule = null;
 					$import = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.import'));
 					if ($import && $import > 0) {
-						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+						$schedule = $this->_sqlinterface->EXECUTE('calendar_get_by_id', [
 							':id' => $import
 						]);
 					}
@@ -407,9 +407,9 @@ class CALENDAR extends API {
 						':alert' => null,
 						':autodelete' => null
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', $columns)) $this->response([
+					if ($this->_sqlinterface->EXECUTE('calendar_post', $columns)) $this->response([
 						'response' => [
-							'id' => $this->_pdo->lastInsertId(),
+							'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 							'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
 							'type' => 'success'
 						]]);
@@ -435,7 +435,7 @@ class CALENDAR extends API {
 						'...' => ['value' => '0']
 					]
 				];
-				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', [
+				$schedules = $this->_sqlinterface->EXECUTE('calendar_get_type', [
 					':type' => 'longtermplanning'
 				]);
 				// sort by closed date desc since sql query sorts different
@@ -574,7 +574,7 @@ class CALENDAR extends API {
 				break;
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+				if ($this->_sqlinterface->EXECUTE('calendar_delete', [
 					':ids' => [$this->_requestedId]
 				])) $this->response([
 					'response' => [
@@ -602,7 +602,7 @@ class CALENDAR extends API {
 	 * gathers all the entries though, supposed to be filtered by different methods 
 	 */
 	public function monthlyTimesheets(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		// set up calendar
 		$calendar->days('month', $this->_requestedTimespan);
 		$holidays = $calendar->holidays(substr($this->_requestedTimespan, 0, 4));
@@ -631,7 +631,7 @@ class CALENDAR extends API {
 		$days = array_values($days);
 		$last = clone $days[count($days) - 1];
 		
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		// retrieve stats in advance
 		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
 		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));
@@ -903,7 +903,7 @@ class CALENDAR extends API {
 				]
 			]
 		]]];
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$dbevents = $calendar->search($this->_requestedId ? : '');
 
 		// append filtered events
@@ -936,7 +936,7 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function tasks(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
@@ -1155,7 +1155,7 @@ class CALENDAR extends API {
  	*/
 	private function tasksEvents($dbevents, $calendar){
 		$events = [];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist'); // to eventually match affected_user_id
 
 		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
@@ -1261,7 +1261,7 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function timesheet(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$response = ['render' => ['content' => []]];
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -1269,14 +1269,14 @@ class CALENDAR extends API {
 			case 'PUT':
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id']; // if not selected default to current user!
-				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				if ($affected_user = $this->_sqlinterface->EXECUTE('user_get', [
 					':ids' => $affected_user_id,
 					':names' => ''
 				])) $affected_user = $affected_user[0];
 
 				if (UTILITY::propertySet($this->_payload, 'calendarEventId')){
 					// editing of timesheet entries is allowed for admin and affected user for regulatory security only
-					$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+					$calendarentry = $this->_sqlinterface->EXECUTE('calendar_get_by_id', [
 						':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
 					]);
 					$calendarentry = $calendarentry ? $calendarentry[0] : null;
@@ -1524,7 +1524,7 @@ class CALENDAR extends API {
 					];
 				break;
 			case 'DELETE':
-				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+				$calendarentry = $this->_sqlinterface->EXECUTE('calendar_get_by_id', [
 					':id' => $this->_requestedId
 				]);
 				$calendarentry = $calendarentry ? $calendarentry[0] : null;
@@ -1683,7 +1683,7 @@ class CALENDAR extends API {
 	 * returns a link to summary file 
 	 */
 	public function yearlyTimesheets(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 
 		// setting up a whole year within calendarutility->days leads to a memory overflow.
 		// iterate instantly in this rarely used scenario
@@ -1695,7 +1695,7 @@ class CALENDAR extends API {
 		$lastDay->modify('last day of december this year');
 		$lastDay->setTime(23, 59);
 
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		// retrieve stats in advance
 		$timesheet_stats_year = $calendar->timesheetSummary($users, $day->format('Y-m-d'), $lastDay->format('Y-m-d'));
 		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $lastDay->format('Y-m-d'));
@@ -1782,7 +1782,7 @@ class CALENDAR extends API {
 		];
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('calendar.timesheet.yearly_summary', [], true)] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -1820,7 +1820,7 @@ class CALENDAR extends API {
 		list identifiers, scan codes, add hint (e.g. address, room, etc)
 		api endpoint description
 		*/
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
@@ -2013,7 +2013,7 @@ class CALENDAR extends API {
  	*/
 	private function worklistsEvents($dbevents, $calendar){
 		$events = [];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist'); // to eventually match affected_user_id
 		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
 			$due = new \DateTime($row['span_end']);

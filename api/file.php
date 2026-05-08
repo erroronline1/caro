@@ -20,8 +20,8 @@ class FILE extends API {
 	public $_requestedFile = null;
 	public $_accessible = null;
 
-	public function __construct(){
-		parent::__construct();
+	public function __construct($_class_vars  = []){
+		parent::__construct($_class_vars);
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
 			!in_array(REQUEST[1], ['stream'])
@@ -41,7 +41,7 @@ class FILE extends API {
 	 * @return array filepaths
 	 */
 	public function activeexternalfiles(){
-		$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+		$files = $this->_sqlinterface->EXECUTE('file_external_documents_get_active');
 		if ($files) return array_column($files, 'path');
 		return [];
 	}
@@ -93,8 +93,8 @@ class FILE extends API {
 					}
 
 					// insert files and ressources to database
-					$sqlQueryStack = SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'file_external_documents_post'), $insertions);
-					$success = boolval(array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack)));
+					$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('file_external_documents_post'), $insertions);
+					$success = boolval(array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)));
 					if ($success){		
 						$this->response(['response' => [
 							'msg' => $this->_lang->GET('file.manager.new_file_created'),
@@ -140,7 +140,7 @@ class FILE extends API {
 						$response = $this->_lang->GET('file.external_file.regulatory_context');
 				}
 				// process prepared database update
-				if ($this->_requestedId && SQLQUERY::EXECUTE($this->_pdo, $prepare, $tokens)) $this->response(['response' => [
+				if ($this->_requestedId && $this->_sqlinterface->EXECUTE($prepare, $tokens)) $this->response(['response' => [
 						'msg' => $response,
 						'type' => 'success'
 					]]);
@@ -157,7 +157,7 @@ class FILE extends API {
 				]];
 
 				// retrieve all external documents per database
-				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
+				$files = $this->_sqlinterface->EXECUTE('file_external_documents_get');		
 				if ($files){
 					// append filter input
 					$response['render']['content'][] = [
@@ -172,7 +172,7 @@ class FILE extends API {
 					];
 
 					// gather possible useage by texttemplates
-					$texttemplates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
+					$texttemplates = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
 					$template_use = [];
 					foreach($texttemplates as $template){
 						if ($template['hidden'] || !$template['linked_files']) continue;
@@ -649,7 +649,7 @@ class FILE extends API {
 				$files = array_merge($files, $this->_filehandler->listFiles($folder ,'asc'));
 			}
 		}
-		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path')); // all
+		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column($this->_sqlinterface->EXECUTE('file_external_documents_get_active'), 'path')); // all
 		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = $this->_filehandler->listFiles($this->_filehandler->directory('external_documents') ,'asc'); // external_document specified
 		
 		// return based on similarity if search is provided

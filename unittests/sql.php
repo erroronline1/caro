@@ -21,13 +21,13 @@ session_start();
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-require_once('../api/_config.php');
 @define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+require_once('../api/_config.php');
 require_once('../api/_utility.php');
 require_once('../api/_sqlinterface.php');
 
 class SQLTEST {
-	private mixed $_pdo = null;
+	private mixed $_sqlinterface = null;
 	/**
 	 * 10k insertions take about 30s of time, selections about 20s  
 	 * set to an appropriate amount, make a cluster switch meanwhile and check for potential losses
@@ -43,13 +43,7 @@ class SQLTEST {
 
 
 	public function __construct(){
-		$options = [
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-			//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
-		];
-
-		$cluster = [
+		$this->_sqlinterface = new SQLINTERFACE([
 			"driver" => "sqlsrv",
 			"host" => "Server=LABSQL-DAG1, 1433",
 			"user" => "carosql",
@@ -57,11 +51,7 @@ class SQLTEST {
 			"database" => "Database=caro",
 			"charset" => "",
 			"packagesize" => 4096
-		];
-
-		$this->_pdo = new \PDO( $cluster['driver'] . ':' . $cluster['host'] . ';' . $cluster['database']. ';' . $cluster['charset'], $cluster['user'], $cluster['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
-		if ($dbsetup) $this->_pdo->exec($dbsetup);
+		]);
 	}
 
 	/**
@@ -141,11 +131,11 @@ class SQLTEST {
 	public function insert(){
 		$result = '';
 		for ($i = 0; $i < $this->_insertions; $i++){
-			SQLQUERY::EXECUTE($this->_pdo, "INSERT INTO " . $this->_table . " (value, timestamp) VALUES ('". hash("sha512", $i+random_int(0,10000000)) . "', CURRENT_TIMESTAMP)");
+			$this->_sqlinterface->EXECUTE("INSERT INTO " . $this->_table . " (value, timestamp) VALUES ('". hash("sha512", $i+random_int(0,10000000)) . "', CURRENT_TIMESTAMP)");
 		}
 		$result .= $this->printSuccess('execution time to write : ' . microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]);
 
-		$num = SQLQUERY::EXECUTE($this->_pdo, "SELECT COUNT(id) as num FROM " . $this->_table);
+		$num = $this->_sqlinterface->EXECUTE("SELECT COUNT(id) as num FROM " . $this->_table);
 		$num = $num ? intval($num[0]['num']) : 0;
 
 		if ($num !== $this->_insertions) $result .=  $this->printError('Oh no! Off by '. $this->_insertions-$num);
@@ -161,7 +151,7 @@ class SQLTEST {
 		$result = '';
 		$asserted = [0];
 		for ($i = 0; $i <= $this->_insertions; $i++){
-			if ($row = SQLQUERY::EXECUTE($this->_pdo, "SELECT * FROM " . $this->_table . " WHERE id=" . $i))
+			if ($row = $this->_sqlinterface->EXECUTE("SELECT * FROM " . $this->_table . " WHERE id=" . $i))
 				$asserted[] = intval($row[0]['id']);
 		}
 		$result .=  $this->printSuccess('execution time to read: ' . microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]);
@@ -176,7 +166,7 @@ class SQLTEST {
 	 * required for a successful match of ids for read-test
 	 */
 	public function truncate(){
-		SQLQUERY::EXECUTE($this->_pdo, "TRUNCATE TABLE " . $this->_table);
+		$this->_sqlinterface->EXECUTE("TRUNCATE TABLE " . $this->_table);
 		return $this->printSuccess('table has been truncated again');
 	}
 }

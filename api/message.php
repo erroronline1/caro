@@ -62,7 +62,7 @@ class MESSAGE extends API {
 				}
 				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_post', $announcement)) $this->response([
+				if ($this->_sqlinterface->EXECUTE('announcement_post', $announcement)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.announcement.saved_success'),
 						'type' => 'success',
@@ -75,7 +75,7 @@ class MESSAGE extends API {
 					]]);
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_delete', [
+				if ($this->_sqlinterface->EXECUTE('announcement_delete', [
 					':id' => $this->_announcement
 				])) $this->response([
 					'response' => [
@@ -101,7 +101,7 @@ class MESSAGE extends API {
 	 * lists all announcements
 	 */
 	public function announcements(){
-		$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_all');
+		$announcements = $this->_sqlinterface->EXECUTE('announcement_get_all');
 		$response = ['render' => ['content' => []]];
 
 		$units = [];
@@ -277,7 +277,7 @@ class MESSAGE extends API {
 				$datalist = [];
 				$response = ['render' => ['content' => []]];
 				// prepare existing users lists
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				$administrativeUser = [];
 				foreach ($user as $row) {
 					if (PERMISSION::filteredUser($row, ['permission' => ['admin', 'ceo', 'qmo', 'prrc']])) $administrativeUser[] = $row['id'];
@@ -289,14 +289,14 @@ class MESSAGE extends API {
 
 				if ($this->_conversation){
 					// select conversation
-					$messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_conversation', [
+					$messages = $this->_sqlinterface->EXECUTE('message_get_conversation', [
 						':user' => $_SESSION['user']['id'],
 						':conversation' => $this->_conversation
 					]);
 					$conversation_content = [];
 
 					// get user info on conversation partner
-					$conversation_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					$conversation_user = $this->_sqlinterface->EXECUTE('user_get', [
 						':ids' => $this->_conversation,
 						':names' => ''
 					]);
@@ -403,14 +403,14 @@ class MESSAGE extends API {
 					];
 
 					// select conversations for viewing user
-					$conversations = SQLQUERY::EXECUTE($this->_pdo, 'message_get_conversations', [
+					$conversations = $this->_sqlinterface->EXECUTE('message_get_conversations', [
 						':user' => $_SESSION['user']['id']
 					]);
 					if ($conversations) {
 						// list up all last messages, with unread mark if applicable
 						foreach ($conversations as $conversation){
 							// select unseen per conversation
-							$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen_conversations', [
+							$unseen = $this->_sqlinterface->EXECUTE('message_get_unseen_conversations', [
 								':user' => $_SESSION['user']['id'],
 								':conversation' => $conversation['conversation_user']
 							]);
@@ -437,7 +437,7 @@ class MESSAGE extends API {
 				}
 				break;
 			case 'DELETE':
-				SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
+				$this->_sqlinterface->EXECUTE('message_delete_messages', [
 					':user' => $_SESSION['user']['id'],
 					// passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
 					':ids' => array_map(fn($id) => intval($id), explode('_', UTILITY::propertySet($this->_payload, '_selectedconversation') ? : ''))
@@ -475,7 +475,7 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// get recipient ids
-				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				$recipients = $this->_sqlinterface->EXECUTE('user_get', [
 					':ids' => '',
 					':names' => preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.to')) ? : '')
 				]);
@@ -504,13 +504,13 @@ class MESSAGE extends API {
 							'redirect' => false,
 							'type' => 'error'
 						]]);
-					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'message_post_message', [
+					$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('message_post_message', [
 						':from_user' => $_SESSION['user']['id'],
 						':to_user' => $recipient['id'],
 						':message' => $message
 					]));
 				}
-				$success = array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack)) / 2; // message_post_message affects 2 rows for sender and receiver
+				$success = array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)) / 2; // message_post_message affects 2 rows for sender and receiver
 				if ($success === count($recipients)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.message.send_success'),
@@ -537,7 +537,7 @@ class MESSAGE extends API {
 	 */
 	public function register(){
 		// prepare existing users lists
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		$response = ['render' => ['content' => []]];
 
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
@@ -663,7 +663,7 @@ class MESSAGE extends API {
 				$whiteboard[':content'] .= "\n" . $this->_lang->GET('message.whiteboard.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
 
 
-				$owhiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', [
+				$owhiteboard = $this->_sqlinterface->EXECUTE('whiteboard_get', [
 					':id' => $this->_requestedID
 				]);
 				$owhiteboard = $owhiteboard ? $owhiteboard[0] : null;
@@ -686,7 +686,7 @@ class MESSAGE extends API {
 					if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_post', $whiteboard)) {
+				if ($this->_sqlinterface->EXECUTE('whiteboard_post', $whiteboard)) {
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle_export')) && $_FILES["_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')]){
 						$paths = [];
 						foreach ($this->_filehandler->storeUploadedFiles(
@@ -727,7 +727,7 @@ class MESSAGE extends API {
 					]]);
 				break;
 			case 'GET':
-				$whiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', [
+				$whiteboard = $this->_sqlinterface->EXECUTE('whiteboard_get', [
 					':id' => $this->_requestedID
 				]);
 				$whiteboard = $whiteboard ? $whiteboard[0]: null;
@@ -811,7 +811,7 @@ class MESSAGE extends API {
 
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_delete', [
+				if ($this->_sqlinterface->EXECUTE('whiteboard_delete', [
 					':id' => $this->_requestedID
 				])) $this->response([
 					'response' => [
@@ -839,7 +839,7 @@ class MESSAGE extends API {
 		$response = ['render' => ['content' => []]];
 
 		$whiteboards = $adminview = [];
-		foreach(SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get_all') as $whiteboard){
+		foreach($this->_sqlinterface->EXECUTE('whiteboard_get_all') as $whiteboard){
 			$whiteboard['user_name'] = $whiteboard['user_name'] ? : $this->_lang->GET('general.deleted_user');
 			if ($whiteboard['organizational_unit']) $whiteboard['organizational_unit'] = explode(',', $whiteboard['organizational_unit']);
 			if (!$whiteboard['organizational_unit'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || in_array('common', $whiteboard['organizational_unit']) || array_intersect($_SESSION['user']['units'], $whiteboard['organizational_unit'])){

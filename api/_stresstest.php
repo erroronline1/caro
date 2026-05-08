@@ -86,8 +86,8 @@ class STRESSTEST extends INSTALL{
 	];
 
 	// optional overrides of parent properties
-	public $_defaultUser = "Caro App";
-	public $_defaultLanguage = 'de';
+	public string $_defaultUser = "Caro App";
+	public string $_defaultLanguage = 'de';
 
 	public function __construct(){
 		parent::__construct();
@@ -173,7 +173,7 @@ class STRESSTEST extends INSTALL{
 		$this->_currentdate->modify('-12 month');
 		for ($i = 0; $i < $this->_calendarentries; $i++){
 			if (!($i % intval($this->_calendarentries/12/30))) $this->_currentdate->modify('+1 day');
-			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+			$this->_sqlinterface->EXECUTE('calendar_post', [
 				':id' => null,
 				':type' => 'tasks',
 				':span_start' => $this->_currentdate->format('Y-m-d H:i:s'),
@@ -195,12 +195,12 @@ class STRESSTEST extends INSTALL{
 	 * deletes all calendar events with prefix
 	 */
 	public function removeCalendarEvents(){
-		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
+		$entries = $this->_sqlinterface->EXECUTE('calendar_search', [
 				':SEARCH' => $this->_prefix
 			],
 			'contained'
 		);
-		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+		$entries = $this->_sqlinterface->EXECUTE('calendar_delete', [
 			':ids' => array_column($entries, 'id')
 		]);
 		return $this->printSuccess(count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted');
@@ -211,8 +211,8 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function createRecords(){
 		$this->_currentdate->modify('-12 month');
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
+		$records = $this->_sqlinterface->EXECUTE('records_get_all');
 
 		for ($i = 0; $i < $this->_recordentries; $i++){
 			if (!($i % intval($this->_recordentries/12/30))) {
@@ -244,7 +244,7 @@ class STRESSTEST extends INSTALL{
 				$recordcontent[] = $current_record;
 			}
 			else $recordcontent = [$current_record];
-			SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			$this->_sqlinterface->EXECUTE('records_post', [
 				':context' => 'casedocumentation',
 				':case_state' => null,
 				':record_type' => 'treatment',
@@ -271,7 +271,7 @@ class STRESSTEST extends INSTALL{
 			'mysql' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'"
 		];
-		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
+		$del = $this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]);
 		return $this->printSuccess($del . ' entries with prefix ' . $this->_prefix . ' deleted');
 	}
 
@@ -280,8 +280,8 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function createOrders(){
 		$response = '';
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+		$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
+		$products = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 			':ids' => array_column($vendors, 'id')
 		]);
 		$orders = [];
@@ -306,8 +306,8 @@ class STRESSTEST extends INSTALL{
 				':ordertype' => 'order'
 			];
 		}
-		$sqlQueryStack = SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'order_post_approved_order'), $orders);
-		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+		$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('order_post_approved_order'), $orders);
+		$response .= implode('<br/>', array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 
 		$response .= $this->printSuccess($i. ' orders done, please check the application for performance');
 
@@ -322,7 +322,7 @@ class STRESSTEST extends INSTALL{
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'"
 		];
-		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
+		$del = $this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]);
 		return $this->printSuccess($del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted');
 	}
 
@@ -334,7 +334,7 @@ class STRESSTEST extends INSTALL{
 			$sqlQueryStack = [];
 			$response = '';
 			$DBall = [
-				...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist')
+				...$this->_sqlinterface->EXECUTE('csvfilter_datalist')
 			];
 			foreach ($DBall as $row){
 				if (PERMISSION::fullyapproved('csvrules', $row['approval'])) continue;
@@ -347,10 +347,10 @@ class STRESSTEST extends INSTALL{
 					$update[':' . $key] = $value ?: null;
 				}
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post', $update) . '; ');
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('csvfilter_post', $update) . '; ');
 			}
 
-		$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+		$response .= implode('<br/>', array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 		$response .= $this->printSuccess('all csv filters in the database have been approved.');
 
 			return $response;
@@ -366,8 +366,8 @@ class STRESSTEST extends INSTALL{
 			$sqlQueryStack = [];
 			$response = '';
 			$DBall = [
-				...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
-				...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist')
+				...$this->_sqlinterface->EXECUTE('document_component_datalist'),
+				...$this->_sqlinterface->EXECUTE('document_document_datalist')
 			];
 			foreach ($DBall as $row){
 				$row['approval'] = json_decode($row['approval'] ? : '', true) ? : [];
@@ -375,13 +375,13 @@ class STRESSTEST extends INSTALL{
 
 				$row['approval'] = $row['approval'] + $this->_documentApproval;
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'document_put_approve',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('document_put_approve',
 				[
 					':approval' => UTILITY::json_encode($row['approval']),
 					':id' => $row['id']
 				]) . '; ');
 			}
-			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+			$response .= implode('<br/>', array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all documents in the database have been approved.');
 
 			return $response;
@@ -396,7 +396,7 @@ class STRESSTEST extends INSTALL{
 		if ($this->_incorporationApproval){
 			$sqlQueryStack = [];
 			$response = '';
-			$DBall = [...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products')];
+			$DBall = [...$this->_sqlinterface->EXECUTE('consumables_get_products')];
 			foreach ($DBall as $row){
 				if (!$row['incorporated']) continue;
 				$row['incorporated'] = json_decode($row['incorporated'], true);
@@ -408,13 +408,13 @@ class STRESSTEST extends INSTALL{
 				$lastincorporation = $lastincorporation + $this->_incorporationApproval;
 				$row['incorporated'][count($row['incorporated']) - 1 ] = $lastincorporation;
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_put_incorporation',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_put_incorporation',
 				[
 					':incorporated' => UTILITY::json_encode($row['incorporated']),
 					':id' => $row['id']
 				]) . '; ');
 			}
-			$response .= implode('<br/>', array_filter(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
+			$response .= implode('<br/>', array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean'])));
 			$response .= $this->printSuccess('all pending incorporation have been approved.');
 			return $response;
 		}
@@ -428,7 +428,7 @@ class STRESSTEST extends INSTALL{
 		$json = $this->importJSON('../templates/', 'audits');
 
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates')
+			...$this->_sqlinterface->EXECUTE('audit_get_templates')
 		];
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -441,7 +441,7 @@ class STRESSTEST extends INSTALL{
 					$dbentry['method'] === $entry['method']
 					// no checking if $dbentry['content'] === $entry['content'] for db-specific character encoding
 				){
-					SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
+					$this->_sqlinterface->EXECUTE('audit_delete_template', [
 						':id' => $dbentry['id']
 					]);
 					$matches++;
@@ -457,7 +457,7 @@ class STRESSTEST extends INSTALL{
 	public function removeCSVFilter(){
 		$json = $this->importJSON('../templates/', 'csvfilter');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
+		$DBall = $this->_sqlinterface->EXECUTE('csvfilter_datalist');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -471,7 +471,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id']
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if ($this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]))
 						$matches++;
 				}
 			}
@@ -487,13 +487,13 @@ class STRESSTEST extends INSTALL{
 		$json = $this->importJSON('../templates/', 'documents');
 
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
+			...$this->_sqlinterface->EXECUTE('document_component_datalist'),
+			...$this->_sqlinterface->EXECUTE('document_document_datalist'),
+			...$this->_sqlinterface->EXECUTE('document_bundle_datalist')
 		];
 
 		// check if any of the documents have been in use, also see audit.php documentusage()
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$records = $this->_sqlinterface->EXECUTE('records_get_all');
 		$usedid = [];
 		foreach ($records as $record){
 			$record['content'] = json_decode($record['content'], true);
@@ -525,7 +525,7 @@ class STRESSTEST extends INSTALL{
 					!in_array($dbentry['id'], array_keys($usedid)) // no deletion if documents are part of sample records
 					// no checking if $dbdocument['content'] === $entry['content'] for db-specific character encoding
 				){
-					SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
+					$this->_sqlinterface->EXECUTE('document_delete', [
 						':id' => $dbentry['id']
 					]);
 					$matches++;
@@ -541,7 +541,7 @@ class STRESSTEST extends INSTALL{
 	public function removeManual(){
 		$json = $this->importJSON('../templates/', 'manuals');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+		$DBall = $this->_sqlinterface->EXECUTE('application_get_manual');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -555,7 +555,7 @@ class STRESSTEST extends INSTALL{
 					$dbentry['content'] === $entry['content'] &&
 					!array_diff(explode(',', $dbentry['permissions'] ? : ''), explode(',', $entry['permissions'] ? : ''))
 				){
-					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values' => [':id' => $dbentry['id']]]))
+					if ($this->_sqlinterface->EXECUTE('application_delete_manual', ['values' => [':id' => $dbentry['id']]]))
 						$matches++;
 				}
 			}
@@ -569,7 +569,7 @@ class STRESSTEST extends INSTALL{
 	public function removeRisks(){
 		$json = $this->importJSON('../templates/', 'risks');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		$DBall = $this->_sqlinterface->EXECUTE('risk_datalist');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -589,7 +589,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_risks WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_risks WHERE id = " . $dbentry['id']
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if ($this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]))
 						$matches++;
 				}
 			}
@@ -603,7 +603,7 @@ class STRESSTEST extends INSTALL{
 	public function removeTexttemplates(){
 		$json = $this->importJSON('../templates/', 'texts');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
+		$DBall = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -620,7 +620,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id']
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if ($this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]))
 						$matches++;
 				}
 			}
@@ -634,7 +634,7 @@ class STRESSTEST extends INSTALL{
 	public function removeUsers(){
 		$json = $this->importJSON('../templates/', 'users');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$DBall = $this->_sqlinterface->EXECUTE('user_get_datalist');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -649,10 +649,10 @@ class STRESSTEST extends INSTALL{
 					!array_diff(explode(',', $dbentry['permissions'] ? : ''), explode(',', $entry['permissions'] ? : '')) &&
 					!array_diff(explode(',', $dbentry['units'] ? : ''), explode(',', $entry['units'] ? : ''))
 				){
-					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 						':ids' => $dbentry['id'] ? : 0
 					]);
-					if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
+					if ($this->_sqlinterface->EXECUTE('user_delete', [
 						':id' => $dbentry['id']
 					]))	{
 						// delete training attachments (certificates)
@@ -675,7 +675,7 @@ class STRESSTEST extends INSTALL{
 	public function removeVendors(){
 		$json = $this->importJSON('../templates/', 'vendors');
 
-		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$DBall = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 
 		$matches = 0;
 		foreach ($DBall as $dbentry){
@@ -689,7 +689,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id']
 					];
-					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if ($this->_sqlinterface->EXECUTE($deletion[CONFIG['sql']['CARO']['driver']]))
 						$matches++;
 				}
 			}
@@ -703,7 +703,7 @@ class STRESSTEST extends INSTALL{
 	public function fileserver(){
 		if (!empty(REQUEST[1])){
 			require_once('./_filehandler.php');
-			$FILEHANDLER = new FILEHANDLER($this->_pdo);
+			$FILEHANDLER = new FILEHANDLER($this->_sqlinterface);
 			// gather directories eligible for database strategy
 			$directories = [
 				$FILEHANDLER->directory('audit_attachments'),
@@ -711,7 +711,7 @@ class STRESSTEST extends INSTALL{
 				$FILEHANDLER->directory('record_attachments'),
 				$FILEHANDLER->directory('external_documents')
 			];
-			foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist') as $vendor){
+			foreach ($this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist') as $vendor){
 				$directories[] = $FILEHANDLER->directory('vendor_documents', [':id' => $vendor['id']]);
 				$directories[] = $FILEHANDLER->directory('vendor_products', [':id' => $vendor['id']]);
 			}
@@ -720,7 +720,7 @@ class STRESSTEST extends INSTALL{
 			foreach($directories as $directory){
 				switch(REQUEST[1]){
 					case 'fileserver':
-						$dbfiles = SQLQUERY::EXECUTE($this->_pdo, 'media_get_path_contents', [':path' => $directory]);
+						$dbfiles = $this->_sqlinterface->EXECUTE('media_get_path_contents', [':path' => $directory]);
 						array_push($files, ...array_map(Fn($path, $filename) => $path . '/' . $filename, array_column($dbfiles, 'path'), array_column($dbfiles, 'name')));
 						break;
 					case 'database':
@@ -745,20 +745,20 @@ class STRESSTEST extends INSTALL{
 							break;
 						}
 
-						$dbfile = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file', [':path' => $file]);
+						$dbfile = $this->_sqlinterface->EXECUTE('media_get_file', [':path' => $file]);
 						$dbfile = $dbfile ? $dbfile[0] : null;
 						if (!$dbfile) break;
 
 						$FILEHANDLER->createDirectory($dbfile['path']);
 						// inflate and reconvert to binary again
-						$dbfile['content'] = SQLQUERY::retrievebinary($dbfile['content']);
+						$dbfile['content'] = $this->_sqlinterface->retrievebinary($dbfile['content']);
 						$tempfile = fopen($file, 'wb');
 						fwrite($tempfile, $dbfile['content']);
 						fclose($tempfile);
 						echo $this->printSuccess('file successfully written to filesystem', $file) . PHP_EOL;
 						break;
 					case 'database':
-						if (SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [':path' => $file])) {
+						if ($this->_sqlinterface->EXECUTE('media_get_file_info', [':path' => $file])) {
 							echo $this->printWarning('file already present in database', $file) . PHP_EOL;
 							break;
 						}
@@ -767,11 +767,11 @@ class STRESSTEST extends INSTALL{
 						$fileContents = fread($fileHandle, filesize($file));
 						fclose($fileHandle);
 
-						if (SQLQUERY::EXECUTE($this->_pdo, 'media_post', [
+						if ($this->_sqlinterface->EXECUTE('media_post', [
 							':path' => $pifile['dirname'],
 							':name' => $pifile['basename'],
 							':mime_type' => mime_content_type($file),
-							':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
+							':content' => $this->_sqlinterface->storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 							':upload_date' => date('Y-m-d H:i:s'),
 						]))
 	 						echo $this->printSuccess('file successfully written to database', $file) . PHP_EOL;

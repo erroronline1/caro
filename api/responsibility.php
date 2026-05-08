@@ -36,9 +36,10 @@ class RESPONSIBILITY extends API {
 	 * display responsibilities and accept assignment
 	 */
 	public function responsibilities(){
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PATCH':
-				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
+				$responsibility = $this->_sqlinterface->EXECUTE('user_responsibility_get', [
 					':id' => intval($this->_requestedID)
 				]);
 				$responsibility = $responsibility ? $responsibility[0]: null;
@@ -51,7 +52,7 @@ class RESPONSIBILITY extends API {
 					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_date['servertime']->format('Y-m-d');
 					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
 				}
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
+				if ($this->_sqlinterface->EXECUTE('user_responsibility_accept', [
 						':id' => intval($this->_requestedID),
 						':assigned_users' => UTILITY::json_encode(($responsibility['assigned_users'])),
 						':proxy_users' => $responsibility['proxy_users']
@@ -69,7 +70,7 @@ class RESPONSIBILITY extends API {
 				break;
 			case 'GET':
 				$response = ['render' => ['content' => []]];
-				$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
+				$responsibilities = $this->_sqlinterface->EXECUTE('user_responsibility_get_all');
 				$available_units = [];
 				$selected = [];
 
@@ -122,7 +123,7 @@ class RESPONSIBILITY extends API {
 
 				$content = [];
 				if ($selected){
-					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+					$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 					foreach ($selected as $row){
 						$content = [];
 						$assigned = [];
@@ -221,7 +222,7 @@ class RESPONSIBILITY extends API {
 	 */
 	public function responsibility(){
 		if (!PERMISSION::permissionFor('responsibilities'))  $this->response([], 401);
-
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
@@ -245,7 +246,7 @@ class RESPONSIBILITY extends API {
 				$responsibility[':units'] = implode(',', $responsibility[':units']);
 
 				//user datalist
-				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 
 				// process assigned users
 				foreach ($this->_payload as $key => $value){
@@ -262,7 +263,7 @@ class RESPONSIBILITY extends API {
 				}
 				$responsibility[':proxy_users'] = UTILITY::json_encode($responsibility[':proxy_users']);
 				// insert responsibility into database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', $responsibility)) {
+				if ($this->_sqlinterface->EXECUTE('user_responsibility_post', $responsibility)) {
 					$responsibility[':assigned_users'] = json_decode($responsibility[':assigned_users'], true);
 					$responsibility[':proxy_users'] = json_decode($responsibility[':proxy_users'], true);
 					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
@@ -290,7 +291,7 @@ class RESPONSIBILITY extends API {
 					],
 					'content' => []]
 				];
-				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
+				$responsibility = $this->_sqlinterface->EXECUTE('user_responsibility_get', [
 					':id' => intval($this->_requestedID)
 				]);
 				$responsibility = $responsibility ? $responsibility[0] : [
@@ -309,7 +310,7 @@ class RESPONSIBILITY extends API {
 				$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
 
 				//user datalist
-				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				foreach ($users as $key => $user){
 					if (PERMISSION::filteredUser($user)) unset($users[$key]);
 				}
@@ -464,7 +465,7 @@ class RESPONSIBILITY extends API {
 				];
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_delete', [
+				if ($this->_sqlinterface->EXECUTE('user_responsibility_delete', [
 					':id' => $this->_requestedID
 				])) $this->response([
 					'response' => [

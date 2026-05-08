@@ -124,10 +124,10 @@ class RISK extends API {
 						}		
 						break;
 				}
-				if (SQLQUERY::EXECUTE($this->_pdo, 'risk_post', $risk)) $this->response([
+				if ($this->_sqlinterface->EXECUTE('risk_post', $risk)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('risk.risk_saved'),
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -141,7 +141,7 @@ class RISK extends API {
 				$datalist = $select = [];
 
 				// get requested risk or set up properties
-				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
+				$risk = $this->_sqlinterface->EXECUTE('risk_get', [
 					':id' => intval($this->_requestedID)
 				]);
 				$risk = $risk ? $risk[0] : [
@@ -174,7 +174,7 @@ class RISK extends API {
 				}
 
 				// gather all processes and sort database entries according to type and process to selects
-				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+				$risk_datalist = $this->_sqlinterface->EXECUTE('risk_datalist');
 				foreach ($risk_datalist as $row){
 					if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 
@@ -433,7 +433,7 @@ class RISK extends API {
 
 						// prepare available documents lists
 						// get latest approved by name
-						$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+						$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 						$hidden = $insertdocument = [];
 						$selecteddocuments = explode(', ', $risk['proof'] ? : '');
 						foreach ($documents as $key => $row) {
@@ -703,7 +703,7 @@ class RISK extends API {
 	public function risksearch($parameter = []){
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
-		$risk_datalist = $parameter['search'] ? SQLQUERY::EXECUTE($this->_pdo, 'risk_search', [
+		$risk_datalist = $parameter['search'] ? $this->_sqlinterface->EXECUTE('risk_search', [
 			':SEARCH' => $parameter['search'] ? : '%'
 			],
 			true,

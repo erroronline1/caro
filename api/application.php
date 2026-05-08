@@ -109,7 +109,7 @@ class APPLICATION extends API {
 
 		if (isset($_SESSION['user'])){
 			// add manual filtered by applicable permission
-			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+			$query = $this->_sqlinterface->EXECUTE('application_get_manual');
 			$topics = [];
 			foreach ($query as $row){
 				if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
@@ -213,7 +213,7 @@ class APPLICATION extends API {
 				$entry['permissions'] = implode(',', $permissions);
 
 				// post manual entry
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_post_manual', [
+				$query = $this->_sqlinterface->EXECUTE('application_post_manual', [
 					':title' => $entry['title'],
 					':content' => $entry['content'],
 					':permissions' => $entry['permissions'],
@@ -222,7 +222,7 @@ class APPLICATION extends API {
 		
 				if ($query) $this->response([
 					'response' => [
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'msg' => $this->_lang->GET('application.manual.saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
@@ -234,7 +234,7 @@ class APPLICATION extends API {
 					]]);
 				break;
 			case 'GET':
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
+				$query = $this->_sqlinterface->EXECUTE('application_get_manual_by_id', [
 					':id' => $this->_requestedManual != 'false' ? $this->_requestedManual : null
 				]);
 
@@ -253,7 +253,7 @@ class APPLICATION extends API {
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
 				// prepare all entries selection
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+				$query = $this->_sqlinterface->EXECUTE('application_get_manual');
 				$options = ['...' . $this->_lang->GET('application.manual.new_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . $this->_lang->GET('application.manual.new_topic')) ? ['selected' => true] : []];
 				foreach ($query as $row){
 					$options[$row['title']] = ['value' => $row['id']];
@@ -320,7 +320,7 @@ class APPLICATION extends API {
 	
 				break;
 			case 'DELETE':
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', [
+				$query = $this->_sqlinterface->EXECUTE('application_delete_manual', [
 					':id' => $this->_requestedManual
 				]);
 				if ($query) $this->response([
@@ -527,7 +527,7 @@ class APPLICATION extends API {
 		// default functions for every regular user
 		///////////////////////////////////////////
 		else {
-			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+			$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 
 			// storage warning
 			$storage = round(disk_free_space("/") / pow(1024, 3), 3);
@@ -543,7 +543,7 @@ class APPLICATION extends API {
 
 			if (isset($user['app_settings']['weeklyhours']) && isset($user['app_settings']['annualvacation'])){
 				// vacation warning
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				$user = $this->_sqlinterface->EXECUTE('user_get', [
 					':ids' => $_SESSION['user']['id'],
 					':names' => $_SESSION['user']['name']
 				]);
@@ -565,7 +565,7 @@ class APPLICATION extends API {
 
 			// display current announcements
 			$recentannouncements = [];
-			$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_recent');
+			$announcements = $this->_sqlinterface->EXECUTE('announcement_get_recent');
 			foreach($announcements as $announcement){
 				$announcement['organizational_unit'] = array_filter(explode(',', $announcement['organizational_unit'] ? : ''), fn($u) => boolval($u));
 				if ($announcement['organizational_unit'] && !array_intersect($announcement['organizational_unit'], $_SESSION['user']['units'])) continue;

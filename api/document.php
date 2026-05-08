@@ -49,7 +49,7 @@ class DOCUMENT extends API {
 					]]);
 				$approveas = explode(' | ', $approveas);
 
-				$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+				$approve = $this->_sqlinterface->EXECUTE('document_get', [
 					':id' => $this->_requestedID
 				]);
 				$approve = $approve ? $approve[0] : null;
@@ -70,7 +70,7 @@ class DOCUMENT extends API {
 				$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 
 				// update document approval 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
+				if ($this->_sqlinterface->EXECUTE('document_put_approve', [
 					':id' => $approve['id'],
 					':approval' => UTILITY::json_encode($approve['approval']) ? : ''
 				]) !== false) {
@@ -84,7 +84,7 @@ class DOCUMENT extends API {
 						elseif ($approve['context'] === 'component') {
 							// check for dependencies in documents
 							$dependeddocuments = [];
-							$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+							$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 							$hidden = [];
 							foreach ($fd as $row) {
 								if ($approve['id'] === $row['id'] || PERMISSION::pending('documentapproval', $row['approval'])) continue;
@@ -102,7 +102,7 @@ class DOCUMENT extends API {
 								$recipients['permission'] = explode(',', $approve['restricted_access']);
 							}
 							else {
-								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+								$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 								$recipients['user'] = array_column($users, 'name');
 							}
 							
@@ -132,8 +132,8 @@ class DOCUMENT extends API {
 				$componentselection = $documentselection = $approvalposition = [];
 
 				// prepare all unapproved elements
-				$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
-				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+				$components = $this->_sqlinterface->EXECUTE('document_component_datalist');
+				$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 				$unapproved = ['documents' => [], 'components' => []];
 				$response = ['render' => ['content' => [[]]]]; // default first nesting
 				$hidden = [];
@@ -194,7 +194,11 @@ class DOCUMENT extends API {
 				// display selected element for review
 				if ($this->_requestedID){
 					$alert = '';
-					// recursively delete required attributes
+					/**
+					 * recursively delete required attributes
+					 * @param array $element
+					 * @return array
+					 */
 					function unrequire($element){
 						$result = [];
 						foreach ($element as $sub){
@@ -211,7 +215,7 @@ class DOCUMENT extends API {
 						return [$result];
 					}
 
-					$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+					$approve = $this->_sqlinterface->EXECUTE('document_get', [
 						':id' => $this->_requestedID
 					]);
 					$approve = $approve ? $approve[0] : null;
@@ -228,7 +232,7 @@ class DOCUMENT extends API {
 					if ($approve['context'] === 'component'){
 						array_push($response['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
 						// check for dependencies in documents
-						$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+						$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 						$hidden = [];
 						foreach ($fd as $row) {
 							if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -348,7 +352,7 @@ class DOCUMENT extends API {
 				// put hidden attribute if anything else remains the same
 				// get latest by name
 				$exists = [];
-				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
+				$documents = $this->_sqlinterface->EXECUTE('document_bundle_get_by_name', [
 					':name' => $bundle[':name']
 				]);
 				foreach ($documents as $exists){
@@ -362,7 +366,7 @@ class DOCUMENT extends API {
 					$bundle[':approval'] = $exists['approval'];
 				}
 				// append bundle to database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $bundle)) $this->response([
+				if ($this->_sqlinterface->EXECUTE('document_post', $bundle)) $this->response([
 						'response' => [
 							'name' => $bundle[':name'],
 							'msg' => $this->_lang->GET('assemble.compose.bundle.saved', [':name' => $bundle[':name']]),
@@ -385,14 +389,14 @@ class DOCUMENT extends API {
 
 				// get selected bundle
 				if (intval($this->_requestedID)){
-					$bundle = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+					$bundle = $this->_sqlinterface->EXECUTE('document_get', [
 						':id' => $this->_requestedID
 					]);
 					$bundle = $bundle ? $bundle[0] : null;
 				} else {
 					// get latest by name
 					$bundle = [];
-					$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
+					$documents = $this->_sqlinterface->EXECUTE('document_bundle_get_by_name', [
 						':name' => $this->_requestedID
 					]);
 					foreach ($documents as $bundle){
@@ -414,7 +418,7 @@ class DOCUMENT extends API {
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('assemble.compose.bundle.not_found', [':name' => $this->_requestedID]), 'type' => 'error']; // early exit
 		
 				// prepare existing bundle lists
-				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+				$bundles = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 				$hidden = [];
 				foreach ($bundles as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -429,7 +433,7 @@ class DOCUMENT extends API {
 				ksort($options);
 				// prepare available documents lists
 				// get latest approved by name
-				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+				$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 				$hidden = [];
 				foreach ($documents as $row) {
 					if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
@@ -441,7 +445,7 @@ class DOCUMENT extends API {
 				ksort($insertdocument);
 
 				// get active external files
-				$externaldocuments = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+				$externaldocuments = $this->_sqlinterface->EXECUTE('file_external_documents_get_active');
 				if ($externaldocuments) {
 					foreach(array_column($externaldocuments, 'path') as $path){
 						$insertexternaldocument[$path] = ['value' => $path . "\n"];
@@ -576,9 +580,9 @@ class DOCUMENT extends API {
 		if ($this->_requestedID === 'null') $this->_requestedID = null;
 		$available_units = [];
 		$this->_requestedID = $this->_requestedID ? : null;
-		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+		$bd = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 
-		$externaldocuments = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+		$externaldocuments = $this->_sqlinterface->EXECUTE('file_external_documents_get_active');
 		if ($externaldocuments) $externaldocuments = array_column($externaldocuments, 'path');
 
 		$hidden = $bundles = [];
@@ -591,6 +595,7 @@ class DOCUMENT extends API {
 			if (!$this->_unit && !in_array($row['unit'], $_SESSION['user']['units'])) continue;
 
 			// add to result
+			$percent = 0;
 			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent); // filter by similarity if search is requested
 			if (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($this->_requestedID, $row['name'], FNM_CASEFOLD)) {
 				if (($documents = $row['content'] ? explode(',', $row['content']) : false) !== false){
@@ -698,6 +703,7 @@ class DOCUMENT extends API {
 
 				/**
 				 * uploads files and populates component image widgets with the final path and file name
+				 * @param object $FILEHANDLER
 				 * @param array $content payload $component['content]
 				 * @param string $component_name passed for scope
 				 * @param string $timestamp YmdHis passed for scope
@@ -728,6 +734,11 @@ class DOCUMENT extends API {
 							$filename = implode('_', array_slice(explode('_', pathinfo($file['path'])['basename']) , 2));
 							$uploaded_files[$filename] = $file['path'];
 						}
+						/**
+						 * @param object $FILEHANDLER
+						 * @param array $element
+						 * @param array $uploaded_filearray 
+						 */
 						function replace_images($FILEHANDLER, $element, $uploaded_filearray){
 							$result = [];
 							foreach ($element as $sub){
@@ -752,7 +763,11 @@ class DOCUMENT extends API {
 					return $content;
 				}
 
-				// recursively scan for images within content
+				/**
+				 * recursively scan for images within content
+				 * @param array $element
+				 * @param array $result
+				 */
 				function usedImages($element, $result = []){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -782,7 +797,7 @@ class DOCUMENT extends API {
 				];
 
 				// select latest document by name
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
+				$exists = $this->_sqlinterface->EXECUTE('document_component_get_by_name', [
 					':name' => $component_name
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
@@ -811,7 +826,7 @@ class DOCUMENT extends API {
 					}
 
 					if ($update){
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document_component)) $this->response([
+						if ($this->_sqlinterface->EXECUTE('document_post', $document_component)) $this->response([
 								'response' => [
 									'name' => $exists['name'],
 									'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
@@ -837,9 +852,9 @@ class DOCUMENT extends API {
 
 				$document_component[':content'] = UTILITY::json_encode($component);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document_component)) {
+				if ($this->_sqlinterface->EXECUTE('document_post', $document_component)) {
 					// alert userGroups for approval
-					$component_id = $this->_pdo->lastInsertId();
+					$component_id = $this->_sqlinterface->_pdo->lastInsertId();
 					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
 					foreach (PERMISSION::permissionFor('documentapproval', true) as $permission){
 						if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
@@ -863,7 +878,7 @@ class DOCUMENT extends API {
 			case 'GET':
 				// return just the content for the composer
 				if (intval($this->_requestedID)){
-					$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+					$component = $this->_sqlinterface->EXECUTE('document_get', [
 						':id' => $this->_requestedID
 					]);
 					$component = $component ? $component[0] : null;
@@ -878,12 +893,16 @@ class DOCUMENT extends API {
 				$this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 				break;
 			case 'DELETE':
-				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+				$component = $this->_sqlinterface->EXECUTE('document_get', [
 					':id' => $this->_requestedID
 				]);
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.delete_failure'), 'type' => 'error']]); //early exit
-				// recursively delete images
+				/**
+				 * recursively delete images
+				 * @param object $FILEHANDLER
+				 * @param array $element
+				 */
 				function deleteImages($FILEHANDLER, $element){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -895,7 +914,7 @@ class DOCUMENT extends API {
 					}
 				}
 				deleteImages($this->_filehandler, json_decode($component['content'], true)['content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
+				if ($this->_sqlinterface->EXECUTE('document_delete', [
 					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.component.delete_success'),
@@ -923,7 +942,7 @@ class DOCUMENT extends API {
 		
 		// get selected component
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+			$component = $this->_sqlinterface->EXECUTE('document_get', [
 				':id' => $this->_requestedID
 			]);
 			$component = $component ? $component[0] : null;
@@ -948,7 +967,7 @@ class DOCUMENT extends API {
 			$options[$unit] = ['...' . $this->_lang->GET('assemble.compose.component.existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$alloptions[$unit] = ['...' . $this->_lang->GET('assemble.compose.component.existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		}
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$components = $this->_sqlinterface->EXECUTE('document_component_datalist');
 		$hidden = [];
 		foreach ($components as $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
@@ -1000,7 +1019,7 @@ class DOCUMENT extends API {
 		// load approved documents for occasional linking
 		// check for dependencies in documents
 		$approveddocuments = $dependeddocuments = [];
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = [];
 		foreach ($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -1211,7 +1230,11 @@ class DOCUMENT extends API {
 				// check for forbidden names
 				if (UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 
-				// recursively retrieve input names and check for identifier withon component
+				/**
+				 * recursively retrieve input names and check for identifier withon component
+				 * @param array $element
+				 * @param array $result
+				 */
 				function componentAttributes($element, $result = ['names' => [], 'hasidentifier' => false]){
 					foreach ($element as $sub){
 						if (array_is_list($sub)){
@@ -1298,7 +1321,7 @@ class DOCUMENT extends API {
 				];
 
 				// select latest document by name
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_document_get_by_name', [
+				$exists = $this->_sqlinterface->EXECUTE('document_document_get_by_name', [
 					':name' => $this->_payload->name
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
@@ -1320,7 +1343,7 @@ class DOCUMENT extends API {
 					}
 
 					if ($update) {
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document)) $this->response([
+						if ($this->_sqlinterface->EXECUTE('document_post', $document)) $this->response([
 								'response' => [
 									'name' => $this->_payload->name,
 									'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
@@ -1339,8 +1362,8 @@ class DOCUMENT extends API {
 				// if not updated check if approve is set, not earlier
 				if (!$this->_payload->approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_saved_missing'), 'type' => 'error']]);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', $document)) {
-						$document_id = $this->_pdo->lastInsertId();
+				if ($this->_sqlinterface->EXECUTE('document_post', $document)) {
+						$document_id = $this->_sqlinterface->_pdo->lastInsertId();
 						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
 						foreach (PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
@@ -1362,13 +1385,13 @@ class DOCUMENT extends API {
 					]]);
 				break;
 			case 'DELETE':
-				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+				$component = $this->_sqlinterface->EXECUTE('document_get', [
 					':id' => $this->_requestedID
 				]);
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.delete_failure'), 'type' => 'error']]);
 				
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
+				if ($this->_sqlinterface->EXECUTE('document_delete', [
 					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.document.delete_success'),
@@ -1399,7 +1422,7 @@ class DOCUMENT extends API {
 		
 		// get selected document
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+			$document = $this->_sqlinterface->EXECUTE('document_get', [
 				':id' => $this->_requestedID
 			]);
 			$document = $document ? $document[0] : null;
@@ -1427,7 +1450,7 @@ class DOCUMENT extends API {
 			$alloptions[$unit] = ['...' . $this->_lang->GET('assemble.compose.document.existing_documents_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$componentoptions[$unit] = ['...' => ['value' => '']];
 		}
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = [];
 		foreach ($fd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
@@ -1444,7 +1467,7 @@ class DOCUMENT extends API {
 		}
 
 		// prepare existing component list of fully approved
-		$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$cd = $this->_sqlinterface->EXECUTE('document_component_datalist');
 		$hidden = [];
 		foreach ($cd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
@@ -1503,7 +1526,7 @@ class DOCUMENT extends API {
 		}
 
 		// check for bundle dependencies
-		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+		$bd = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 		$hidden = [];
 		$dependedbundles = [];
 		foreach ($bd as $key => $row) {
@@ -1516,7 +1539,7 @@ class DOCUMENT extends API {
 		// check for dependencies in approved components (linked documents)
 		$dependedcomponents = [];
 		if ($document['name']){
-			$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+			$cd = $this->_sqlinterface->EXECUTE('document_component_datalist');
 			$hidden = [];
 			foreach ($cd as $row) {
 				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -1849,7 +1872,7 @@ class DOCUMENT extends API {
 	 * this is a cross-module method this class may be instatiated for
 	 */
 	public function documentsearch($parameter = []){
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = $matches = [];
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
@@ -1934,7 +1957,7 @@ class DOCUMENT extends API {
 		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
 		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
 
-		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
+		$document = $this->_sqlinterface->EXECUTE('document_get', [
 			':id' => $document_id
 		]);
 		$document = $document ? $document[0] : null;
@@ -2022,7 +2045,7 @@ class DOCUMENT extends API {
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
 
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$pdffile = $PDF->documentsPDF($summary);
 
 		if ($internal_id) return $pdffile;
@@ -2040,7 +2063,12 @@ class DOCUMENT extends API {
 			],
 		]);
 	}
-	// in objects scope to avoid redeclaration on imports (e.g. maintenance)
+	/**
+	 * in objects scope to avoid redeclaration on imports (e.g. maintenance)
+	 * @param string $name
+	 * @param array $enumerate
+	 * @param int $number
+	 */
 	private function enumerate($name, $enumerate = [], $number = 1){
 		if (isset($enumerate[$name])) $enumerate[$name] += $number;
 		else $enumerate[$name] = $number;	
@@ -2193,7 +2221,7 @@ class DOCUMENT extends API {
 	private function latestApprovedName($query = '', $name = '', $maxtimestamp = ''){
 		// get latest approved by name
 		$element = [];
-		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+		$elements = $this->_sqlinterface->EXECUTE($query, [
 			':name' => $name
 		]);
 		foreach ($elements as $element){
@@ -2274,7 +2302,7 @@ class DOCUMENT extends API {
 
 		$result = [];
 		$contentBody = [];
-		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
+		$contents = $this->_sqlinterface->EXECUTE($query, $parameters);
 		if ($contents){
 			foreach ($contents as $content){
 				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
@@ -2296,7 +2324,7 @@ class DOCUMENT extends API {
 				default:
 					foreach (explode(',', $content['content']) as $usedcomponent) {
 						// get latest approved by name
-						$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
+						$components = $this->_sqlinterface->EXECUTE('document_component_get_by_name', [
 							':name' => $usedcomponent
 						]);
 						foreach ($components as $component){

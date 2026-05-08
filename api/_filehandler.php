@@ -16,15 +16,15 @@ define("FILEHANDLER_IMAGE_STREAM", 0x2);
 define("FILEHANDLER_IMAGE_RESOURCE", 0x4);
 
 class FILEHANDLER{
-	public $_pdo = null;
+	// CARO\API\SQLINTERFACE
+	public mixed $_sqlinterface = null;
 
 	/**
-	 * @param object $_pdo current pdo necessary if files are to be stored in a database
+	 * @param object $_sqlinterface current pdo necessary if files are to be stored in a database
 	 */
-	public function __construct($_pdo = null){
-		$this->_pdo = $_pdo;
+	public function __construct($_sqlinterface = null){
+		$this->_sqlinterface = $_sqlinterface;
 	}
-
 
 	/**
 	 *       _ _           _                   
@@ -43,6 +43,7 @@ class FILEHANDLER{
 	 * @return string|object|null a GdImage ressource or no return
 	 */
 	public function alterImage($file, $maxSize = 1024, $destination = FILEHANDLER_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = '', $watermarkPattern = false, $resourceExtension = null){
+		$input = $filetype = null;
 		if (is_file($file)){
 			$filetype = getimagesize($file)[2];
 			switch($filetype){
@@ -323,14 +324,14 @@ class FILEHANDLER{
 			}
 			if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
 				// delete database entries (records exceeding lifespan)
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'media_delete', [
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('media_delete', [
 					':path' => $pathinfo['dirname'],
 					':names' => $pathinfo['basename']
 				]));
 			}
 		}
 		if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
-			$result = boolval(array_sum(SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack)));
+			$result = boolval(array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)));
 		}
 		return $result;
 	}
@@ -387,7 +388,7 @@ class FILEHANDLER{
 		if (file_exists($path)) return './api/api.php/file/stream/' . substr($path, 1);
 		if (self::isInFilesystem($path)) return '';
 		
-		$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [
+		$file = $this->_sqlinterface->EXECUTE('media_get_file_info', [
 			':path' => $path
 		]);
 		$file = $file ? $file[0] : null;
@@ -454,7 +455,7 @@ class FILEHANDLER{
 				$file = array_merge($file, pathinfo($attributes['href']));
 				if (self::isInFilesystem($file['realpath'])) $mime = mime_content_type($file['realpath']);
 				else {
-					$dbfile = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file_info', [
+					$dbfile = $this->_sqlinterface->EXECUTE('media_get_file_info', [
 						':path' => $file['realpath']
 					]);
 					$dbfile = $dbfile ? $dbfile[0] : null;
@@ -578,8 +579,8 @@ class FILEHANDLER{
 			}
 			return $result;
 		}
-		//else database
-		$files = SQLQUERY::EXECUTE($this->_pdo, 'media_get_path_contents', [
+		// else database
+		$files = $this->_sqlinterface->EXECUTE('media_get_path_contents', [
 			':path' => $directory
 		]);
 		$result = array_map(Fn($v) => $v['path'] . '/' . $v['name'], $files);
@@ -610,7 +611,7 @@ class FILEHANDLER{
 			if (self::isInFilesystem($path)) return null; // does not exist, but should be there
 
 			// else recreate from database
-			$file = SQLQUERY::EXECUTE($this->_pdo, 'media_get_file', [
+			$file = $this->_sqlinterface->EXECUTE('media_get_file', [
 				':path' => $path
 			]);
 			$file = $file ? $file[0] : null;
@@ -618,7 +619,7 @@ class FILEHANDLER{
 
 			self::createDirectory($file['path']);
 			// inflate and reconvert to binary again
-			$file['content'] = SQLQUERY::retrievebinary($file['content']);
+			$file['content'] = $this->_sqlinterface->retrievebinary($file['content']);
 			$tempfile = fopen($path, 'wb');
 			fwrite($tempfile, $file['content']);
 			fclose($tempfile);
@@ -725,7 +726,6 @@ class FILEHANDLER{
 						replace: $destination['replace'] ?? null,
 						imageoptions: $imageoptions)
 					: $this->saveToDatabase(
-						$this->_pdo,
 						tmpname: $_FILES[$inputname]['tmp_name'][$j],
 						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
 						mime_type: $_FILES[$inputname]['type'][$j],
@@ -765,7 +765,6 @@ class FILEHANDLER{
 		}
 	}
 	/**
-	 * @param object $_pdo an active pdo instance
 	 * @param string $tmpname temporary file
 	 * @param string $destination expected path
 	 * @param string $mime_type
@@ -773,9 +772,9 @@ class FILEHANDLER{
 	 * 
 	 * @return string filename, occasionally enumerated
 	 */
-	public function saveToDatabase($_pdo, $tmpname, $destination, $mime_type, $imageoptions = []){
+	public function saveToDatabase($tmpname, $destination, $mime_type, $imageoptions = []){
 		$file = pathinfo($destination);
-		$present = SQLQUERY::EXECUTE($_pdo, 'media_get_path_contents', [
+		$present = $this->_sqlinterface->EXECUTE('media_get_path_contents', [
 			':path' => $destination
 		]);
 		
@@ -791,11 +790,11 @@ class FILEHANDLER{
 			$fileContents = self::alterImage($fileContents, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_RESOURCE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')), strtolower($file['extension']));
 		}
 
-		if (SQLQUERY::EXECUTE($_pdo, 'media_post', [
+		if ($this->_sqlinterface->EXECUTE('media_post', [
 			':path' => $file['dirname'],
 			':name' => $filename,
 			':mime_type' => $mime_type,
-			':content' => SQLQUERY::storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
+			':content' => $this->_sqlinterface->storebinary($fileContents), // unfortunately bloats the data to almost double the size even with compression. direct your complaints to microsoft as mariadb does have no issues storing binary directly
 			':upload_date' => date('Y-m-d H:i:s'),
 		])) return [
 			'path' => $file['dirname'] . '/' . $filename,

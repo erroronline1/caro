@@ -52,7 +52,7 @@ class RECORD extends API {
 	 * @param array $action inputs js events for inputs
 	 * @param string $checked json-encoded case_state options from the record
 	 * 
-	 * @return response|array either result of state update or form elements
+	 * @return array either result of state update or form elements
 	 * 
 	 * also see application.php->cron()
 	 */
@@ -61,7 +61,7 @@ class RECORD extends API {
 			case 'PATCH':
 				if (!PERMISSION::permissionFor('recordscasestate') || array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-				$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+				$case = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 					':identifier' => $this->_requestedID
 				]);
 				$case = $case ? $case[0] : null;
@@ -142,7 +142,7 @@ class RECORD extends API {
 					$case[':content'] = UTILITY::json_encode($records) ? : null;
 					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]);
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', $case)) $this->response([
+					if ($this->_sqlinterface->EXECUTE('records_post', $case)) $this->response([
 						'response' => [
 							'msg' => $successMsg,
 							'type' => 'success'
@@ -246,7 +246,7 @@ class RECORD extends API {
 	public function close(){
 		if (!PERMISSION::permissionFor('recordsclosing') && !PERMISSION::permissionFor('complaintclosing')) $this->response([], 401);
 		if (!in_array($this->_passedIdentify, PERMISSION::permissionFor('recordsclosing', true)) && !in_array($this->_passedIdentify, PERMISSION::permissionFor('complaintclosing', true))) $this->response([], 401);
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $this->_requestedID
 		]);
 		$data = $data ? $data[count($data) - 1] : []; // most recent entry suffices 
@@ -258,7 +258,7 @@ class RECORD extends API {
 			'date' => $this->_date['servertime']->format('Y-m-d H:i')
 		];
 
-		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
+		$this->_sqlinterface->EXECUTE('records_close', [
 			':closed' => UTILITY::json_encode($data['closed']),
 			':identifier' => $this->_requestedID
 		]);
@@ -287,10 +287,18 @@ class RECORD extends API {
 		]];
 
 		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, make images available on fileserver database strategy
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
+		$datalists = $this->_sqlinterface->EXECUTE('records_datalist_get', [
 			':unit' => $document['unit']
 		]);
+		/**
+		 * @param array $element
+		 * @param string $identify
+		 * @param object $calendar
+		 * @param object $_lang
+		 * @param object $_filehandler
+		 * @param array $datalists
+		 */
 		function setidentifier($element, $identify, $calendar, $_lang, $_filehandler, $datalists){
 			$content = [];
 			foreach ($element as $subs){
@@ -365,7 +373,10 @@ class RECORD extends API {
 			]
 		]]);
 
-		// check if a submit button is applicable
+		/**
+		 * check if a submit button is applicable
+		 * @param array $element
+		 */ 
 		function saveable($element){
 			$saveable = false;
 			foreach ($element as $subs){
@@ -425,7 +436,7 @@ class RECORD extends API {
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$preset = null;
 				if ($this->_passedIdentify){
-					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+					$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 						':identifier' => $this->_passedIdentify
 					]);
 					$data = $data ? $data[0] : null;
@@ -449,7 +460,7 @@ class RECORD extends API {
 			if (in_array($document['context'], ['generalrecords'])) {
 				$preset = null;
 				if ($this->_passedIdentify){
-					$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+					$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 						':identifier' => $this->_passedIdentify
 					]);
 					$data = $data ? $data[0] : null;
@@ -463,7 +474,7 @@ class RECORD extends API {
 					$restrictedToUnit[$translation] = ['value' => $unit];
 					if (isset($preset['unit']) && in_array($unit, $preset['unit'])) $restrictedToUnit[$translation]['checked'] = true;
 				}
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				$datalist = $restrictedToUser = [];
 				foreach ($user as $key => $row) {
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient', 'group']])) continue;
@@ -587,15 +598,13 @@ class RECORD extends API {
 	 *          |_|
 	 * export records as pdf
 	 * @param string $summarize full|document|simplified|simplifieddocument
-	 * 
-	 * @return response download link
 	 */
 	private function export($summarize = "full"){
 		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
 		$content = $this->summarizeRecord($summarize, true);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->recordsPDF($content);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -708,15 +717,15 @@ class RECORD extends API {
 		}
 
 		if ($IDENTIFY_BY_){
-			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+			$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 				':identifier' => $IDENTIFY_BY_
 			]);
 			$data = $data ? $data[0] : null;
 
 			if ($data) {
 				$result = [];
-				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
+				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 
 				$records = json_decode($data['content'], true);
 				foreach ($records as $record){
@@ -788,7 +797,7 @@ class RECORD extends API {
 
 		// get latest approved by name
 		$element = [];
-		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+		$elements = $this->_sqlinterface->EXECUTE($query, [
 			':name' => $name
 		]);
 		foreach ($elements as $element){
@@ -822,13 +831,13 @@ class RECORD extends API {
 		$necessarydocuments = $bundle['content'] ? explode(',', $bundle['content']) : []; // extract document names
 
 		// unset hidden documents from bundle presets
-		$alldocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$alldocuments = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		foreach ($alldocuments as $row){
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessarydocuments)) !== false) unset($necessarydocuments[$key]);
 		}
 		// retrieve record
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $this->_passedIdentify
 		]);
 		$data = $data ? $data[0] : null;
@@ -874,7 +883,7 @@ class RECORD extends API {
 
 		// prepare available documents to control appending button or proof bundle entries valid
 		$validDocuments = [];
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = [];
 		foreach ($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
@@ -990,7 +999,10 @@ class RECORD extends API {
 					// update record datalists if passed document contains issues permitting autocompletion
 					if ($useddocument){
 
-						// recursive check for names that permit autocompletion
+						/**
+						 * recursive check for names that permit autocompletion
+						 * @param array $element
+						 */ 
 						function autocomplete($element){
 							$content = [];
 							foreach ($element as $subs){
@@ -1005,7 +1017,7 @@ class RECORD extends API {
 						};
 
 						if ($issues = autocomplete($useddocument['content'])){
-							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [
+							$datalists = $this->_sqlinterface->EXECUTE('records_datalist_get', [
 								':unit' => $useddocument['unit']
 							]);
 							$sqlQueryStack = [];
@@ -1024,7 +1036,7 @@ class RECORD extends API {
 									array_push($datalist, ...$values);
 									$datalist = array_values(array_unique($datalist));
 									sort($datalist);
-									$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_put', [
+									$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('records_datalist_put', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
@@ -1034,14 +1046,14 @@ class RECORD extends API {
 									// issue not found, add unique and sorted datalist
 									$datalist = array_values(array_unique($values));
 									sort($datalist);
-									$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post', [
+									$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('records_datalist_post', [
 										':issue' => $issue,
 										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
 									]));
 								}
 							}
-							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+							$this->_sqlinterface->EXECUTE($sqlQueryStack);
 						}
 					}
 
@@ -1054,7 +1066,7 @@ class RECORD extends API {
 					];
 					if ($secureattachments) $current_record['attachments'] = UTILITY::json_encode($secureattachments);
 					
-					$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+					$case = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 						':identifier' => $identifier
 					]);
 					$case = $case ? $case[0] : null;
@@ -1063,7 +1075,7 @@ class RECORD extends API {
 					$restricted_access = [];
 					if (!$case || $case['context'] === 'generalrecords'){
 						if ($restricted_users) {
-							$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 							$restricted_access['user'] = array_map(Fn($usr, $name) => $usr['name'] === $name ? $usr['id'] : false, $user, preg_split('/[,;]\s{0,}/', $restricted_users));
 						}
 						if ($restricted_groups){
@@ -1114,9 +1126,9 @@ class RECORD extends API {
 					$case[':content'] = BLOCKCHAIN::add($case[':content'], $current_record); // append current record
 					$case[':content'] = UTILITY::json_encode($case[':content']);
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', $case)){
+					if ($this->_sqlinterface->EXECUTE('records_post', $case)){
 						// append next document recommendation for common and matching user units
-						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+						$bd = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 						$hidden = $recommended = [];
 						foreach ($bd as $key => $row) {
 							if ($row['hidden']
@@ -1197,7 +1209,7 @@ class RECORD extends API {
 				foreach ($content['units'] as $unit){
 					$messagedialog[$this->_lang->_USER['units'][$unit]] = ['value' => $unit];
 				}
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				$datalist = [];
 				foreach ($user as $key => $row) {
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient', 'group']])) continue;
@@ -1445,7 +1457,7 @@ class RECORD extends API {
 				}
 				// append document recommendations for common and matching user units
 				// retrieve bundles
-				$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+				$bd = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 				$hidden = $bundles = [];
 				foreach ($bd as $key => $row) {
 					if ($row['hidden']
@@ -1621,7 +1633,7 @@ class RECORD extends API {
 					$bundles = ['...' . $this->_lang->GET('record.match_bundles_default') => ['value' => '0']];
 					// match against bundles
 					// prepare existing bundle lists, not reusable forom above because all bundles are supposed to be displayed
-					$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+					$bd = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 					$hidden = [];
 					foreach ($bd as $key => $row) {
 						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -1742,7 +1754,7 @@ class RECORD extends API {
 
 		// get all records or these fitting the search
 		$data = $this->recordsearch(['search' => $this->_payload->_filter]);
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		$last_user = [];
 		foreach($users as $user){
 			$last_user[$user['id']] = $user['name'];
@@ -1922,7 +1934,7 @@ class RECORD extends API {
 	public function recordsearch($parameter = []){
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_search', [
+		$data = $this->_sqlinterface->EXECUTE('records_search', [
 				':search' => $parameter['search'] ? : '%',
 				':SEARCH' => $parameter['search'] ? : '%'
 			],
@@ -2053,12 +2065,12 @@ class RECORD extends API {
 		}
 		
 		// check if new id (e.g. scanned) is already taken
-		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$original = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $new_id
 		]);
 		$original = $original ? $original[0] : null;
 
-		$merge = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$merge = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $entry_id
 		]);
 		$merge = $merge ? $merge[0] : null;
@@ -2074,7 +2086,7 @@ class RECORD extends API {
 
 		if (!$original) {
 			// overwrite identifier, append record altering
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			if ($this->_sqlinterface->EXECUTE('records_post', [
 					':context' => $merge['context'],
 					':case_state' => $merge['case_state'] ? : null,
 					':record_type' => $merge['record_type'],
@@ -2104,7 +2116,7 @@ class RECORD extends API {
 					'type' => 'error'
 				]]);
 	
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			if ($this->_sqlinterface->EXECUTE('records_post', [
 					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $original['record_type'],
@@ -2119,7 +2131,7 @@ class RECORD extends API {
 					':restricted_access' => $original['restricted_access'],
 					':id' => $original['id'],
 					':unit' => $original['unit']
-			]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
+			]) && $this->_sqlinterface->EXECUTE('records_delete', [
 					':id' => $merge['id']
 			])) $this->response([
 				'response' => [
@@ -2147,7 +2159,7 @@ class RECORD extends API {
 		$entry_id = UTILITY::propertySet($this->_payload, 'entry_id');
 		$record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'));
 
-		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$original = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $entry_id
 		]);
 		$original = $original ? $original[0] : null;
@@ -2165,7 +2177,7 @@ class RECORD extends API {
 					], true)]
 			]);
 			// update record
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			if ($this->_sqlinterface->EXECUTE('records_post', [
 					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $record_type,
@@ -2220,15 +2232,14 @@ class RECORD extends API {
 	 *  |_ -| | |     |     | .'|  _| |- _| -_|  _| -_|  _| . |  _| . |
 	 *  |___|___|_|_|_|_|_|_|__,|_| |_|___|___|_| |___|___|___|_| |___|
 	 *
-	 * @param str $type full, simplified, document
-	 * @param bool $retype based on view and permission link to retype or not
+	 * @param string $type full, simplified, document
 	 * @param bool $export if summary is about to be exported to a pdf
 	 * 
 	 * @return array $summary
 	 */
 
 	private function summarizeRecord($type = 'full', $export = false){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $this->_requestedID
 		]);
 		$data = $data ? $data[0] : null;
@@ -2268,7 +2279,7 @@ class RECORD extends API {
 		];
 		$accumulatedcontent = [];
 
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 
 		$records = json_decode($data['content'], true);
 		// sort by date
@@ -2315,7 +2326,7 @@ class RECORD extends API {
 			if (isset($data['restricted_access']['permission'])) $restricted[] = $this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor', [], $export)], $export);
 			if (isset($data['restricted_access']['unit'])) array_push($restricted, ...array_map(Fn($v) => $this->_lang->GET('units.' . $v, [], $export), $data['restricted_access']['unit']));
 			if (isset($preset['user'])) {
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				array_push($restricted, ...array_map(Fn($usr, $id) => $usr['id'] === $id ? $usr['name'] : false, $user, $preset['user']));
 			}
 			if ($restricted)
@@ -2376,6 +2387,11 @@ class RECORD extends API {
 			require_once('./document.php');
 			$documentfinder = new DOCUMENT(get_class_vars(get_class($this)));
 
+			/**
+			 * @param string $name
+			 * @param array $enumerate
+			 * @param int $number
+			 */
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;
 				else $enumerate[$name] = $number;	
@@ -2386,7 +2402,7 @@ class RECORD extends API {
 			 * recursive content setting according to the most recent document
 			 * @param array $element component and subsets
 			 * @param array $payload
-			 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
+			 * @param string $type
 			 * @param array $enumerate names of elements that have to be enumerated
 			 * 
 			 * also see document.php export()
@@ -2458,11 +2474,11 @@ class RECORD extends API {
 	}
 
 	public function verify(){
-		$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+		$case = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $this->_requestedID
 		]);
 		$case = $case ? $case[0] : null;
-		if (!$case || ! BLOCKCHAIN::verified($this->_pdo, json_decode($case['content'], true))) $this->response([
+		if (!$case || ! BLOCKCHAIN::verified($this->_sqlinterface, json_decode($case['content'], true))) $this->response([
 			'response' => [
 				'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $this->_requestedID]),
 				'type' => 'error'

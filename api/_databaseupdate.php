@@ -21,26 +21,21 @@ require_once('_sqlinterface.php');
 // didn't bother handling exceptions like missing driver instructions. if you edit this you are supposed to fairly know what you're doing anyway. 
 
 class UPDATE{
-	public $_pdo;
-	private $driver;
+	// CARO\API\SQLINTERFACE
+	public mixed $_sqlinterface;
+	private string $driver;
 
 	public function __construct(){
-		$options = [
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-		];
-		$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
-		if ($dbsetup) $this->_pdo->exec($dbsetup);
-		$this->driver = CONFIG['sql'][CONFIG['sql']['use']]['driver'];
+		$this->_sqlinterface = new SQLINTERFACE(CONFIG['sql']['CARO']);
+		$this->driver = CONFIG['sql']['CARO']['driver'];
 	}
 
 	public function update(){
 		foreach (['_2026_03_27'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
-					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
-					$sql = SQLQUERY::EXECUTE($this->_pdo, $query);
+					|| $this->_sqlinterface->EXECUTE($this->backup($query)[$this->driver][0]) !== false){
+					$sql = $this->_sqlinterface->EXECUTE($query);
 					if (!$sql || !isset($sql[1]))
 						echo '<br />[*] This update has no errorInfo and was successful or without side effects:<br /><code>' . $query . '</code><br />';
 					else
@@ -54,6 +49,9 @@ class UPDATE{
 		}
 	}
 
+	/**
+	 * @param string $query
+	 */
 	private function backup($query){
 		preg_match("/ALTER TABLE (\w+)|DROP TABLE (\w+)/m", $query, $table);
 		if (!isset($table[1]) || !$table[1]) return false;
@@ -455,9 +453,9 @@ class UPDATE{
 		$EXECUTE = false;
 		////////////////////////////
 
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		foreach($users as $user){
-			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+			$user = $this->_sqlinterface->EXECUTE('user_get', [
 				':id' => $user['id'],
 				':name' => $user['name']
 			]);
@@ -479,7 +477,7 @@ class UPDATE{
 			echo "<pre>";
 			print_r($u_user);
 			echo "</pre>";
-			if ($EXECUTE && SQLQUERY::EXECUTE($this->_pdo, 'user_post', $u_user)) echo "<br />[!] CREDENTIALS HAVE BEEN ADJUSTED, NOW DISABLE THE EXECUTION AGAIN!";
+			if ($EXECUTE && $this->_sqlinterface->EXECUTE('user_post', $u_user)) echo "<br />[!] CREDENTIALS HAVE BEEN ADJUSTED, NOW DISABLE THE EXECUTION AGAIN!";
 		}
 
 		return [

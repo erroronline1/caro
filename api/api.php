@@ -21,16 +21,16 @@ session_set_cookie_params([
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-require_once('./_config.php');
 define ('REQUEST',
 	array_map(
 		fn($param) => $param,//str_replace('%2B', '+', $param),
 		explode("/", substr(rawurldecode(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1']))), 1))
 	)
 );
+require_once('./_config.php'); // application configuration
 require_once('./_utility.php'); // general utilities
-require_once('./_sqlinterface.php');
-require_once('./_language.php');
+require_once('./_sqlinterface.php'); // multilingual sql handler
+require_once('./_language.php'); // language model
 // import to determine if interface is present
 require_once("./_erpinterface.php");
 
@@ -47,7 +47,7 @@ class API {
 	/**
 	 * preset database connection
 	 */
-	public $_pdo;
+	public $_sqlinterface;
 	
 	/**
 	 * preset standard response code
@@ -72,7 +72,7 @@ class API {
 	public $_filehandler = null;
 
 	/**
-	 * public preset of descendant classes property to ececute requested method as per REQUEST[1]
+	 * public preset of descendant classes property to execute requested method as per REQUEST[1]
 	 */
 	public $_requestedMethod = null;
 
@@ -95,20 +95,11 @@ class API {
 		// import passed class_vars to avoid duplicate calls and processing
 		foreach(array_keys(get_class_vars(get_class($this))) as $var){
 			switch($var){
-				case '_pdo':
-					$options = [
-						\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-						\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-						//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
-					];
-					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-					if (empty($_class_vars[$var])) {
-						$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
-						if ($dbsetup) $this->_pdo->exec($dbsetup);
-					}
+				case '_sqlinterface':
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new SQLINTERFACE(CONFIG['sql']['CARO']);
 					break;
 				case '_filehandler':
-					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new FILEHANDLER($this->_pdo);
+					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new FILEHANDLER($this->_sqlinterface);
 					break;
 				case '_lang':
 					$this->{$var} = !empty($_class_vars[$var]) ? $_class_vars[$var] : new LANG();
@@ -138,7 +129,7 @@ class API {
 	public function alertUserGroup($group = [], $message = ''){
 		$recipients = [];
 
-		foreach(SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist') as $user){
+		foreach($this->_sqlinterface->EXECUTE('user_get_datalist') as $user){
 			$user['permissions'] = explode(',', $user['permissions']);
 			$user['units'] = explode(',', $user['units']);
 			// filter default (patients and system user)
@@ -187,9 +178,9 @@ class API {
 					':message' => $message
 				];
 			}
-			$sqlQueryStack = array_merge($sqlQueryStack, SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'message_post_system_message'), $insertions));
+			$sqlQueryStack = array_merge($sqlQueryStack, $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('message_post_system_message'), $insertions));
 		}
-		SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+		$this->_sqlinterface->EXECUTE($sqlQueryStack);
 		// clear stack in case this method is called before end of request handling
 		$this->_messages = [];
 	}
@@ -233,7 +224,7 @@ class API {
 			// login or reauth by token
 			// get user by token and their application settings for frontend setup
 			// if database has changed in the meantime, session credentials do not match, invalidating the session
-			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+			$user = $this->_sqlinterface->EXECUTE('application_login', [
 				':token' => $token,
 				':two_factor' => $two_factor ?: null
 			]);
@@ -598,7 +589,7 @@ class API {
 		}
 		$this->requestLog(response: $this->_httpResponse);
 
-		SQLQUERY::CLOSE($this->_pdo);
+		$this->_sqlinterface->CLOSE();
 		$this->set_headers();
 		echo $data;
 		exit();
@@ -621,7 +612,7 @@ class API {
 		if (empty($_SESSION['user'])) return;
 		
 		if (!empty($_SESSION['request']['id']) && $response){
-			SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_update', [
+			$this->_sqlinterface->EXECUTE('application_request_log_update', [
 				':id' => $_SESSION['request']['id'],
 				':response_code' => $response,
 				':execution_time' => microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]
@@ -647,7 +638,7 @@ class API {
 			$payload = $payload ? UTILITY::json_encode($payload) : null;
 		}
 
-		if (SQLQUERY::EXECUTE($this->_pdo, 'application_request_log', [
+		if ($this->_sqlinterface->EXECUTE('application_request_log', [
 			':timestamp' => date('Y-m-d H:i:s'),
 			':method' => $_SERVER['REQUEST_METHOD'],
 			':api' => mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])),
@@ -658,7 +649,7 @@ class API {
 			':user_ip' => $_SERVER['REMOTE_ADDR'],
 			':response_code' => null,
 			':execution_time' => null
-		])) return $this->_pdo->lastInsertId();
+		])) return $this->_sqlinterface->_pdo->lastInsertId();
 		return 0;
 	}
 
@@ -667,15 +658,19 @@ class API {
 	 */
 	public function session_get_fingerprint(){
 		if (isset($_SESSION['user']['id']))
-			if ($fingerprint = SQLQUERY::EXECUTE($this->_pdo, 'application_get_session_fingerprint', [
+			if ($fingerprint = $this->_sqlinterface->EXECUTE('application_get_session_fingerprint', [
 				':id' => session_id(),
 				':user_id' => $_SESSION['user']['id']
 			])) return $fingerprint ? $fingerprint[0]['fingerprint'] : null;
 		return null;
 	}
 
+	/**
+	 * @param string $hash
+	 * @param string $checksum
+	 */
 	public function session_get_user_from_fingerprint_checksum($hash, $checksum){
-		if ($user = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_from_fingerprint_checksum', [
+		if ($user = $this->_sqlinterface->EXECUTE('application_get_user_from_fingerprint_checksum', [
 				':checksum' => $checksum,
 				':hash' => $hash
 			])) return $user ? $user[0] : null;
@@ -691,7 +686,7 @@ class API {
 		// i don't know how to handle this otherwise
 		// on failure the user may just not get a meaningful response and has to update the interface.
 		// does not happen on proper logout and even on automated logout only rarely
-		@SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
+		@$this->_sqlinterface->EXECUTE('application_post_session', [
 			':id' => session_id(),
 			':user_id' => $_SESSION['user']['id']
 		]);

@@ -827,14 +827,14 @@ class BLOCKCHAIN {
 	 *  |___|_|___|___|_,_|___|_|_|__,|_|_|_|_|_|\_/|___|_| |_|_| |_|___|___|
 	 * 
 	 * verify chain by validating hashes. if $details is set to true the chain is returned with raw data and additional verification information
-	 * @param object $_pdo established connection
+	 * @param object $_sqlinterface established connection
 	 * @param array $chain
 	 * @param bool $details to return details on checks
 	 * 
 	 * @return bool|array
 	 */
-	public static function verified($_pdo, $chain = [], $details = false){
-		$_filehandler = new FILEHANDLER($_pdo);
+	public static function verified($_sqlinterface, $chain = [], $details = false){
+		$_filehandler = new FILEHANDLER($_sqlinterface);
 		$report = [];
 		if (!$chain) return false;
 		// initiate report with genesis block

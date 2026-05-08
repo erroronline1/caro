@@ -17,51 +17,61 @@ namespace CARO\API;
 https://github.com/mauris/ini-writer
 */
 class Dumper {
-    public function dump($input)
-    {
-        $output = '';
-        foreach ($input as $section => $array) {
-            $output .= self::writeSection($section, $array);
-        }
+	/**
+	 * @param array $input
+	 */
+	public function dump($input)
+	{
+		$output = '';
+		foreach ($input as $section => $array) {
+			$output .= self::writeSection($section, $array);
+		}
 
-        return $output;
-    }
+		return $output;
+	}
 
-    protected static function writeSection($section, $array)
-    {
-        $subsections = array();
-        $output = "[$section]\n";
-        foreach ($array as $key => $value) {
-            if (is_array($value) || is_object($value)) {
-                $key = $section . '.' . $key;
-                $subsections[$key] = (array) $value;
-            } else {
-                $output .= self::normalizeKey($key) . '=';
-                if (is_string($value)) {
-                    $output .= '"' . addslashes($value) .'"';
-                } elseif (is_bool($value)) {
-                    $output .= $value ? 'true' : 'false';
-                } else {
-                    $output .= $value;
-                }
-                $output .= "\n";
-            }
-        }
+	/**
+	 * @param string $section
+	 * @param array $array
+	 */
+	protected static function writeSection($section, $array)
+	{
+		$subsections = array();
+		$output = "[$section]\n";
+		foreach ($array as $key => $value) {
+			if (is_array($value) || is_object($value)) {
+				$key = $section . '.' . $key;
+				$subsections[$key] = (array) $value;
+			} else {
+				$output .= self::normalizeKey($key) . '=';
+				if (is_string($value)) {
+					$output .= '"' . addslashes($value) .'"';
+				} elseif (is_bool($value)) {
+					$output .= $value ? 'true' : 'false';
+				} else {
+					$output .= $value;
+				}
+				$output .= "\n";
+			}
+		}
 
-        if ($subsections) {
-            $output .= "\n";
-            foreach ($subsections as $section => $array) {
-                $output .= self::writeSection($section, $array);
-            }
-        }
+		if ($subsections) {
+			$output .= "\n";
+			foreach ($subsections as $subsection => $subarray) {
+				$output .= self::writeSection($subsection, $subarray);
+			}
+		}
 
-        return $output;
-    }
+		return $output;
+	}
 
-    protected static function normalizeKey($key)
-    {
-        return str_replace('=', '_', $key);
-    }
+	/**
+	 * @param string $key
+	 */
+	protected static function normalizeKey($key)
+	{
+		return str_replace('=', '_', $key);
+	}
 }
 
 class MAINTENANCE extends API {
@@ -283,7 +293,7 @@ class MAINTENANCE extends API {
 					// create product lists if applicable
 					if (array_intersect($selection, ['products_ods', 'products_xlsx'])){
 						// create table
-						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+						$products = $this->_sqlinterface->EXECUTE('consumables_get_products');
 						$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order', 'last_order'];
 						$result = [];
 						// reduce data to required columns, convert null to ''
@@ -329,7 +339,7 @@ class MAINTENANCE extends API {
 								require_once('./document.php');
 								$DOCUMENT = new DOCUMENT();
 								$approveddocuments = [];
-								$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+								$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 								$hidden = [];
 								foreach ($fd as $row) {
 									if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -497,16 +507,16 @@ class MAINTENANCE extends API {
 						];
 					}
 
-					$sqlQueryStack = SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'records_datalist_post'), $insertions);
+					$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('records_datalist_post'), $insertions);
 					if ($sqlQueryStack){
 						// drop unit entries
-						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', [':unit' => $unit])) $response['render']['content'][] = [
+						if ($this->_sqlinterface->EXECUTE('records_datalist_delete', [':unit' => $unit])) $response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
 							]
 						];
-						$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+						$result = $this->_sqlinterface->EXECUTE($sqlQueryStack);
 						if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
 							foreach($error as $e){
 								$response['render']['content'][] = [
@@ -534,7 +544,7 @@ class MAINTENANCE extends API {
 					];
 				}
 				else {
-					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', [':unit' => $unit]);
+					$datalists = $this->_sqlinterface->EXECUTE('records_datalist_get', [':unit' => $unit]);
 					if (!$datalists){
 						$response['response'] = [
 							'msg' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
@@ -630,7 +640,7 @@ class MAINTENANCE extends API {
 				$until = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.until'));
 				$until = $until ? $this->convertToServerTime($until . ' 23:59:59') : null;
 
-				if ($log = SQLQUERY::EXECUTE($this->_pdo, 'application_request_log_get', [
+				if ($log = $this->_sqlinterface->EXECUTE('application_request_log_get', [
 					':from' => $from,
 					':until' => $until
 				])){
@@ -689,7 +699,7 @@ class MAINTENANCE extends API {
 	 */
 	private function riskupdate(){
 		$response = ['render' => ['content' => []]];
-		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		$risks = $this->_sqlinterface->EXECUTE('risk_datalist');
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -851,9 +861,9 @@ class MAINTENANCE extends API {
 						if (gettype($value) === 'string') $newrisk[$key] = $value;
 						if (gettype($value) === 'NULL') $newrisk[$key] = null;
 					}
-					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'risk_post', $newrisk) . '; ');
+					$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('risk_post', $newrisk) . '; ');
 				}
-				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+				$result = $this->_sqlinterface->EXECUTE($sqlQueryStack);
 				$anomalies = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 
 				$this->response(
@@ -956,7 +966,7 @@ class MAINTENANCE extends API {
 					];
 					// gather possibly existing entries
 					$DBall = [
-						...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
+						...$this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist'),
 					];
 					$intersections = array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 					$options = [];
@@ -1004,7 +1014,7 @@ class MAINTENANCE extends API {
 				$json = file_get_contents($this->_filehandler->directory('tmp') . '/' . $_SESSION['user']['id'] . 'vendorupdate.json');
 				$json = json_decode($json, true);
 				$DBall = [
-					...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
+					...$this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist'),
 				];
 				$intersections = array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 				
@@ -1039,7 +1049,7 @@ class MAINTENANCE extends API {
 						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 
-					$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
+					$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_post_vendor',
 						[
 							':id' => $vendor['id'],
 							':name' => $vendor['name'],
@@ -1050,7 +1060,7 @@ class MAINTENANCE extends API {
 						]) . '; ');
 					$success[] = $vendor['name'];
 				}
-				$result = SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+				$result = $this->_sqlinterface->EXECUTE($sqlQueryStack);
 				if($error = array_filter($result, Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))) {
 					foreach($error as $e){
 						$response['render']['content'][] = [

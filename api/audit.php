@@ -53,13 +53,13 @@ class AUDIT extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
-				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', [
+				$template = $this->_sqlinterface->EXECUTE('audit_get_template', [
 					':id' => $this->_requestedTemplate
 				]);
 				$template = $template ? $template[0] : null;
 				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
 
-				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+				$audit = $this->_sqlinterface->EXECUTE('audit_and_management_get_by_id', [
 					':id' => $this->_requestedID
 				]);
 				$audit = $audit ? $audit[0] : null;
@@ -126,7 +126,7 @@ class AUDIT extends API {
 
 				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', $audit)) {
+				if ($this->_sqlinterface->EXECUTE('audit_and_management_post', $audit)) {
 					if ($audit[':closed']){
 						$audit[':content'] = json_decode($audit[':content'], true);
 						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit[':unit']] . "\n \n";
@@ -163,7 +163,7 @@ class AUDIT extends API {
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				}
@@ -185,9 +185,9 @@ class AUDIT extends API {
 						'...' => ['value' => '0']
 					]
 				];
-				$templates = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
-				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
-				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$templates = $this->_sqlinterface->EXECUTE('audit_get_templates');
+				$audits = $this->_sqlinterface->EXECUTE('audit_get');
+				$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				// drop system user and group accounts
 				foreach ($users as $key => $row){
 					if (PERMISSION::filteredUser($row, ['id' => [1], 'permission' => ['patient', 'group']])) unset($users[$key]);
@@ -430,7 +430,7 @@ class AUDIT extends API {
 					}
 
 					// append final note, measure entries into calendar, deletion and closing options
-					$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+					$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 					$response['render']['content'][] = [
 						[
 							'type' => 'textarea',
@@ -487,7 +487,7 @@ class AUDIT extends API {
 				}
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
+				if ($this->_sqlinterface->EXECUTE('audit_and_management_delete', [
 					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.execute.delete_success'),
@@ -505,7 +505,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given audit
 	 */
 	private function exportaudit(){
-		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+		$audit = $this->_sqlinterface->EXECUTE('audit_and_management_get_by_id', [
 			':id' => UTILITY::propertySet($this->_payload, '_auditid') ?: 0
 		]);
 		$audit = $audit ? $audit[0] : null;
@@ -559,7 +559,7 @@ class AUDIT extends API {
 		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary', [], true) . '*';
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.checks_type.audits')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -617,7 +617,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+		$audits = $this->_sqlinterface->EXECUTE('audit_get');
 		foreach ($audits as $audit){
 			if (!$audit['closed']) continue;
 			if ($from > $audit['last_touch'] || $until < $audit['last_touch']) continue;
@@ -764,10 +764,10 @@ class AUDIT extends API {
 
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', $template)) $this->response([
+				if ($this->_sqlinterface->EXECUTE('audit_post_template', $template)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.template.saved'),
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -782,8 +782,8 @@ class AUDIT extends API {
 				$datalist = ['objectives' => [], 'questions' => [], 'hints' => []];
 				$templatehints = [];
 				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
-				$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
+				$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
+				$data = $this->_sqlinterface->EXECUTE('audit_get_templates');
 
 				if ($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'];
 
@@ -974,7 +974,7 @@ class AUDIT extends API {
 				if ($template['id']){
 					// a template can only be deleted if not used by an unfinished audit
 					$unused = true;
-					$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+					$audits = $this->_sqlinterface->EXECUTE('audit_get');
 					foreach ($audits as $audit){
 						if ($audit['template'] === $template['id'] && !$audit['closed']) {
 							$unused = false;
@@ -1011,7 +1011,7 @@ class AUDIT extends API {
 				];
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
+				if ($this->_sqlinterface->EXECUTE('audit_delete_template', [
 					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.template.delete_success'),
@@ -1102,7 +1102,7 @@ class AUDIT extends API {
 	 * list and link complaints from records, sum by year
 	 */
 	private function complaints(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$data = $this->_sqlinterface->EXECUTE('records_get_all');
 		$entries = $content = [];
 		foreach ($data as $row){
 			if ($row['record_type'] === 'complaint'){
@@ -1206,7 +1206,7 @@ class AUDIT extends API {
 		}
 
 		// get all current approved document older than given timestamp
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = $currentdocuments = [];
 		foreach ($documents as $document){
 			if (!PERMISSION::fullyapproved('documentapproval', $document['approval']) || $document['date'] >= $requestedTimestamp) continue;
@@ -1219,10 +1219,10 @@ class AUDIT extends API {
 		}
 	
 		// get all components
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$components = $this->_sqlinterface->EXECUTE('document_component_datalist');
 
 		// get all current bundles
-		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+		$bundles = $this->_sqlinterface->EXECUTE('document_bundle_datalist');
 		$hidden = $currentbundles = [];
 		foreach ($bundles as &$bundle){
 			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
@@ -1358,7 +1358,7 @@ class AUDIT extends API {
 			]
 		];
 		$links = [];
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
+		if ($files = $this->_sqlinterface->EXECUTE('file_external_documents_get_active')) {
 			foreach ($files as $file){
 				if (preg_match('/^\.\.\//', $file['path'])){
 					$file['url'] = $this->_filehandler->getFileLink($file['path']);
@@ -1423,7 +1423,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -1453,8 +1453,8 @@ class AUDIT extends API {
 	 * analyses records and displays a use count for selected document contexts
 	 */
 	private function documentusage(){
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$records = $this->_sqlinterface->EXECUTE('records_get_all');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$usedname = $usedid = [];
 
 		foreach ($records as $record){
@@ -1527,7 +1527,7 @@ class AUDIT extends API {
 		switch($this->_requestedType){
 			case 'auditsummary':
 				$this->_requestedOption = array_search($this->_requestedOption, $this->_lang->_USER['units']);
-				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+				$audits = $this->_sqlinterface->EXECUTE('audit_get');
 				foreach ($audits as $audit){
 					if ($audit['unit'] === $this->_requestedOption && $audit['closed']) {
 						$audit['content'] = json_decode($audit['content'], true);
@@ -1556,7 +1556,7 @@ class AUDIT extends API {
 		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// get unincorporated articles from approved orders
-		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		$products = $this->_sqlinterface->EXECUTE('consumables_get_products');
 		foreach ($products as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
@@ -1572,7 +1572,7 @@ class AUDIT extends API {
 			unset($products[$id]); // to avoid duplicate warnings on orderedunincorporated below
 		}
 
-		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
+		$approvedorders = $this->_sqlinterface->EXECUTE('order_get_approved_order_by_substr', [
 			':substr' => 'ordernumber_label'
 		]);
 		foreach ($approvedorders as $row){
@@ -1707,7 +1707,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -1742,7 +1742,7 @@ class AUDIT extends API {
 			case 'PUT':
 				$managementreview = [];
 				if ($this->_requestedID){
-					$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+					$managementreview = $this->_sqlinterface->EXECUTE('audit_and_management_get_by_id', [
 						':id' => $this->_requestedID
 					]);
 					$managementreview = $managementreview ? $managementreview[0] : null;
@@ -1764,7 +1764,7 @@ class AUDIT extends API {
 					$managementreview[':content'][$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.required.' . $key)) ? : '';
 				}
 				$managementreview[':content'] = UTILITY::json_encode($managementreview[':content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', $managementreview)) {
+				if ($this->_sqlinterface->EXECUTE('audit_and_management_post', $managementreview)) {
 					if ($managementreview[':closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
 							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
@@ -1774,7 +1774,7 @@ class AUDIT extends API {
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.managementreview.saved'),
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				}
@@ -1793,7 +1793,7 @@ class AUDIT extends API {
 						'...' => ['value' => '0']
 					]
 				];
-				$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+				$managementreviews = $this->_sqlinterface->EXECUTE('management_get');
 
 				if ($this->_requestedID && $this->_requestedID !== 'false' && ($managementreview = $managementreviews[array_search($this->_requestedID, array_column($managementreviews, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1906,7 +1906,7 @@ class AUDIT extends API {
 				}
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
+				if ($this->_sqlinterface->EXECUTE('audit_and_management_delete', [
 					':id' => $this->_requestedID
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.managementreview.delete_success'),
@@ -1924,7 +1924,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given management review
 	 */
 	private function exportmanagementreview(){
-		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', [
+		$managementreview = $this->_sqlinterface->EXECUTE('audit_and_management_get_by_id', [
 			':id' => UTILITY::propertySet($this->_payload, '_reviewid') ?: 0
 		]);
 		$managementreview = $managementreview ? $managementreview[0] : null;
@@ -1951,7 +1951,7 @@ class AUDIT extends API {
 		$summary['content']['   '] = '*' . $this->_lang->GET('audit.signature_uneccessary', [], true) . '*';
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.navigation.management_review')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -2009,7 +2009,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+		$managementreviews = $this->_sqlinterface->EXECUTE('management_get');
 		foreach ($managementreviews as $managementreview){
 			if (!$managementreview['closed']) continue;
 			if ($from > $managementreview['last_touch'] || $until < $managementreview['last_touch']) continue;
@@ -2069,11 +2069,11 @@ class AUDIT extends API {
 
 		// get unchecked articles for MDR §14 sample check
 		// this is actually faster than a nested sql query
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 		foreach ($vendors as &$vendor){
 			$vendor['products'] = json_decode($vendor['products'] ? : '', true); 
 		}
-		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+		$products = $this->_sqlinterface->EXECUTE('consumables_get_products_by_vendor_id', [
 			':ids' => array_column($vendors, 'id')
 		]);
 		// get all checkable products
@@ -2143,7 +2143,7 @@ class AUDIT extends API {
 		];
 
 		// add check records
-		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		$products = $this->_sqlinterface->EXECUTE('consumables_get_products');
 		// order descending
 		usort($products, function ($a, $b) {
 			if ($a['checked'] === $b['checked']) return 0;
@@ -2223,7 +2223,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -2504,8 +2504,8 @@ class AUDIT extends API {
 		$contexts = array_map(Fn($v) => array_search($v, $this->_lang->_USER['documentcontext']['identify']), explode(' | ', $contexts));
 		$units = array_map(Fn($v) => array_search($v, $this->_lang->_USER['units']), explode(' | ', $units));
 
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$records = $this->_sqlinterface->EXECUTE('records_get_all');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$result = [];
 		// initiate all possible keys aka document fields
 		$keys = [];
@@ -2650,7 +2650,7 @@ class AUDIT extends API {
 			]
 		];
 		if($_SERVER['REQUEST_METHOD'] === 'POST' && $identifier){
-			$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+			$case = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 				':identifier' => $identifier
 			]);
 			$case = $case ? $case[0] : null;
@@ -2665,7 +2665,7 @@ class AUDIT extends API {
 			else {
 				$report = '';
 				$recordcontent = json_decode($case['content'], true);
-				foreach(BLOCKCHAIN::verified($this->_pdo, $recordcontent, true) as $block){
+				foreach(BLOCKCHAIN::verified($this->_sqlinterface, $recordcontent, true) as $block){
 					foreach($block as $key => $value){
 						if ($key === 'verification') continue;
 						$report .= $key . ': ' . $value . "  \n";
@@ -2738,7 +2738,7 @@ class AUDIT extends API {
 						'type' => 'textsection',
 						'attributes' => [
 							'data-type' => 'certificate',
-							'name' => BLOCKCHAIN::verified($this->_pdo, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
+							'name' => BLOCKCHAIN::verified($this->_sqlinterface, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
 						],
 						'mdcontent' => $report
 					]
@@ -2801,7 +2801,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -2832,7 +2832,7 @@ class AUDIT extends API {
 	private function regulatory(){
 		$content = [];
 		// prepare existing document lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$hidden = $regulatory = [];
 		foreach ($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
@@ -2850,7 +2850,7 @@ class AUDIT extends API {
 			}
 		}
 		// get active external documents
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
+		if ($files = $this->_sqlinterface->EXECUTE('file_external_documents_get_active')) {
 			foreach ($files as $file){
 				foreach (explode(',', $file['regulatory_context']) as $context){
 					if (preg_match('/^\.\.\//', $file['path'])){
@@ -2919,7 +2919,7 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -2954,7 +2954,7 @@ class AUDIT extends API {
 		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
 		// prepare existing risks lists
-		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		$risks = $this->_sqlinterface->EXECUTE('risk_datalist');
 
 		// gathering and distributing entry properties
 		$entries = [];
@@ -3099,7 +3099,7 @@ class AUDIT extends API {
 			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['mdcontent']) ? $issue['mdcontent'] : ' ';	
 		}
 		if (count($summary['content']) > 1){
-			$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+			$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 			$file = $PDF->auditPDF($summary);
 			$downloadfiles[$this->_lang->GET('audit.risk_issues_none')] = [
 				'href' => $this->_filehandler->getFileLink($file),
@@ -3110,7 +3110,7 @@ class AUDIT extends API {
 		// create risk dump as xlsx, sheetwise processes
 
 		// prepare existing risks lists
-		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		$risks = $this->_sqlinterface->EXECUTE('risk_datalist');
 
 		// gathering and distributing entry properties
 		$entries = [];
@@ -3229,11 +3229,11 @@ class AUDIT extends API {
 	private function trainingevaluation(){
 		if ($_SERVER['REQUEST_METHOD'] === 'PUT' && PERMISSION::permissionFor('trainingevaluation')){
 			$user = null;
-			$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
+			$training = $this->_sqlinterface->EXECUTE('user_training_get', [
 				':id' => $this->_requestedID
 			]);
 			$training = $training ? $training[0] : [];
-			if ($training) $user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+			if ($training) $user = $this->_sqlinterface->EXECUTE('user_get', [
 					':ids' => intval($training['user_id']),
 					':names' => ''
 			]);
@@ -3261,14 +3261,14 @@ class AUDIT extends API {
 						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 						'content' => (array) $this->_payload
 					]);
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', $trainingclone);
+					$this->_sqlinterface->EXECUTE('user_training_post', $trainingclone);
 				}
 			}
 		}
 
 		$content = [];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
+		$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
@@ -3411,8 +3411,8 @@ class AUDIT extends API {
 				]
 			]
 		];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
+		$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
@@ -3485,7 +3485,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -3517,7 +3517,7 @@ class AUDIT extends API {
 	private function userskills(){
 		$content = [];
 
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 
 		$selectedUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.organizational_unit'));
 
@@ -3558,7 +3558,7 @@ class AUDIT extends API {
 				$unfulfilledskills[] = $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
 			}
 		}
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+		$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
@@ -3707,7 +3707,7 @@ class AUDIT extends API {
 				$allskills[$duty . '.' . $skill] = [];
 			}
 		}
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		foreach ($users as $user){
 			if (PERMISSION::filteredUser($user)) continue;
 
@@ -3729,7 +3729,7 @@ class AUDIT extends API {
 			];
 		}
 
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [ 
+		$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [ 
 			':ids' => array_column($users, 'id')
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
@@ -3781,7 +3781,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
@@ -3810,8 +3810,8 @@ class AUDIT extends API {
 	 * returns all current active vendors with stored info, most recent products import, MDR sample check and certificate details in alphabetical order
 	 */
 	private function vendors(){
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_last_checked');
+		$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
+		$lastchecks = $this->_sqlinterface->EXECUTE('consumables_get_last_checked');
 		$vendor_info = [
 			'purchase_info' => 'consumables.vendor.purchase_info',
 			'infotext' => 'consumables.vendor.info',
@@ -3931,7 +3931,7 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$PDF = new PDF(CONFIG['pdf']['record'], $this->_pdo);
+		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
 		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),

@@ -734,47 +734,41 @@ define('DEFAULTSQL', [
 class INSTALL {
 	/**
 	 * preset database connection
+	 * CARO\API\SQLINTERFACE
 	 */
-	public $_pdo;
+	public mixed $_sqlinterface;
 	
 	/**
 	 * current date with correct timezone
 	 */
-	public $_currentdate;
+	public \DateTime $_currentdate;
 
 	/**
 	 * make languagemodel LANG class and its methods available
 	 */
-	public $_lang = null;
+	public mixed $_lang = null;
 
 	/**
 	 * make filehandler FILEHANDLER class and its methods available
 	 */
-	public $_filehandler = null;
+	public mixed $_filehandler = null;
 
-	public $_payload = [];
+	public array $_payload = [];
 
 	/**
 	 * current settings for install
 	 */
-	public $_defaultUser = CONFIG['system']['caroapp'];
-	public $_defaultLanguage = CONFIG['application']['defaultlanguage'];
-	public $_pdoDriver = CONFIG['sql']['use'];
+	public string $_defaultUser = CONFIG['system']['caroapp'];
+	public string $_defaultLanguage = CONFIG['application']['defaultlanguage'];
 
 	public function __construct(){
-		$options = [
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-		];
-		$this->_pdo = new \PDO( CONFIG['sql'][$this->_pdoDriver]['driver'] . ':' . CONFIG['sql'][$this->_pdoDriver]['host'] . ';' . CONFIG['sql'][$this->_pdoDriver]['database']. ';' . CONFIG['sql'][$this->_pdoDriver]['charset'], CONFIG['sql'][$this->_pdoDriver]['user'], CONFIG['sql'][$this->_pdoDriver]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
-		if ($dbsetup) $this->_pdo->exec($dbsetup);
+		$this->_sqlinterface = new SQLINTERFACE(CONFIG['sql']['CARO']);
 
 		$this->_currentdate = new \DateTime('now');
 
 		$this->_lang = new LANG();
 
-		$this->_filehandler = new FILEHANDLER($this->_pdo);
+		$this->_filehandler = new FILEHANDLER($this->_sqlinterface);
 
 		switch($_SERVER['REQUEST_METHOD']){
 			case "GET":
@@ -800,6 +794,7 @@ class INSTALL {
 
 	/**
 	 * display install navigation
+	 * @param string $method
 	 */
 	public function navigation($method){
 		if (method_exists($this, $method)) {
@@ -903,7 +898,7 @@ class INSTALL {
 		$counter = 0;
 		foreach ($sqlQueryStack as $chunk){
 			try {
-				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
+				if ($this->_sqlinterface->EXECUTE($chunk)) {
 					$response .= $this->printSuccess('Success:', $chunk);
 					$counter++;
 				}
@@ -972,16 +967,16 @@ class INSTALL {
 		//secure fileserver by default
 		$this->_filehandler->createDirectory('../fileserver');
 
-		if (SQLQUERY::EXECUTE($this->_pdo, DEFAULTSQL['installed'][$this->_pdoDriver])){
+		if ($this->_sqlinterface->EXECUTE(DEFAULTSQL['installed'][CONFIG['sql']['CARO']['driver']])){
 			return $this->printWarning('Databases already installed.');
 		}
-		if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
+		if (!$statement = $this->_sqlinterface->query(DEFAULTSQL['install_tables'][CONFIG['sql']['CARO']['driver']])){
 			return $this->printError('There has been an error installing the databases!');
 		}
 		$statement->closeCursor();
 		$response = $this->printSuccess('Databases installed.');
 
-		if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+		if (REQUEST[1] && $this->_sqlinterface->EXECUTE('user_post', [
 			':id' => null,
 			':name' => $this->_defaultUser,
 			':permissions' => 'admin',
@@ -1006,7 +1001,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'audits');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
+			...$this->_sqlinterface->EXECUTE('audit_get_templates'),
 		];
 
 		$sqlQueryStack = [];
@@ -1046,7 +1041,7 @@ class INSTALL {
 					continue;
 				}
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'audit_post_template',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('audit_post_template',
 				[
 					':id' => null,
 					':content' => $entry['content'],
@@ -1074,7 +1069,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'csvfilter');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist'),
+			...$this->_sqlinterface->EXECUTE('csvfilter_datalist'),
 		];
 
 		$insertions = [];
@@ -1101,7 +1096,7 @@ class INSTALL {
 			}
 		}
 
-		if ($execution = $this->executeSQL(SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'csvfilter_post'), $insertions)))
+		if ($execution = $this->executeSQL($this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('csvfilter_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from csv-filter ressources.');
 
@@ -1116,9 +1111,9 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'documents');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
-			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
+			...$this->_sqlinterface->EXECUTE('document_document_datalist'),
+			...$this->_sqlinterface->EXECUTE('document_component_datalist'),
+			...$this->_sqlinterface->EXECUTE('document_bundle_datalist')
 		];
 
 		/**
@@ -1182,7 +1177,7 @@ class INSTALL {
 			$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 			$name_context[] = $entry['name'] . '_' . $entry['context'];
-			$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'document_post',
+			$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('document_post',
 			[
 				':id' => null,
 				':name' => $entry['name'],
@@ -1215,7 +1210,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'manuals');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual'),
+			...$this->_sqlinterface->EXECUTE('application_get_manual'),
 		];
 
 		$sqlQueryStack = $names = [];
@@ -1244,7 +1239,7 @@ class INSTALL {
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				$names[] = $entry['title'];
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'application_post_manual',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('application_post_manual',
 				[
 					':id' => null,
 					':title' => $entry['title'],
@@ -1270,7 +1265,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'texts');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist'),
+			...$this->_sqlinterface->EXECUTE('texttemplate_datalist'),
 		];
 
 		// allowed pattern
@@ -1326,7 +1321,7 @@ class INSTALL {
 				];
 			}
 		}
-		if ($execution = $this->executeSQL(SQLQUERY::PACK_INSERT($this->_pdo, SQLQUERY::PREPARE($this->_pdo, 'texttemplate_post'), $insertions)))
+		if ($execution = $this->executeSQL($this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('texttemplate_post'), $insertions)))
 			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from texts ressources.');
 
@@ -1341,7 +1336,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'users');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
+			...$this->_sqlinterface->EXECUTE('user_get_datalist'),
 		];
 		$sqlQueryStack = $names = $orderauths = [];
 		foreach ($json as $entry){
@@ -1412,7 +1407,7 @@ class INSTALL {
 
 				$names[] = $entry['name'];
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_post',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('user_post',
 				[
 					':id' => null,
 					':name' => $entry['name'],
@@ -1444,7 +1439,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'vendors');
 		// gather possibly existing entries
 		$DBall = [
-			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
+			...$this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist'),
 		];
 
 		$sqlQueryStack = $names = [];
@@ -1479,7 +1474,7 @@ class INSTALL {
 					}
 				}
 
-				$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'consumables_post_vendor',
+				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('consumables_post_vendor',
 				[
 					':id' => null,
 					':hidden' => null,

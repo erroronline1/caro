@@ -403,7 +403,7 @@ class ERPQUERY extends API {
 
 		include('./consumables.php');
 		$consumables = new CONSUMABLES(get_class_vars(get_class($this)));
-		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$vendorlist = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 
 		$content = [];
 		$content[] = [

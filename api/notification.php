@@ -49,7 +49,7 @@ class NOTIFICATION extends API {
 	 *
 	 */
 	public function notifs(){
-		if (!$this->_users) $this->_users =  SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_users) $this->_users =  $this->_sqlinterface->EXECUTE('user_get_datalist');
 		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 		$result = [
 			// first call is cron, for tidying up and occasionally creating items
@@ -83,7 +83,7 @@ class NOTIFICATION extends API {
 	 */
 	public function audits(){
 		if (!PERMISSION::permissionFor('audit')) return 0;
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+		$data = $this->_sqlinterface->EXECUTE('audit_get');
 		$number = 0;
 		foreach ($data as $row){
 			if (!$row['closed']) $number++;
@@ -103,7 +103,7 @@ class NOTIFICATION extends API {
 	 */
 	public function complaints(){
 		if (!PERMISSION::permissionFor('complaintclosing') && !array_intersect(['ceo'], $_SESSION['user']['permissions'])) return 0;
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$data = $this->_sqlinterface->EXECUTE('records_get_all');
 		$number = 0;
 		foreach ($data as $row){
 			if ($row['record_type'] === 'complaint'){
@@ -126,7 +126,7 @@ class NOTIFICATION extends API {
 		// get pending incorporations
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
-			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+			$allproducts = $this->_sqlinterface->EXECUTE('consumables_get_products');
 			foreach ($allproducts as $product) {
 				if (!$product['incorporated']) continue;
 				$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
@@ -160,10 +160,10 @@ class NOTIFICATION extends API {
 		$logfile = 'cron.log';
 		$log = [];
 
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
-		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_users) $this->_users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 
 		$override = false;
@@ -180,10 +180,10 @@ class NOTIFICATION extends API {
 								$user['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 								if (isset($user['app_settings']['autodeleteMessages'])){
 									$prior_date = clone $this->_date['servertime'];
-									if ( $messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_messages_prior_date', [
+									if ( $messages = $this->_sqlinterface->EXECUTE('message_get_messages_prior_date', [
 										':user' => $user['id'],
 										':timestamp' => $prior_date->modify('-' . $user['app_settings']['autodeleteMessages'] . ' weeks')->format('Y-m-d H:i:s')
-									])) SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
+									])) $this->_sqlinterface->EXECUTE('message_delete_messages', [
 											':user' => $user['id'],
 											':ids' => array_column($messages, 'id')
 										]);
@@ -193,20 +193,20 @@ class NOTIFICATION extends API {
 							// delete request log entries older than config defined days
 							$deldate = clone ($this->_date['servertime']);
 							$deldate->modify('-' . CONFIG['lifespan']['session']['request_log'] . ' days');
-							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_request_log', [
+							$this->_sqlinterface->EXECUTE('application_delete_request_log', [
 								':date' => $deldate->format('Y-m-d H:i:s')
 							]);
 							// delete sessions
 							$deldate = clone ($this->_date['servertime']);
 							$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
-							SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
+							$this->_sqlinterface->EXECUTE('application_delete_sessions', [
 								':date' => $deldate->format('Y-m-d H:i:s')
 							]);
 
 							// delete old delivered unarchived orders
 							require_once('./order.php');
 							$order = new ORDER(get_class_vars(get_class($this)));
-							$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_issued', [
+							$old = $this->_sqlinterface->EXECUTE('order_get_approved_order_by_issued', [
 								':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
 							]);
 							foreach ($old as $row){
@@ -240,7 +240,7 @@ class NOTIFICATION extends API {
 							// does only update database null values
 							// also see record.php->casestate()
 							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
-								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
+								$data = $this->_sqlinterface->EXECUTE('records_get_unclosed');
 								// split multiple erp case numbers within records
 								$casenumbers = [];
 								foreach ($data as $row => $case){
@@ -279,7 +279,7 @@ class NOTIFICATION extends API {
 										foreach($current_records as $current){
 											$records = BLOCKCHAIN::add($records, $current);
 										}
-										$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'records_post',
+										$updates = $this->_sqlinterface->PACK($updates, $this->_sqlinterface->PREPARE('records_post',
 											[
 												':context' => $case['context'],
 												':case_state' => UTILITY::json_encode($case['case_state']),
@@ -300,7 +300,7 @@ class NOTIFICATION extends API {
 								//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
 								// run updates
 								foreach ($updates as $update){
-									SQLQUERY::EXECUTE($this->_pdo, $update);
+									$this->_sqlinterface->EXECUTE($update);
 								}
 								$execution = true;
 							}
@@ -311,12 +311,12 @@ class NOTIFICATION extends API {
 							// also see order.php->approved()
 							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
 
-								$oldest = SQLQUERY::EXECUTE($this->_pdo, 'order_get_appoved_oldest_approval');
+								$oldest = $this->_sqlinterface->EXECUTE('order_get_appoved_oldest_approval');
 								$oldest = $oldest ? $oldest[0]['approved'] : null;
 
 								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata($oldest))) break; 
 
-								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
+								$orders = $this->_sqlinterface->EXECUTE('order_get_approved_search', [
 									':SEARCH' => '%',
 									':organizational_unit' => array_keys($this->_lang->_USER['units']),
 									':user' => 0
@@ -332,7 +332,7 @@ class NOTIFICATION extends API {
 									'delivered_full'
 								];
 
-								$preProducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+								$preProducts = $this->_sqlinterface->EXECUTE('consumables_get_products');
 								$products = [];
 								foreach ($preProducts as $product){
 									// assign id as key, unique anyway, fasten things up later
@@ -361,7 +361,7 @@ class NOTIFICATION extends API {
 										$article = $articles[array_key_first($articles)];
 										foreach ($states as $state){
 											if ($order[$state] === null && $article[$state]){
-												$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_state',
+												$updates = $this->_sqlinterface->PACK($updates, $this->_sqlinterface->PREPARE('order_put_approved_order_state',
 													[
 														':ids' => $order['id'],
 														':field' => $state,
@@ -371,7 +371,7 @@ class NOTIFICATION extends API {
 										}
 										if ($article['order_reference'] && !isset($order['order_data']['order_reference'])) {
 											$order['order_data']['order_reference'] = $article['order_reference'];
-												$updates = SQLQUERY::PACK($updates, SQLQUERY::PREPARE($this->_pdo, 'order_put_approved_order_addinformation',
+												$updates = $this->_sqlinterface->PACK($updates, $this->_sqlinterface->PREPARE('order_put_approved_order_addinformation',
 													[
 														':id' => $order['id'],
 														':order_data' => UTILITY::json_encode($order['order_data'])
@@ -381,7 +381,7 @@ class NOTIFICATION extends API {
 										//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
 										if ($updates) {
 											foreach ($updates as $update){
-												SQLQUERY::EXECUTE($this->_pdo, $update);
+												$this->_sqlinterface->EXECUTE($update);
 											}
 											$orderstatistics->statistics_update($order['id']);
 										}
@@ -396,7 +396,7 @@ class NOTIFICATION extends API {
 							// alert purchase on new orders since last execution
 							// prior to this implementation every approved order did a message resulting in spamming and the fear of them becoming dulled to notifications
 							if (file_exists($logfile)){
-								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed_alert', [
+								$orders = $this->_sqlinterface->EXECUTE('order_get_approved_unprocessed_alert', [
 									':timestamp' => date('Y-m-d H:i:s', filemtime($logfile)) 
 								]);
 								$orders = $orders ? intval($orders[0]['num']) : null;
@@ -410,8 +410,8 @@ class NOTIFICATION extends API {
 						case 'alert_open_records_and_retention_periods':
 							// alert unclosed records, records not having set lifespan
 							// delete expired records including record attachments and orders that contain identifier e.g. as commission
-							$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-							$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+							$data = $this->_sqlinterface->EXECUTE('records_get_all');
+							$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 							$sqlQueryStack = [];
 							$unclosed_notif = [];
 							$missingretention_notif = [];
@@ -443,7 +443,7 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
+										$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('records_notified',
 											[
 												':notified' => $diff,
 												':identifier' => $row['identifier']
@@ -479,7 +479,7 @@ class NOTIFICATION extends API {
 										}
 
 										// prepare alert flags
-										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_notified',
+										$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('records_notified',
 											[
 												':notified' => $diff,
 												':identifier' => $row['identifier']
@@ -498,14 +498,14 @@ class NOTIFICATION extends API {
 											$this->_filehandler->delete($delete, 'thisIsOnlySupposedToBeAbleFromTheCronJob');
 										}
 										// prepare deletion
-										$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'records_delete',
+										$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('records_delete',
 											[
 												':id' => intval($row['id'])
 											]) . '; ');
 
 										// delete orders containing identifier e.g. archived case related orders having identifier as commission
 										if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
-											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
+											$orders = $this->_sqlinterface->EXECUTE('order_get_approved_search', [
 												':SEARCH' => '"' . $row['identifier'] . '"', // literal
 												':organizational_unit' => array_keys($this->_lang->_DEFAULT['units']), // all units
 												':user' => 0
@@ -540,12 +540,12 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+							$this->_sqlinterface->EXECUTE($sqlQueryStack);
 							$execution = true;
 							break;
 						case 'alert_unclosed_audits':
 							// notify on unclosed audits
-							$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+							$data = $this->_sqlinterface->EXECUTE('audit_get');
 							foreach ($data as $row){
 								if ($row['closed']) continue;
 								// alert if applicable
@@ -561,7 +561,7 @@ class NOTIFICATION extends API {
 											':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 										], true)
 									);
-									SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified', [
+									$this->_sqlinterface->EXECUTE('audit_and_management_notified', [
 										':notified' => $diff,
 										':id' => $row['id']
 									]);
@@ -572,7 +572,7 @@ class NOTIFICATION extends API {
 						case 'alert_undelivered_orders':
 							// alert requesting undelivered orders or marking delivered as issued
 							$sqlQueryStack = [];
-							$unissued = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_undelivered_unissued');
+							$unissued = $this->_sqlinterface->EXECUTE('order_get_approved_undelivered_unissued');
 							$undelivered_notif = [];
 							$unissued_notif = [];
 
@@ -645,7 +645,7 @@ class NOTIFICATION extends API {
 								} else $issue_interval = $order['issued_notified'];
 
 								// prepare alert flags
-								if ($update) $sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'order_notified',
+								if ($update) $sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('order_notified',
 									[
 										':delivered_notified' => $deliver_interval ?: null,
 										':issued_notified' => $issue_interval ?: null,
@@ -669,7 +669,7 @@ class NOTIFICATION extends API {
 								);
 							}
 							// set alert flags
-							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+							$this->_sqlinterface->EXECUTE($sqlQueryStack);
 							$execution = true;
 							break;
 						case 'delete_files_and_calendar':
@@ -681,7 +681,7 @@ class NOTIFICATION extends API {
 
 							// clear folders in case of fileserver database strategy
 							if (CONFIG['fileserver']['strategy'] === 'database'){
-								$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+								$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 								foreach(CONFIG['fileserver'] as $key => $directory){
 									if ($key =='strategy') continue;
 									// if files reside in filesystem they will not be deleted
@@ -701,7 +701,7 @@ class NOTIFICATION extends API {
 
 							// delete order statistics
 							$prior_date = clone $this->_date['servertime'];
-							SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics', [
+							$this->_sqlinterface->EXECUTE('order_truncate_order_statistics', [
 								':datetime' => $prior_date->modify('-' . CONFIG['lifespan']['order']['statistics'] . ' years')->format('Y-m-d H:i:s')
 							]);
 
@@ -713,19 +713,19 @@ class NOTIFICATION extends API {
 							foreach($this->_users as $user){
 								if (!$user['invalidation_date']) continue;
 								if ($user['invalidation_date'] < date('Y-m-d')) {
-									$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_put_auto_restrict',
+									$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('user_put_auto_restrict',
 									[
 										':id' => $user['id'],
 										':token' => hash('sha256', $user[':name'] . random_int(100000,999999) . time()),
 									]) . '; ');
 								}
 							}
-							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+							$this->_sqlinterface->EXECUTE($sqlQueryStack);
 							$execution = true;
 							break;
 						case 'schedule_archived_orders_review':
 							// schedule archived approved orders review
-							$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');
+							$orders = $this->_sqlinterface->EXECUTE('order_get_approved_archived');
 							$units = [];
 							foreach ($orders as $order){
 								if (!isset($units[$order['organizational_unit']])) $units[$order['organizational_unit']] = 0;
@@ -764,7 +764,7 @@ class NOTIFICATION extends API {
 						case 'schedule_outdated_consumables_documents_review':
 							// schedule consumables document reviews for vendor- and product-documents
 							// at best only the most recent file by vendor and filename / productnumber.filename is processed if provided
-							$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+							$vendors = $this->_sqlinterface->EXECUTE('consumables_get_vendor_datalist');
 							foreach ($vendors as $vendor){
 								if ($vendor['hidden']) continue;
 								// process vendor-documents
@@ -856,7 +856,7 @@ class NOTIFICATION extends API {
 							break;
 						case 'schedule_responsibilities_renewal':
 							// schedule renewal of expired responsibilities
-							$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
+							$responsibilities = $this->_sqlinterface->EXECUTE('user_responsibility_get_all');
 							foreach ($responsibilities as $row){
 								if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 									// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
@@ -887,7 +887,7 @@ class NOTIFICATION extends API {
 							break;
 						case 'schedule_training_evaluation':
 							// schedule training evaluation
-							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+							$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 								':ids' => array_column($this->_users, 'id')
 							]);
 							foreach ($trainings as $training){
@@ -930,7 +930,7 @@ class NOTIFICATION extends API {
 							break;
 						case 'schedule_retrainings':
 							// schedule retrainings
-							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+							$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 								':ids' => array_column($this->_users, 'id')
 							]);
 							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
@@ -957,7 +957,7 @@ class NOTIFICATION extends API {
 										}
 										if ($none) {
 											// insert scheduled training and message user and supervisor
-											$sqlQueryStack = SQLQUERY::PACK($sqlQueryStack, SQLQUERY::PREPARE($this->_pdo, 'user_training_post', [
+											$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('user_training_post', [
 													':name' => $training['name'],
 													':user_id' => $user['id'],
 													':date' => null,
@@ -987,7 +987,7 @@ class NOTIFICATION extends API {
 									}
 								}
 							}
-							SQLQUERY::EXECUTE($this->_pdo, $sqlQueryStack);
+							$this->_sqlinterface->EXECUTE($sqlQueryStack);
 							$execution = true;
 							break;
 					}
@@ -1020,7 +1020,7 @@ class NOTIFICATION extends API {
 	public function csvfilter(){
 		if (!PERMISSION::permissionFor('csvrules')) return 0;
 		// prepare all unapproved elements
-		$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
+		$filters = $this->_sqlinterface->EXECUTE('csvfilter_datalist');
 		$unapproved = 0;
 		$hidden = [];
 		foreach ($filters as $element){
@@ -1045,8 +1045,8 @@ class NOTIFICATION extends API {
 	public function documents(){
 		if (!PERMISSION::permissionFor('documentapproval')) return 0;
 		// prepare all unapproved elements
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
-		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$components = $this->_sqlinterface->EXECUTE('document_component_datalist');
+		$documents = $this->_sqlinterface->EXECUTE('document_document_datalist');
 		$unapproved = 0;
 		$hidden = [];
 		foreach (array_merge($components, $documents) as $element){
@@ -1070,7 +1070,7 @@ class NOTIFICATION extends API {
 	 */
 	public function managementreview(){
 		if (!PERMISSION::permissionFor('audit')) return 0;
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+		$data = $this->_sqlinterface->EXECUTE('management_get');
 		$number = 0;
 		foreach ($data as $row){
 			if ($row['closed']) continue;
@@ -1088,7 +1088,7 @@ class NOTIFICATION extends API {
 	 * number of unclosed measures 
 	 */
 	public function measures(){
-		$measures = SQLQUERY::EXECUTE($this->_pdo, 'measure_get');
+		$measures = $this->_sqlinterface->EXECUTE('measure_get');
 		return count(array_filter($measures, fn($m) => !$m['closed']));
 	}
 
@@ -1102,7 +1102,7 @@ class NOTIFICATION extends API {
 	 * reset icanread user setting if applicable because obviously they won't
 	 */
 	public function messageunnotified(){
-		$unnotified = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unnotified', [
+		$unnotified = $this->_sqlinterface->EXECUTE('message_get_unnotified', [
 			':user' => $_SESSION['user']['id']
 		]);
 		$unnotified = $unnotified ? intval($unnotified[0]['number']) : 0;
@@ -1122,9 +1122,9 @@ class NOTIFICATION extends API {
 				':invalidation_date' => $_SESSION['user']['invalidation_date'],
 				':two_factor' => $_SESSION['user']['two_factor']
 			];
-			SQLQUERY::EXECUTE($this->_pdo, 'user_post', $user);
+			$this->_sqlinterface->EXECUTE('user_post', $user);
 		}
-		SQLQUERY::EXECUTE($this->_pdo, 'message_put_notified', [
+		$this->_sqlinterface->EXECUTE('message_put_notified', [
 			':user' => $_SESSION['user']['id']
 		]);
 		return $unnotified;
@@ -1139,7 +1139,7 @@ class NOTIFICATION extends API {
 	 * number of unseen messages
 	 */
 	public function messageunseen(){
-		$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen', [
+		$unseen = $this->_sqlinterface->EXECUTE('message_get_unseen', [
 			':user' => $_SESSION['user']['id']
 		]);
 		$unseen = $unseen ? intval($unseen[0]['number']) : 0;
@@ -1157,7 +1157,7 @@ class NOTIFICATION extends API {
 	public function order(){
 		$unprocessed = 0;
 		if (PERMISSION::permissionFor('orderprocessing', false, false)){
-			$unprocessed = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed');
+			$unprocessed = $this->_sqlinterface->EXECUTE('order_get_approved_unprocessed');
 			$unprocessed = $unprocessed ? intval($unprocessed[0]['num']) : 0;
 		}
 		return $unprocessed;
@@ -1176,9 +1176,9 @@ class NOTIFICATION extends API {
 	public function preparedorders(){
 		if (!$_SESSION['user']['orderauth']) return 0;
 		$prepared = 0;
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
+		$orders = $this->_sqlinterface->EXECUTE('order_get_prepared_orders');
 		// minified userlist to decode orderer
-		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_users) $this->_users = $this->_sqlinterface->EXECUTE('user_get_datalist');
 		$users = [];
 		foreach ($this->_users as $user){
 			$users[$user['id']] = ['name' => $user['name'], 'units' => $user['units']];
@@ -1212,7 +1212,7 @@ class NOTIFICATION extends API {
 	 * * office
 	 */
 	public function records(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$data = $this->_sqlinterface->EXECUTE('records_get_all');
 		$number = 0;
 		foreach ($data as $row){
 			if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
@@ -1249,7 +1249,7 @@ class NOTIFICATION extends API {
 	 */
 	public function responsibilities(){
 		$number = 0;
-		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
+		$responsibilities = $this->_sqlinterface->EXECUTE('user_responsibility_get_all');
 		foreach ($responsibilities as $row){
 			$row['assigned_users'] = json_decode($row['assigned_users'], true);
 			if (isset($row['assigned_users'][$_SESSION['user']['id']]) && !$row['assigned_users'][$_SESSION['user']['id']]) {
@@ -1280,8 +1280,8 @@ class NOTIFICATION extends API {
 	 */
 	public function scheduledtrainings(){
 		// schedule training evaluation
-		if (!$this->_users) $this->_users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+		if (!$this->_users) $this->_users = $this->_sqlinterface->EXECUTE('user_get_datalist');
+		$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 			':ids' => array_column($this->_users, 'id')
 		]);
 
@@ -1292,7 +1292,7 @@ class NOTIFICATION extends API {
 			if (array_intersect(array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])), $_SESSION['user']['units'])) $unitusers[] = $user['id'];
 		}
 		if ($unitusers){
-			$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			$trainings = $this->_sqlinterface->EXECUTE('user_training_get_user', [
 				':ids' => $unitusers
 			]);
 			foreach ($trainings as $training){
@@ -1316,10 +1316,10 @@ class NOTIFICATION extends API {
 	 * note that if imported as module sending messages will fail if $importmodule->alertUserGroupSubmit() is not explicitly called
 	 */
 	public function tasks($alert = false){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
-		if (!$this->_users) $this->_users =  SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		if (!$this->_users) $this->_users =  $this->_sqlinterface->EXECUTE('user_get_datalist');
 		if (!$this->_unit_members) $this->_unit_members = $this->unit_members();
 
 		if ($alert) {
@@ -1369,7 +1369,7 @@ class NOTIFICATION extends API {
 	 *
 	 */
 	public function worklists(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
 
