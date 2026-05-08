@@ -12,7 +12,7 @@
 namespace CARO\API;
 
 require(__DIR__ . '/../vendor/autoload.php');
-include_once('./_filehandler.php');
+require_once(__DIR__ . '/../api/_filehandler.php');
 
 class UTILITY {
 
@@ -23,6 +23,9 @@ class UTILITY {
 	 *  |___|_|___|__,|_|_|_|_|_|  _|___|_| |___|
 	 *                          |_|
 	 * trim input data
+	 * @param array|string $data
+	 * 
+	 * @return array|string
 	 */
 	public static function cleanInputs($data){
 		$clean_input = [];
@@ -43,6 +46,7 @@ class UTILITY {
 	 *  |___|___|___|___|_  |
 	 *                  |___|
 	 * displays error reports by var_dumping id debug mode is on per config
+	 * @param mixed $vars
 	 */
 	public static function debug(...$vars){
 		if (CONFIG['application']['debugging'])	var_dump(...$vars);
@@ -58,7 +62,8 @@ class UTILITY {
 	 * matches a string against CONFIG['forbidden']['names']
 	 * optional override of a defined pattern if key matches config or append if not
 	 * @param string $name
-	 * @param array $pattern
+	 * @param array $extendedpattern
+	 * 
 	 * @return string|false matched pattern or not matched
 	 */
 	public static function forbiddenName($name, $extendedpattern = []){
@@ -90,6 +95,7 @@ class UTILITY {
 	 * adjust frontent assemble/dialog accordingly to return the correct values
 	 * 
 	 * @param string $string input
+	 * 
 	 * @return string output
 	 */
 	public static function hiddenOption($string){
@@ -104,11 +110,12 @@ class UTILITY {
 	 *
 	 * handles the identifier format globally
 	 * if the passed identifier does not have a valid trailing base 36 unix timestamp the default date will be appended accordingly
-	 * @param string passed $identifier
+	 * @param string $identifier
 	 * @param string $default_date_to_add
 	 * @param bool $return_string_before_timestamp returns first part of submitted identifier without timestamp appended
 	 * @param bool $translate_timestamp returns Y-m-d H:i:s translation of timestamp
 	 * @param bool $return_verified_timestamp returns the trailing timestamp if valid
+	 * 
 	 * @return string|null
 	 */
 	public static function identifier($identifier = '', $default_date_to_add = '', $return_string_before_timestamp = false, $translate_timestamp = false, $return_verified_timestamp = false){
@@ -166,7 +173,6 @@ class UTILITY {
 		return json_encode($array, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | $flags);
 	}
 
-
 	/**
 	 *                                   _           _
 	 *   ___ ___ ___ ___ ___ ___ ___ _ _| |___ ___ _| |
@@ -186,13 +192,13 @@ class UTILITY {
 				// according to https://stackoverflow.com/a/18209799/6087758
 				$inputstream = preg_replace_callback(
 					'/(^|(?<=&))[^=[&]+/',
-					function($key) { return bin2hex(urldecode($key[0])); },
+					function($key) { return bin2hex(rawurldecode($key[0])); },
 					$_SERVER['QUERY_STRING']
 				);
 				parse_str($inputstream, $post);
 				$data = array();
 				foreach ($post as $key => $val) {
-					$data[hex2bin($key)] = urldecode($val);
+					$data[hex2bin($key)] = rawurldecode($val); // avoid + being decoded, proper whitespace must be %20
 				}
 				break;
 			case "POST":
@@ -212,7 +218,7 @@ class UTILITY {
 					// according to https://stackoverflow.com/a/18209799/6087758
 					$raw_data = preg_replace_callback(
 						'/(^|(?<=&))[^=[&]+/',
-						function($key) { return bin2hex(urldecode($key[0])); },
+						function($key) { return bin2hex(rawurldecode($key[0])); },
 						$raw_data
 					);
 					parse_str($raw_data, $input);
@@ -353,6 +359,9 @@ class UTILITY {
 	 * kudos: https://stackoverflow.com/a/5950598/6087758
 	 * iconv relies on locales that you may not have control over
 	 * and this is more versatile than https://stackoverflow.com/q/158241/6087758 with  mb_convert_encoding to ISO-8859-15
+	 * @param string $string
+	 * 
+	 * @return string
 	 */
 	public static function utf82ascii($string){
 		if (strpos($string = htmlentities($string, ENT_QUOTES, 'UTF-8'), '&') !== false){
@@ -410,6 +419,7 @@ class PERMISSION {
 	 * check whether an approvalcolumn has been fully approved according to function
 	 * @param string $function as defined within config.ini
 	 * @param string|array $approvalcolumn 'approval'-column
+	 * 
 	 * @return bool
 	 * 
 	 */
@@ -432,6 +442,7 @@ class PERMISSION {
 	 * check per user permission so there is only one count per unapproved element even on multiple permissions
 	 * @param string $function as defined within config.ini
 	 * @param string|array $approvalcolumn 'approval'-column
+	 * 
 	 * @return array of pending approval permission
 	 * 
 	 */
@@ -454,6 +465,7 @@ class PERMISSION {
 	 * @param string $function as defined within config.ini
 	 * @param bool $returnvalues
 	 * @param bool|array $default
+	 * 
 	 * @return bool|array
 	 */
 	public static function permissionFor($function = '', $returnvalues = false, $default = ['admin']){
@@ -479,6 +491,7 @@ class PERMISSION {
 	 * 
 	 * returns a boolean if user matches with passed authorizations
 	 * @param array|string $auth as either array or comma separated string
+	 * 
 	 * @return bool
 	 */
 	public static function permissionIn($auth){
@@ -497,6 +510,7 @@ class PERMISSION {
 	 * skips system user and patients by default if not specified otherwise
 	 * @param array $user database row
 	 * @param array $filter with id, permission or unit as arrays
+	 * 
 	 * @return bool
 	 */
 	public static function filteredUser($user, $filter = ['id' => [1], 'permission' => ['patient']]) {
@@ -526,6 +540,7 @@ class SEARCH{
 	 *          |_|
 	 * splits a search string into terms with conditions
 	 * @param string $search requested search string
+	 * 
 	 * @return array array of named arrays containing operator, column, term and pregterm with wildcard replacement
 	 */
 	public static function expressions($search){
@@ -565,8 +580,8 @@ class SEARCH{
 	 *
 	 * iterates over terms and checks if mandatory, excluded or any search strings are found
 	 * usable for data not prefiltered via sql query
-	 * @param array $terms
-	 * @param array $expressions
+	 * @param string $search
+	 * @param array $terms to compare search against
 	 * 
 	 * @return bool
 	 */
@@ -787,6 +802,7 @@ class BLOCKCHAIN {
 	 * add a block to the chain, initiate the chain if necessary
 	 * @param null|array $chain
 	 * @param array $block
+	 * 
 	 * @return array
 	 */
 	public static function add($chain = [], $block = []){
@@ -814,6 +830,7 @@ class BLOCKCHAIN {
 	 * @param object $_pdo established connection
 	 * @param array $chain
 	 * @param bool $details to return details on checks
+	 * 
 	 * @return bool|array
 	 */
 	public static function verified($_pdo, $chain = [], $details = false){
@@ -872,6 +889,7 @@ class BLOCKCHAIN {
 	 * this may have to be done manually or with future methods if necessary in case of serious concerns, but at least there is no data loss
 	 * @param array $chain
 	 * @param array $append chain to append
+	 * 
 	 * @return bool|array false if validation fails, else $chain 
 	 */
 	public static function merge($chain = [], $append = []){
