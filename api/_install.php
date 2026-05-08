@@ -788,7 +788,7 @@ class INSTALL {
 		}
 		$inputstream = preg_replace_callback(
 			'/(^|(?<=&))[^=[&]+/',
-			function($key) { return bin2hex(urldecode($key[0])); },
+			function($key) { return bin2hex(rawurldecode($key[0])); },
 			$inputstream
 		);
 		parse_str($inputstream, $post);
