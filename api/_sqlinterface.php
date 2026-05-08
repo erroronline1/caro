@@ -12,17 +12,38 @@
 namespace CARO\API;
 
 class SQLQUERY {
+
+	private array $_pdoOptions = [
+		\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+		\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+		//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
+	];
+	private array $_connectionParameters = [];
+	private string $_driverQuote = '';
+	public $_pdo = null;
+
+	/**
+	 * instatiate database connection
+	 * @param array $_connectionParameters
+	 */
+	public function __construct($_connectionParameters = []){
+		$this->_connectionParameters =  $_connectionParameters;
+		self::CONNECT();
+	}
+
 	/**
 	 * return query for driver
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
 	 * @param array $tokens strtr tokens and values
+	 * @param bool|string $searchwildcards true for ? and *, all for replacement of [^\w\d], contain for only %...% - see SEARCH()
 	 * 
 	 * @return string sql query
 	 */
 	public static function PREPARE($_pdo, $query = '', $tokens = [], $searchwildcards = false){
 		// retrive query matching sql driver, else process raw query
 
+//		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][$this->_connectionParameters['driver']];
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 
 		foreach($tokens as $key => $value){
@@ -36,6 +57,7 @@ class SQLQUERY {
 		$query = strtr($query, $tokens);
 		
 		// handle unfortunate sqlsrv unicode implementation that is very much unsupportive of tokenized replacements on NULL-values
+		//$query = preg_replace(["/ELSE N'(" . $this->_driverQuote . ".*?" . $this->_driverQuote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $query);
 		$quote = substr($_pdo->quote('.'), 0, 1);
 		$query = preg_replace(["/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $query);
 		return $query;
@@ -101,6 +123,7 @@ class SQLQUERY {
 				break;
 			case 'string':
 				if (in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) return $value;
+				//return $this->_pdo->quote($value);
 				return $_pdo->quote($value);
 				break;
 			case 'NULL':
@@ -151,13 +174,20 @@ class SQLQUERY {
 		foreach ($columns as $column){
 			$concatenations = [];
 			foreach ($expressions as $expression){
+				//switch($this->_connectionParameters['driver']){
 				switch(CONFIG['sql'][CONFIG['sql']['use']]['driver']){
 					case 'mysql':
+						//if ($expression['operator'] === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						//elseif ($expression['operator'] === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column['column'] . "), '') NOT LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						//else $concatenations[] = 'OR IFNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						if ($expression['operator'] === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						elseif ($expression['operator'] === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column['column'] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						else $concatenations[] = 'OR IFNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						break;
 					case 'sqlsrv':
+						//if ($expression['operator'] === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						//elseif ($expression['operator'] === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column['column'] . "), '') NOT LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						//else $concatenations[] = 'OR ISNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $this->_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						if ($expression['operator'] === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						elseif ($expression['operator'] === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column['column'] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						else $concatenations[] = 'OR ISNULL(LOWER(' . $column['column'] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
@@ -192,7 +222,6 @@ class SQLQUERY {
 	 * 
 	 * MASKING HAS TO BE DONE BEFOREHAND, best by passing SQLQUERY::PREPARE
 	 * 
-	 * @param object $_pdo preset database connection, passed from main application
 	 * @param array $packages so far
 	 * @param string $query next sql query
 	 * @return array $packages extended packages so far
@@ -201,6 +230,7 @@ class SQLQUERY {
 		if ($query){
 			$packageIndex = count($packages) - 1;
 			if (isset($packages[$packageIndex])){
+				//if (strlen($packages[$packageIndex] . $query . ';') < $this->_connectionParameters['packagesize']) $packages[$packageIndex] .= $query . ';';
 				if (strlen($packages[$packageIndex] . $query . ';') < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $packages[$packageIndex] .= $query . ';';
 				else $packages[] = $query . ';';
 			}
@@ -231,11 +261,13 @@ class SQLQUERY {
 				}
 				$item = strtr($values, $item);
 				// handle unfortunate sqlsrv unicode implementation that is very much unsupportive of tokenized replacements on NULL-values
+				//$item = preg_replace(["/ELSE N'(" . $this->_driverQuote . ".*?" . $this->_driverQuote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $item);
 				$quote = substr($_pdo->quote('.'), 0, 1);
 				$item = preg_replace(["/ELSE N'(" . $quote . ".*?" . $quote .")' END/s", "/ NNULL /"], ['ELSE N$1 END', ' NULL '], $item);
 
 				if (count($packageitems)){
 					$index = count($packageitems) - 1;
+					//if (strlen($query . ' VALUES ' . implode(',', [$item, ...$packageitems[$index]])) < $this->_connectionParameters['packagesize']){
 					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$packageitems[$index]])) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']){
 						$packageitems[$index][] = $item;
 					}
@@ -257,12 +289,36 @@ class SQLQUERY {
 	 */
 	public static function CLOSE($_pdo){
 		$_pdo = null;
+		// $this->_pdo = null;
+	}
+
+	/**
+	 * (re-)establishes a database connection
+	 * @param array $_connectionParameters database connection parameters
+	 */
+	private function CONNECT($_connectionParameters = []){
+		$_connectionParameters = $_connectionParameters ?: $this->_connectionParameters;
+		if (!$_connectionParameters || array_keys($_connectionParameters) != ['driver', 'host', 'database', 'charset', 'user', 'password'] ) throw new \Exception("no or insufficient database connection parameters provided");
+		$this->_pdo = new \PDO(
+			$_connectionParameters['driver'] . ':' .
+			$_connectionParameters['host'] . ';' .
+			$_connectionParameters['database']. ';' .
+			$_connectionParameters['charset'],
+			$_connectionParameters['user'],
+			$_connectionParameters['password'],
+			$this->_pdoOptions);
+		$dbsetup = SQLQUERY::PREPARE($this->_pdo, 'DYNAMICDBSETUP');
+		if ($dbsetup) $this->_pdo->exec($dbsetup);
+		
+		$this->_driverQuote = substr($this->_pdo->quote('.'), 0, 1);
 	}
 
 	/**
 	 * driver dependent binary conversion because sqlsrv is a jerk
+	 * @param string $data
 	 */
 	public static function storebinary($data){
+		//switch($this->_connectionParameters['driver']){
 		switch(CONFIG['sql']['use']){
 			case 'mysql':
 				return $data;
@@ -270,7 +326,12 @@ class SQLQUERY {
 				return bin2hex($data);
 		}
 	}
+	/**
+	 * driver dependent binary conversion because sqlsrv is a jerk
+	 * @param string $data
+	 */
 	public static function retrievebinary($data){
+		//switch($this->_connectionParameters['driver']){
 		switch(CONFIG['sql']['use']){
 			case 'mysql':
 				return $data;
