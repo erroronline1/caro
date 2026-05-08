@@ -29,11 +29,18 @@ require_once('../api/_sqlinterface.php');
 class SQLTEST {
 	private mixed $_pdo = null;
 	/**
-	 * 10k insertions take about 30s of time, selections about 20s
+	 * 10k insertions take about 30s of time, selections about 20s  
 	 * set to an appropriate amount, make a cluster switch meanwhile and check for potential losses
 	 */
-
 	private int $_insertions = 10_000;
+	
+	/**
+	 * *id* primary key, auto increment  
+	 * *value* text | varchar(1000)  
+	 * *timestamp* datetime
+	 */
+	private string $_table = 'dbo.Table_1';
+
 
 	public function __construct(){
 		$options = [
@@ -127,14 +134,18 @@ class SQLTEST {
 	}
 
 
+	/**
+	 * executes the set amount of insertions  
+	 * measures the time and checks if the row-count matches
+	 */
 	public function insert(){
 		$result = '';
 		for ($i = 0; $i < $this->_insertions; $i++){
-			SQLQUERY::EXECUTE($this->_pdo, "INSERT INTO dbo.Table_1 (value, timestamp) VALUES ('". hash("sha512", $i+random_int(0,10000000)) . "', CURRENT_TIMESTAMP)");
+			SQLQUERY::EXECUTE($this->_pdo, "INSERT INTO " . $this->_table . " (value, timestamp) VALUES ('". hash("sha512", $i+random_int(0,10000000)) . "', CURRENT_TIMESTAMP)");
 		}
 		$result .= $this->printSuccess('execution time to write : ' . microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]);
 
-		$num = SQLQUERY::EXECUTE($this->_pdo, "SELECT COUNT(id) as num FROM dbo.Table_1");
+		$num = SQLQUERY::EXECUTE($this->_pdo, "SELECT COUNT(id) as num FROM " . $this->_table);
 		$num = $num ? intval($num[0]['num']) : 0;
 
 		if ($num !== $this->_insertions) $result .=  $this->printError('Oh no! Off by '. $this->_insertions-$num);
@@ -142,11 +153,15 @@ class SQLTEST {
 		return $result;
 	}
 
+	/**
+	 * reads the set amount of insertions  
+	 * measures the time and checks if the ids match the range of insertions
+	 */
 	public function read(){
 		$result = '';
 		$asserted = [0];
 		for ($i = 0; $i <= $this->_insertions; $i++){
-			if ($row = SQLQUERY::EXECUTE($this->_pdo, "SELECT * FROM dbo.Table_1 WHERE id=" . $i))
+			if ($row = SQLQUERY::EXECUTE($this->_pdo, "SELECT * FROM " . $this->_table . " WHERE id=" . $i))
 				$asserted[] = intval($row[0]['id']);
 		}
 		$result .=  $this->printSuccess('execution time to read: ' . microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]);
@@ -156,8 +171,12 @@ class SQLTEST {
 		return $result;
 	}
 
+	/**
+	 * truncates the table  
+	 * required for a successful match of ids for read-test
+	 */
 	public function truncate(){
-		SQLQUERY::EXECUTE($this->_pdo, "TRUNCATE TABLE dbo.Table_1");
+		SQLQUERY::EXECUTE($this->_pdo, "TRUNCATE TABLE " . $this->_table);
 		return $this->printSuccess('table has been truncated again');
 	}
 }
