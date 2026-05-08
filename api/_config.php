@@ -9,10 +9,10 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-$defaultconfig = parse_ini_file('config.ini', true, INI_SCANNER_TYPED);
-if (is_file('config.env')){
+$defaultconfig = parse_ini_file(__DIR__ . '/../api/config.ini', true, INI_SCANNER_TYPED);
+if (is_file(__DIR__ . '/../api/config.env')){
 	// config.env must contain the same nesting and keys as config.ini to override default settings
-	$envconfig = parse_ini_file('config.env', true, INI_SCANNER_TYPED);
+	$envconfig = parse_ini_file(__DIR__ . '/../api/config.env', true, INI_SCANNER_TYPED);
 
 	/**
 	 * recursively overwrite and append default config.ini parameters with environment settings

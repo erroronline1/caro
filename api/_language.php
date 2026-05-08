@@ -21,14 +21,14 @@ class LANG {
 	/**
 	 * contains the preloaded language file as a named array
 	 */
-	public $_DEFAULT = [];
-	public $_USER = [];
+	public array $_DEFAULT = [];
+	public array $_USER = [];
 
 	/**
 	 * initalize languagefiles 
 	 */
 	public function __construct(){
-		$default = './language.' . CONFIG['application']['defaultlanguage'];
+		$default = __DIR__ . '/../api/language.' . CONFIG['application']['defaultlanguage'];
 
 		$file = file_get_contents($default . '.json');
 		$this->_DEFAULT = json_decode($file, true);
@@ -37,7 +37,7 @@ class LANG {
 		}
 		
 		if (isset($_SESSION['user']) && isset($_SESSION['user']['app_settings']['language'])){
-			$user = './language.' . $_SESSION['user']['app_settings']['language'];
+			$user = __DIR__ . '/../api/language.' . $_SESSION['user']['app_settings']['language'];
 			if ($file = file_get_contents($user . '.json'))	{
 				$this->_USER = json_decode($file, true);
 				if (is_file($user . '.env') && $file = file_get_contents($user . '.env')){
@@ -54,6 +54,7 @@ class LANG {
 	 * @param string $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
 	 * @param string $forceDefault override user setting, especially on logout, otherwise first login attempts may fail
+	 * 
 	 * @return string textchunk with replacements
 	 */
 	public function GET($request, $replace = [], $forceDefault = false){
@@ -75,6 +76,8 @@ class LANG {
 	 * recursively find the language chunk independent of nesting depth
 	 * @param array $chain exploded request
 	 * @param array $lang LANGUAGEFILE or passed subset
+	 * 
+	 * @return string raw textChunk without replacements
 	 */
 	private static function find($chain, $lang){
 		$key = array_shift($chain);
@@ -103,6 +106,8 @@ class LANG {
 	 * returns a language specific chunk ~~with whitespaces and periods replaced with underscore as in request parameters~~
 	 * @param string $request dot separated keys of languagefile
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
+	 * @param bool $forceDefault returns application default language instead of user selected
+	 * 
 	 * @return string textchunk ~~with replacements and whitespaces replaced with underscore as in request parameters~~
 	 * 
 	 * legacy kept as precaution, payload parameters are processed by this, but currently do not require altering 
@@ -115,6 +120,8 @@ class LANG {
 	* recursively overwrite and append default parameters with environment settings
 	* @param array $lang starting with language.xx.json
 	* @param array $env starting with language.xx.env
+
+	* @return array
 	*/
 	private static function override($lang, $env){
 	   foreach ($env as $key => $value){

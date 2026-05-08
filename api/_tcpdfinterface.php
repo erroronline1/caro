@@ -14,7 +14,7 @@ error_reporting(E_ALL);
 
 require(__DIR__ . '/../vendor/autoload.php');
 define('K_PATH_FONTS', realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
-require_once('./_filehandler.php');
+require_once(__DIR__ . '/../api/_filehandler.php');
 
 class PDF{
 	private $_pageSetup = [];

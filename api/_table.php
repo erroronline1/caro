@@ -12,12 +12,12 @@
 namespace CARO\API;
 
 require(__DIR__ . '/../vendor/autoload.php');
-require_once('./_filehandler.php');
+require_once(__DIR__ . '/../api/_filehandler.php');
 
 CLASS TABLE{
-	private $content = [];
-	private $unstructuredDataAboveHeader = [];
-	private $_filehandler = null;
+	private array $content = [];
+	private array $unstructuredDataAboveHeader = [];
+	private mixed $_filehandler = null;
 
 	/**
 	 * imports data from a file or a named array
@@ -84,7 +84,7 @@ CLASS TABLE{
 
 	/**
 	 * add data above the header or flush by providing an empty array
-	 * @param $data as tweo dimensional array
+	 * @param array $data as two dimensional array
 	 */
 	public function dataAboveHeader($data){
 		$this->unstructuredDataAboveHeader = $data;
@@ -138,7 +138,12 @@ CLASS TABLE{
 			return $this->content;
 	}
 
-	// write to multiple csv
+	/**
+	 * write to multiple csv
+	 * @param string $dst
+	 * @param null $type
+	 * @param array $options
+	 */
 	private function files($dst, $type = null, $options = []){
 		$response = [];
 		$csvoptions = new \OpenSpout\Writer\CSV\Options(
@@ -147,7 +152,7 @@ CLASS TABLE{
 		//	SHOULD_ADD_BOM: false
 		);
 		$writer = new \OpenSpout\Writer\CSV\Writer($csvoptions);
-		$sheetName = $recentSheet = null;
+		$sheetName = $recentSheet = $tmp_name = null;
 
 		// write sheets
 		foreach($this->content as $sheetName => $sheet) {
@@ -197,10 +202,16 @@ CLASS TABLE{
 		return $response;
 	}
 
-	// write to ods or xlsx
+	/**
+	 * write to ods or xlsx
+	 * @param string $dst
+	 * @param mixed $type
+	 * @param array $options
+	 */
 	private function sheets($dst, $type = null, $options = []){
 		// url
 		$file = pathinfo($dst);
+		$writer = $celloptions = null;
 
 		$contentToWrite = $this->content;
 		switch (strtolower($type ?: $file['extension'])){
