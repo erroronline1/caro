@@ -3126,8 +3126,9 @@ can be tested and verified importing unittest.js and calling `rendertest('app')`
 
 Other libraries rely on dynamic data and have to be tested in development runtime
 * viewstl: upload an stl/obj-file and view it within the file selection
-* TCPDF: generate a record and export it as pdf
-* xlsxwriter: generate orders and export the order statistic from the audit-module
+* tc-lib-pdf: generate a record and export it as pdf
+* openspout: generate orders and export the order statistic from the audit-module
+* markdown: preview markdown with the markdown playground from eny eligible input (e.g. Messages, Managementreview)
 
 ## Stress test and performance
 Some stress tests can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
@@ -3138,11 +3139,11 @@ During development following outcomes could be noted:
 * 1k approved orders process in about 2.7s on the server side and 3s on the client side (in full data tile view on desktop) on 282k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested, before going public.**
+Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevocable long-term results within records. The script should be removed from the production server once being tested, before going public.**
 
 Same applies to vendors. Vendor-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
 
-A Method is provided to change the [fileserver strategy](#fileserver-strategy), copying files between the filesystem and the database.
+A method is provided to change the [fileserver strategy](#fileserver-strategy), copying files between the filesystem and the database.
 
 One special usecase may be the auto-approval incorporations on migration from another quality management system. If you agree within the administration on terms, you can set up the approvals that will override all currently pending incorporations. This step should be well thought out, documented and only being used once after initial migration and imports of product lists through the [ERP interface](#erp-interface), assuming previous known products have been incorporated already.
 This is possible for document approval too and could also be used wisely on subsequently added roles for approval, to reduce the workload. Again, this should be well documented.
@@ -3188,10 +3189,13 @@ graph TD;
     sql<-->module;
     utility_php<-->module;
 
-    module<-->calendar(_calendarutility.php)
-    module<-->csv(_csvprocessor.php);
-    module<-->pdf(_tcpdfinterface.php);
-    module<-->libraries([libraries]);
+    module<---->calendar(_calendarutility.php)
+    module<----->csv(_csvprocessor.php);
+    module<----->pdf(_tcpdfinterface.php);
+    module<----->table(_table.php);
+    module<--->file(_filehandler.php);
+    module<-.->erp(_erpinterface.php);
+    module<-->libraries([vendor libraries]);
     module==>api_php2(api.php);
 
     api_php2-->response((response));
