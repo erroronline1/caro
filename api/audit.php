@@ -2683,17 +2683,22 @@ class AUDIT extends API {
 						if ($key === 'verification') {
 							continue;
 						}
-						$report .= $key . ': ' . $value . "  \n";
+						$report .= $value . "\n";
 					}
-					$report .= $block['verification'] . "\n \n \n";
+					$report .= $block['verification'] . "\n\n";
 				}
 				// gather attachments if applicable
 				$files = [];
 				foreach($recordcontent as $block){
 					if (isset($block['attachments'])) {
 						$block['attachments'] = json_decode($block['attachments'], true);
-						$files = array_merge($files, array_combine(array_map(Fn($f) => $f, array_keys($block['attachments'])), array_map(Fn($f) => ['href' => $this->_filehandler->getFileLink($f)], array_keys($block['attachments']))));
+						$files = array_merge($files, array_combine(array_map(Fn($f) => $f, array_keys($block['attachments'])), array_map(Fn($f) => ['href' => $this->_filehandler->getFileLink($f), 'data-path' => $f], array_keys($block['attachments']))));
 					}
+				}
+				// mask filenames to avoid emphasis for _
+				foreach($files as $file){
+					$escapedFile = str_replace('_', '\_', $file['data-path']);
+					$report = str_replace($file['data-path'], $escapedFile, $report);
 				}
 
 				// include code for verification into output
@@ -2753,7 +2758,7 @@ class AUDIT extends API {
 						'type' => 'textsection',
 						'attributes' => [
 							'data-type' => 'certificate',
-							'name' => BLOCKCHAIN::verified($this->_sqlinterface, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier])
+							'name' => BLOCKCHAIN::verified($this->_sqlinterface, $recordcontent) ? $this->_lang->GET('record.verify.passed', [':identifier' => $identifier], true) : $this->_lang->GET('record.verify.corrupt', [':identifier' => $identifier], true)
 						],
 						'mdcontent' => $report
 					]
@@ -2789,12 +2794,12 @@ class AUDIT extends API {
 	}
 	private function exportrecordverification(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.recordverification') . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.recordverification', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('audit.checks_type.recordverification'),
+			'title' => $this->_lang->GET('audit.checks_type.recordverification', [], true),
 			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
