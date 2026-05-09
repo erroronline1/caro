@@ -840,6 +840,9 @@ pre,
 code {
 	font-family: monospace;
 }
+pre.eol1_md {
+	overflow: scroll;
+}
 
 blockquote {
 	border-left: 0.5em solid var(--cta);
