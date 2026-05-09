@@ -26,7 +26,7 @@ class ListTypeGenerator{
 }
 
 class Markdown {
-	private $_anchor_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,"\'>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
+	private $_anchor_auto = '/(?<!\]\()(?:\<{0,1})(?<!\'|"|`)((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,"\'`>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 		private $_anchor_md = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!\\)\))(?!\))/m'; // regular md links; rewrite working regex101.com expression on construction for correct escaping of \
 	private $_blockquote = '/(^>{1,}.*?\n$)+/ms';
 	private $_code_block = '/^ {0,3}([`~]{3})(.*?)\n((?:.|\n)+?)\n^ {0,3}\1\n|^ {4}([^\*\-\d].+)+/m';
@@ -39,7 +39,6 @@ class Markdown {
 	private $_headings = '/(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_horizontal_rule = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_image = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
-		private $_inlineEvents = '/on\w+?=(\'|").+?(?<!\\)\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|href=(\'|")javascript:.+?(?<!\\)\3/mi'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_larger = '/(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_linebreak = '/ +\n/';
 	private $_list = '/((?:^)(\*|\-|\+|\d+\.) {1,3}(?:.|\n)+?)(?:\n$|\Z)/m';
@@ -47,6 +46,7 @@ class Markdown {
 	private $_mark = '/==(.+?)==/';
 	private $_paragraph = '/(?:^$\n|\A)((?<!^<)(?:(\n|.)(?!>$))+?)(?:\n^$|\Z)/mi';
 		private $_reference = '/(?:(?<!!|\\)\[)(.+?)(?:(?<!\\)\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/m'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_safeMode = '/<\/{0,1} {0,}(a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video|xmp)|on\w+?=(\'|").+?(?<!\\)\2/mi'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_strikethrough = '/(?<!\\)~{2}([^\n]+?)(?<!\\| |\n)~{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_subscript = '/(?<!\\)~{1}([^\n]+?)(?<!\\| |\n)~{1}/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_superscript = '/(?<!\\)\^{1}([^\n]+?)(?<!\\| |\n)\^{1}/';
@@ -60,7 +60,7 @@ class Markdown {
 	private $_limitTo = [];
 
 	// predefined character-sets to replace if required
-	public $_escaped = [
+	public array $_escaped = [
 		"&" => "&amp;",
 		"<" => "&lt;",
 		">" => "&gt;",
@@ -68,7 +68,7 @@ class Markdown {
 		"'" => "&#039;",
 	];
 
-	public $_typographs = [
+	public array $_typographs = [
 		"(c)" => "&copy;",
 		"(r)" => "&reg;",
 		"(tm)" => "&trade;",
@@ -78,18 +78,19 @@ class Markdown {
 	];
 
 	// modifiable lists for using as extended class
-	public $_methodsInProcessingOrder = [
-		"emphasis", // should come first to avoid to avoid modifying custom class insertions having unserscore in their name
-		"footnote", // should come second to avoid mishandling indentation and reutilizing list and superscript
-		"blockquote", // should come thirs to enable nesting
+	public array $_methodsInProcessingOrder = [
+		"safeMode", // safeMode must come first to disable unsupported tags; can not render inline events and scripts to avoid malicious inserts
+		"emphasis", // should come second to avoid to avoid modifying custom class insertions having unserscore in their name
+		"footnote", // should come third to avoid mishandling indentation and reutilizing list and superscript
+		"blockquote", // should come fourth to enable nesting
 		"reference", // before a and footnote to not mess up with similar patterns
 		"headings", // before hr avoiding conversion of ----
 		"horizontal_rule", // before emphasis avoiding matching *** as emphasis
 		"definition",
 		"task", // before list otherwise only the first occasionally nested item is converted
 		"list",
-		"code", // after list to avoid erroneous indentation matching
 		"anchor", // safeMode can not render anchors to avoid malicious scripts
+		"code", // after list to avoid erroneous indentation matching, after anchor to enable anchor code escaping
 		"mailto", // safeMode can not render anchors to avoid malicious scripts
 		"image",
 		"mark",
@@ -101,7 +102,6 @@ class Markdown {
 		"typographer",
 		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		"linebreak",
-		"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
 	];
 
 	public $_nested_blocks = [
@@ -112,14 +112,15 @@ class Markdown {
 	];
 
 	// convert some tags currently not supported by the mentioned library
-	private $TCPDF = null;
+	// implementation as intval can handle major version behaviour
+	private int $TCPDF = 0;
 
 	/**
 	 * instatiate the interface
 	 * 
-	 * @param bool $TCPDF default null switches some tags for compatibility reasons
+	 * @param bool $TCPDF default false switches some tags for compatibility reasons
 	 */
-	public function __construct($TCPDF = null)
+	public function __construct($TCPDF = 0)
 	{
 		// rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_anchor_md = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\()(.+?)((?: \").+(?:\"))*(?:(?<!' . preg_quote('\\', '/') . ')\))(?!\))/m'; // regular md links
@@ -127,14 +128,14 @@ class Markdown {
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/m';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=|_)/';
 		$this->_mailto = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
-		$this->_inlineEvents = '/on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\1|<(script|title|textarea|style|xmp|iframe|noembed|noframes|plaintext).+?\/\2>|(\'|")javascript:.+?(?<!' . preg_quote('\\', '/') . ')\3/mi';
 		$this->_larger = '/(?<!' . preg_quote('\\', '/') . ')\^{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{2}/';
 		$this->_reference = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/m';
+		$this->_safeMode = '/<\/{0,1} {0,}(a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video|xmp)|on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\2/mi';
 		$this->_strikethrough = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
 		$this->_subscript = '/(?<!' . preg_quote('\\', '/') . ')~{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{1}/';
 		$this->_superscript = '/(?<!' . preg_quote('\\', '/') . ')\^{1}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{1}/';
 		$this->_typographer = '/(?<!' . preg_quote('\\', '/') . ')\((?:c|r|tm|p)(?<!' . preg_quote('\\', '/') . ')\)|(?<!' . preg_quote('\\', '/') . ')\+-|(?<!' . preg_quote('\\', '/') . ')->/i';
-		$this->TCPDF = boolval($TCPDF); 
+		$this->TCPDF = intval($TCPDF); 
 	}
 
 	/**
@@ -142,7 +143,7 @@ class Markdown {
 	 * 
 	 * @param string $path filepath to csv
 	 * @param array $csv dialect options
-	 * @return string|exception Marktown table or exception for lack of rows
+	 * @return string|\Exception Marktown table or exception for lack of rows
 	 */
 	public function csv2md($path, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
 		$csvfile = fopen($path, 'r');
@@ -189,7 +190,7 @@ class Markdown {
 	 * 
 	 * @param string $content Markdown table
 	 * @param array $csv dialect options
-	 * @return array|exception [tempfile => string, headers => string] or exception due to lack of identified tables
+	 * @return array|\Exception [tempfile => string, headers => string] or exception due to lack of identified tables
 	 */
 	public function md2csv($content, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
 		$data = [];
@@ -246,8 +247,8 @@ class Markdown {
 		$text = preg_replace(['/\r/','/\t/'], ['', '    '], $text ?: '') . "\n"; // add a new line for improved pattern matching by default
 
 		foreach ($this->_methodsInProcessingOrder as $method) {
-			if (!$limitTo || in_array($method, $limitTo) || ($safeMode && in_array($method, ["anchor", "inlineEvents", "reference", "mailto"]))) {
-				if (in_array($method, ["anchor", "inlineEvents", "reference", "mailto"])) $text = $this->$method($text, $safeMode);
+			if (!$limitTo || in_array($method, $limitTo) || ($safeMode && in_array($method, ["anchor", "safeMode", "reference", "mailto"]))) {
+				if (in_array($method, ["anchor", "safeMode", "reference", "mailto"])) $text = $this->$method($text, $safeMode);
 				else $text = $this->$method($text);
 			}
 		}
@@ -287,6 +288,7 @@ class Markdown {
 
 	/**
 	 * development helper...
+	 * @param mixed $content
 	 */
 	private function debug(...$content){
 		echo "<pre>"; var_dump(...$content); echo "</pre>";
@@ -360,8 +362,8 @@ class Markdown {
 		$content = preg_replace_callback($this->_blockquote,
 			function($match) use ($recursion){
 				$match[0] = $this->blockquote(preg_replace(['/^> {0,1}|^ /m'], '', $match[0]), true); // remove blockquote character and possible whitespace and check recursively for nested blockquotes
-				if ($recursion) return '<blockquote class="eol1_md"><p>' . $match[0] . "</p></blockquote>"; // fence with tags
-				return '<blockquote class="eol1_md"><p>' . "\n" . $match[0] . "\n</p></blockquote>\n";
+				if ($recursion) return '<p><blockquote class="eol1_md">' . $match[0] . "</blockquote></p>"; // fence with tags
+				return '<p><blockquote class="eol1_md">' . "\n" . $match[0] . "\n</blockquote></p>\n";
 			},
 			$content
 		);
@@ -380,7 +382,7 @@ class Markdown {
 				// $match[2] for fenced code would be a specified language, not sure what to do with that yet
 				// if match[4] code blocks are written with pure indentation
 				$code = isset($match[4]) ? preg_replace('/^ {4}/m', '', $match[0]) : $match[3];
-				return '<pre class="eol1_md">' . (!$this->TCPDF ? '<code class="eol1_md">' : '') . str_replace('    ', "\t", $this->escapeHtml($code)) . (!$this->TCPDF ? '</code>' : '') . "</pre>"; // replace 4 spaces within code with tabs to avoid collision with pre
+				return (!$this->TCPDF ? '<code class="eol1_md">' : '') . '<pre class="eol1_md">' . str_replace('    ', "\t", $this->escapeHtml($code)) . '</pre>' . (!$this->TCPDF ? '</code>' : ''); // replace 4 spaces within code with tabs to avoid possible collisions
 			},
 			$content);
 
@@ -558,34 +560,11 @@ class Markdown {
 	 * @return string
 	 */
 	private function image($content){
-		if ($this->TCPDF) return preg_replace($this->_image,
-				'<img alt="$1" src="$2" style="float:left; max-width:100%" />',
-				$content
-			);
 		return preg_replace($this->_image,
 			'<img alt="$1" src="$2" class="eol1_md" />',
 			$content
 		);
 
-	}
-
-	/**
-	 * replace inline events, href-javascript and some tags with spechialchars
-	 * may break some links but better safe than sorry
-	 * 
-	 * @param string $content
-	 * @param bool $safeMode
-	 * @return string
-	 */
-	private function inlineEvents($content, $safeMode){
-		if ($safeMode) {
-			return preg_replace_callback($this->_inlineEvents,
-				function($match){
-					return htmlspecialchars($match[0]);
-				},
-				$content);
-		}
-		return $content;
 	}
 
 	/**
@@ -619,7 +598,7 @@ class Markdown {
 	 * detects list and replaces list items recursively with available nested blocks
 	 * 
 	 * @param string $content
-	 * @param bool|Generator $recursion for passing down a generator for ol list styles
+	 * @param bool|\Generator $recursion for passing down a generator for ol list styles
 	 * @return string
 	 */
 	private function list($content, $recursion = false){
@@ -631,6 +610,7 @@ class Markdown {
 				$li_type = $bullet > 0 ? 'ol' : 'ul';
 				$offset = $bullet < 2 ? '' : ' start="' . $bullet . '"';
 				$entries = [];
+				$item_split = $type = '';
 				switch($li_type){
 					case 'ol':
 						$item_split = '/^\d+\. */m';
@@ -651,7 +631,7 @@ class Markdown {
 					if ($list_entry){
 						// recursively replace nested items
 						$list_entry = $this->list(preg_replace('/^ {4}/m', '', $list_entry . "\n"), $recursion);  // add linebreak to end for pattern recognition
-						$entries[] = ($this->TCPDF && $li_type === 'ol' ? str_repeat('&nbsp;', 3) : '') . trim($list_entry);
+						$entries[] = ($this->TCPDF && $this->TCPDF < 8 && $li_type === 'ol' ? str_repeat('&nbsp;', 3) : '') . trim($list_entry);
 					}
 				}
 				return '<' . $li_type . $type . $offset . ' class="eol1_md"><li>' . implode('</li><li>', $entries) . '</li></' . $li_type . '>';
@@ -765,6 +745,25 @@ class Markdown {
 	}
 
 	/**
+	 * replace inline events, href-javascript and some tags with spechialchars
+	 * may break some links but better safe than sorry
+	 * 
+	 * @param string $content
+	 * @param bool $safeMode
+	 * @return string
+	 */
+	private function safeMode($content, $safeMode){
+		if ($safeMode) {
+			return preg_replace_callback($this->_safeMode,
+				function($match){
+					return htmlspecialchars($match[0]);
+				},
+				$content);
+		}
+		return $content;
+	}
+
+	/**
 	 * replace strikethrough
 	 * 
 	 * @param string $content
@@ -854,7 +853,7 @@ class Markdown {
 	 * @return string
 	 */
 	private function task($content){
-		if ($this->TCPDF) return preg_replace_callback($this->_task, // current implementation of tcpdf does not support html-checkboxes
+		if ($this->TCPDF && $this->TCPDF < 8) return preg_replace_callback($this->_task, // tcpdf 6.x does not support html-checkboxes
 			function($match){
 				return (trim(strtolower($match[1])) ? '[X]': '[&nbsp;&nbsp;]') . ' ' . $match[2];
 			},

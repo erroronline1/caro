@@ -19,10 +19,12 @@ class ComposerStaticInit96662d1f59aa64d8ac2140b75a7025a8
         array (
             'Com\\Tecnick\\Unicode\\Data\\' => 25,
             'Com\\Tecnick\\Unicode\\' => 20,
+            'Com\\Tecnick\\Pdf\\Parser\\' => 23,
             'Com\\Tecnick\\Pdf\\Page\\' => 21,
             'Com\\Tecnick\\Pdf\\Image\\' => 22,
             'Com\\Tecnick\\Pdf\\Graph\\' => 22,
             'Com\\Tecnick\\Pdf\\Font\\' => 21,
+            'Com\\Tecnick\\Pdf\\Filter\\' => 23,
             'Com\\Tecnick\\Pdf\\Encrypt\\' => 24,
             'Com\\Tecnick\\Pdf\\' => 16,
             'Com\\Tecnick\\File\\' => 17,
@@ -48,6 +50,10 @@ class ComposerStaticInit96662d1f59aa64d8ac2140b75a7025a8
         array (
             0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-unicode/src',
         ),
+        'Com\\Tecnick\\Pdf\\Parser\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-pdf-parser/src',
+        ),
         'Com\\Tecnick\\Pdf\\Page\\' =>
         array (
             0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-pdf-page/src',
@@ -63,6 +69,10 @@ class ComposerStaticInit96662d1f59aa64d8ac2140b75a7025a8
         'Com\\Tecnick\\Pdf\\Font\\' =>
         array (
             0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-pdf-font/src',
+        ),
+        'Com\\Tecnick\\Pdf\\Filter\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-pdf-filter/src',
         ),
         'Com\\Tecnick\\Pdf\\Encrypt\\' =>
         array (

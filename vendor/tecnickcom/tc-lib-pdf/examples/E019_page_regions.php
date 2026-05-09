@@ -16,10 +16,10 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require(__DIR__ . '/../../../../vendor/autoload.php');
+require(__DIR__ . '/../vendor/autoload.php');
 
 // define fonts directory
-\define('K_PATH_FONTS', \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');

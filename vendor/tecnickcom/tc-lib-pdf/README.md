@@ -24,8 +24,10 @@ If this project is useful to you, please consider [supporting development via Gi
 - [Installation](#installation)
 - [Font Setup](#font-setup)
 - [Quick Start](#quick-start)
+- [PDF Import](#pdf-import)
 - [Remote Resources and fileOptions](#remote-resources-and-fileoptions)
 - [Digital Signatures](#digital-signatures)
+- [PDF/A Archival](#pdfa-archival)
 - [PDF/X Conformance](#pdfx-conformance)
 - [PDF/UA Accessibility](#pdfua-accessibility)
 - [Development](#development)
@@ -120,9 +122,15 @@ The fastest way to evaluate the library is to follow the installation and font s
   - each feature (OCSP, CRL, cert embedding, DSS, VRI) can be enabled independently via `setSignature()` LTV options
 - **PDF annotations**: links, text notes, file attachments, markup, shapes, media, and widgets
 - **JavaScript** embedding
-- **PDF/A** (1/2/3, including a/b/u conformance levels) — see [Factur-X / ZUGFeRD](#other) below
+- **PDF/A** (1/2/3, including a/b/u conformance levels) — see [PDF/A Archival](#pdfa-archival) section and [E001_invoice.php](examples/E001_invoice.php) for a Factur-X / ZUGFeRD example
 - **PDF/X** (generic alias, PDF/X-1a, PDF/X-3, PDF/X-4, PDF/X-5) — print-exchange conformance: per-variant OutputIntent identifiers, GTS_PDFXVersion in Info dict and XMP, PDF version enforcement, CMYK color forcing for restrictive profiles (X-1a, X-3), transparency restrictions, and suppression of encryption and JavaScript
 - **PDF/UA** (generic alias, PDF/UA-1, PDF/UA-2) — accessibility conformance: tagged structure tree (`StructTreeRoot` / `ParentTree`), `MarkInfo /Marked true`, document language (`/Lang`), `DisplayDocTitle true`, `ActualText` for ligatures and special glyphs, figure alt-text tagging, and heading-level clamping to prevent skipped levels; PDF/UA-2 targets PDF 2.0
+
+### PDF Import
+- Import pages from existing PDFs as **Form XObjects** and place them on any destination page
+- Import a single page at a user-defined position and scale (`importPage` / `useImportedPage`)
+- Append full documents page-by-page, auto-sized to the source page dimensions (`addPageFromImport`)
+- Load source PDFs from a file path or raw byte string (`setImportSourceFile` / `setImportSourceData`)
 
 ### Other
 - **1D and 2D barcodes** via [`tc-lib-barcode`](https://github.com/tecnickcom/tc-lib-barcode)
@@ -203,6 +211,14 @@ composer update
 composer require ...
 ```
 
+To also cover `composer dump-autoload` (used in many CI pipelines), add the hook to `post-autoload-dump` as well:
+
+```json
+"post-autoload-dump": [
+    "@tc-lib-pdf-fonts"
+]
+```
+
 If you prefer to generate fonts manually, run the build in the `tc-lib-pdf-font` package:
 
 ```bash
@@ -249,7 +265,12 @@ $pdf->page->addContent($bfont['out']);
 
 $html = '<h1>Hello, PDF!</h1><p>Generated with tc-lib-pdf.</p>';
 
-$pdf->addHTMLCell($html, 15, 20, 180);
+$pdf->addHTMLCell(
+    html:   $html,
+    posx:   15,   // mm from left page edge
+    posy:   20,   // mm from top page edge
+    width:  180,  // mm wide (0 = to right margin)
+);
 
 $rawpdf = $pdf->getOutPDFString();
 
@@ -257,6 +278,8 @@ $pdf->renderPDF($rawpdf);
 ```
 
 `getOutPDFString()` returns the raw PDF bytes. `renderPDF()` streams those bytes to the browser; if you need file storage or an email attachment, keep the returned string and write or hand it off yourself.
+
+> **Note:** `realpath()` returns `false` when the fonts directory does not yet exist. If you see `K_PATH_FONTS` errors on first run, verify that fonts were generated after `composer install` (see [Font Setup](#font-setup)).
 
 For more complete examples — including invoices, images, barcodes, HTML tables, dedicated HTML selector/form/table showcases, PDF/X, and PDF/UA — see the [examples](examples) directory.
 Annotation-focused runnable example: [examples/E027_annotations.php](examples/E027_annotations.php).
@@ -274,6 +297,67 @@ If the minimal example fails on first run, verify these two points first:
 
 - `K_PATH_FONTS` resolves to an existing generated font directory.
 - The companion fonts were generated after `composer install` or `composer update`.
+
+---
+
+## PDF Import
+
+`tc-lib-pdf` can import pages from existing PDFs as Form XObjects and place them on destination pages.
+
+### Source registration and page count
+
+```php
+$sourceId = $pdf->setImportSourceFile('/path/to/source.pdf');
+// or: $sourceId = $pdf->setImportSourceData($rawPdfBytes);
+
+$count = $pdf->getSourcePageCount($sourceId);
+```
+
+### Import one page and place it
+
+```php
+$tpl = $pdf->importPage($sourceId, 1, [
+    'box' => 'CropBox',          // MediaBox|CropBox|BleedBox|TrimBox|ArtBox
+    'groupXObject' => true,
+    'cache' => true,
+    'respectRotation' => true,
+]);
+
+$pdf->addPage();
+$placed = $pdf->useImportedPage($tpl, 20, 20, 120, 80, [
+    'keepAspectRatio' => true,
+    'align' => 'CC',             // TL|TC|TR|CL|CC|CR|BL|BC|BR
+    'clip' => true,
+]);
+```
+
+### Append pages from a source document
+
+```php
+// Append all pages.
+$templates = $pdf->appendDocument($sourceId);
+
+// Append only selected pages.
+$templates = $pdf->appendDocument($sourceId, [1, 3, 5]);
+
+// Add one imported page sized to the source page.
+$tpl = $pdf->addPageFromImport($sourceId, 2);
+```
+
+### Import examples
+
+- Single page import: [examples/E065_import_single_page.php](examples/E065_import_single_page.php)
+- Full document append: [examples/E066_import_document_append.php](examples/E066_import_document_append.php)
+- Advanced N-up composition from imported pages: [examples/E067_import_page_region_nup.php](examples/E067_import_page_region_nup.php)
+
+### Import limitations and fidelity notes
+
+- Form and annotation semantics are not merged into editable destination structures; pages are imported as Form XObjects.
+- Digital signatures in source files are not preserved as valid signatures in the destination output.
+- Encrypted source PDFs are currently not importable with the bundled parser backend. Password-like options are accepted by the import API, but encrypted inputs fail with an explicit actionable exception.
+- For multi-stream page contents, import normalizes by decoding and concatenating stream bytes; this can change low-level byte representation while preserving rendered appearance in typical cases.
+- Transparency-group behavior is conformance-aware: when transparency is disallowed by the active PDF mode (for example PDF/X-1a or PDF/X-3), import suppresses transparency groups to remain compliant.
+- Setting `groupXObject` to `false` can reduce output size, but may change compositing on source pages that rely on transparency blending.
 
 ---
 
@@ -407,19 +491,57 @@ openssl pkcs12 -export -in tcpdf.crt -inkey tcpdf.key -out tcpdf.p12
 
 ---
 
+## PDF/A Archival
+
+`tc-lib-pdf` supports PDF/A output for long-term archival workflows (ISO 19005). Pass the mode string as the `mode` argument to the `Tcpdf` constructor:
+
+```php
+// PDF/A-1b (default conformance level when suffix is omitted)
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa1');
+
+// Explicit conformance levels
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa1a');  // PDF/A-1a
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa1b');  // PDF/A-1b
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa2a');  // PDF/A-2a
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa2b');  // PDF/A-2b
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa2u');  // PDF/A-2u
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa3a');  // PDF/A-3a
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa3b');  // PDF/A-3b
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa3u');  // PDF/A-3u
+```
+
+| Mode suffix | Conformance | Unicode ToUnicode | Tagged structure |
+|-------------|-------------|-------------------|------------------|
+| `a` | Level A | required | required |
+| `b` | Level B | required | not required |
+| `u` | Level U (parts 2/3 only) | required | not required |
+
+PDF/A-3 supports embedding arbitrary file attachments (for example XML invoice payloads). This is the basis for **Factur-X / ZUGFeRD** workflows — embed the structured XML in a PDF/A-3 document and register the relationship via XMP metadata:
+
+```php
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfa3');
+// ... build document ...
+$pdf->Annotation(/* file attachment annotation pointing to the XML */);
+$pdf->setCustomXMP('x:xmpmeta.rdf:RDF.rdf:Description.pdfaExtension:schemas.rdf:Bag', $xmpBag);
+```
+
+Runnable example (invoice with embedded Factur-X XML): [examples/E001_invoice.php](examples/E001_invoice.php).
+
+---
+
 ## PDF/X Conformance
 
-`tc-lib-pdf` supports multiple PDF/X profiles for print-exchange workflows. Pass the mode string as the fifth argument to the `Tcpdf` constructor:
+`tc-lib-pdf` supports multiple PDF/X profiles for print-exchange workflows. Pass the mode string as the `mode` argument to the `Tcpdf` constructor:
 
 ```php
 // Generic PDF/X alias (maps to the library's baseline print-exchange workflow)
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfx');
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfx');
 
 // Specific variants
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfx1a'); // PDF/X-1a:2003
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfx3');  // PDF/X-3:2003
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfx4');  // PDF/X-4:2010
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfx5');  // PDF/X-5g:2010
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfx1a'); // PDF/X-1a:2003
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfx3');  // PDF/X-3:2003
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfx4');  // PDF/X-4:2010
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfx5');  // PDF/X-5g:2010
 ```
 
 Each variant automatically applies the appropriate conformance constraints:
@@ -439,15 +561,15 @@ Runnable examples: [examples/E010_pdfx.php](examples/E010_pdfx.php) through [exa
 
 ## PDF/UA Accessibility
 
-`tc-lib-pdf` supports tagged PDF output conforming to PDF/UA (ISO 14289). Pass the mode string as the fifth argument to the `Tcpdf` constructor:
+`tc-lib-pdf` supports tagged PDF output conforming to PDF/UA (ISO 14289). Pass the mode string as the `mode` argument to the `Tcpdf` constructor:
 
 ```php
 // Generic PDF/UA alias
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfua');
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfua');
 
 // Specific parts
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfua1'); // PDF/UA-1 (PDF 1.7)
-$pdf = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfua2'); // PDF/UA-2 (PDF 2.0)
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfua1'); // PDF/UA-1 (PDF 1.7)
+$pdf = new \Com\Tecnick\Pdf\Tcpdf(mode: 'pdfua2'); // PDF/UA-2 (PDF 2.0)
 ```
 
 When a PDF/UA mode is active the library automatically:

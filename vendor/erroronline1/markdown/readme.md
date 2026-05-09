@@ -16,6 +16,11 @@ There are about 1000 PHP packages on [Packagist](https://packagist.org/search/?q
 It matches common Markdown behaviour as far as I could tell after testing with several examples. See [issues](https://github.com/erroronline1/markdown/issues) for deviations.  
 Also half the lines for double the features of Parsedown at almost the same speed, or double the speed using the same features (give or take server caching), if that is of any importance.
 
+Releases follow [Semantic Versioning](https://semver.org):
+* PATCH - backwards-compatible bug fixes
+* MINOR - backwards-compatible new features
+* MAJOR - breaking changes
+
 ## Features
 * Link auto-detection, as well as tel- and ftp-protocol
 * Markdown link titles
@@ -27,10 +32,15 @@ Also half the lines for double the features of Parsedown at almost the same spee
 * Typographic replacements
 * A custom Markdown `^^for larger text^^`
 
-safeMode does not convert links and aims to convert relevant characters for script execution and insertions to HTML-escaped characters to avoid malicious code from untrusted user input. Internal links like `#heading` are not affected though.
+### safeMode
+safeMode does not convert external links and aims to convert relevant characters for script execution and insertions to HTML-escaped characters to avoid malicious code from untrusted user input. Internal links like `#heading` are not affected though.  
+The bracket of the following tags is escaped: (a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video) to not trick users into unintended elements, HTML is otherwise considered uncritical and is therefore unaltered.  
+*Caveat*: if any of these tags are embedded in a code block the < will be rendered to `&lt;` too.
 
-The md2html-method of both libraries can be passed selected tags, while others will be ignored. This may improve contextual performance. Without a selection all formatting will be executed.
+### Formatting selection 
+The md2html-method of both libraries can be passed selected formatting methods, while others will be ignored. This may improve contextual performance. Without a selection all formatting will be executed.
 
+### Styling helpers
 Most of the major created element tags have a `class="eol1_md"` attribute, so you can style these more easily. This is applicable for
 * a
 * blockquote
@@ -78,12 +88,9 @@ import { Markdown } from "../vendor/erroronline1/markdown/src/Markdown.js";
 ```
 
 ## Use
-Instatiate the Markdown class. In PHP you can choose to override some semantic HTML with tags supported by [TCPDF v6.11](https://github.com/tecnickcom/tcpdf) and, looking at the source code its successor currently too.  
+Instatiate the Markdown class.  
 ```php
-// normal mode
 $MARKDOWN = new \erroronline1\Markdown\Markdown();
-// or TCPDF-mode
-$MARKDOWN = new \erroronline1\Markdown\Markdown(true);
 
 // normal mode
 $mycontent = $MARKDOWN->md2html($mycontent);
@@ -91,23 +98,31 @@ $mycontent = $MARKDOWN->md2html($mycontent);
 $mycontent = $MARKDOWN->md2html($mycontent, true);
 ```
 
-The same goes for the ECMAScript version. The TCPDF-flag is obviously not available.  
 ```js
 const MARKDOWN = new Markdown();
 mycontent = MARKDOWN->md2html(mycontent, true, ["emphasis", "larger", "linebreak"]);
 ```
 will only render bold and italic, my custom larger text and linebreaks. The safeMode will still be applied.
 
+### TCPDF and tc-lib-pdf
+In PHP you can choose to override some semantic HTML with tags supported by [TCPDF v6.11](https://github.com/tecnickcom/tcpdf) and [tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf) as far as i can catch up.  
+You can enable the respective mode by passing the required version number on instatiation of the class  
+```php
+$MARKDOWN = new \erroronline1\Markdown\Markdown(6); // for TCPDF
+$MARKDOWN = new \erroronline1\Markdown\Markdown(8); // for tc-lib-pdf
+```
+To be honest currently the switch is version 8 so any number below or above will process the respective latest versions abilities.  
+
 ### Customization
 It's easy to implement your own features by just extending the class and add/or override your own methods. Add your method to the `_methodsInProcessingOrder`- and, if applicable, the `_nested-blocks`-property (push, slice, whatever). Of course you can override methods as well. See a working implementation in index.php:
 
 ```php
 class md extends \erroronline1\Markdown\Markdown{
-	public function __construct($TCPDF = null){
+	public function __construct($TCPDF = 0){
 		parent::__construct($TCPDF);
 		array_push($this->_methodsInProcessingOrder, "markdown");
 	}
-	public function markdown($content){
+	public function markdown($content = ''){
 		return preg_replace('/markdown/i', "nwobʞɿɒM", $content);
 	}
 }

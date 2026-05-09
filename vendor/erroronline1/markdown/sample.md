@@ -177,9 +177,12 @@ Definition list containing
 > | are | possible | as well |
 
 ## Safety related content that should pose lesser threat with safeMode
-
-<script>alert('this script injection had been presented by disabled safeMode')</script>  
+<a href="http://some.shady.website">totally legit website link</a>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
 <a href="javascript:alert('click event')">a href with click event</a>  
 [markdown link with js protocol href](javascript:alert('js href'))  
 <div onclick="alert('you clicked!')">clickable div</div>
+
+### safeMode restricted tags
+e.g. <label>is this input really part of your ui? <input type="text" /></label>  
+<script>alert('this script injection had been presented by disabled safeMode')</script>

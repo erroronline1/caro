@@ -6595,16 +6595,9 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf)
     * creates PDF-files on the server side, successor of [TCPDF](https://github.com/tecnickcom/tcpdf)
     * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v8.11.3
+    * v8.12.2
     * \> 1.8k stars
     * \> 200 forks
-    * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
-* [https://github.com/tecnickcom/tcpdf](https://github.com/tecnickcom/tcpdf)
-    * creates PDF-files on the server side, support mode only, will be fully replaced by tc-lib-pdf once it is completed
-    * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v6.10.1
-    * \> 4.5k stars
-    * \> 1.6k forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout)
     * creates CSV-, ODS- and XLSX-files on the server side
@@ -6656,7 +6649,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v2.1.1
+    * v2.2.0
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)

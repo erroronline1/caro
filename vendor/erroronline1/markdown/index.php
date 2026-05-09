@@ -7,17 +7,18 @@ require_once('./src/Markdown.php');
 $defaultSample = file_get_contents('./sample.md');
 
 $methods = [
-	"emphasis", // should come first to avoid to avoid modifying custom class insertions having unserscore in their name 
-	"footnote", // should come second to avoid mishandling indentation and reutilizing list and superscript
-	"blockquote", // should come thirs to enable nesting
+	//"safeMode", // safeMode must come first to disable unsupported tags; can not render inline events and scripts to avoid malicious inserts
+	"emphasis", // should come second to avoid to avoid modifying custom class insertions having unserscore in their name
+	"footnote", // should come third to avoid mishandling indentation and reutilizing list and superscript
+	"blockquote", // should come fourth to enable nesting
 	"reference", // before a and footnote to not mess up with similar patterns
 	"headings", // before hr avoiding conversion of ----
 	"horizontal_rule", // before emphasis avoiding matching *** as emphasis
 	"definition",
 	"task", // before list otherwise only the first occasionally nested item is converted
 	"list",
-	"code", // after list to avoid erroneous indentation matching
 	"anchor", // safeMode can not render anchors to avoid malicious scripts
+	"code", // after list to avoid erroneous indentation matching, after anchor to enable anchor code escaping
 	"mailto", // safeMode can not render anchors to avoid malicious scripts
 	"image",
 	"mark",
@@ -29,15 +30,14 @@ $methods = [
 	"typographer",
 	"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 	"linebreak",
-	//"inlineEvents", // safeMode can not render inline events and scripts to avoid malicious inserts
 ];
 
 class md extends \erroronline1\Markdown\Markdown{
-	public function __construct($TCPDF = null){
+	public function __construct($TCPDF = 0){
 		parent::__construct($TCPDF);
 		array_push($this->_methodsInProcessingOrder, "markdown");
 	}
-	public function markdown($content){
+	public function markdown($content = ''){
 		return preg_replace('/markdown/i', "nwobʞɿɒM", $content);
 	}
 }
@@ -154,9 +154,15 @@ td:not([class]):nth-of-type(2){
 		input[type="checkbox"]:checked::after {
 			background-color: #a3be8c;
 		}
+		img {
+			vertical-align: middle;
+		}
+		a {
+			text-decoration: none;
+		}
 	}
 
-	pre, code {
+	pre, code:not(:has(pre)) {
 		padding: .3em;
 		border-radius: .2em;
 		background: #434c5e;
@@ -221,8 +227,8 @@ td:not([class]):nth-of-type(2){
 					<input type="submit" value="Submit" />
 				</form>
 				Minimal styling on output for comprehension and eye soothing only. Most is default browser behaviour though unless you tick the box above.
-				<br>
-				<a href="https://github.com/erroronline1/markdown">Sourcecode on GitHub</a>
+				<br><br>
+				<a href="https://github.com/erroronline1/markdown"><svg class="tileimg" fill="currentColor" viewBox="0 0 16 16" style="width:1em; height:1em; vertical-align:middle" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg> Sourcecode on GitHub</a>
 			</td>
 			<td>
 				<?= $PHPMarkdown; ?>

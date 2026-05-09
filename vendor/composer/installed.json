@@ -2,23 +2,23 @@
     "packages": [
         {
             "name": "erroronline1/markdown",
-            "version": "v2.1.1",
-            "version_normalized": "2.1.1.0",
+            "version": "v2.2.0",
+            "version_normalized": "2.2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/erroronline1/markdown.git",
-                "reference": "e9f182a9b880744f01d9c9970659dc5b41e495d9"
+                "reference": "09edfe3afcf196de3709d93c87268886bfafd7b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/e9f182a9b880744f01d9c9970659dc5b41e495d9",
-                "reference": "e9f182a9b880744f01d9c9970659dc5b41e495d9",
+                "url": "https://api.github.com/repos/erroronline1/markdown/zipball/09edfe3afcf196de3709d93c87268886bfafd7b2",
+                "reference": "09edfe3afcf196de3709d93c87268886bfafd7b2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.0"
             },
-            "time": "2026-05-02T21:01:47+00:00",
+            "time": "2026-05-06T04:07:22+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -39,7 +39,7 @@
             "description": "Markdown compiler for PHP and ECMA-script.",
             "support": {
                 "issues": "https://github.com/erroronline1/markdown/issues",
-                "source": "https://github.com/erroronline1/markdown/tree/v2.1.1"
+                "source": "https://github.com/erroronline1/markdown/tree/v2.2.0"
             },
             "install-path": "../erroronline1/markdown"
         },
@@ -387,17 +387,17 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf",
-            "version": "8.11.3",
-            "version_normalized": "8.11.3.0",
+            "version": "8.12.2",
+            "version_normalized": "8.12.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf.git",
-                "reference": "6514cac3f5e485f09e98dc7f3a274ffc1a4c2e5e"
+                "reference": "ee82c71ace96a31ff0ee43d03aaf6c7de559b344"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf/zipball/6514cac3f5e485f09e98dc7f3a274ffc1a4c2e5e",
-                "reference": "6514cac3f5e485f09e98dc7f3a274ffc1a4c2e5e",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf/zipball/ee82c71ace96a31ff0ee43d03aaf6c7de559b344",
+                "reference": "ee82c71ace96a31ff0ee43d03aaf6c7de559b344",
                 "shasum": ""
             },
             "require": {
@@ -412,6 +412,7 @@
                 "tecnickcom/tc-lib-pdf-graph": "^2.4",
                 "tecnickcom/tc-lib-pdf-image": "^2.2",
                 "tecnickcom/tc-lib-pdf-page": "^4.3",
+                "tecnickcom/tc-lib-pdf-parser": "^3.1",
                 "tecnickcom/tc-lib-unicode": "^2.1",
                 "tecnickcom/tc-lib-unicode-data": "^2.0"
             },
@@ -422,7 +423,7 @@
                 "phpunit/phpunit": "^13.1 || ^12.5 || ^11.5 || ^10.5",
                 "squizlabs/php_codesniffer": "^4.0"
             },
-            "time": "2026-05-01T19:11:11+00:00",
+            "time": "2026-05-04T21:14:56+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -534,6 +535,76 @@
                 }
             ],
             "install-path": "../tecnickcom/tc-lib-pdf-encrypt"
+        },
+        {
+            "name": "tecnickcom/tc-lib-pdf-filter",
+            "version": "2.1.2",
+            "version_normalized": "2.1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/tc-lib-pdf-filter.git",
+                "reference": "547a3b05d15e623d0edbedab54d4332a823cd6e6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-filter/zipball/547a3b05d15e623d0edbedab54d4332a823cd6e6",
+                "reference": "547a3b05d15e623d0edbedab54d4332a823cd6e6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcre": "*",
+                "ext-zlib": "*",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "^2.16",
+                "phpcompatibility/php-compatibility": "^10.0.0@dev",
+                "phpmd/phpmd": "^2.15",
+                "phpunit/phpunit": "^13.1 || ^12.5 || ^11.5 || ^10.5",
+                "squizlabs/php_codesniffer": "^4.0"
+            },
+            "suggest": {
+                "ext-imagick": "Required for JPXDecode (JPEG 2000) filter support"
+            },
+            "time": "2026-05-01T19:03:10+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Com\\Tecnick\\Pdf\\Filter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP library to decode PDF compression and encryption filters",
+            "homepage": "https://tcpdf.org",
+            "keywords": [
+                "compression",
+                "encryption",
+                "filter",
+                "pdf",
+                "tc-lib-pdf-filter"
+            ],
+            "support": {
+                "issues": "https://github.com/tecnickcom/tc-lib-pdf-filter/issues",
+                "source": "https://github.com/tecnickcom/tc-lib-pdf-filter"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/tecnickcom",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../tecnickcom/tc-lib-pdf-filter"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-font",
@@ -814,6 +885,72 @@
                 }
             ],
             "install-path": "../tecnickcom/tc-lib-pdf-page"
+        },
+        {
+            "name": "tecnickcom/tc-lib-pdf-parser",
+            "version": "3.1.2",
+            "version_normalized": "3.1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/tc-lib-pdf-parser.git",
+                "reference": "9f0c184eec9258c8671ad7a745e99608ea5515b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-parser/zipball/9f0c184eec9258c8671ad7a745e99608ea5515b6",
+                "reference": "9f0c184eec9258c8671ad7a745e99608ea5515b6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcre": "*",
+                "php": ">=8.1",
+                "tecnickcom/tc-lib-pdf-filter": "^2.1"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "^2.16",
+                "phpcompatibility/php-compatibility": "^10.0.0@dev",
+                "phpmd/phpmd": "^2.15",
+                "phpunit/phpunit": "^13.1 || ^12.5 || ^11.5 || ^10.5",
+                "squizlabs/php_codesniffer": "^4.0"
+            },
+            "time": "2026-05-01T19:04:32+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Com\\Tecnick\\Pdf\\Parser\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP library to parse PDF documents",
+            "homepage": "https://tcpdf.org",
+            "keywords": [
+                "document",
+                "parser",
+                "pdf",
+                "tc-lib-pdf-parser"
+            ],
+            "support": {
+                "issues": "https://github.com/tecnickcom/tc-lib-pdf-parser/issues",
+                "source": "https://github.com/tecnickcom/tc-lib-pdf-parser"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/tecnickcom",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../tecnickcom/tc-lib-pdf-parser"
         },
         {
             "name": "tecnickcom/tc-lib-unicode",
