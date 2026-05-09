@@ -1348,8 +1348,8 @@ class ORDER extends API {
 					foreach (json_decode($order['order_data'] ? : '', true) as $key => $items){ // data
 						if (is_array($items)){ // actual items
 							foreach ($items as $item){
-								foreach ($item as $key => $subvalue){
-									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $subvalue));
+								foreach ($item as $ikey => $subvalue){
+									if (boolval($subvalue)) $order_data['items'][$index][$ikey] = trim(preg_replace(["/\\r/", "/\\\\n|\\n/"], ['', "\n"], $subvalue));
 								}
 								$index++;
 							}
@@ -1602,7 +1602,7 @@ class ORDER extends API {
 					$this->_lang->PROPERTY('order.attach_photo')
 				],
 				destination: [
-					'path' => $this->_filehandler->directory('order_attachments')
+					'path' => 'order_attachments'
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
@@ -1618,7 +1618,7 @@ class ORDER extends API {
 					$this->_lang->PROPERTY('order.attach_file')
 				],
 				destination: [
-					'path' => $this->_filehandler->directory('order_attachments')
+					'path' => 'order_attachments'
 				],
 				naming: [
 					'prefix' => $this->_date['servertime']->format('YmdHis')
@@ -1680,6 +1680,7 @@ class ORDER extends API {
 	 * determine criticality of return reason
 	 * review incorporation if reasonable
 	 * used for patching approved orders as well as approved manual returns from the order form
+	 * @param array $decoded_order_data
 	 */
 	private function return_criticality($decoded_order_data){
 		if ($return_reason = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.return_reason'))) $criticality = array_key_exists($return_reason, $this->_lang->_USER['orderreturns']['critical']) ? $return_reason : false;

@@ -606,7 +606,7 @@ class TOOL extends API {
 							$this->_lang->PROPERTY('tool.image.source')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('tmp')
+							'path' => 'tmp'
 							// no overwriting of present files within temp dir
 						],
 						naming: [
@@ -619,13 +619,14 @@ class TOOL extends API {
 						]
 					);
 					foreach ($images as $image){
+						$image['path'] = $this->_filehandler->translate_path($image['path']);
 						$dimensions = getimagesize($image['path']);
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',
 							'description' => pathinfo($image['path'])['basename'],
 							'attributes' => [
 								'name' => pathinfo($image['path'])['basename'],
-								'url' => $this->_filehandler->getFileLink($this->_filehandler->directory('tmp') . '/' . pathinfo($image['path'])['basename'])
+								'url' => $this->_filehandler->getFileLink($image['path'])
 							],
 							'dimensions' => [
 								'width' => $dimensions[0],

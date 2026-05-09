@@ -117,7 +117,7 @@ class USER extends API {
 							$this->_lang->PROPERTY('user.take_photo')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('users'),
+							'path' => 'users',
 							'replace' => true
 						],
 						naming: [
@@ -135,7 +135,7 @@ class USER extends API {
 							$this->_lang->PROPERTY('user.take_image')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('users'),
+							'path' => 'users',
 							'replace' => true
 						],
 						naming: [
@@ -445,7 +445,6 @@ class USER extends API {
 								]
 							]
 						];
-						
 
 					// append image options
 					if ($user['image']) {
@@ -838,7 +837,7 @@ class USER extends API {
 							$this->_lang->PROPERTY('user.take_photo')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('users')
+							'path' => 'users'
 						],
 						naming: [
 							'prefix' => 'profilepic_' . $user[':name']
@@ -855,7 +854,7 @@ class USER extends API {
 							$this->_lang->PROPERTY('user.take_image')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('users')
+							'path' => 'users'
 						],
 						naming: [
 							'prefix' => 'profilepic_' . $user[':name']
@@ -1444,7 +1443,7 @@ class USER extends API {
 									$this->_lang->PROPERTY('user.training.add_document')
 								],
 								destination: [
-									'path' => $this->_filehandler->directory('users')
+									'path' => 'users'
 								],
 								naming: [
 									'prefix' => $user['id'] . '_' . $user['name'],

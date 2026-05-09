@@ -1383,7 +1383,7 @@ class INSTALL {
 						$this->_lang->PROPERTY('user.take_photo')
 					],
 					destination: [
-						'path' => $this->_filehandler->directory('users'),
+						'path' => 'users',
 						'replace' => true
 					],
 					naming: [

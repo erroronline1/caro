@@ -942,14 +942,14 @@ class MAINTENANCE extends API {
 							$this->_lang->PROPERTY('maintenance.vendorupdate.file')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('tmp'),
+							'path' => 'tmp',
 							'replace' => true
 						], 
 						naming: [
 							'rename' => $_SESSION['user']['id'] . 'vendorupdate'
 						]
 					);
-					$json = file_get_contents($file[0]['path']);
+					$json = file_get_contents($this->_filehandler->translate_path($file[0]['path']));
 					$json = json_decode($json, true);
 					if (!$json)	{
 						$response['response'] = [

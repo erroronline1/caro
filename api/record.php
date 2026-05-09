@@ -319,6 +319,7 @@ class RECORD extends API {
 					}
 					if ($subs['type'] === 'image' && !empty($subs['attributes']['url'])){
 						$_filehandler->serve($subs['attributes']['url'], false);
+						$subs['attributes']['url'] = $_filehandler->getFileLink($subs['attributes']['url']);
 					}
 					if (isset($subs['autocomplete'])){
 						if (($index = array_search($subs['attributes']['name'], array_column($datalists, 'issue'))) !== false){
@@ -956,7 +957,6 @@ class RECORD extends API {
 				$entry_datetime .= ':00'; // append seconds for database format
 
 				// handle attachments and images
-				if (!file_exists($this->_filehandler->directory('record_attachments'))) mkdir($this->_filehandler->directory('record_attachments'), 0777, true);
 				$attachments = [];
 				foreach ($_FILES as $fileinput => $files){
 					if ($uploaded = $this->_filehandler->storeUploadedFiles(
@@ -964,7 +964,7 @@ class RECORD extends API {
 							$fileinput
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('record_attachments')
+							'path' => 'record_attachments'
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['servertime']->format('YmdHis') . '_' . $fileinput)
@@ -1421,7 +1421,7 @@ class RECORD extends API {
 					if (isset($content['attachments'][$document])){
 						foreach($content['attachments'][$document] as $path){
 							$file = pathinfo($path);
-							$files[$file['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($this->_filehandler->directory('record_attachments') . '/'. $path)]);
+							$files[$file['basename']] = $this->_filehandler->link(['href' => $this->_filehandler->getFileLink($path)]);
 						}
 						array_push($body[count($body) -1][0]['content'], [
 							'type' => 'links',
@@ -2355,13 +2355,18 @@ class RECORD extends API {
 						$displayvalue = $entry['value'];
 						// populate file image and attachments based on values containing respective paths and extensions
 						// guess file url; special regex delimiter
-						if (stripos($entry['value'], substr($this->_filehandler->directory('record_attachments'), 1)) !== false) {
+						
+						// match a probable first directory
+						preg_match('/^([\w\d]+)(?:\/|$)/m', $entry['value'], $relative);
+						// replace with config setting if applicable
+						if (($relative && CONFIG['fileserver'][$relative[1]] ?? false)
+							|| stripos($entry['value'], substr($this->_filehandler->directory('record_attachments'), str_starts_with($this->_filehandler->directory('record_attachments'), '..') ? 1 : 0)) !== false) {
 							$displayvalue = '';
 							$files = [];
 							foreach (explode(', ', $entry['value']) as $file){
-								$file = pathinfo($file);
+
 								if (!isset($summary['attachments'][$document])) $summary['attachments'][$document] = [];
-								$summary['attachments'][$document][] = $files[] = $file['basename'];
+								$summary['attachments'][$document][] = $files[] = $this->_filehandler->translate_path($file);
 							}
 							$displayvalue = implode(', ', $files);
 						}

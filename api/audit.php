@@ -50,6 +50,7 @@ class AUDIT extends API {
 	 */
 	public function audit(){
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
@@ -93,7 +94,7 @@ class AUDIT extends API {
 							$fileinput
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('audit_attachments')
+							'path' => 'audit_attachments'
 						],
 						naming: [
 							'prefix' => preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])
@@ -330,12 +331,12 @@ class AUDIT extends API {
 							$link = [];
 							foreach ($preset['files'] as $file){
 								$fileinfo = pathinfo($file);
+								$file = $this->_filehandler->translate_path($file);
 								$file = [
-									'path' => $file,
 									'name' => $fileinfo['basename'],
 									'link' => $this->_filehandler->getFileLink($file)
 								];
-								$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+								$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -620,7 +621,7 @@ class AUDIT extends API {
 		$audits = $this->_sqlinterface->EXECUTE('audit_get');
 		foreach ($audits as $audit){
 			if (!$audit['closed']) continue;
-			if ($from > $audit['last_touch'] || $until < $audit['last_touch']) continue;
+			if ($from > substr($audit['last_touch'], 0 , 10) || $until < substr($audit['last_touch'], 0, 10)) continue;
 			$audit['content'] = json_decode($audit['content'], true);
 			$current = [
 				[
@@ -672,13 +673,13 @@ class AUDIT extends API {
 					$link = [];
 					foreach ($question['files'] as $file){
 						$fileinfo = pathinfo($file);
+						$file = $this->_filehandler->translate_path($file);
 						$file = [
-							'path' => $file,
 							'name' => $fileinfo['basename'],
 							'link' => $this->_filehandler->getFileLink($file)
 						];
 
-						$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
+						$link[$file['name']] = $this->_filehandler->link(['href' => $file['link'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [
@@ -722,7 +723,11 @@ class AUDIT extends API {
 	 */
 	public function audittemplate(){
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
-		// recursively sanitize unpredictable nested frontend input
+		/**
+		 * recursively sanitize unpredictable nested frontend input
+		 * @param array $element
+		 * @param array $result
+		 */
 		function sanitizeQuestionNesting($element, $result = []){
 			foreach ($element as $sub){
 				if (array_is_list($sub)){
@@ -733,6 +738,7 @@ class AUDIT extends API {
 			}
 			return $result;
 		}
+		$response = ['render' => ['content' => []]];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1190,6 +1196,11 @@ class AUDIT extends API {
 		$_requestedDateTime = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.documents.datetime')) ?: $this->_date['usertime']->format('Y-m-d\TH:i');
 		$requestedTimestamp = $this->convertToServerTime($_requestedDateTime . ':59');
 
+		/**
+		 * @param array $components
+		 * @param string $requestedTimestamp
+		 * @param string $name
+		 */
 		function latestApprovedComponent($components, $requestedTimestamp, $name = ''){
 			if (!$name) return false;
 			// get latest approved by name
@@ -1360,7 +1371,8 @@ class AUDIT extends API {
 		$links = [];
 		if ($files = $this->_sqlinterface->EXECUTE('file_external_documents_get_active')) {
 			foreach ($files as $file){
-				if (preg_match('/^\.\.\//', $file['path'])){
+				$file['path'] = $this->_filehandler->translate_path($file['path']);
+				if (str_starts_with($file['path'], '..')){
 					$file['url'] = $this->_filehandler->getFileLink($file['path']);
 				}
 				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $this->convertFromServerTime($file['activated'], true)]);
@@ -1737,6 +1749,7 @@ class AUDIT extends API {
 	 */
 	public function managementreview(){
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
@@ -2841,8 +2854,8 @@ class AUDIT extends API {
 				foreach (explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
 					$satisfied = false;
 					if (isset($regulatory[$regulatory_context])){
-						foreach ($regulatory[$regulatory_context] as $key => $value){
-							if (preg_match('/^' . $row['name'] . ' \(/', $key)) $satisfied = true;
+						foreach ($regulatory[$regulatory_context] as $rkey => $value){
+							if (preg_match('/^' . $row['name'] . ' \(/', $rkey)) $satisfied = true;
 						}
 					}
 					if (!$satisfied) $regulatory[$regulatory_context][$row['name'] . ' (' . $this->convertFromServerTime($row['date']) . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
@@ -2853,7 +2866,7 @@ class AUDIT extends API {
 		if ($files = $this->_sqlinterface->EXECUTE('file_external_documents_get_active')) {
 			foreach ($files as $file){
 				foreach (explode(',', $file['regulatory_context']) as $context){
-					if (preg_match('/^\.\.\//', $file['path'])){
+					if (str_starts_with($file['path'], '..')){
 						$file['path'] = $this->_filehandler->getFileLink($file['path']);
 					}
 					$regulatory[$context][$file['path'] . ' (' . $file['activated'] . ')'] = ['href' => $file['path']];
@@ -3400,6 +3413,7 @@ class AUDIT extends API {
 	 * returns all user experience points by year
 	 */
 	private function userexperience(){
+		$content = [];
 		// add export button
 		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
@@ -3821,6 +3835,7 @@ class AUDIT extends API {
 			'sales_representative' => 'consumables.vendor.sales_representative',
 			'customer_id' => 'consumables.vendor.customer_id',
 		];
+		$content = [];
 
 		// add export button
 		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [

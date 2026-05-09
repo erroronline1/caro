@@ -865,6 +865,7 @@ class BLOCKCHAIN {
 					foreach ($attachments as $file => $hash){
 						// provide file, write from database if this fileserver strategy is selected per config
 						$_filehandler->serve(path: $file, stream: false);
+						$file = $_filehandler->translate_path($file);
 						// verify file hash
 						$filehash = hash_file('sha256', $file);
 						if (is_file($file)){

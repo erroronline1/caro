@@ -694,7 +694,7 @@ class MESSAGE extends API {
 								"_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')
 							],
 							destination: [
-								'path' => $this->_filehandler->directory('tmp')
+								'path' => 'tmp'
 							],
 							naming: [
 								'prefix' => $whiteboard[':name']

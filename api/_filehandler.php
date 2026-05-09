@@ -308,22 +308,24 @@ class FILEHANDLER{
 		if (gettype($paths) === 'string') $paths = [$paths];
 		$sqlQueryStack = [];
 		foreach ($paths as $path) {
-			$pathinfo = pathinfo($path);
-			if (self::isInFilesystem($path, array_keys(CONFIG['fileserver']))){
+			$physicalpath = self::translate_path($path);
+
+			if (self::isInFilesystem($physicalpath)){
 				// delete files and directories recursively
-				if (is_file($path)){
-					$result = unlink($path);
+				if (is_file($physicalpath)){
+					$result = unlink($physicalpath);
 				}
-				elseif (is_dir($path)){
-					foreach (scandir($path) as $subdir){
-						if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
-						if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
+				elseif (is_dir($physicalpath)){
+					foreach (scandir($physicalpath) as $subdir){
+						if (is_file($physicalpath . '/' . $subdir)) unlink($physicalpath . '/' . $subdir);
+						if (is_dir($physicalpath . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($physicalpath . '/' . $subdir);
 					}
-					$result = rmdir($path);
+					$result = rmdir($physicalpath);
 				}
 			}
 			if ($fromDatabase === 'thisIsOnlySupposedToBeAbleFromTheCronJob') {
 				// delete database entries (records exceeding lifespan)
+				$pathinfo = pathinfo($path);
 				$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('media_delete', [
 					':path' => $pathinfo['dirname'],
 					':names' => $pathinfo['basename']
@@ -385,15 +387,16 @@ class FILEHANDLER{
 	 */
 	public function getFileLink($path){
 		if (!$path) return "#";
-		if (file_exists($path)) return './api/api.php/file/stream/' . substr($path, 1);
-		if (self::isInFilesystem($path)) return '';
+		$physicalpath = self::translate_path($path);
+		if (file_exists($physicalpath)) return './api/api.php/file/stream/' . substr($physicalpath, str_starts_with($physicalpath, '..') ? 1 : 0);
+		if (self::isInFilesystem($physicalpath)) return '';
 		
 		$file = $this->_sqlinterface->EXECUTE('media_get_file_info', [
 			':path' => $path
 		]);
 		$file = $file ? $file[0] : null;
 		if (!$file) return '';
-		return './api/api.php/file/stream/' . substr($path, 1);;
+		return './api/api.php/file/stream/' . substr($physicalpath, str_starts_with($physicalpath, '..') ? 1 : 0);
 	}
 
 	/**
@@ -549,33 +552,34 @@ class FILEHANDLER{
 	 */
 	public function listFiles($directory, $order = 'desc', $temp = []){
 		$result = [];
-		if (self::isInFilesystem($directory, $temp)){
-			if (!file_exists($directory)) return $result;
+		$physicalpath = self::translate_path($directory);
+		if (self::isInFilesystem($physicalpath, $temp)){
+			if (!file_exists($physicalpath)) return $result;
 			switch ($order){
 				case 'asc':
-					$dir = scandir($directory);
+					$dir = scandir($physicalpath);
 					break;
 				default: //case 'desc':
-					$dir = scandir($directory, SCANDIR_SORT_DESCENDING);
+					$dir = scandir($physicalpath, SCANDIR_SORT_DESCENDING);
 					break;
 			}
 			foreach ($dir as $file){
 				if (
 					(
-						is_file($directory . '/' . $file)
+						is_file($physicalpath . '/' . $file)
 						&& !in_array($file, [
 							'.htaccess',
 							'web.config'
 						])
 					) || 
 					(	// consider snapshot directories in tmp as well. double check if dir is in assigned tmp, otherwise this is nasty.
-						is_dir($directory . '/' . $file)
+						is_dir($physicalpath . '/' . $file)
 						&& !in_array($file, ['.', '..'])
-						&& $directory . '/' . $file === self::directory('tmp', [
+						&& $physicalpath . '/' . $file === self::directory('tmp', [
 							':snapshot' => $file
 						])
 					)
-				) $result[] = $directory . '/' . $file;
+				) $result[] = $physicalpath . '/' . $file;
 			}
 			return $result;
 		}
@@ -596,6 +600,21 @@ class FILEHANDLER{
 	}
 
 	/**
+	 * translate config fileserver keys from relative path if applicable and return a real path
+	 * @param string $path
+	 * 
+	 * @return string
+	 */
+	public function translate_path($path){
+		// match the first directory
+		preg_match('/^([\w\d]+)(?:\/|$)/m', $path, $relative);
+		// replace with config setting if applicable
+		if ($relative && CONFIG['fileserver'][$relative[1]] ?? false) $path = substr_replace($path, CONFIG['fileserver'][$relative[1]], 0, strlen($relative[1]));
+		// delete unset tokens if applicable
+		return preg_replace('/:[\w\d]+\//', '', $path);
+	}
+
+	/**
 	 *                       
 	 *   ___ ___ ___ _ _ ___   
 	 *  |_ -| -_|  _| | | -_|  
@@ -606,9 +625,10 @@ class FILEHANDLER{
 	 * @param string $path full file path with filename and extension as found either in file system or database as path and name
 	 * @param bool $stream direct stream ressource or just ensure file exists within filesystem
 	 */
-	public function serve($path, $stream = true){		
-		if (!file_exists($path)){
-			if (self::isInFilesystem($path)) return null; // does not exist, but should be there
+	public function serve($path, $stream = true){
+		$physicalpath = self::translate_path($path);
+		if (!file_exists($physicalpath)){
+			if (self::isInFilesystem($physicalpath)) return null; // does not exist, but should be there
 
 			// else recreate from database
 			$file = $this->_sqlinterface->EXECUTE('media_get_file', [
@@ -620,17 +640,17 @@ class FILEHANDLER{
 			self::createDirectory($file['path']);
 			// inflate and reconvert to binary again
 			$file['content'] = $this->_sqlinterface->retrievebinary($file['content']);
-			$tempfile = fopen($path, 'wb');
+			$tempfile = fopen($physicalpath, 'wb');
 			fwrite($tempfile, $file['content']);
 			fclose($tempfile);
 		}
 		
 		// once more, with feeling
-		if (!file_exists($path)) return false;
+		if (!file_exists($physicalpath)) return false;
 
 		if (!$stream) return true;
 
-		switch (pathinfo($path)['extension']){
+		switch (pathinfo($physicalpath)['extension']){
 			case 'stl':
 				$mime_type = 'model/stl';
 				break;
@@ -638,18 +658,18 @@ class FILEHANDLER{
 				$mime_type = 'model/obj';
 				break;
 			default:
-				$mime_type = mime_content_type($path);
+				$mime_type = mime_content_type($physicalpath);
 		}
 
 		header('Content-Type: '. $mime_type);
-		header('Content-Disposition: inline; filename=' . pathinfo($path)['basename']);
+		header('Content-Disposition: inline; filename=' . pathinfo($physicalpath)['basename']);
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate');
 		header('Pragma: public');
-		header('Content-Length: '.filesize($path));
+		header('Content-Length: '.filesize($physicalpath));
 		ob_clean();
 		flush();
-		readfile($path);
+		readfile($physicalpath);
 		exit;
 	}
 
@@ -663,7 +683,8 @@ class FILEHANDLER{
 	 * 
 	 * @param array $input mandatory array of input names
 	 * @param array $destination [  
-	 *     'path' => string, mandatory  
+	 *     'path' => string config fileserver key, mandatory  
+	 *     'token' => array to replace path components
 	 *     'replace' => bool, to replace files, otherwise enumerated if applicable  
 	 * ]
 	 * @param array $naming [  
@@ -686,10 +707,11 @@ class FILEHANDLER{
 	 * ]
 	*/
 	public function storeUploadedFiles($input = [], $destination = [], $naming = [], $imageoptions = []){
-		if (!$input || empty($destination['path'])) return [];
+		if (!$input || empty($destination['path']) || empty(CONFIG['fileserver'][$destination['path']])) return [];
 		$targets = [];
 
-		if (isset($destination['path']) && !file_exists($destination['path'])) self::createDirectory($destination['path']);
+		$realpath = self::directory($destination['path'], $destination['token'] ?? []);
+		if (!file_exists($realpath)) self::createDirectory($realpath);
 
 		// iterate over $_FILE input names
 		for ($i = 0; $i < count($input); $i++) {
@@ -722,60 +744,68 @@ class FILEHANDLER{
 				$targets[] = self::isInFilesystem($destination['path'])
 					? $this->saveToFilesystem(
 						tmpname: $_FILES[$inputname]['tmp_name'][$j],
-						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						destination: [
+							'physical' => $realpath . '/' . $file['filename'] . '.' . $file['extension'],
+							'relative' => $destination['path'] . '/' . $file['filename'] . '.' . $file['extension']
+						],
 						replace: $destination['replace'] ?? null,
 						imageoptions: $imageoptions)
 					: $this->saveToDatabase(
 						tmpname: $_FILES[$inputname]['tmp_name'][$j],
-						destination: $destination['path'] . '/' . $file['filename'] . '.' . $file['extension'],
+						destination: [
+							'physical' => $realpath . '/' . $file['filename'] . '.' . $file['extension'],
+							'relative' => $destination['path'] . '/' . $file['filename'] . '.' . $file['extension']
+						],
 						mime_type: $_FILES[$inputname]['type'][$j],
 						imageoptions: $imageoptions)
 				;
+
 			}
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
 	/**
 	 * @param string $tmpname temporary file
-	 * @param string $destination expected path with full filename and extension
+	 * @param array $destination expected physical path with full filename and extension as well as relative path starting with config fileserver key
 	 * @param bool $replace overwrite existing file or enumerate if already present
 	 * @param array $imageoptions, see storeUploadedFiles()
 	 * 
 	 * @return string filename, occasionally enumerated
 	 */
 	public function saveToFilesystem($tmpname, $destination, $replace = false, $imageoptions = []){
-		$file = pathinfo($destination);
+		$file = pathinfo($destination['physical']);
 		if (!$replace){
 			$extension = '.' . $file['extension'];
-			$files = glob(str_replace($extension, '*' . $extension, $destination)); // find all ./directory/subdirectory/filename*.ext
-			$destination = self::enumerate($destination, $files);
+			$files = glob(str_replace($extension, '*' . $extension, $destination['physical'])); // find all ./directory/subdirectory/filename*.ext
+			$destination['physical'] = self::enumerate($destination['physical'], $files);
+			$destination['relative'] = pathinfo($destination['relative'])['dirname'] . '/' . pathinfo($destination['physical'])['basename']; // adjust passed relative name
 		}
 		// move_uploaded_file is for post only, else rename for put files
-		if ($tmpname && (@move_uploaded_file($tmpname, $destination) || rename( $tmpname, $destination))){
+		if ($tmpname && (@move_uploaded_file($tmpname, $destination['physical']) || rename( $tmpname, $destination['physical']))){
 			// alter images by default to strip metadata for data safety reasons
 			// also apply watermark pattern for CARO signatures by default.
 			if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'png', 'gif'])){
 				if (stristr($file['filename'], 'CAROsignature')) $imageoptions['size'] = CONFIG['limits']['image']['signature']; 
-				self::alterImage($destination, $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_REPLACE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')));
+				self::alterImage($destination['physical'], $imageoptions['size'] ?? null, FILEHANDLER_IMAGE_REPLACE, false, $imageoptions['label'] ?? null, $imageoptions['watermark'] ?? null, boolval(stristr($file['filename'], 'CAROsignature')));
 			}
 			return [
-				'path' => $destination,
-				'hash' => hash_file('sha256', $destination)
+				'path' => $destination['relative'],
+				'hash' => hash_file('sha256', $destination['physical'])
 			];
 		}
 	}
 	/**
 	 * @param string $tmpname temporary file
-	 * @param string $destination expected path
+	 * @param array $destination expected physical path with full filename and extension as well as relative path starting with config fileserver key
 	 * @param string $mime_type
 	 * @param array $imageoptions
 	 * 
 	 * @return string filename, occasionally enumerated
 	 */
 	public function saveToDatabase($tmpname, $destination, $mime_type, $imageoptions = []){
-		$file = pathinfo($destination);
+		$file = pathinfo($destination['relative']);
 		$present = $this->_sqlinterface->EXECUTE('media_get_path_contents', [
-			':path' => $destination
+			':path' => $destination['relative']
 		]);
 		
 		$filename = self::enumerate($file['basename'], array_column($present, 'name'));

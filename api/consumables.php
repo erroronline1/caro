@@ -375,7 +375,8 @@ class CONSUMABLES extends API {
 								$input
 							],
 							destination: [
-								'path' => $this->_filehandler->directory('vendor_products', [':id' => $currentproduct['vendor_id']])
+								'path' => 'vendor_products',
+								'token' => [':id' => $currentproduct['vendor_id']]
 							],
 							naming: [
 								'prefix' => $currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']
@@ -662,7 +663,8 @@ class CONSUMABLES extends API {
 								$input
 							],
 							destination: [
-								$this->_filehandler->directory('vendor_products', [':id' => $currentproduct['vendor_id']])
+								'path' => 'vendor_products',
+								'token' => [':id' => $currentproduct['vendor_id']]
 							],
 							naming: [
 								'prefix' => $currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']
@@ -913,7 +915,8 @@ class CONSUMABLES extends API {
 								$this->_lang->PROPERTY('consumables.product.documents_update')
 							],
 							destination: [
-								'path' => $this->_filehandler->directory('vendor_products', [':id' => $vendor['id']])
+								'path' => 'vendor_products',
+								'token' => [':id' => $vendor['id']]
 							],
 							naming: [ 
 								'prefix' => $vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']
@@ -1019,7 +1022,8 @@ class CONSUMABLES extends API {
 							$this->_lang->PROPERTY('consumables.product.documents_update')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('vendor_products', [':id' => $vendor['id']])
+							'path' => 'vendor_products',
+							'token' => [':id' => $vendor['id']]
 						],
 						naming: [
 							'prefix' => $vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']
@@ -2700,7 +2704,6 @@ class CONSUMABLES extends API {
 							}
 						}
 					}
-
 					// save documents after creating database entry providing id
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 						$this->_filehandler->storeUploadedFiles(
@@ -2708,7 +2711,8 @@ class CONSUMABLES extends API {
 								$this->_lang->PROPERTY('consumables.vendor.documents_update')
 							],
 							destination: [
-								'path' => $this->_filehandler->directory('vendor_documents', [':id' => $vendor[':id']])
+								'path' => 'vendor_documents',
+								'token' => [':id' => $vendor[':id']]
 							], 
 							naming: [
 								'prefix' => $vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry
@@ -2724,7 +2728,8 @@ class CONSUMABLES extends API {
 									$input
 								],
 								destination: [
-									'path' => $this->_filehandler->directory('vendor_documents', [':id' => $vendor[':id']])
+									'path' => 'vendor_documents',
+									'token' => [':id' => $vendor[':id']]
 								],
 								naming: [
 									'prefix' => $vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry

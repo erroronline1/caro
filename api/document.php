@@ -195,19 +195,25 @@ class DOCUMENT extends API {
 				if ($this->_requestedID){
 					$alert = '';
 					/**
-					 * recursively delete required attributes
+					 * recursively delete required attributes and replace relative image paths
 					 * @param array $element
+					 * @param object $FILEHANDLER
 					 * @return array
 					 */
-					function unrequire($element){
+					function unrequire($element, $FILEHANDLER){
 						$result = [];
 						foreach ($element as $sub){
 							if (array_is_list($sub)){
-								array_push($result, ...unrequire($sub));
+								array_push($result, ...unrequire($sub, $FILEHANDLER));
 							} else {
 								if (isset($sub['attributes'])){
 									unset ($sub['attributes']['required']);
 									unset ($sub['attributes']['data-required']);
+									// serve image and translate path
+									if (isset($sub['attributes']['url'])) {
+										$FILEHANDLER->serve($sub['attributes']['url'], false);
+										$sub['attributes']['url'] = $FILEHANDLER->getFileLink($sub['attributes']['url']);
+									}
 								}
 								if ($sub) $result[] = $sub;
 							}
@@ -230,7 +236,7 @@ class DOCUMENT extends API {
 					// unset requires attributes in advance to posting approval to avoid unneccessary formvalidation
 					$dependeddocuments = [];
 					if ($approve['context'] === 'component'){
-						array_push($response['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
+						array_push($response['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'], $this->_filehandler)[0]);
 						// check for dependencies in documents
 						$fd = $this->_sqlinterface->EXECUTE('document_document_datalist');
 						$hidden = [];
@@ -249,7 +255,7 @@ class DOCUMENT extends API {
 								if (!PERMISSION::fullyapproved('documentapproval', $cmpnnt['approval'])){
 									$alert .= $this->_lang->GET('assemble.approve.document_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
-								array_push($response['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
+								array_push($response['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'], $this->_filehandler)[0]);
 							}
 						}
 						if ($alert) $response['response'] = ['msg' => $alert, 'type' => 'info'];
@@ -718,7 +724,7 @@ class DOCUMENT extends API {
 								'composedComponent_files'
 							],
 							destination: [
-								'path' => $FILEHANDLER->directory('component_attachments')
+								'path' => 'component_attachments'
 							],
 							naming: [
 								'prefix' => $component_name . '_' . $timestamp
@@ -747,10 +753,10 @@ class DOCUMENT extends API {
 								} else {
 									if ($sub['type'] === 'image'){
 										preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
-										$filename = $fakefilename[0][count($fakefilename[0])-1];
+										$filename = $fakefilename[0][count($fakefilename[0]) - 1];
 										if ($filename && isset($uploaded_filearray[$filename])){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
 											$sub['attributes']['name'] = $filename;
-											$sub['attributes']['url'] = $FILEHANDLER->getFileLink($uploaded_filearray[$filename]);
+											$sub['attributes']['url'] = $uploaded_filearray[$filename];
 										}
 									}
 									$result[] = $sub;
@@ -774,7 +780,7 @@ class DOCUMENT extends API {
 							array_push($result, ...usedImages($sub, $result));
 						} else {
 							if (isset($sub['type']) && $sub['type'] === 'image')
-								$result[] = '.' . $sub['attributes']['url'];
+								$result[] = $sub['attributes']['url'];
 						}
 					}
 					return $result;
@@ -909,7 +915,7 @@ class DOCUMENT extends API {
 							deleteImages($FILEHANDLER, $sub);
 						} else {
 							if (isset($sub['type']) && $sub['type'] === 'image')
-								$FILEHANDLER->delete('.' . $sub['attributes']['url']);
+								$FILEHANDLER->delete($sub['attributes']['url']);
 						}
 					}
 				}
@@ -2160,10 +2166,10 @@ class DOCUMENT extends API {
 					$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
 				}
 				elseif ($subs['type'] === 'image'){
-					$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
+					$content['content'][$name] = ['type' => 'image', 'value' => $this->_filehandler->translate_path($subs['attributes']['url'])];
 					$file = pathinfo($subs['attributes']['url']);
 					if (in_array(strtolower($file['extension']), ['jpg', 'jpeg', 'gif', 'png'])) {
-						$content['images'][] = $subs['attributes']['url'];
+						$content['images'][] = $this->_filehandler->translate_path($subs['attributes']['url']);
 					}
 				}
 				elseif ($subs['type'] === 'range'){

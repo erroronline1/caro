@@ -910,7 +910,8 @@ class TEXTTEMPLATE extends API {
 				$files = [];
 				foreach($template['linked_files'] as $path){
 					$filename = pathinfo($path)['basename'];
-					$files[$filename] = $this->_filehandler->link(['href' => substr($path, 1), 'download' => $filename]);
+					$path = $this->_filehandler->translate_path($path);
+					$files[$filename] = $this->_filehandler->link(['href' => substr($path, str_starts_with($path, '..') ? 1 : 0), 'download' => $filename]);
 				}
 
 				$response['render']['content'][] = [

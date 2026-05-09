@@ -599,7 +599,7 @@ class ERPQUERY extends API {
 						$this->_lang->PROPERTY('erpquery.upload.file')
 					],
 					destination: [
-						'path' => $this->_filehandler->directory('erp_documents')
+						'path' => 'erp_documents'
 					],
 					naming: [
 						'rename' => $rename

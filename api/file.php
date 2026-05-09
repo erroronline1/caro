@@ -71,7 +71,7 @@ class FILE extends API {
 							$this->_lang->PROPERTY('file.manager.new_file')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('external_documents')
+							'path' => 'external_documents'
 						]
 					);
 					$insertions = [];
@@ -185,7 +185,6 @@ class FILE extends API {
 					$response['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
-
 							// construct hint for possible use before modifying path
 							$hint = null;
 							if (isset($template_use[$file['path']])){
@@ -195,11 +194,11 @@ class FILE extends API {
 									. implode(', ', $template_use[$file['path']])
 								]);
 							}
-
+							$file['path'] = $this->_filehandler->translate_path($file['path']);
 							// distinguish between uploaded files and linked ressources
 							$fileinfo = pathinfo($file['path']);
 
-							if (preg_match('/^\.\.\//', $file['path'])){
+							if (str_starts_with($file['path'], '..')){
 								$file['name'] = $fileinfo['basename'];
 								$file['path'] = $this->_filehandler->getFileLink($file['path']);
 							}
@@ -325,7 +324,8 @@ class FILE extends API {
 							$this->_lang->PROPERTY('file.manager.new_file')
 						], 
 						destination: [
-							'path' => $this->_filehandler->directory('files_documents', [':dir' => $destination])
+							'path' => 'files_documents',
+							'token' => [':dir' => $destination]
 						]
 					);
 					$this->response(['response' => [
@@ -579,7 +579,8 @@ class FILE extends API {
 				foreach ($content as $file){
 					// distinguish between uploaded files and linked ressources
 					$fileinfo = pathinfo($file);
-					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => $this->_filehandler->getFileLink($file)];
+					$file = $this->_filehandler->translate_path($file);
+					if (str_starts_with($file, '..'))	$file = ['name' => $fileinfo['basename'], 'path' => $this->_filehandler->getFileLink($file)];
 					else $file = ['name' => $file, 'path' => $file];
 
 					$matches[$file['name']] = $this->_filehandler->link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
@@ -677,7 +678,7 @@ class FILE extends API {
 		$matches = [];
 		if ($files = $this->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
 			foreach ($files as $file){
-				$matches[] = preg_match('/^\.\.\//', $file) ? substr($file, 1) : $file;
+				$matches[] = substr($file, str_starts_with($file, '..') ? 1 : 0);
 			}
 		}
 		$this->response([
@@ -705,7 +706,7 @@ class FILE extends API {
 							$this->_lang->PROPERTY('file.sharepoint_upload_header')
 						],
 						destination: [
-							'path' => $this->_filehandler->directory('sharepoint')
+							'path' => 'sharepoint'
 						],
 						naming: [
 							'prefix' => $_SESSION['user']['name']
