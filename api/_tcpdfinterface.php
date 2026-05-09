@@ -74,6 +74,14 @@ class PDF{
 				border-left: 3px solid #ddd;
 				margin-left: -5px;
 			}
+			.input {
+				font-size:17px;
+				width: 100%;
+				padding: 10px;
+			}
+			textarea {
+				width: 100%;
+			}
 		</style>
 		END;
 	}
@@ -102,7 +110,10 @@ class PDF{
 		$this->_pdf->SetAuthor($_SESSION['user']['name']);
 		$this->_pdf->SetTitle($fileContent['title'] ?? '');
 		$this->_pdf->setPDFFilename($fileContent['filename'] . '.pdf');
-	}
+
+		$page = $this->_pdf->page->getPage();
+		$this->_markdown_css = str_replace('width: 100%', 'width: '. $page['region'][0]['RW'] - 20 . 'mm', $this->_markdown_css);
+		}
 
 	/**
 	 * writes the prepared content chunks as name:content to the pages and sets bookmarks
@@ -154,7 +165,7 @@ class PDF{
 		$page = $this->_pdf->page->getPage();
 		$bbox = $this->_pdf->getLastBBox();
 
-		$attachment_caption = $this->_pdf->_lang->GET('record.file_attachments');
+		$attachment_caption = $this->_pdf->_lang->GET('record.file_attachments', [], true);
 		$this->_pdf->setBookmark(
 			name: $attachment_caption
 		);
@@ -251,7 +262,6 @@ class PDF{
 		foreach ($fileContent['content'] as $document => $entries){
 			$content = [];
 			foreach ($entries as $key => $value){
-
 				switch ($value['type']){
 					case 'version':
 						$content[' '] = $value['value'];
@@ -285,17 +295,18 @@ class PDF{
 						foreach ($value['value'] as $option){
 							$checked = str_starts_with($option, '_____');
 							$option = $checked ? substr($option, 5) : $option;
-							$checkboxes[] = '<label><input type="checkbox" ' . ($checked ? 'checked' : '') . ' name="' . $option . '" /> ' . $option . '</label>';
+							$checkboxes[] = '<label><input type="checkbox" ' . ($checked ? 'checked' : '') . ' name="' . $key.$option . '" /> ' . $option . '</label>';
 						}
 						$content[$key] = $this->_markdown_css . implode('<br /><br />', $checkboxes);
 						break;
 					case 'multiline':
 						if ($value['value']) { // print value if present
-							$content[$key] = $this->_markdown_css .  $this->_markdown->md2html($value['value']);
+							$content[$key] = nl2br($value['value']);
 							break;
 						}
 						// else textarea
-						$content[$key] = $this->_markdown_css . '<textarea rows="8" name="' . $key . '">xcvb</textarea>' . '<span style="color:white">.</span>'; // height is off otherwise;
+						$content[$key] = $this->_markdown_css . '<textarea rows="8" name="' . $key . '"> </textarea>'
+							. '<span style="color:white">' . str_repeat('.<br />', 7) . '</span>'; // height is off otherwise
 						break;
 					case 'links':
 						$links = [];
@@ -315,11 +326,12 @@ class PDF{
 								$content[$key] = $this->_markdown_css . '<a href="' . $link[1] . '" class="eol1_md" target="_blank">' . $link[1] . '</a>' . ($link[2] ? $this->_markdown->md2html($link[2]): '');
 							}
 							else 
-								$content[$key] = $this->_markdown_css . $this->_markdown->md2html($value['value']);
+								$content[$key] = $value['value'];
 							break;
 
 						}
-						$content[$key] = $this->_markdown_css . '<input type="text" name="' . $key . '" /><br />' . '<span style="color:white">....</span>'; // height is off otherwise
+						$content[$key] = $this->_markdown_css . '<input type="text" class="input" name="' . $key . '" />'
+							. '<br /><span style="color:white">.</span>'; // height is off otherwise
 				}
 			}
 			$init = $this->writeStandardHTML($content, 0, $init);
@@ -635,11 +647,6 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		]);
 		// add the actual first page with determined settings
 		$page = $this->addPage($pageSetup);
-	}
-
-	// forces pagebreak if content exceeds name or page height
-	public function applyCustomPageBreak() {
-
 	}
 
 	/**
