@@ -2361,7 +2361,7 @@ class RECORD extends API {
 						// match a probable first directory
 						preg_match('/^([\w\d]+)(?:\/|$)/m', $entry['value'], $relative);
 						// replace with config setting if applicable
-						if (($relative && CONFIG['fileserver'][$relative[1]] ?? false)
+						if (($relative && (CONFIG['fileserver'][$relative[1]] ?? false))
 							|| stripos($entry['value'], substr($this->_filehandler->directory('record_attachments'), str_starts_with($this->_filehandler->directory('record_attachments'), '..') ? 1 : 0)) !== false) {
 							$displayvalue = '';
 							$files = [];
