@@ -493,20 +493,36 @@ class PDF{
 		return $this->return();
 	}
 
+	/**
+	 * create a pdf for a table output  
+	 * @param array $fileContent see self::init()
+	 */
 	public function tablePDF($fileContent){
 		// create a pdf for a table output
 		$this->init($fileContent);
-		// set cell padding
-		$this->_pdf->setDefaultCellPadding(5, 1, 5, 1);
-		
 		if (array_is_list($fileContent['content'])) $fileContent['content'] = [$fileContent['content']];
 
 		$page = 0;
+		$init = true;
 		foreach($fileContent['content'] as $header => $table){
-			if ($page++) $this->_pdf->AddPage();
-			$this->_pdf->SetFont('helvetica', '', 16); // font size
-			if (!array_is_list($fileContent['content'])) $this->_pdf->MultiCell(0, 4, $header, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			$this->_pdf->SetFont('helvetica', '', 8); // font size
+			if ($page++) {
+				$this->_pdf->AddPage();
+				$init = true;
+			}
+			$page = $this->_pdf->page->getPage();
+			$bbox = $init ? ['y' =>  $this->_pdf->_contentCoordinates['top'], 'h' => 0] : $this->_pdf->getLastBBox();
+			$init = false;
+			if (!array_is_list($fileContent['content'])){
+				$this->_pdf->addHTMLCell(
+					html: '<h3>' . $header . '</h3>',
+					posx: $page['region'][0]['RX'],
+					posy: $bbox['y'] + $bbox['h'],
+					width: $page['region'][0]['RW'],
+				);
+				$page = $this->_pdf->page->getPage();
+				$bbox = $this->_pdf->getLastBBox();
+			}
+
 			$html = <<<END
 				<style>
 					tr.odd {background-color:#ddd}
@@ -532,8 +548,12 @@ class PDF{
 			}
 			$html .= '</tbody>';
 			$html .= '</table>';
-			// writeHTML($html, $ln=true, $fill=false, $reseth=false, $cell=false, $align='')			
-			$this->_pdf->writeHTML($html);
+			$this->_pdf->addHTMLCell(
+				html: $html,
+				posx: $page['region'][0]['RX'],
+				posy: $bbox['y'] + $bbox['h'],
+				width: $page['region'][0]['RW'],
+			);
 		}
 
 		return $this->return();

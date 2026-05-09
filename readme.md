@@ -29,9 +29,6 @@ Things are still in motion. Images may be outdated.
 
 ## to do
 * review openspout ods cell formatting
-* further implementation of tc-lib-pdf, set up tcpdfinterface.php
-    * review default css
-    * tablePDF
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * in case [sql cluster switch](#rejected-requirements) raises issues
