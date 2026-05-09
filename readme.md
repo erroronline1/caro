@@ -36,7 +36,6 @@ Things are still in motion. Images may be outdated.
     * recordsPDF
     * tablePDF
 * sqlsqrv 16->19->22 migration compatibility?
-* recommend fileserver strategy (as operator of infrastructure did)
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * in case [sql cluster switch](#rejected-requirements) raises issues
     * on repeated failure parent::response(203|207)?
@@ -2135,7 +2134,7 @@ If you are going to prepare the deployment you are free to create multiple files
 
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
-* Decide for a fileserver strategy. Available options are `database` or `fileserver`, depending on availability of storage solutions.
+* Decide for a [fileserver strategy](#fileserver-strategy). Available options are `database` or `fileserver`, depending on availability of storage solutions.
 * [Customize](#customisation) your appropriate language-files (language.XX.env/.json and manual templates)
 * *optional:* provide and customize icons to be displayed on [response-popups](#user-acceptance-considerations).
 * Select an installation password for the system user.
@@ -2431,8 +2430,12 @@ There may be the need for a somewhat advanced computer enthusiast for:
 You can try to get your hands dirty on diving into the sourcecode as well, most of the other functions should work out of the box though.
 
 ### Fileserver strategy
-Depending on available storage solutions and backup strategies you can decide whether to store record files in the filesystem or the database. The strategy should be chosen on installation and not be changed afterwards. However within the [_stresstest](#stress-test-and-performance) a method is available to switch files from or to filesystem/database. This may take a remarkable amount of computation and time, should be avoided if possible and at least executed from the command line to avoid timeouts on webrequests.  
-The directory structure within the `fileserver`-directory stays the same, for database stored files will be converted into local files temporarily to improve caching.
+Depending on available storage solutions and backup strategies you can decide whether to store record binaries in the filesystem or the database.  
+Changes *are* possible during runtime by using the respective method within the [_stresstest](#stress-test-and-performance) to switch files from or to filesystem/database. This may take a remarkable amount of computation and time, should be avoided if possible and at least executed from the command line to avoid timeouts on webrequests.  
+The directory structure within the `fileserver`-directory stays the same, for database stored files will be converted into local files temporarily to improve caching.  
+In case of migrating to another physical storage the config.ini-entries can be changed as file adresses within the application are mostly relative and point to the given keys.
+
+Please consult your operator of infrasturcture which strategy suits you best.
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.

@@ -2033,7 +2033,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
-* Entscheidung über die Speicherstrategie. Verfügbare Optionen sind `database` oder `fileserver`, abhängig von der Verfügbarkeit von Speicherlösungen.
+* Entscheidung über die [Speicherstrategie](#speicherstrategie). Verfügbare Optionen sind `database` oder `fileserver`, abhängig von der Verfügbarkeit von Speicherlösungen.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und Manual-Vorlagen)
 * Bereitstellung und Anpassung von Bildern, die auf [Antwort-PopUps](#erwägungen-zur-nutzerakzeptanz) angezeigt werden.
 * Auswahl eines Installationskennworts für die Systemnutzerin.
@@ -2329,8 +2329,12 @@ Es benötigt vermutlich eine einigermaßen fortgeschrittene computerbegeisterte 
 Man kann sich auch die Hände beim Eintauchen in den Quelltext schmutzig machen, aber alle anderen Funktionen sollten direkt funktionieren.
 
 ### Speicherstrategie
-Abhängig von verfügbaren Speicherlösungen und Backup-Strategien kann entschieden werden, ob Dateien von Aufzeichnungen im Dateisystem oder der Datenbank gespeichert werden sollen. Die Strategie sollte bei der Installation festgelegt werden und anschließend nicht geändert werden. Es gibt jedoch innerhalb des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) eine Methode um Dateien zwischen dem Dateisystem und der Datenbank zu schieben. Dies könnte jedoch außergewöhnlich viele Serverressourcen blockieren und lange dauern, sollte daher möglichst vermieden und wenigstens von der Kommandozeile aus ausgeführt werden um Zeitüberschreitungen bei Serveranfragen zu vermeiden. 
-Die Verzeichnisstruktur innerhalb des `fileserver`-Verzeichnisses bleibt die gleiche, da Daten aus der Datenbank vorübergehend in lokale Dateien verwandelt werden im Caching zu verbessern.
+Abhängig von verfügbaren Speicherlösungen und Backup-Strategien kann entschieden werden, ob Dateien von Aufzeichnungen im Dateisystem oder der Datenbank gespeichert werden sollen.  
+Wechsel während der Laufzeit *sind* möglich mithilfe einer Methode innerhalb des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) um Dateien zwischen dem Dateisystem und der Datenbank zu schieben. Dies könnte jedoch außergewöhnlich viele Serverressourcen blockieren und lange dauern, sollte daher möglichst vermieden und wenigstens von der Kommandozeile aus ausgeführt werden um Zeitüberschreitungen bei Serveranfragen zu vermeiden.  
+Die Verzeichnisstruktur innerhalb des `fileserver`-Verzeichnisses bleibt die gleiche, da Daten aus der Datenbank vorübergehend in lokale Dateien verwandelt werden um Caching zu verbessern.  
+Im Falle einer Migrierung auf einen anderen physischen Speicher können die Einsträge in der config.ini angepasst werden, da Dateizuordnungen innerhalb der Anwendung meist relativ sind und auf die entsprechenden Indizes verweisen.
+
+Der Betreiber der Infrastruktur sollte zu Rate gezogen werden, welche Speicherstrategie geeignet ist.
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
