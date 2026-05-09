@@ -2045,6 +2045,9 @@ class DOCUMENT extends API {
 				'value' => ''
 			]], $summary['content']);
 		}
+		else // for some reason there is a blank pagebreak otherwise
+			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => '<span style="color:white">.</span>']], $summary['content']);
+
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
 
