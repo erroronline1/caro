@@ -60,7 +60,7 @@ class PDF{
 		$this->_sqlinterface = $pdo;
 		$this->_filehandler = new FILEHANDLER($pdo);
 
-		$this->_markdown = new \erroronline1\Markdown\Markdown(true);
+		$this->_markdown = new \erroronline1\Markdown\Markdown(8);
 		$this->_markdown_css = <<<END
 		<style>
 			.eol1_odd {
@@ -70,7 +70,7 @@ class PDF{
 				border-right:1px solid #ddd;
 				padding: 5px;
 			}
-			blockquote{
+			blockquote {
 				border-left: 3px solid #ddd;
 				margin-left: -5px;
 			}
@@ -108,10 +108,11 @@ class PDF{
 	 * writes the prepared content chunks as name:content to the pages and sets bookmarks
 	 * 
 	 * @param array $chunks
-	 * @param array $bookmarkLevel default 0 but can be overridden
+	 * @param int $bookmarkLevel default 0 but can be overridden
+	 * @param bool $init continues after last insertion on false
+	 * @return bool to manage init for following calls
 	 */
-	private function writeStandardHTML($chunks, $bookmarkLevel = 0){
-		$init = true;
+	private function writeStandardHTML($chunks, $bookmarkLevel = 0, $init = true){
 		for($i = 0; $i < count(array_keys($chunks)); $i++){
 			$name = array_keys($chunks)[$i];
 			$content = $chunks[$name];
@@ -140,6 +141,7 @@ class PDF{
 				width: $page['region'][0]['RW'] - 20,
 			);
 		}
+		return $init;
 	}
 
 	/**
@@ -163,9 +165,6 @@ class PDF{
 			width: $page['region'][0]['RW'],
 		);
 		
-		$page = $this->_pdf->page->getPage();
-		$bbox = $this->_pdf->getLastBBox();
-
 		foreach($files as $file){
 			$this->_filehandler->serve($file, false);
 			if (!is_file($file)) continue;
@@ -213,17 +212,15 @@ class PDF{
 	 */
 	public function auditPDF($fileContent){
 		$this->init($fileContent);
-
 		// prepare content as html
 		foreach ($fileContent['content'] as $key => &$value){
-
 			// values column
 			if (gettype($value) === 'array') {
 				$value = implode("  \n", array_keys($value));
 			}
 
 			if (str_starts_with($value ?: '', '::CODE::')) {
-				$value = '<pre>' . substr($value, 8) . '</pre>';
+				$value = '<pre style="font-size:small">' . substr($value, 8) . '</pre>';
 			}
 			else {
 				// mask filenames that otherwise my end up formatted with emphasis
@@ -244,144 +241,88 @@ class PDF{
 		return $this->return();
 	}
 
+	/**
+	 * create a pdf for a document export 
+	 * @param array $fileContent see self::init()
+	 */
 	public function documentsPDF($fileContent){
-		// create a pdf for a document export
 		$this->init($fileContent);
-		// set cell padding
-		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
-		$_markdown = new \erroronline1\Markdown\Markdown(true);
-		$_filehandler = new FILEHANDLER($this->_sqlinterface);
-
-		$this->_pdf->setFormDefaultProp(['lineWidth' => 0, 'borderStyle' => 'solid']);
-
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-		
-		$height = [
-			'multiline' => 31,
-			'default' => 5
-		];
-
+		$init = true;
 		foreach ($fileContent['content'] as $document => $entries){
-			$this->_pdf->setBookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
-			$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize'] + 2);
-			$this->_pdf->MultiCell(145, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$content = [];
 			foreach ($entries as $key => $value){
-				// make sure to write on next page if multiline textfield would reach into footer
-				if ($value['type'] === "multiline" && !$value['value']
-					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_pageSetup['marginbottom'] - $height['multiline']) {
-						$this->_pdf->AddPage();
-						$this->_pdf->SetY($this->_pageSetup['margintop']);
-				}
-				// make sure to write on next page if image would reach into footer
-				if ($value['type'] === "image" && $value['value']
-					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_pageSetup['marginbottom'] - $this->_pageSetup['exportimage_maxheight']) {
-						$this->_pdf->AddPage();
-						$this->_pdf->SetY($this->_pageSetup['margintop']);
-				}
-
-				// version of components to be displayed smallish and ignoring the name column (component name for unique key)
-				if ($value['type'] === 'version'){
-					$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize'] - 4);
-					$this->_pdf->MultiCell(140, 4, $value['value'], 0, 'R', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
-					continue;
-				}
-
-				$this->_pdf->setBookmark($key, 1);
-				// name column
-				$this->_pdf->SetFont('helvetica', 'B', $this->_pageSetup['fontsize']);
-				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
-				$this->_pdf->applyCustomPageBreak($nameLines, $this->_pageSetup['fontsize']);
-
-				// values column
-				$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']);
 
 				switch ($value['type']){
-					case 'textsection':
-						$textsectionLines = $this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
-						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
+					case 'version':
+						$content[' '] = $value['value'];
 						break;
+					case 'textsection':
 					case 'markdown':
-						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html($value['value']), 0, 1, 0, true, '', true);
-						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
+						$content[$key] = $this->_markdown_css . $this->_markdown->md2html($value['value']);
 						break;
 					case 'image':
 						if (isset($fileContent['images'][$document]) && in_array($value['value'], $fileContent['images'][$document])) {
-							$value['value'] = '.' . str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
-							$_filehandler->serve($value['value'], false); // make available
-							
-							$imagedata = pathinfo($value['value']);
-							list($img_width, $img_height, $img_type, $img_attr) = getimagesize($value['value']);
+							// inline image embedding
+							$filename = $value['value'];
+							$this->_filehandler->serve($filename, false);
+							// sizing
+							list($img_width, $img_height, $img_type, $img_attr) = getimagesize($filename);
 							$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
-							$outputsize = [
-								'width' => $ratio < 1 ? 0 : $this->_pageSetup['exportimage_maxwidth'],
-								'height' => $ratio > 1 ? 0 : $this->_pageSetup['exportimage_maxheight']
-							];
-							$this->_pdf->SetFont('helvetica', 'B', $this->_pageSetup['fontsize']);
-							$this->_pdf->MultiCell(50, $this->_pageSetup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, $this->_pdf->GetY() + $nameLines * 5, true, 0, false, true, 0, 'T', false);
-							$this->_pdf->Image($value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
-							$this->_pdf->Ln(max($this->_pageSetup['exportimage_maxheight'], $outputsize['height']));
+							// scale to max settings if exceeding these 
+							$out_height = $img_height > $this->_pageSetup['exportimage_maxheight'] ? $this->_pageSetup['exportimage_maxheight'] : $img_height;
+							$out_width = $out_height * $ratio;
+							$out_width = $out_width > $this->_pageSetup['exportimage_maxwidth'] ? $this->_pageSetup['exportimage_maxwidth'] : $out_width;
+							$out_height = $out_width / $ratio;
+							// approximately convert pixel to mm; weird factor by trial and error
+							$out_width *= (72 / 25.4) * 1.35;
+							$out_height *= (72 / 25.4) * 1.35;
+							// realpath for tc-lib-pdf								
+							$content[$key] = $this->_markdown_css . '<img src="' . realpath($filename) . '" width="' . $out_width . '" height="' . $out_height . '" class="eol1_md" />';
 						}
 						break;
 					case 'selection':
+						$checkboxes = [];
 						foreach ($value['value'] as $option){
-							$this->_pdf->applyCustomPageBreak($nameLines, $this->_pageSetup['fontsize']);
-
-							$this->_pdf->SetFontSize(14);
-							$this->_pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $this->_pdf->GetY() + 4);
-							$this->_pdf->SetFontSize($this->_pageSetup['fontsize']);
-							$this->_pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
-							$this->_pdf->Ln(-7);
+							$checked = str_starts_with($option, '_____');
+							$option = $checked ? substr($option, 5) : $option;
+							$checkboxes[] = '<label><input type="checkbox" ' . ($checked ? 'checked' : '') . ' name="' . $option . '" /> ' . $option . '</label>';
 						}
-						$this->_pdf->Ln(max([1, $nameLines - count($value['value'])]) * 5);
+						$content[$key] = $this->_markdown_css . implode('<br /><br />', $checkboxes);
 						break;
 					case 'multiline':
-						if ($value['value']) { // print value for missing field values on some systems
-							$this->_pdf->SetFont('helvetica', 'I', $this->_pageSetup['fontsize']); // font size
-							$this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
-							$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']); // font size
+						if ($value['value']) { // print value if present
+							$content[$key] = $this->_markdown_css .  $this->_markdown->md2html($value['value']);
 							break;
 						}
-						$this->_pdf->SetFontSize(0); // variable font size
-						$this->_pdf->TextField($key, 133, $height['multiline'], ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $this->_pdf->GetY() + 4);
-						$this->_pdf->Ln($height['multiline'] + max([1, $nameLines]) * 5);
+						// else textarea
+						$content[$key] = $this->_markdown_css . '<textarea rows="8" name="' . $key . '">xcvb</textarea>' . '<span style="color:white">.</span>'; // height is off otherwise;
 						break;
 					case 'links':
-						if ($value['value']) { // print value for missing field values on some systems
-							$this->_pdf->SetFont('helvetica', 'I', $this->_pageSetup['fontsize']); // font size
+						$links = [];
+						if ($value['value']) {
 							foreach ($value['value'] as $link){
 								if ($link) {
-									// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-									$this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link . '" target="_blank">' . $link . '</a>', 0, 1, 0, true, '', true);
+									$links[] = '<a href="' . $link . '" class="eol1_md" target="_blank">' . $link . '</a>';
 								}
 							}
-							$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']); // font size
-							break;
 						}
-						$this->_pdf->SetFontSize(0); // variable font size
-						$this->_pdf->TextField($key, 133, $height['default'], [], ['v' => $value['value'], 'dv' => $value['value']], 65, $this->_pdf->GetY() + 4);
-						$this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
+						$content[$key] = $this->_markdown_css . implode('<br />', $links);
 						break;
 					default:
-						if ($value['value']) { // print value for missing field values on some systems
-							$this->_pdf->SetFont('helvetica', 'I', $this->_pageSetup['fontsize']); // font size
+						if ($value['value']) { // print value if present
 							preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value['value'], $link); // link widget value
 							if ($link) {
-								// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-								$this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+								$content[$key] = $this->_markdown_css . '<a href="' . $link[1] . '" class="eol1_md" target="_blank">' . $link[1] . '</a>' . ($link[2] ? $this->_markdown->md2html($link[2]): '');
 							}
-							// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-							else $this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
-							$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']); // font size
-							$this->_pdf->Ln(($height['default'] + max([1, $nameLines])));
+							else 
+								$content[$key] = $this->_markdown_css . $this->_markdown->md2html($value['value']);
 							break;
+
 						}
-						$this->_pdf->SetFontSize(0); // variable font size
-						$this->_pdf->TextField($key, 133, $height['default'], [], ['v' => $value['value'], 'dv' => $value['value']], 65, $this->_pdf->GetY() + 4);
-						$this->_pdf->Ln(($height['default'] + max([1, $nameLines]) * 5));
+						$content[$key] = $this->_markdown_css . '<input type="text" name="' . $key . '" /><br />' . '<span style="color:white">....</span>'; // height is off otherwise
 				}
 			}
+			$init = $this->writeStandardHTML($content, 0, $init);
 		}
 
 		return $this->return();
@@ -467,95 +408,75 @@ class PDF{
 		return $this->return();
 	}
 
+	/**
+	 * create a pdf for a record summary  
+	 * @param array $fileContent see self::init()
+	 */
 	public function recordsPDF($fileContent){
-		$_lang = new LANG();
-		$_filehandler = new FILEHANDLER($this->_sqlinterface);
-		// create a pdf for a record summary
 		$this->init($fileContent);
-		// set cell padding
-		$this->_pdf->setDefaultCellPadding(5, 5, 5, 5);
-
+		$_lang = new LANG();
+		$init = true;
 		if ($fileContent['erp_case_number']){
-			// name column
-			$this->_pdf->SetFont('helvetica', 'B', $this->_pageSetup['fontsize']);
-			$this->_pdf->MultiCell(50, 4, $_lang->GET('record.erp_case_number', [], true), 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-			// values column
-			$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']);
-			$this->_pdf->MultiCell(140, 4, $fileContent['erp_case_number'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$init = $this->writeStandardHTML([
+				$_lang->GET('record.erp_case_number', [], true) => $fileContent['erp_case_number']
+			]);
 		}
-
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+		
 		foreach ($fileContent['content'] as $document => $entries){
-			$this->_pdf->setBookmark($document === ' ' && isset($this->_pdf->header['title']) ? $this->_pdf->header['title'] : $document , 0);
-			$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize'] + 2); 
-			$this->_pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			foreach ($entries as $key => $values){
-				$this->_pdf->setBookmark($key, 1);
-				// name column
-				$this->_pdf->SetFont('helvetica', 'B', $this->_pageSetup['fontsize']);
-				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-				$this->_pdf->applyCustomPageBreak($nameLines, $this->_pageSetup['fontsize']);
-				
-				// values column
-				$this->_pdf->SetFont('helvetica', '', $this->_pageSetup['fontsize']);
-				$valueLines = 0;
+			if (!empty(trim($document))) // write and set bookmark level 0
+				$init = $this->writeStandardHTML([
+					'<em>' . $document . '</em>' => ''
+				], 0, $init);
+			foreach ($entries as &$values){
 				if (gettype($values) === 'array'){
-					foreach ($values as $value){
-						preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
+					foreach ($values as &$value){
+						preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
 						if ($link){
-							// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-							$valueLines += $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+							$value = '<a href="' . $link[1] . '" class="eol1_md" target="_blank">' . $link[1] . '</a>' . ($link[2] ? $this->_markdown->md2html($link[2]): '');
 							continue;
 						}
-						preg_match("/(.+?) (\(.+?\))$/", $value, $link); // attachment value with contributor for full export
+
+						preg_match("/(.+?) ~\*\(.+?\)*~$/", $value, $link); // attachment value with contributor for full export
 						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
 
 						$possibleFiles = explode(', ', $link[1]);
-						if (isset($fileContent['attachments'][$document]) && array_intersect($possibleFiles, $fileContent['attachments'][$document])){
-							foreach($possibleFiles as $filename){
-								$path = $_filehandler->directory('record_attachments') . '/' . $filename;
-								$_filehandler->serve($path, false);
-								$file = pathinfo($path);
-								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-									// inline image embedding
-									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-									list($img_width, $img_height, $img_type, $img_attr) = getimagesize($path); 
-									$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
-									$outputsize = [
-										'width' => $ratio < 1 ? 0 : $this->_pageSetup['exportimage_maxwidth'],
-										'height' => $ratio > 1 ? 0 : $this->_pageSetup['exportimage_maxheight']
-									];
-									$this->_pdf->Image($path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
-									$valueLines += $this->_pdf->Ln(max($this->_pageSetup['exportimage_maxheight'], $outputsize['height']));
-								}
-								else {
-									// file attachment
-									$valueLines += $this->_pdf->MultiCell(140, 4, $filename, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-									// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
-									$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_pageSetup['marginleft'] + 5, $this->_pdf->GetY() - $this->_pageSetup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => $path));
-								}	
+						foreach($possibleFiles as $filename){
+							$filename = $this->_filehandler->translate_path(str_replace('\_', '_', $filename));
+							if (!isset($fileContent['attachments'][$document]) || !in_array($filename, $fileContent['attachments'][$document])) {
+								$value = $this->_markdown->md2html($value);
+								continue;
+							}
+							$file = pathinfo($filename);
+							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+								// inline image embedding
+								$this->_filehandler->serve($filename, false);
+								// sizing
+								list($img_width, $img_height, $img_type, $img_attr) = getimagesize($filename);
+								$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+								// scale to max settings if exceeding these 
+								$out_height = $img_height > $this->_pageSetup['exportimage_maxheight'] ? $this->_pageSetup['exportimage_maxheight'] : $img_height;
+								$out_width = $out_height * $ratio;
+								$out_width = $out_width > $this->_pageSetup['exportimage_maxwidth'] ? $this->_pageSetup['exportimage_maxwidth'] : $out_width;
+								$out_height = $out_width / $ratio;
+								// approximately convert pixel to mm; weird factor by trial and error
+								$out_width *= (72 / 25.4) * 1.35;
+								$out_height *= (72 / 25.4) * 1.35;
+								// realpath for tc-lib-pdf								
+								$value = '<img src="' . realpath($filename) . '" width="' . $out_width . '" height="' . $out_height . '" class="eol1_md" /><br />' . $this->_markdown->md2html($value);
 							}
 						}
-						// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-						else $valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 					}
+					$values = $this->_markdown_css . implode('<br />', $values);
 				}
-				elseif (str_starts_with($values, '::MARKDOWN::')){
-					// textsection on full export with enabled markdown for documents textsection widget
-					// with prefix PDF can decide better over HTMLCell vs MultiCell
-					$_markdown = new \erroronline1\Markdown\Markdown(true);
-					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $this->_markdown_css . $_markdown->md2html(substr($values, 12)), 0, 1, 0, true, '', true);
+				else {
+					$values = $this->_markdown_css . $this->_markdown->md2html($values);
 				}
-				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-
-				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
-				$this->_pdf->Ln(($offset - 1) * $this->_pageSetup['fontsize'] / 2);
 			}
+			$init = $this->writeStandardHTML($entries, 1, $init);
+			if (!empty($fileContent['attachments'][$document])) $this->attachments($fileContent['attachments'][$document]);
 		}
 
-		$this->_pdf->SetFont('helvetica', '', 8); 
-		if (isset($fileContent['recenthash'])) $this->_pdf->MultiCell(140, 4, $fileContent['recenthash'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+		if (isset($fileContent['recenthash'])) $this->writeStandardHTML([$_lang->GET('record.verify.verify', [], true) => $fileContent['recenthash']], 0, $init);
 
 		return $this->return();
 	}

@@ -293,7 +293,7 @@ class _ERPINTERFACE {
 		if ($result) {
 			switch($export){
 				case 'pdf':
-					require_once('./_pdf.php');
+					require_once('./_tcpdfinterface.php');
 					$PDF = new PDF(CONFIG['pdf']['table']);		
 					$content = [
 						'title' => "test",
@@ -2178,7 +2178,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		if ($result) {
 			switch($export){
 				case 'pdf':
-					require_once('./_pdf.php');
+					require_once('./_tcpdfinterface.php');
 					$PDF = new PDF(CONFIG['pdf']['table']);
 					$content = [
 						'title' => $key,

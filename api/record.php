@@ -13,8 +13,7 @@ namespace CARO\API;
 
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
-require_once('./_pdf.php');
-//require_once('./_tcpdfinterface.php');
+require_once('./_tcpdfinterface.php');
 require_once('./_calendarutility.php');
 
 class RECORD extends API {
@@ -1415,7 +1414,10 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'mdcontent' => trim($display)
+								'mdcontent' => trim($display),
+								'mdrestrictions' => [
+									'safeMode' => true
+								]
 							]);
 					}
 					if (isset($content['attachments'][$document])){
@@ -2366,7 +2368,8 @@ class RECORD extends API {
 							foreach (explode(', ', $entry['value']) as $file){
 
 								if (!isset($summary['attachments'][$document])) $summary['attachments'][$document] = [];
-								$summary['attachments'][$document][] = $files[] = $this->_filehandler->translate_path($file);
+								$summary['attachments'][$document][] = $this->_filehandler->translate_path($file);
+								$files[] = str_replace('_', '\_', $file); // mask _ to avoid markdown emphasis
 							}
 							$displayvalue = implode(', ', $files);
 						}
@@ -2374,7 +2377,7 @@ class RECORD extends API {
 						switch ($type){
 							case 'document':
 							case 'full':
-								$summary['content'][$document][$key][] = $displayvalue . ' (' . $entry['author'] . ")"; // append all entries
+								$summary['content'][$document][$key][] = $displayvalue . ' ~*(' . $entry['author'] . ")*~"; // append all entries
 								break;
 							case 'simplified':
 							case 'simplifieddocument':
@@ -2436,8 +2439,7 @@ class RECORD extends API {
 
 						if ($subs['type'] === 'textsection'){
 							if (isset($subs['mdcontent'])){
-								// with prefix PDF can decide better over HTMLCell vs MultiCell
-								$value  = '::MARKDOWN::' . $subs['mdcontent'];
+								$value  = $subs['mdcontent'];
 							}
 							else $value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';

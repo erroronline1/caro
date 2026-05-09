@@ -31,9 +31,6 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * further implementation of tc-lib-pdf, set up tcpdfinterface.php
     * review default css
-    * image size handling
-    * documentsPDF
-    * recordsPDF
     * tablePDF
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
@@ -3196,7 +3193,7 @@ graph TD;
 
     module<-->calendar(_calendarutility.php)
     module<-->csv(_csvprocessor.php);
-    module<-->pdf(_pdf.php);
+    module<-->pdf(_tcpdfinterface.php);
     module<-->libraries([libraries]);
     module==>api_php2(api.php);
 

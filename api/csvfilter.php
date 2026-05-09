@@ -168,7 +168,7 @@ class CSVFILTER extends API {
 						}
 						break;
 					case 'pdf':
-						require_once('./_pdf.php');
+						require_once('./_tcpdfinterface.php');
 						$PDF = new PDF(CONFIG['pdf']['table']);
 						$pdfcontent = [
 							'title' => $filter['name'],

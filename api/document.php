@@ -12,8 +12,7 @@
 namespace CARO\API;
 
 // add and edit document components and documents
-//require_once('./_tcpdfinterface.php');
-require_once('./_pdf.php');
+require_once('./_tcpdfinterface.php');
 
 class DOCUMENT extends API {
 	// processed parameters for readability
@@ -2006,8 +2005,6 @@ class DOCUMENT extends API {
 			'title' => $document['name'],
 			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)], true)
 		];
-
-
 
 		$enumerate = [];
 		$fillable = false;
