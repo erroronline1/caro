@@ -44,7 +44,7 @@ class SQLINTERFACE {
 	 */
 	private function CONNECT($_connectionParameters = []){
 		$_connectionParameters = $_connectionParameters ?: $this->_connectionParameters;
-		if (!$_connectionParameters || array_keys($_connectionParameters) != ['driver', 'host', 'database', 'charset', 'user', 'password', 'packagesize'] ) throw new \Exception("no or insufficient database connection parameters provided");
+		if (!$_connectionParameters || array_diff(array_keys($_connectionParameters), ['driver', 'host', 'database', 'charset', 'user', 'password', 'packagesize'])) throw new \Exception("no or insufficient database connection parameters provided");
 
 		$this->_pdo = new \PDO(
 			$_connectionParameters['driver'] . ':' .
