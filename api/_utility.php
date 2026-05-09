@@ -838,11 +838,14 @@ class BLOCKCHAIN {
 		$report = [];
 		if (!$chain) return false;
 		// initiate report with genesis block
-		$report[] = ['content' => "Genesis block\n> " . UTILITY::json_encode($chain[0]), 'verification' => "\n* " . (isset($chain[0]['hash']) ? "Randomized hash" : "**This block is not secured!**")];
+		$report[] = [
+			'content' => "### Genesis block\n> ~~~\n> " . UTILITY::json_encode($chain[0]) . "\n> ~~~\n",
+			'verification' => "\n* " . (isset($chain[0]['hash']) ? "Randomized hash" : "**This block is not secured!**")
+		];
 		// iterate through available blocks
 		for($i = 1; $i < count($chain); $i++){
 			$block = $chain[$i];
-			$blockreport = ['content' => 'Block ' . $i . "  \n> " . UTILITY::json_encode($block), 'verification' => ''];
+			$blockreport = ['content' => '### Block ' . $i . "  \n> ~~~\n> " . UTILITY::json_encode($block) . "\n> ~~~\n", 'verification' => ''];
 
 			if (!isset($chain[$i - 1]['hash'])){
 				if (!$details) return false;
