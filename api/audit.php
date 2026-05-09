@@ -2680,7 +2680,9 @@ class AUDIT extends API {
 				$recordcontent = json_decode($case['content'], true);
 				foreach(BLOCKCHAIN::verified($this->_sqlinterface, $recordcontent, true) as $block){
 					foreach($block as $key => $value){
-						if ($key === 'verification') continue;
+						if ($key === 'verification') {
+							continue;
+						}
 						$report .= $key . ': ' . $value . "  \n";
 					}
 					$report .= $block['verification'] . "\n \n \n";
@@ -2805,7 +2807,7 @@ class AUDIT extends API {
 					$summary['content'][$item['attributes']['name']] = $item['mdcontent'];	
 					break;
 				case 'links':
-					$summary['files'] = array_keys($item['content']);
+					$summary['files'] = array_map(Fn($v) => $this->_filehandler->translate_path($v), array_keys($item['content']));
 					break;
 				case 'code':
 					// this is not directly implemented as markdown by default, for the codeblock to have a smaller font size, decided by PDF using the prefix
