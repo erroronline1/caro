@@ -35,14 +35,10 @@ Things are still in motion. Images may be outdated.
     * documentsPDF
     * recordsPDF
     * tablePDF
-* [dynamic fileserver approach](#rejected-requirements)
-    * prefixes: fileserver keys as strtr-tokens, e.g. :audit_attachments/ with trailing slash just to be sure
-    * no storage of paths in records, for altering will compromise blockchain
-    * no later necessity of hack if implemented from the start
 * sqlsqrv 16->19->22 migration compatibility?
 * recommend fileserver strategy (as operator of infrastructure did)
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
-    * in case sql cluster switch raises issues
+    * in case [sql cluster switch](#rejected-requirements) raises issues
     * on repeated failure parent::response(203|207)?
 
 ## Content
@@ -2237,7 +2233,7 @@ names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CUSTOMERID|PRODUCTS|EXPIREDDOCUMENTS)$" ; literal terms |-separated
 
-filename[characters] = "[^\s\w\d]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
+filename[characters] = "[^\s\w\d-]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
 
 [lifespan]
 calendar[autodelete] = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
@@ -2932,7 +2928,7 @@ Stakeholder identification:
 | Automate user access invalidation on set date | Data safety officer | 2026-03-02 | Implemented; 2026-03-06 |
 | Manual storage extraction from workmates: ensure purchase is aware on that to correct booking | CEO | 2026-03-13 | Does already work this way. Unprocessed orders show up irregardless of other set states; 2026-03-14 |
 | QR-code catalogue for easier ordering | CEO | 2026-03-13 | Labels can be exported from products view, combine erp-number or article number and vendor; 2026-03-14 |
-| Dynamic fileserver approach, no paths but references in documentation | Operator of infrastructure | 2026-05-04 | |
+| Dynamic fileserver approach, no paths but references in documentation | Operator of infrastructure | 2026-05-04 | Implemented; 2026-05-09 |
 | Application must handle delays during SQL cluster node switch | Operator of infrastructure | 2026-05-04 | |
 
 #### Rejected requirements
