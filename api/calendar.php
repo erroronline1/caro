@@ -98,7 +98,7 @@ class CALENDAR extends API {
 						],
 						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false))
 					];
-					$file = $PDF->qrcodePDF($content, 12);
+					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => $this->_filehandler->getFileLink($file),
 						'download' => pathinfo($file)['basename']
