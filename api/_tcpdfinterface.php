@@ -35,7 +35,7 @@ class PDF{
 		$this->_pageSetup = [
 			'format' => $pageSetup['format'] ?? 'A4',
 			'unit' => $pageSetup['unit'] ?? 'mm',
-			'orientation' => isset($pageSetup['orientation']) && $pageSetup['orientation'] === 'landscape' ? 'L'  : 'P',
+			'orientation' => isset($pageSetup['orientation']) && in_array($pageSetup['orientation'], ['landscape', 'L']) ? 'L'  : 'P',
 			'margintop' => isset($pageSetup['margintop']) ? intval($pageSetup['margintop']) : 10,
 			'marginright' => isset($pageSetup['marginright']) ? intval($pageSetup['marginright']) : 10,
 			'marginbottom' => isset($pageSetup['marginbottom']) ? intval($pageSetup['marginbottom']) : 10,
@@ -45,10 +45,12 @@ class PDF{
 			'exportimage_maxwidth' => isset($pageSetup['exportimage_maxwidth']) ? min(130, intval($pageSetup['exportimage_maxwidth'])) : 130,
 			'exportimage_maxheight' => isset($pageSetup['exportimage_maxheight']) ? intval($pageSetup['exportimage_maxheight']) : 75,
 			'rows' => isset($pageSetup['rows']) ? intval($pageSetup['rows']) : 1,
+			'row_gap' => isset($pageSetup['row_gap']) ? intval($pageSetup['row_gap']) : 0,
 			'columns' => isset($pageSetup['columns']) ? intval($pageSetup['columns']) : 1,
+			'column_gap' => isset($pageSetup['column_gap']) ? intval($pageSetup['column_gap']) : 0,
 			'fontsize' => isset($pageSetup['fontsize']) ? intval($pageSetup['fontsize']) : 12,
 			'codesizelimit' => isset($pageSetup['codesizelimit']) ? intval($pageSetup['codesizelimit']) : null,
-			'codepadding' => isset($pageSetup['codepadding']) ? intval($pageSetup['codepadding']) : 0,
+			'codepadding' => isset($pageSetup['codepadding']) ? intval($pageSetup['codepadding']) : 2,
 			'header' => $pageSetup['header'] ?? true,
 			'footer' => $pageSetup['footer'] ?? true,
 		];
@@ -109,7 +111,11 @@ class PDF{
 		$this->_pdf->SetCreator(CONFIG['system']['caroapp']);
 		$this->_pdf->SetAuthor($_SESSION['user']['name']);
 		$this->_pdf->SetTitle($fileContent['title'] ?? '');
-		$this->_pdf->setPDFFilename($fileContent['filename'] . '.pdf');
+
+		// filename sanitation
+		$path = $this->_filehandler->directory('tmp') . '/' . $this->_fileContent['filename'] . '.pdf';
+		$this->_fileContent['filename'] = substr($this->_fileContent['filename'], 0, 260 - strlen($path));
+		$this->_pdf->setPDFFilename($this->_fileContent['filename'] . '.pdf');
 
 		$page = $this->_pdf->page->getPage();
 		$this->_markdown_css = str_replace('width: 100%', 'width: '. $page['region'][0]['RW'] - 20 . 'mm', $this->_markdown_css);
@@ -211,9 +217,8 @@ class PDF{
 	private function return(){
 		if ($this->_pageSetup['footer']) $this->_pdf->pageNumeration();
 
-		$_filehandler = new FILEHANDLER();
-		$this->_pdf->savePDF(__DIR__.'/' .$_filehandler->directory('tmp'), $this->_pdf->getOutPDFString());
-		return $_filehandler->directory('tmp') . '/' .$this->_fileContent['filename'] . '.pdf';
+		$this->_pdf->savePDF(__DIR__.'/' .$this->_filehandler->directory('tmp'), $this->_pdf->getOutPDFString());
+		return $this->_filehandler->directory('tmp') . '/' . $this->_fileContent['filename'] . '.pdf';
 	}
 
 	/**
@@ -375,12 +380,11 @@ class PDF{
 		$this->init($fileContent);
 
 		// override default cell padding
-		$this->_pdf->setDefaultCellPadding(1, 1, 1, 1);
+		$this->_pdf->setDefaultCellPadding(0, 0, 0, 0);
 
 		$page = $this->_pdf->page->getPage();
-		//var_dump($page);
-		$columnwidth = intval(($page['width'] - ($this->_pageSetup['marginleft'] + $this->_pageSetup['marginright'])) / $this->_pageSetup['columns']);
-		$rowheight = intval(($page['height'] - ($this->_pageSetup['margintop'] + $this->_pageSetup['marginbottom'])) / $this->_pageSetup['rows']);
+		$columnwidth = intval(($page['width'] - ($this->_pageSetup['marginleft'] + $this->_pageSetup['marginright'])) / $this->_pageSetup['columns'] - $this->_pageSetup['column_gap']);
+		$rowheight = intval(($page['height'] - ($this->_pageSetup['margintop'] + $this->_pageSetup['marginbottom'])) / $this->_pageSetup['rows'] - $this->_pageSetup['row_gap']);
 
 		$codesize = intval(min($columnwidth, $rowheight, $this->_pageSetup['codesizelimit'] ? : $rowheight * .7));
 		for ($row = 0; $row < $this->_pageSetup['rows']; $row++){
@@ -388,8 +392,8 @@ class PDF{
 				$this->_pdf->page->addContent($this->_pdf->getBarcode(
 					type: 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'],
 					code: $fileContent['content'][0],
-					posx: $column * $columnwidth + $page['region'][0]['RX'],//$this->_pageSetup['marginleft'],
-					posy: $row * $rowheight + $page['region'][0]['RY'], //$this->_pageSetup['margintop'],
+					posx: $column * ($columnwidth + $this->_pageSetup['column_gap']) + $page['region'][0]['RX'],
+					posy: $row * ($rowheight + $this->_pageSetup['row_gap']) + $page['region'][0]['RY'],
 					width: $codesize,
 					height: $codesize,
 					style: [
@@ -402,12 +406,12 @@ class PDF{
 						'fillColor' => 'black',
 					]
 				));
-				$font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $fontSize); // font size
+				$font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // font size
 				$this->_pdf->page->addContent($font['out']);
 				$text = $this->_pdf->getTextCell(
 					txt: $fileContent['content'][1],
-					posx: $column * $columnwidth + $codesize + $this->_pageSetup['codepadding'] + $page['region'][0]['RX'],
-					posy: $row * $rowheight + $page['region'][0]['RY'], //$this->_pageSetup['margintop'],
+					posx: $column * ($columnwidth + $this->_pageSetup['column_gap']) + $codesize + $this->_pageSetup['codepadding'] + $page['region'][0]['RX'],
+					posy: $row * ($rowheight + $this->_pageSetup['row_gap']) + $page['region'][0]['RY'],
 					width: $columnwidth - $codesize - $this->_pageSetup['codepadding'],
 					height: $rowheight,
 					valign: 'T',
@@ -638,7 +642,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		]);
 		$this->setDefaultCellMargin(0, 0, 0, 0);
 		if ($this->_defaultfont === null) {
-			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // add default font
 		}
 		
 		// create a page with defaultPageContent to determine the top and bottom content boundaries after applying defaultPageContent()
@@ -830,7 +834,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			$heights['footer'][] = $bbox['h'];
 		}
 
-		$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+		$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // add default font
 		$out .= $this->_defaultfont['out'];
 		$out .= $this->graph->getStopTransform();
 		$this->setDefaultCellPadding(5, 3, 3, 3);
