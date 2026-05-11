@@ -2240,22 +2240,25 @@ sheet[format] = 'A4'
 sheet[orientation] = 'portrait' ; portrait or landscape
 sheet[rows] = 11
 sheet[columns] = 5
+sheet[column_gap] = 5
 sheet[margintop] = 0 ; in mm
 sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
 sheet[marginleft] = 0 ; in mm
-sheet[fontsize] = 10
+sheet[fontsize] = 6
 sheet[header] = no
 sheet[footer] = no
 
 label[format] = '85 x 35 Dymo' ; Breite und Höhe in mm, ggf Bezeichnung
 label[orientation] = 'landscape' ; portrait or landscape
-label[margintop] = 2 ; in mm
-label[marginright] = 2 ; in mm
-label[marginbottom] = 2 ; in mm
-label[marginleft] = 1 ; in mm
+label[margintop] = 4 ; in mm
+label[marginright] = 4 ; in mm
+label[marginbottom] = 4 ; in mm
+label[marginleft] = 4 ; in mm
 label[header] = no
 label[footer] = no
+label[fontsize] = 10
+label[codepadding] = 3 ; in mm
 
 ; Seiteneinstellungen für PDF-Aufzeichnungen
 [pdf]
@@ -2294,10 +2297,12 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 | exportimage_maxwidth | einfache Zahl in *unit* für maximale Breite eingebetteter Bilder, kann nicht größer als 135 sein | 135 |
 | exportimage_maxheight | einfache Zahl in *unit* für maximale Höhe eingebetteter Bilder | 75 |
 | rows | wiederholende Zeilen desselben Inhalts | 1 |
+| row_gap | Abstand zwischen Zeilen in mm | 0 |
 | columns | wiederholende Spalten desselben Inhalts | 1 |
+| column_gap | Abstand zwischen Spalten in mm | 0 |
 | fontsize | einfache Zahl der Schriftgröße in *unit* | 12 |
 | codesizelimit | einfache Zahl in *unit* limitiert die Größe, welche sich sonst am kleineren Wert von Spaltenbreite oder Zeilenhöhe orientiert | none |
-| codepadding | plain number in *unit*, zusätzlicher Abstand zwischen Code und Text | none |
+| codepadding | plain number in *unit*, zusätzlicher Abstand zwischen Code und Text | 2 |
 | header | yes oder no | yes |
 | footer | yes oder no | yes |
 

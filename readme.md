@@ -2335,22 +2335,25 @@ sheet[format] = 'A4'
 sheet[orientation] = 'portrait' ; portrait or landscape
 sheet[rows] = 11
 sheet[columns] = 5
+sheet[column_gap] = 5
 sheet[margintop] = 0 ; in mm
 sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
 sheet[marginleft] = 0 ; in mm
-sheet[fontsize] = 10
+sheet[fontsize] = 6
 sheet[header] = no
 sheet[footer] = no
 
 label[format] = '85 x 35 Dymo' ; width and height in mm
 label[orientation] = 'landscape' ; portrait or landscape
-label[margintop] = 2 ; in mm
-label[marginright] = 2 ; in mm
-label[marginbottom] = 2 ; in mm
-label[marginleft] = 1 ; in mm
+label[margintop] = 4 ; in mm
+label[marginright] = 4 ; in mm
+label[marginbottom] = 4 ; in mm
+label[marginleft] = 4 ; in mm
 label[header] = no
 label[footer] = no
+label[fontsize] = 10
+label[codepadding] = 3 ; in mm
 
 ; page settings for record pdf
 [pdf]
@@ -2386,13 +2389,15 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 | marginleft | plain number in *unit*, margin on left side of page | 20 |
 | header_image | path to image file for header in upper right corner | none |
 | footer_image | path to image file in lower right corner | none |
-| exportimage_maxwidth | plain number in *unit* for maximum width of embedded images, can not exceed 135 | 135 |
+| exportimage_maxwidth | plain number in *unit* for maximum width of embedded images, can not exceed 130 | 130 |
 | exportimage_maxheight | plain number in *unit* for maximum height of embedded images | 75 |
 | rows | repetitive rows of content | 1 |
+| row_gap | spacing between rows in mm | 0 |
 | columns | repetitive columns of content | 1 |
+| column_gap | spacing between columns in mm | 0 |
 | fontsize | plain number of font size in points | 12 |
 | codesizelimit | plain number of *unit* limits the size that is the minimum value of colum width or row height otherwise | none |
-| codepadding | plain number in *unit*, additional space between code and text | none |
+| codepadding | plain number in *unit*, additional space between code and text | 2 |
 | header | yes or no | yes |
 | footer | yes or no | yes |
 
