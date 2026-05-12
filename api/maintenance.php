@@ -236,7 +236,7 @@ class MAINTENANCE extends API {
 		
 		$methods = [
 			'cron_log',
-			'erp_connection',
+//			'erp_connection',
 			'records_datalist',
 			'riskupdate',
 			'vendorupdate',

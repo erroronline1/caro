@@ -36,6 +36,7 @@ Things are still in motion. Images may be outdated.
 * markdown exclude formatting characters in links somehow (buffer detected links?) OR urlencode/decode _client.message.newMessage content (maybe a flag if encoded)
 * row/column alignment for qrcodePDF still off
 * tidy, rephrase readme
+* ini dumper does not work properly in maintenance, refactor
 
 ## Content
 * [Aims](#aims)
