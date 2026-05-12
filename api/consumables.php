@@ -1383,6 +1383,10 @@ class CONSUMABLES extends API {
 								]
 							];
 						}
+						$text = ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name'];
+						if (strlen($text) > CONFIG['limits']['length']['identifier']){
+							$text = substr($text, 0, CONFIG['limits']['length']['identifier'] - 3) . '...';
+						}
 						$response['render']['content'][] = [
 							[
 								'type' => 'text',
@@ -1395,9 +1399,10 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search_label_text'),
+									'name' => $this->_lang->GET('consumables.product.search_label_text'), 
 									'id' => '_searchlabel2',
-									'value' => ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name']
+									'maxlength' => CONFIG['limits']['length']['identifier'],
+									'value' => $text
 								]
 							],
 							...$labels
@@ -1631,6 +1636,10 @@ class CONSUMABLES extends API {
 								]
 							];
 						}
+						$text = ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name'];
+						if (strlen($text) > CONFIG['limits']['length']['identifier']){
+							$text = substr($text, 0, CONFIG['limits']['length']['identifier'] - 3) . '...';
+						}
 						$response['render']['content'][] = [
 							[
 								'type' => 'text',
@@ -1645,7 +1654,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.search_label_text'),
 									'id' => '_searchlabel2',
-									'value' => ($product['article_no'] ?: $this->_lang->GET('consumables.product.erp_id') . ' '. $product['erp_id']) . ' ' . $product['article_name'] . ($product['article_alias'] ? ' (' . $product['article_alias'] . ')' : ''). ' ' . $product['vendor_name']
+									'value' => $text
 								]
 							],
 							...$labels
