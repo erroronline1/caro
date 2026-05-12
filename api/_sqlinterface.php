@@ -83,23 +83,34 @@ class SQLINTERFACE {
 
 		// execute query packages
 		foreach($sqlQueryStack as $q){
-			try {
-				$statement = $this->_pdo->query($q);
+			// have three attempts on reconnecting in case of cluster switch related connection reset
+			for ($attempts = 0; $attempts < 2; $attempts++){
+				try {
+					$statement = $this->_pdo->query($q);
+					break;
+				}
+				catch (\Exception $e) {
+					usleep(50000); // 0.05 s
+					$this->CONNECT();
+					//UTILITY::debug($q, $e);
+					//die();
+					//$result[] = $q . PHP_EOL . $e;
+				}
 			}
-			catch (\Exception $e) {
-				/* // */ UTILITY::debug($q, $e);
-				/* // */ die();
-				$result[] = $q . PHP_EOL . $e;
+			try { // if the connection fails, $statement is invalid
+				// prepare result response
+				if (str_starts_with($q, 'SELECT')) {
+					//UTILITY::debug($statement->debugDumpParams());
+					$result[] = $statement->fetchAll();
+				}
+				elseif (str_starts_with($q, 'CREATE') || str_starts_with($q, 'IF OBJECT_ID(N')) $result[] = $statement->errorInfo(); // _databaseupdate.php table creation
+				elseif (str_starts_with($q, 'ALTER TABLE') || str_starts_with($q, 'IF COL_LENGTH(')) $result[] = $statement->errorInfo(); // _databaseupdate.php column altering
+				else $result[] = $statement->rowCount(); // affected rows
 			}
-
-			// prepare result response
-			if (str_starts_with($q, 'SELECT')) {
-				//UTILITY::debug($statement->debugDumpParams());
-				$result[] = $statement->fetchAll();
+			catch(\Exception $e){
+				UTILITY::debug($q, $e);
+				die();
 			}
-			elseif (str_starts_with($q, 'CREATE') || str_starts_with($q, 'IF OBJECT_ID(N')) $result[] = $statement->errorInfo(); // _databaseupdate.php table creation
-			elseif (str_starts_with($q, 'ALTER TABLE') || str_starts_with($q, 'IF COL_LENGTH(')) $result[] = $statement->errorInfo(); // _databaseupdate.php column altering
-			else $result[] = $statement->rowCount(); // affected rows
 		}
 		$statement = null;
 
@@ -340,9 +351,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_announcements (id, author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) " .
 						"VALUES (:id, :author_id, CURRENT_TIMESTAMP, :organizational_unit, :span_start, :span_end, :subject, :text, :highlight) " .
 						"ON DUPLICATE KEY UPDATE author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = :span_start, span_end = :span_end, subject = :subject, text = :text, highlight = :highlight",
-			'sqlsrv' => "MERGE INTO caro_announcements WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :author_id AS author_id, :date AS date, :organizational_unit AS organizational_unit, :span_start AS span_start, :span_end AS span_end, N:subject AS subject, (CASE WHEN :text IS NULL THEN NULL ELSE N':text' END) AS text, :highlight as highlight) AS source " .
-						"(id, author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_announcements AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(datetime, :span_start, 120), span_end = CONVERT(datetime, :span_end, 120), subject = N:subject, text = (CASE WHEN :text IS NULL THEN NULL ELSE N':text' END), highlight = :highlight " .
 						"WHEN NOT MATCHED THEN INSERT (author_id, date, organizational_unit, span_start, span_end, subject, text, highlight) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(datetime, :span_start, 120), CONVERT(datetime, :span_end, 120), N:subject, (CASE WHEN :text IS NULL THEN NULL ELSE N':text' END), :highlight);"
 		],
@@ -364,9 +374,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_audit_and_management (id, template, unit, content, last_touch, last_user, closed, notified) " .
 						"VALUES (:id, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL) " .
 						"ON DUPLICATE KEY UPDATE content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed",
-			'sqlsrv' => "MERGE INTO caro_audit_and_management WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :template AS template, :unit AS unit, N:content AS content, :last_touch AS last_touch, N:last_user AS last_user, :closed AS closed, :notified AS notified) AS source " .
-						"(id, template, unit, content, last_touch, last_user, closed, notified) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_audit_and_management AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET content = N:content, last_touch = CURRENT_TIMESTAMP, last_user = N:last_user, closed = :closed " .
 						"WHEN NOT MATCHED THEN INSERT (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, N:content, CURRENT_TIMESTAMP, N:last_user, :closed, NULL);"
 		],
@@ -396,9 +405,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author, hint, method) " .
 						"VALUES (:id, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method) " .
 						"ON DUPLICATE KEY UPDATE content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author",
-			'sqlsrv' => "MERGE INTO caro_audit_templates WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:content AS content, N:objectives AS objectives, :unit AS unit, (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END) AS author, (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END) AS hint, :method AS method) AS source " .
-						"(id, content, objectives, unit, author, hint, method) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_audit_templates AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET content = N:content, objectives = N:objectives, unit = :unit, hint = (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END), method = :method, date = CURRENT_TIMESTAMP, author = (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END) " .
 						"WHEN NOT MATCHED THEN INSERT (content, objectives, unit, date, author, hint, method) VALUES (N:content, N:objectives, :unit, CURRENT_TIMESTAMP, (CASE WHEN :author IS NULL THEN NULL ELSE N':author' END), (CASE WHEN :hint IS NULL THEN NULL ELSE N':hint' END), :method);",
 		],
@@ -444,9 +452,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) " .
 						"VALUES (:id, :title, :content, :permissions) " .
 						"ON DUPLICATE KEY UPDATE title = :title, content = :content, permissions = :permissions",
-			'sqlsrv' => "MERGE INTO caro_manual WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:title AS title, N:content AS content, :permissions AS permissions) AS source " .
-						"(id, title, content, permissions) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_manual AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET title = N:title, content = N:content, permissions = :permissions " .
 						"WHEN NOT MATCHED THEN INSERT (title, content, permissions) VALUES (N:title, N:content, :permissions);"
 		],
@@ -466,8 +473,8 @@ class SQLINTERFACE {
 
 		'application_post_session' => [
 			'mysql' => "INSERT IGNORE INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
-			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) " .
+			'sqlsrv' => "MERGE INTO caro_sessions AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id ) " .
 						"WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP " .
 						"WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP);"
 		],
@@ -494,9 +501,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) " .
 						"VALUES (:id, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete) " .
 						"ON DUPLICATE KEY UPDATE span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete",
-			'sqlsrv' => "MERGE INTO caro_calendar WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :type AS type, :span_start AS span_start, :span_end AS span_end, :author_id AS author_id, :affected_user_id AS affected_user_id, :organizational_unit AS organizational_unit, (CASE WHEN :subject IS NULL THEN NULL ELSE N':subject' END) AS subject, (CASE WHEN :misc IS NULL THEN NULL ELSE N':misc' END) AS misc, (CASE WHEN :closed IS NULL THEN NULL ELSE N':closed' END) AS closed, :alert AS alert, :autodelete AS autodelete) AS source " .
-						"(id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_calendar AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET span_start = CONVERT(datetime, :span_start, 120), span_end = CONVERT(datetime, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = (CASE WHEN :subject IS NULL THEN NULL ELSE N':subject' END), misc = (CASE WHEN :misc IS NULL THEN NULL ELSE N':misc' END), closed = (CASE WHEN :closed IS NULL THEN NULL ELSE N':closed' END), alert = :alert, autodelete = :autodelete " .
 						"WHEN NOT MATCHED THEN INSERT (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (:type, CONVERT(datetime, :span_start, 120), CONVERT(datetime, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, (CASE WHEN :subject IS NULL THEN NULL ELSE N':subject' END), (CASE WHEN :misc IS NULL THEN NULL ELSE N':misc' END), (CASE WHEN :closed IS NULL THEN NULL ELSE N':closed' END), :alert, :autodelete);"
 		],
@@ -539,9 +545,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, products, evaluation) " .
 						"VALUES (:id, :hidden, :name, :info, :products, :evaluation) " .
 						"ON DUPLICATE KEY UPDATE hidden = :hidden, name = :name, info = :info, products = :products, evaluation = :evaluation",
-			'sqlsrv' => "MERGE INTO caro_consumables_vendors WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END) AS hidden, N:name AS name, (CASE WHEN :info IS NULL THEN NULL ELSE N':info' END) AS info, (CASE WHEN :products IS NULL THEN NULL ELSE N':products' END) AS products, (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END) AS evaluation) AS source " .
-						"(id, hidden, name, info, products, evaluation) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_consumables_vendors AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET hidden = (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), name = N:name, info = (CASE WHEN :info IS NULL THEN NULL ELSE N':info' END), products = (CASE WHEN :products IS NULL THEN NULL ELSE N':products' END), evaluation = (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END) " .
 						"WHEN NOT MATCHED THEN INSERT (hidden, name, info, products, evaluation) VALUES ((CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), N:name, (CASE WHEN :info IS NULL THEN NULL ELSE N':info' END), (CASE WHEN :products IS NULL THEN NULL ELSE N':products' END), (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END));"
 		],
@@ -638,9 +643,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden, approval) " .
 						"VALUES (:id, :name, CURRENT_TIMESTAMP, :author, :content, :hidden, :approval) " .
 						"ON DUPLICATE KEY UPDATE name = :name, author = :author, content = :content, hidden = :hidden, approval = :approval",
-			'sqlsrv' => "MERGE INTO caro_csvfilter WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:name AS name, N:content AS content) AS source " .
-						"(id, name, content) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_csvfilter AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = N:name, author = N:author, content = N:content, hidden = (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), approval = (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END) " .
 						"WHEN NOT MATCHED THEN INSERT (name, date, author, content, hidden, approval) VALUES (N:name, CURRENT_TIMESTAMP, N:author, N:content, (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END));"
 		],
@@ -698,9 +702,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) " .
 						"VALUES (:id, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access, :patient_access) " .
 						"ON DUPLICATE KEY UPDATE alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access",
-			'sqlsrv' => "MERGE INTO caro_documents WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:name AS name, N:alias AS alias, :context AS context, :unit AS unit, N:author AS author, N:content AS content, (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END) AS hidden, (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END) AS approval, :regulatory_context AS regulatory_context, :permitted_export AS permitted_export, :restricted_access AS restricted_access, :patient_access AS patient_access) AS source " .
-						"(id, name, alias, context, unit, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_documents AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET alias = N:alias, context = :context, unit = :unit, author = N:author, content = N:content, hidden = (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), approval = (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END), regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access " .
 						"WHEN NOT MATCHED THEN INSERT (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) VALUES (N:name, N:alias, :context, :unit, CURRENT_TIMESTAMP, N:author, N:content, NULL, NULL, :regulatory_context, :permitted_export, :restricted_access, :patient_access);"
 		],
@@ -849,9 +852,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) " .
 						"VALUES (:id, :order_data) " .
 						"ON DUPLICATE KEY UPDATE order_data = :order_data",
-			'sqlsrv' => "MERGE INTO caro_consumables_prepared_orders WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:order_data AS order_data) AS source " .
-						"(id, order_data) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_consumables_prepared_orders AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET order_data = N:order_data " .
 						"WHEN NOT MATCHED THEN INSERT (order_data) VALUES (N:order_data);"
 		],
@@ -941,9 +943,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) " .
 						"VALUES (:order_id, :order_data, :organizational_unit, :orderer_name, :approved, :ordered, :delivered_partially, :delivered_full, :ordertype) " .
 						"ON DUPLICATE KEY UPDATE order_data = :order_data, delivered_partially = :delivered_partially, delivered_full = :delivered_full, ordertype = :ordertype",
-			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :order_id AS order_id, N:order_data AS order_data, :organizational_unit as organizational_unit, N:orderer_name as orderer_name, CONVERT(datetime, :approved, 120) AS approved, CONVERT(datetime, :ordered, 120) AS ordered, CONVERT(datetime, :delivered_partially, 120) AS delivered_partially, CONVERT(datetime, :delivered_full, 120) AS delivered_full, :ordertype AS ordertype) AS source " .
-						"(order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) ON (target.order_id = source.order_id) " .
+			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics AS target USING " .
+						"(SELECT :order_id AS order_id) AS source (order_id) ON (target.order_id = source.order_id) " .
 						"WHEN MATCHED THEN UPDATE SET order_data = N:order_data, delivered_partially = CONVERT(datetime, :delivered_partially, 120), delivered_full = CONVERT(datetime, :delivered_full, 120), ordertype = :ordertype " .
 						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, organizational_unit, orderer_name, approved, ordered, delivered_partially, delivered_full, ordertype) VALUES (:order_id, N:order_data, :organizational_unit, N:orderer_name, CONVERT(datetime, :approved, 120), CONVERT(datetime, :ordered, 120), CONVERT(datetime, :delivered_partially, 120), CONVERT(datetime, :delivered_full, 120), :ordertype);"
 													// ^^^^^^^^ insert id here as opposed to other merged queries because most other tables have id as auto increment, but this is primary only	
@@ -967,9 +968,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access, unit) " .
 						"VALUES (:id, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL, :restricted_access, :unit) " .
 						"ON DUPLICATE KEY UPDATE case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note, restricted_access = :restricted_access, unit = :unit",
-			'sqlsrv' => "MERGE INTO caro_records WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :context AS context, :case_state AS case_state, :record_type AS record_type, N:identifier AS identifier, :last_user AS last_user, (CASE WHEN :last_document IS NULL THEN NULL ELSE N':last_document' END) AS last_document, N:content AS content, :lifespan AS lifespan, :erp_case_number AS erp_case_number, (CASE WHEN :note IS NULL THEN NULL ELSE N':note' END) AS note, :restricted_access AS restricted_access, :unit AS unit) AS source " .
-						"(id, context, case_state, record_type, identifier, last_user, last_document, content, lifespan, erp_case_number, note, restricted_access, unit) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_records AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = N:identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = (CASE WHEN :last_document IS NULL THEN NULL ELSE N':last_document' END), content = N:content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = (CASE WHEN :note IS NULL THEN NULL ELSE N':note' END), restricted_access = :restricted_access, unit = :unit " .
 						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note, restricted_access, unit) VALUES (:context, NULL, :record_type, N:identifier, :last_user, CURRENT_TIMESTAMP, (CASE WHEN :last_document IS NULL THEN NULL ELSE N':last_document' END), N:content, NULL, NULL, NULL, NULL, NULL, :restricted_access, :unit);"
 		],
@@ -1028,9 +1028,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_risks (id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) " .
 						"VALUES (:id, :type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author) " .
 						"ON DUPLICATE KEY UPDATE risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden",
-			'sqlsrv' => "MERGE INTO caro_risks WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :type AS type, N:process AS process, N:risk AS risk, :relevance AS relevance, (CASE WHEN :cause IS NULL THEN NULL ELSE N':cause' END) AS cause, (CASE WHEN :effect IS NULL THEN NULL ELSE N':effect' END) AS effect, :probability AS probability, :damage AS damage, N:measure AS measure, :measure_probability AS measure_probability, :measure_damage AS measure_damage, (CASE WHEN :risk_benefit IS NULL THEN NULL ELSE N':risk_benefit' END) AS risk_benefit, (CASE WHEN :measure_remainder IS NULL THEN NULL ELSE N':measure_remainder' END) AS measure_remainder, (CASE WHEN :proof IS NULL THEN NULL ELSE N':proof' END) AS proof, :date AS date, N:author AS author) AS source " .
-						"(id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_risks AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET risk = N:risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = N:proof, hidden = N:hidden " .
 						"WHEN NOT MATCHED THEN INSERT (type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author, hidden) VALUES (:type, N:process, N:risk, :relevance, (CASE WHEN :cause IS NULL THEN NULL ELSE N':cause' END), (CASE WHEN :effect IS NULL THEN NULL ELSE N':effect' END), :probability, :damage, N:measure, :measure_probability, :measure_damage, (CASE WHEN :risk_benefit IS NULL THEN NULL ELSE N':risk_benefit' END), (CASE WHEN :measure_remainder IS NULL THEN NULL ELSE N':measure_remainder' END), (CASE WHEN :proof IS NULL THEN NULL ELSE N':proof' END), CURRENT_TIMESTAMP, N:author, NULL);"
 		],
@@ -1053,9 +1052,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, type, hidden, approval, linked_files) " .
 						"VALUES (:id, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden, :approval, :linked_files) " .
 						"ON DUPLICATE KEY UPDATE name = :name, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, linked_files = :linked_files",
-			'sqlsrv' => "MERGE INTO caro_texttemplates WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:name AS name, N:content AS content, :type as type) AS source " .
-						"(id, name, content, type) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_texttemplates AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = N:name, unit = :unit, author = N:author, content = N:content, hidden = (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), approval = (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END), linked_files = (CASE WHEN :linked_files IS NULL THEN NULL ELSE N':linked_files' END) " .
 						"WHEN NOT MATCHED THEN INSERT (name, unit, date, author, content, type, hidden, approval, linked_files) VALUES (N:name, :unit, CURRENT_TIMESTAMP, N:author, N:content, N:type, (CASE WHEN :hidden IS NULL THEN NULL ELSE N':hidden' END), (CASE WHEN :approval IS NULL THEN NULL ELSE N':approval' END), (CASE WHEN :linked_files IS NULL THEN NULL ELSE N':linked_files' END));"
 		],
@@ -1086,9 +1084,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) " .
 						"VALUES (:id, :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills, :invalidation_date, :two_factor) " .
 						"ON DUPLICATE KEY UPDATE name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills, invalidation_date = :invalidation_date, two_factor = :two_factor",
-			'sqlsrv' => "MERGE INTO caro_user WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, N:name AS name, :permissions AS permissions, :units AS units, :token AS token, :orderauth AS orderauth, :image AS image, (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END) AS app_settings, :skills AS skills, :invalidation_date AS invalidation_date, :two_factor AS two_factor) AS source " .
-						"(id, name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_user AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = N:name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END), skills = :skills, invalidation_date = :invalidation_date, two_factor = :two_factor " .
 						"WHEN NOT MATCHED THEN INSERT (name, permissions, units, token, orderauth, image, app_settings, skills, invalidation_date, two_factor) VALUES (N:name, :permissions, :units, :token, :orderauth, :image, (CASE WHEN :app_settings IS NULL THEN NULL ELSE N':app_settings' END), :skills, :invalidation_date, :two_factor);",
 		],
@@ -1119,9 +1116,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) " .
 						"VALUES (:id, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description) " .
 						"ON DUPLICATE KEY UPDATE user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description",
-			'sqlsrv' => "MERGE INTO caro_user_responsibility WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :user_id AS user_id, :units AS units, :assigned_users AS assigned_users, :proxy_users AS proxy_users, :span_start AS span_start, :span_end AS span_end, (CASE WHEN :responsibility IS NULL THEN NULL ELSE N':responsibility' END) AS responsibility, (CASE WHEN :description IS NULL THEN NULL ELSE N':description' END) AS description) AS source " .
-						"(id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_user_responsibility AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = (CASE WHEN :responsibility IS NULL THEN NULL ELSE N':responsibility' END), description = (CASE WHEN :description IS NULL THEN NULL ELSE N':description' END) " .
 						"WHEN NOT MATCHED THEN INSERT (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) VALUES (:user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), (CASE WHEN :responsibility IS NULL THEN NULL ELSE N':responsibility' END), (CASE WHEN :description IS NULL THEN NULL ELSE N':description' END));",
 		],
@@ -1148,9 +1144,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) " .
 						"VALUES (:id, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation, :planned) " .
 						"ON DUPLICATE KEY UPDATE name = :name, date = :date, expires = :expires, experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned",
-			'sqlsrv' => "MERGE INTO caro_user_training WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :user_id AS user_id, N:name AS name, :date AS date, :expires AS expires, :experience_points AS experience_points, :file_path AS file_path, (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END) AS evaluation, :planned AS planned) AS source " .
-						"(id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_user_training AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = N:name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END), planned = :planned " .
 						"WHEN NOT MATCHED THEN INSERT (user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES (:user_id, N:name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, (CASE WHEN :evaluation IS NULL THEN NULL ELSE N':evaluation' END), :planned);",
 		],
@@ -1173,9 +1168,8 @@ class SQLINTERFACE {
 			'mysql' => "INSERT INTO caro_whiteboard (id, user_id, name, last_touch, organizational_unit, content, doodle) " .
 						"VALUES (:id, :user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content, :doodle) " .
 						"ON DUPLICATE KEY UPDATE name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content, doodle = :doodle",
-			'sqlsrv' => "MERGE INTO caro_whiteboard WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :user_id AS user_id, N:name AS name, CURRENT_TIMESTAMP AS last_touch, :organizational_unit AS organizational_unit, (CASE WHEN :content IS NULL THEN NULL ELSE N':content' END) AS content, :doodle AS doodle) AS source " .
-						"(id, user_id, name, last_touch, organizational_unit, content, doodle) ON (target.id = source.id) " .
+			'sqlsrv' => "MERGE INTO caro_whiteboard AS target USING " .
+						"(SELECT :id AS id) AS source (id) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = N:name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = (CASE WHEN :content IS NULL THEN NULL ELSE N':content' END), doodle = :doodle " .
 						"WHEN NOT MATCHED THEN INSERT (user_id, name, last_touch, organizational_unit, content, doodle) VALUES (:user_id, N:name, CURRENT_TIMESTAMP, :organizational_unit, (CASE WHEN :content IS NULL THEN NULL ELSE N':content' END), :doodle);",
 		],
