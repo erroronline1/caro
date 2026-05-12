@@ -12,7 +12,7 @@ graph LR;
     test-->alpha["Alpha testing
     with selected users"];
     alpha-->datasafety[Data safety approval];
-    datasafety-.->it{{IT approval}};
+    datasafety-.->it[IT approval];
     it-.->network{{"Network environment
     and infrastructure"}};
     network-.->beta{{"Beta testing"}};
@@ -31,8 +31,11 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
-    * in case [sql cluster switch](#rejected-requirements) raises issues
+    * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeates connection attempt
     * on repeated failure parent::response(203|207)?
+* markdown exclude formatting characters in links somehow (buffer detected links?) OR urlencode/decode _client.message.newMessage content (maybe a flag if encoded)
+* row/column alignment for qrcodePDF still off
+* tidy, rephrase readme
 
 ## Content
 * [Aims](#aims)
