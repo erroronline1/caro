@@ -32,7 +32,7 @@ class SQLTEST {
 	 * 10k insertions take about 30s of time, selections about 20s  
 	 * set to an appropriate amount, make a cluster switch meanwhile and check for potential losses
 	 */
-	private int $_insertions = 10_000;
+	private int $_insertions = 5_000;
 	
 	/**
 	 * *id* primary key, auto increment  
@@ -40,7 +40,6 @@ class SQLTEST {
 	 * *timestamp* datetime
 	 */
 	private string $_table = 'dbo.Table_1';
-
 
 	public function __construct(){
 		$this->_sqlinterface = new SQLINTERFACE([
