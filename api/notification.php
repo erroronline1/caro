@@ -634,7 +634,7 @@ class NOTIFICATION extends API {
 											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
 												':days' => $delivered_full->diff($this->_date['servertime'])->days,
 												':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
-												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . $decoded_order_data['commission'] . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
+												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . rawurlencode($decoded_order_data['commission']) . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
 												':vendor' => strip_tags($decoded_order_data['vendor_label'] ?? ''),
 												':commission' => preg_replace('/\*/', '\\*', addslashes(strip_tags($decoded_order_data['commission']))), // add asterisk masking to avoid dob resulting in wrong formatting
 												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
