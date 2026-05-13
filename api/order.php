@@ -174,7 +174,7 @@ class ORDER extends API {
 								$message = str_replace("\n", ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . rawurlencode($this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']])) . '\', \'' . rawurlencode($_SESSION['user']['name']) . '\', \'' . rawurlencode(str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true) . ',' . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'))))) . '\', {}, [], true)">' . $_SESSION['user']['name'] . '</a>'
 									], true)) . "\n  \n" . strip_tags(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')));
 								// userlist to decode orderer
 								$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
@@ -236,7 +236,7 @@ class ORDER extends API {
 									$this->alertUserGroup(['unit' => [$organizational_unit]], str_replace("\n", ', ', $this->_lang->GET('order.alert_orderstate_change', [
 										':order' => $this->_lang->GET('order.message', $messagepayload, true),
 										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . rawurlencode($this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']])) . '\', \'' . rawurlencode($_SESSION['user']['name']) . '\', \'' . rawurlencode(str_replace(["\n", "\r"], [', ', ''], $this->_lang->GET('order.message', $messagepayload, true))) . '\', {}, [], true)">' . $_SESSION['user']['name'] . '</a>',
 									])));
 								}
 								break;

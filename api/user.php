@@ -896,7 +896,7 @@ class USER extends API {
 						}
 						foreach ($roles as $key => &$values){
 							$values = array_unique($values);
-							$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('message.message.message_to', [':user' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
+							$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. rawurlencode($this->_lang->GET('message.message.message_to', [':user' => $v])) .'\', \'' . rawurlencode($v) . '\', \'\', {}, [], true)">' . $v . '</a>', $values);
 						}
 						preg_match('/[^ ]*caro/m', $user[':name'], $name_cousin);
 						$message = [
