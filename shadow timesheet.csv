@@ -430,3 +430,5 @@
 07.05.26,1,pdf-library
 08.05.26,9,"sql-interface, filehandler, code maintenance"
 09.05.26,9,"pdf-library, sql-interface, documentation"
+12.05.26,2,"maintenance-api, pdf-library, audit-api"
+13.05.26,5,"code maintenance, markdown"

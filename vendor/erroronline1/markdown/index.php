@@ -23,10 +23,10 @@ $methods = [
 	"image",
 	"mark",
 	"strikethrough",
-	"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 	"subscript",
 	"superscript",
 	"table",
+	"fontsize", // after tables for handling -- characters; THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 	"typographer",
 	"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 	"linebreak",

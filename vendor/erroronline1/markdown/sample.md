@@ -19,7 +19,7 @@ By adding decorators in the right place you achieve mid*word*emphasis and *also 
 Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk** or ~~striked \~~ through~~.  
 Subscript like H~2~O, superscript like X^2^ and ==marked text== are available.  
-A custom markdown for this processor can make ^^font larger^^
+A custom markdown for this processor can make ++font larger++ or --smaller--
 
 Substitutions (SETX h1 header)
 ======================

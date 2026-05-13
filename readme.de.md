@@ -1263,7 +1263,7 @@ Durch das Hinzufügen von Formatierungszeichen an der richtigen Stelle kann eine
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~.  
 Tiefgestellt wie H~2~O und hochgestellt wie X^2^ und ==markierter Text== stehen zur Verfügung.  
-Ein individuelles Markdown für diese Engine kann ^^Schrift vergrößern^^  
+Ein individuelles Markdown für diese Engine kann ++Schrift vergrößern++ oder --verleinern--.  
 
 Ersetzungen (SETX h1 Überschrift)
 ======================

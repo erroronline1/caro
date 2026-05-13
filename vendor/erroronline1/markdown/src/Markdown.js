@@ -36,7 +36,7 @@ export class Markdown {
 	_headings = /(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/gm; // must be first line or have a linebreak before
 	_horizontal_rule = /^ {0,3}(?:\-|\- |\*|\* ){3,}$/gm;
 	_image = /(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/g;
-	_larger = /(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/g;
+	_fontsize = /(?<!\\)((?:\+|-){2,})([^\n]+?)(?<!\\| |\n)\1(?!((?:\+|-)))/g;
 	_linebreak = / +\n/g;
 	_list = /((?:^)(\*|\-|\+|\d+\.) {1,3}(?:.|\n)+?)(?:\n$)/gm;
 	_mailto = /([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/g;
@@ -92,21 +92,16 @@ export class Markdown {
 		"image",
 		"mark",
 		"strikethrough",
-		"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 		"subscript",
 		"superscript",
 		"table",
+		"fontsize", // after tables for handling -- characters; THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 		"typographer",
 		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		"linebreak",
 	];
 
-	_nested_blocks = [
-		'blockquote',
-		'code',
-		'definition',
-		'table',
-	];
+	_nested_blocks = ["blockquote", "code", "definition", "table"];
 
 	/**
 	 * entry method to convert a text to markdown
@@ -137,11 +132,11 @@ export class Markdown {
 
 	/**
 	 * methods to run within nested elements like lists and footnotes
-	 * 
-	 * @param {string} content 
+	 *
+	 * @param {string} content
 	 * @returns string
 	 */
-	nested_blocks(content){
+	nested_blocks(content) {
 		this._nested_blocks.forEach((method) => {
 			if (!this._limitTo.length || this._limitTo.includes(method))
 				if (["blockquote"].includes(method)) content = this[method](content, true);
@@ -297,6 +292,19 @@ export class Markdown {
 	}
 
 	/**
+	 * replace fontsize decorator
+	 * THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+	 *
+	 * @param {string} content
+	 * @returns string
+	 */
+	fontsize(content) {
+		return content.replaceAll(this._fontsize, (...match) => {
+			return '<span class="eol1_md" style="font-size:' + (match[1].substring(0, 2) === "++" ? "larger" : "smaller") + ';">' + this.fontsize(match[0].substring(2, match[0].length - 2)) + "</span>";
+		});
+	}
+
+	/**
 	 * replace footnote references with links an append an actual footnote list at the end of the content
 	 * no need for safeMode, since these are internal links only
 	 *
@@ -353,7 +361,7 @@ export class Markdown {
 				size = match[5].startsWith("=") ? 1 : 2;
 				heading = match[4].trim();
 			}
-			id = heading.replaceAll(/[^\w\d\s]/ug, "");
+			id = heading.replaceAll(/[^\w\d\s]/gu, "");
 			if (match[3] || id) {
 				id = (match[3] || id).trim().replaceAll(/\s/g, "-").toLowerCase();
 				// enumerate
@@ -389,17 +397,6 @@ export class Markdown {
 	 */
 	image(content) {
 		return content.replaceAll(this._image, '<img alt="$1" src="$2" class="eol1_md" />');
-	}
-
-	/**
-	 * replace lager font decorator
-	 * THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
-	 *
-	 * @param {string} content
-	 * @returns string
-	 */
-	larger(content) {
-		return content.replaceAll(this._larger, '<span class="eol1_md" style="font-size:larger;">$1</span>');
 	}
 
 	/**

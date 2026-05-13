@@ -39,7 +39,7 @@ class Markdown {
 	private $_headings = '/(?:^)(#+ )(.+?)(?: {#(.+?)}){0,1}(?:#*)$|(?:^)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_horizontal_rule = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_image = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
-		private $_larger = '/(?<!\\)\^{2}([^\n]+?)(?<!\\| |\n)\^{2}/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_fontsize = '/(?<!\\)((?:\+|-){2,})([^\n]+?)(?<!\\| |\n)\1(?!((?:\+|-)))/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_linebreak = '/ +\n/';
 	private $_list = '/((?:^)(\*|\-|\+|\d+\.) {1,3}(?:.|\n)+?)(?:\n$|\Z)/m';
 		private $_mailto = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
@@ -95,10 +95,10 @@ class Markdown {
 		"image",
 		"mark",
 		"strikethrough",
-		"larger", // before superscript for using the same character twice THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 		"subscript",
 		"superscript",
 		"table",
+		"fontsize", // after tables for handling -- characters; THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
 		"typographer",
 		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		"linebreak",
@@ -128,7 +128,7 @@ class Markdown {
 		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!^)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/m';
 		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|>|\^|\[|\]|\(|\)|\||=|_)/';
 		$this->_mailto = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
-		$this->_larger = '/(?<!' . preg_quote('\\', '/') . ')\^{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\^{2}/';
+		$this->_fontsize = '/(?<!' . preg_quote('\\', '/') . ')((?:\+|-){2,})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1(?!((?:\+|-)))/';
 		$this->_reference = '/(?:(?<!!|' . preg_quote('\\', '/') . ')\[)(.+?)(?:(?<!' . preg_quote('\\', '/') . ')\])(?:\[)(.+?)(?:\])|(?:^\[)([^^]+?)(?:\]:)(.+)$/m';
 		$this->_safeMode = '/<\/{0,1} {0,}(a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video|xmp)|on\w+?=(\'|").+?(?<!' . preg_quote('\\', '/') . ')\2/mi';
 		$this->_strikethrough = '/(?<!' . preg_quote('\\', '/') . ')~{2}([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~{2}/';
@@ -461,6 +461,22 @@ class Markdown {
 	}
 
 	/**
+	 * replace fontsize decorator
+	 * THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+	 * 
+	 * @param string $content
+	 * @return string
+	 */
+	private function fontsize($content){
+		return preg_replace_callback($this->_fontsize,
+			function ($match){
+				return '<span class="eol1_md" style="font-size:' . (substr($match[1], 0, 2) == '++' ? 'larger' : 'smaller') . ';">' . $this->fontsize(substr($match[0], 2, -2)) . '</span>';
+			},
+			$content
+		);
+	}
+
+	/**
 	 * replace footnote references with links an append an actual footnote list at the end of the content
 	 * no need for safeMode, since these are internal links only
 	 * 
@@ -565,20 +581,6 @@ class Markdown {
 			$content
 		);
 
-	}
-
-	/**
-	 * replace lager font decorator
-	 * THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
-	 * 
-	 * @param string $content
-	 * @return string
-	 */
-	private function larger($content){
-		return preg_replace($this->_larger,
-			'<span class="eol1_md" style="font-size:larger;">$1</span>',
-			$content
-		);
 	}
 
 	/**

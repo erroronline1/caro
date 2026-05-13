@@ -31,12 +31,9 @@ Things are still in motion. Images may be outdated.
 * review openspout ods cell formatting
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
-    * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeates connection attempt
+    * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
-* markdown exclude formatting characters in links somehow (buffer detected links?) OR urlencode/decode _client.message.newMessage content (maybe a flag if encoded)
-* row/column alignment for qrcodePDF still off
 * tidy, rephrase readme
-* ini dumper does not work properly in maintenance, refactor
 
 ## Content
 * [Aims](#aims)
@@ -1361,7 +1358,7 @@ By adding decorators in the right place you achieve mid*word*emphasis and *also 
 Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk** or ~~striked \~~ through~~.  
 Subscript like H~2~O, superscript like X^2^ and ==marked text== are available.  
-A custom markdown for this processor can make ^^font larger^^
+A custom markdown for this processor can make ++font larger++ or --smaller--
 
 Substitutions (SETX h1 header)
 ======================
@@ -6659,7 +6656,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v2.2.0
+    * v3.0.0
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
