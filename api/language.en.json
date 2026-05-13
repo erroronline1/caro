@@ -3,7 +3,8 @@
 	"_IMPORTANT": "see _language.md",
 	"company": {
 		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland",
-		"mail": "office@mam.tld",
+		"appointmentmail": "appointment@mam.tld",
+		"officemail": "office@mam.tld",
 		"phone": "01234 567890"
 	},
 	"permissions": {
@@ -764,7 +765,7 @@
 			"occasion": "Occasion",
 			"occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
 			"pdf": "PDF handout with QR appointment",
-			"readable": "Your appointment at :company\n\nfor :occasion\non :start\nuntil around :end\n\nPlease remember: :reminder\n\nPhone: :phone\neMail: :mail",
+			"readable": "Your appointment at :company\n \nfor :occasion\non :start\nuntil around :end\n \nPlease remember: :reminder\n \nPhone: :phone\neMail: :mail",
 			"reminder": "Reminder",
 			"reminder_default": "Please let us know if you cannot make the appointment.",
 			"reminder_hint": "e.g. remember bringing shoes",
@@ -1467,7 +1468,7 @@
 			"success": "Incorporation has been saved"
 		},
 		"manual_match": "Are you sure the requested product is not in the database?",
-		"message": ":quantity :unit :number :name by :vendor :aut_idem for :commission\\n:info",
+		"message": ":quantity :unit :number :name by :vendor :aut_idem for :commission\n:info",
 		"message_orderer": "Message to orderer :orderer",
 		"message_to_orderer": "Send message",
 		"navigation": {
@@ -1518,7 +1519,7 @@
 			"cancellation": "Cancellation"
 		},
 		"organizational_unit": "Organizational unit",
-		"prepared_order_item": "**^^:quantity^^** :unit :number :name by :vendor :aut_idem",
+		"prepared_order_item": "**++:quantity++** :unit :number :name by :vendor :aut_idem",
 		"product_not_in_database": "Product not in Database",
 		"productlink": "go to product",
 		"productname_label": "Product name",

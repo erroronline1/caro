@@ -3,7 +3,8 @@
 	"_IMPORTANT": "see _language.md",
 	"company": {
 		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland",
-		"mail": "office@mam.tld",
+		"appointmentmail": "appointment@mam.tld",
+		"officemail": "office@mam.tld",
 		"phone": "01234 567890"
 	},
 	"permissions": {
@@ -764,7 +765,7 @@
 			"occasion": "Anlass",
 			"occasion_hint": "z.B. Gipsabdruck für Orthese, Prothesenanprobe, etc.",
 			"pdf": "PDF Ausdruck mit QR-Code für Termin",
-			"readable": "Ihr Termin bei :company\n\nfür :occasion\nam :start\nbis etwa :end\n\nBitte denken Sie daran: :reminder\n\nTelefon: :phone\neMail: :mail",
+			"readable": "Ihr Termin bei :company\n \nfür :occasion\nam :start\nbis etwa :end\n \nBitte denken Sie daran: :reminder\n \nTelefon: :phone\neMail: :mail",
 			"reminder": "Erinnerung",
 			"reminder_default": "Sagen Sie uns bitte bescheid, falls Sie den Termin nicht wahrnehmen können.",
 			"reminder_hint": "z.B. Vergessen Sie nicht passende Schuhe mitzubringen",
@@ -1467,7 +1468,7 @@
 			"success": "Die Angaben zur Einführung wurde gespeichert"
 		},
 		"manual_match": "Ist der Artikel vielleicht doch in der Datenbank?",
-		"message": ":quantity :unit :number :name von :vendor :aut_idem für :commission\\n:info",
+		"message": ":quantity :unit :number :name von :vendor :aut_idem für :commission\n:info",
 		"message_orderer": "Mitteilung an Besteller :orderer",
 		"message_to_orderer": "Mitteilung senden",
 		"navigation": {
@@ -1518,7 +1519,7 @@
 			"cancellation": "Stornierung"
 		},
 		"organizational_unit": "Bereich",
-		"prepared_order_item": "**^^:quantity^^** :unit :number :name von :vendor :aut_idem",
+		"prepared_order_item": "**++:quantity++** :unit :number :name von :vendor :aut_idem",
 		"product_not_in_database": "Artikel nicht in Datenbank",
 		"productlink": "zum Artikel",
 		"productname_label": "Artikelname",
