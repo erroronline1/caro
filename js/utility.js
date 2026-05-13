@@ -1369,7 +1369,7 @@ export const _client = {
 					});
 				}
 
-				// append orderer and message option
+				// append message option to purchase
 				if (element.purchasemembers) {
 					buttons = {};
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
@@ -1379,6 +1379,7 @@ export const _client = {
 						href: "javascript:void(0)",
 						"data-type": "input",
 						class: "messageto",
+						style: "--icon: url('./media/shopping-bag.svg')",
 						onclick: function () {
 							console.log("element.information");
 							_client.message.newMessage(
