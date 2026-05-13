@@ -17,13 +17,13 @@ define('K_PATH_FONTS', realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font
 require_once(__DIR__ . '/../api/_filehandler.php');
 
 class PDF{
-	private $_pageSetup = [];
-	private $_pdf = null;
-	public $_sqlinterface = null;
-	public $_filehandler = null;
-	private $_markdown = null;
-	private $_markdown_css = null;
-	private $_fileContent = [];
+	private array $_pageSetup = [];
+	private mixed $_pdf = null;
+	public mixed $_sqlinterface = null;
+	public mixed $_filehandler = null;
+	private mixed $_markdown = null;
+	private string $_markdown_css = '';
+	private array $_fileContent = [];
 
 	/**
 	 * initiates a pdf file with passed page settings
@@ -361,7 +361,7 @@ class PDF{
 				if (gettype($value) === 'array') {
 					$value = implode("  \n", array_keys($value));
 				}
-				$value = $this->_markdown_css . $this->_markdown->md2html($value, true, ["list", "emphasis", "larger", "linebreak"]);
+				$value = $this->_markdown_css . $this->_markdown->md2html($value, true, ["list", "emphasis", "fontsize", "linebreak"]);
 			}
 			$this->writeStandardHTML($commission);
 		}
@@ -372,11 +372,9 @@ class PDF{
 	 * create a pdf for a label sheet with qr code and plain text  
 	 * or label for label printer as selected or other available type as per config.ini  
 	 * or an appointment handout  
-	 * $fileContent['content'] is an array of [qrcode content, written text beside]  
-	 * @param array $fileContent
-	 * @param float $fontSize defaults to 8 but can be overridden, e.g. by calendar appointment handout
+	 * @param array $fileContent is an array of [qrcode content, written text beside]  
 	 */
-	public function qrcodePDF($fileContent, $fontSize = 8){
+	public function qrcodePDF($fileContent){
 		$this->init($fileContent);
 
 		// override default cell padding
@@ -385,6 +383,8 @@ class PDF{
 		$page = $this->_pdf->page->getPage();
 		$columnwidth = intval(($page['width'] - ($this->_pageSetup['marginleft'] + $this->_pageSetup['marginright'])) / $this->_pageSetup['columns'] - $this->_pageSetup['column_gap']);
 		$rowheight = intval(($page['height'] - ($this->_pageSetup['margintop'] + $this->_pageSetup['marginbottom'])) / $this->_pageSetup['rows'] - $this->_pageSetup['row_gap']);
+		$distributed_column_gap = $this->_pageSetup['columns'] > 1 ? ($this->_pageSetup['column_gap'] / ($this->_pageSetup['columns'] - 1) * $this->_pageSetup['columns']) : 0;
+		$distributed_row_gap = $this->_pageSetup['rows'] > 1 ? ($this->_pageSetup['row_gap'] / ($this->_pageSetup['rows'] - 1) * $this->_pageSetup['rows']) : 0;
 
 		$codesize = intval(min($columnwidth, $rowheight, $this->_pageSetup['codesizelimit'] ? : $rowheight * .7));
 		for ($row = 0; $row < $this->_pageSetup['rows']; $row++){
@@ -392,8 +392,8 @@ class PDF{
 				$this->_pdf->page->addContent($this->_pdf->getBarcode(
 					type: 'QRCODE,' . CONFIG['limits']['quality']['qr_errorlevel'],
 					code: $fileContent['content'][0],
-					posx: $column * ($columnwidth + $this->_pageSetup['column_gap']) + $page['region'][0]['RX'],
-					posy: $row * ($rowheight + $this->_pageSetup['row_gap']) + $page['region'][0]['RY'],
+					posx: $column * ($columnwidth + $distributed_column_gap) + $page['region'][0]['RX'],
+					posy: $row * ($rowheight + $distributed_row_gap) + $page['region'][0]['RY'],
 					width: $codesize,
 					height: $codesize,
 					style: [
@@ -410,9 +410,9 @@ class PDF{
 				$this->_pdf->page->addContent($font['out']);
 				$text = $this->_pdf->getTextCell(
 					txt: $fileContent['content'][1],
-					posx: $column * ($columnwidth + $this->_pageSetup['column_gap']) + $codesize + $this->_pageSetup['codepadding'] + $page['region'][0]['RX'],
-					posy: $row * ($rowheight + $this->_pageSetup['row_gap']) + $page['region'][0]['RY'],
-					width: $columnwidth - $codesize - $this->_pageSetup['codepadding'],
+					posx: $column * ($columnwidth + $distributed_column_gap) + $codesize + $this->_pageSetup['codepadding'] + $page['region'][0]['RX'],
+					posy: $row * ($rowheight + $distributed_row_gap) + $page['region'][0]['RY'],
+					width: $columnwidth  - $codesize - $this->_pageSetup['codepadding'],
 					height: $rowheight,
 					valign: 'T',
 					halign: 'J'
@@ -607,16 +607,16 @@ class PDF{
 
 class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	// custom pdf header and footer
-	public $qrcodesize = null;
-	public $qrcodecontent = null;
-	public $header = null;
-	public $_pageSetup = null;
-	public $_defaultfont = null;
-	public $_contentCoordinates = [
+	public int $qrcodesize = 0;
+	public mixed $qrcodecontent = '';
+	public array $header = [];
+	public array $_pageSetup = [];
+	public mixed $_defaultfont = null;
+	public array $_contentCoordinates = [
 		'top' => null,
 		'bottom' => null
 	];
-	public $_lang = null;
+	public mixed $_lang = null;
 
 	public function __construct($pageSetup = [], $unicode = true, $qrcodesize = 20, $qrcodecontent = '', $header = ['title' => '', 'date' => '']){
 		parent::__construct(
