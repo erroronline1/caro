@@ -77,7 +77,7 @@ class CALENDAR extends API {
 						wordwrap("SUMMARY:" . $appointment['occasion'], 75, "\n ")  . "\n" .
 						"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
 						"CONTACT:" . $this->_lang->GET('company.phone') . "\n" .
-						"ORGANIZER:" . $this->_lang->GET('company.mail') . "\n" .
+						"ORGANIZER:" . $this->_lang->GET('company.appointmentmail') . "\n" .
 						"END:VEVENT\n" .
 						"END:VCALENDAR";
 
@@ -93,7 +93,7 @@ class CALENDAR extends API {
 								':end' => $this->convertFromServerTime(date("Y-m-d H:i", strtotime($appointment['datetime']) + intval($appointment['duration']) * 3600), true, false),
 								':reminder' => $appointment['reminder'],
 								':phone' => $this->_lang->GET('company.phone'),
-								':mail' => $this->_lang->GET('company.mail')
+								':mail' => $this->_lang->GET('company.appointmentmail')
 							], true)
 						],
 						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false))
