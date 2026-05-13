@@ -563,9 +563,10 @@ export const _client = {
 		 * @param {string} message optional preset
 		 * @param {object} options send, abort
 		 * @param {string, array} datalist possible recipients
+		 * @param {bool} decodeuri dialogheader, recipient, message
 		 * @event Dialog and eventually resolved post request
 		 */
-		newMessage: (dialogheader = "", recipient = "", message = "", options = {}, datalist = []) => {
+		newMessage: (dialogheader = "", recipient = "", message = "", options = {}, datalist = [], decodeuri = false) => {
 			if (!Object.keys(options)) {
 				options[api._lang.GET("order.add_information_cancel")] = false;
 				options[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
@@ -577,7 +578,7 @@ export const _client = {
 					type: "hidden",
 					attributes: {
 						name: api._lang.GET("message.message.to"),
-						value: recipient,
+						value: decodeuri ? decodeURI(recipient) : recipient,
 					},
 				},
 				{
@@ -585,7 +586,7 @@ export const _client = {
 					attributes: {
 						name: api._lang.GET("message.message.message"),
 						rows: 8,
-						value: message ? message + "\n\n" : "",
+						value: message ? (decodeuri ? decodeURI(message) : message) + "\n\n" : "",
 						id: "message",
 						autofocus: true,
 					},
@@ -613,7 +614,7 @@ export const _client = {
 			new Dialog(
 				{
 					type: "input",
-					header: dialogheader,
+					header: decodeuri ? decodeURI(dialogheader) : dialogheader,
 					render: body,
 					options: options,
 				},
@@ -961,7 +962,7 @@ export const _client = {
 						}) + (element.ordertext ? "\n" + element.ordertext : ""),
 					mdrestrictions: {
 						safeMode: true,
-						limitTo: ["list", "emphasis", "larger", "linebreak"],
+						limitTo: ["list", "emphasis", "fontsize", "linebreak"],
 					},
 					attributes: {
 						name: api._lang.GET("order.ordertype." + element.ordertype),
@@ -1418,8 +1419,8 @@ export const _client = {
 									element.information ? element.information.replaceAll('"', '\\"').replaceAll(/\n/g, "\\n") : "", // escape linebreaks for .toString() removes these
 									element.commission ? element.commission.replaceAll('"', '\\"') : "",
 									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
-									element.ordertext ? "\\n" + element.ordertext.replaceAll('"', '\\"') : "",
-									element.identifier ? "\\n" + element.identifier.replaceAll('"', '\\"') : "",
+									element.ordertext ? "\n" + element.ordertext.replaceAll('"', '\\"') : "",
+									element.identifier ? "\n" + element.identifier.replaceAll('"', '\\"') : "",
 									JSON.stringify(buttons),
 								]
 							),
