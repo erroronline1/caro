@@ -13,67 +13,6 @@ namespace CARO\API;
 
 // application maintainance tools
 
-/*
-https://github.com/mauris/ini-writer
-*/
-class Dumper {
-	/**
-	 * @param array $input
-	 */
-	public function dump($input)
-	{
-		$output = '';
-		foreach ($input as $section => $array) {
-			$output .= self::writeSection($section, $array);
-		}
-
-		return $output;
-	}
-
-	/**
-	 * @param string $section
-	 * @param array $array
-	 */
-	protected static function writeSection($section, $array)
-	{
-		$subsections = array();
-		$output = "[$section]\n";
-		foreach ($array as $key => $value) {
-			if (is_array($value) || is_object($value)) {
-				$key = $section . '.' . $key;
-				$subsections[$key] = (array) $value;
-			} else {
-				$output .= self::normalizeKey($key) . '=';
-				if (is_string($value)) {
-					$output .= '"' . addslashes($value) .'"';
-				} elseif (is_bool($value)) {
-					$output .= $value ? 'true' : 'false';
-				} else {
-					$output .= $value;
-				}
-				$output .= "\n";
-			}
-		}
-
-		if ($subsections) {
-			$output .= "\n";
-			foreach ($subsections as $subsection => $subarray) {
-				$output .= self::writeSection($subsection, $subarray);
-			}
-		}
-
-		return $output;
-	}
-
-	/**
-	 * @param string $key
-	 */
-	protected static function normalizeKey($key)
-	{
-		return str_replace('=', '_', $key);
-	}
-}
-
 class MAINTENANCE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
@@ -138,13 +77,13 @@ class MAINTENANCE extends API {
 	 */
 	private function erp_connection(){
 		$response = ['render' => ['content' => []]];
-		$config_copy = constant('CONFIG');
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				// reactivate erp_connection by restoring initial config
 				$unlinkfile = null;
 				if (is_file('_config.env')) {
 					// overwrite env file with copy and delete it
+					// one could keep it, but in case of changes this might become messy
 					copy('_config.env', 'config.env');
 					$unlinkfile = '_config.env';
 				}
@@ -168,15 +107,15 @@ class MAINTENANCE extends API {
 				break;
 			case 'DELETE':
 				// deactivate erp_connection by overriding config, saving current state as a copy or creating an env file
+				$config_copy = file_get_contents('config.ini');
 				if (is_file('config.env')) {
 					// create env file copy
 					copy('config.env', '_config.env');
+					$config_copy = file_get_contents('config.env');
 				}
-				// create or overwrite env file
-				$config_copy['system']['erp'] = false;
+				$config_copy = preg_replace('/^erp =.*?(;|$)/m', 'erp = no $1', $config_copy);
 
-				$dump = new Dumper();
-				if (file_put_contents('config.env', $dump->dump($config_copy))){
+				if (file_put_contents('config.env', $config_copy)){
 					$response['render']['content'][] = [
 						[
 							'type' => 'textsection',
@@ -200,7 +139,7 @@ class MAINTENANCE extends API {
 				'class' => 'red'
 			]
 		];
-		if ((ERPINTERFACE && ERPINTERFACE->_instatiated && $config_copy['system']['erp']) || $_SERVER['REQUEST_METHOD'] === 'PUT')
+		if ((ERPINTERFACE && ERPINTERFACE->_instatiated) || $_SERVER['REQUEST_METHOD'] === 'PUT')
 			$selection[$this->_lang->GET('maintenance.erp_connection.enabled')]['checked'] = true;
 		else
 			$selection[$this->_lang->GET('maintenance.erp_connection.disabled')]['checked'] = true;
@@ -236,7 +175,7 @@ class MAINTENANCE extends API {
 		
 		$methods = [
 			'cron_log',
-//			'erp_connection',
+			'erp_connection',
 			'records_datalist',
 			'riskupdate',
 			'vendorupdate',
