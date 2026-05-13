@@ -221,9 +221,15 @@ class AUDIT extends API {
 				// sanitize $recent preset to only questions and statement
 				if ($recent){
 					$recent['content'] =  json_decode($recent['content'], true);
-					foreach ($recent['content']['questions'] as $i => $set){
-						foreach ($set as $key => $value)
-						if (in_array($key, array_keys($this->_lang->_USER['audit']['audit']['execute'])) && !in_array($key, ['statement'])) unset($recent['content']['questions'][$i][$key]);
+					foreach ($recent['content']['questions'] as $i => &$set){
+						foreach ($set as $key => &$value){
+							if (in_array($key, array_keys($this->_lang->_USER['audit']['audit']['execute'])) && !in_array($key, ['statement'])) {
+								unset($recent['content']['questions'][$i][$key]);
+								continue;
+							}
+							// add blockquote markdown to former response/statement
+							$value[0] = $value[0] ? preg_replace('/^/m', '> ', $value[0]) . "\n\n" : $value[0];
+						}
 					}
 					$recent['content'] =  UTILITY::json_encode(['questions' => $recent['content']['questions']]);
 				}
@@ -393,6 +399,8 @@ class AUDIT extends API {
 									'onclick' => '_client.application.markdownpreview("auditquestion' . $number + 1 . '")'
 								]
 							], [
+								'type' => 'br'
+							], [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => implode(', ' , array_map(fn($r) => $this->_lang->_USER['regulatory'][$r] ?? $r, explode(',', $question['regulatory'])))
@@ -426,6 +434,8 @@ class AUDIT extends API {
 									'class' => 'floatright',
 									'onclick' => '_client.application.markdownpreview("auditstatement' . $number + 1 . '")'
 								]
+							], [
+								'type' => 'br'
 							], ...$proof
 						];	
 					}
