@@ -169,7 +169,7 @@
 			{
 				"question": "Was geschieht im Falle von Rückfragen durch den Kostenträger?",
 				"regulatory": "iso13485_4_2_5",
-				"hint": "z.B. fachliche Fragen: weiterleitung an Bereich"
+				"hint": "z.B. fachliche Fragen: Weiterleitung an Bereich"
 			},
 			{
 				"question": "Was gibt es zu beachten, wenn ein Kostenträger weitere Informationen zu einer Patientenversorgung anfordert?",
@@ -187,14 +187,14 @@
 				"hint": "z.B. Anwendung, Dokumentenpakete"
 			},
 			{
-				"question": "Wie werden Reklamationen on der Verwaltung bearbeitet?",
+				"question": "Wie werden Reklamationen von der Verwaltung bearbeitet?",
 				"regulatory": "iso13485_8_2_2",
 				"hint": ""
 			},
 			{
 				"question": "Wie lange werden Aufzeichnungen aufbewahrt?",
 				"regulatory": "iso13485_4_2_5",
-				"hint": "Aubewahrungsfristen"
+				"hint": "Aufbewahrungsfristen"
 			},
 			{
 				"question": "Wie wird die Überwachung nach dem Inverkehrbringen sichergestellt? Werden Patienten an Kontrolltermine erinnert?",
