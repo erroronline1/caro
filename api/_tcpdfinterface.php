@@ -51,8 +51,8 @@ class PDF{
 			'fontsize' => isset($pageSetup['fontsize']) ? intval($pageSetup['fontsize']) : 12,
 			'codesizelimit' => isset($pageSetup['codesizelimit']) ? intval($pageSetup['codesizelimit']) : null,
 			'codepadding' => isset($pageSetup['codepadding']) ? intval($pageSetup['codepadding']) : 2,
-			'header' => $pageSetup['header'] ?? true,
-			'footer' => $pageSetup['footer'] ?? true,
+			'header' => isset($pageSetup['header']) ? boolval($pageSetup['header']) : true,
+			'footer' => isset($pageSetup['footer']) ? boolval($pageSetup['footer']) : true,
 		];
 		$customsetup = preg_split('/\D{1,}/', $this->_pageSetup['format']);
 		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
@@ -381,8 +381,8 @@ class PDF{
 		$this->_pdf->setDefaultCellPadding(0, 0, 0, 0);
 
 		$page = $this->_pdf->page->getPage();
-		$columnwidth = intval(($page['width'] - ($this->_pageSetup['marginleft'] + $this->_pageSetup['marginright'])) / $this->_pageSetup['columns'] - $this->_pageSetup['column_gap']);
-		$rowheight = intval(($page['height'] - ($this->_pageSetup['margintop'] + $this->_pageSetup['marginbottom'])) / $this->_pageSetup['rows'] - $this->_pageSetup['row_gap']);
+		$columnwidth = intval( $page['region'][0]['RW'] / $this->_pageSetup['columns'] - $this->_pageSetup['column_gap']);
+		$rowheight = intval( $page['region'][0]['RH'] / $this->_pageSetup['rows'] - $this->_pageSetup['row_gap']);
 		$distributed_column_gap = $this->_pageSetup['columns'] > 1 ? ($this->_pageSetup['column_gap'] / ($this->_pageSetup['columns'] - 1) * $this->_pageSetup['columns']) : 0;
 		$distributed_row_gap = $this->_pageSetup['rows'] > 1 ? ($this->_pageSetup['row_gap'] / ($this->_pageSetup['rows'] - 1) * $this->_pageSetup['rows']) : 0;
 
@@ -842,7 +842,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// determine the max top and bottom y-coordinates for further use
 		if (!$this->_contentCoordinates['top']) $this->_contentCoordinates = [
 			'top' => max($heights['header']) + $this->_pageSetup['margintop'],
-			'bottom' => $page['height'] - max($heights['footer']) - $this->_pageSetup['marginbottom'] - 10
+			'bottom' => $page['height'] - max($heights['footer']) - $this->_pageSetup['marginbottom']
 		];
 		$this->page->setY($this->_contentCoordinates['top'] ?: 0);
 		return $out;
