@@ -535,7 +535,7 @@ class APPLICATION extends API {
 				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('application.file_storage_warning', [':space' => $storage . ' GB']),
+						'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
 						'class' => 'red'
 					]
 				];
