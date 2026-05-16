@@ -3,13 +3,13 @@
 Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lokale Apache- oder IIS-Server-Umgebungen.
 
 ## Übersicht
-* [Ziele](#ziele)
+* [Einleitung](#einleitung)
+    * [Ziele](#ziele)
     * [Wesentliche Aspekte](#wesentliche-aspekte)
     * [Erforderliche Infrastruktur](#erforderliche-infrastruktur)
     * [Was es nicht ist](#was-es-nicht-ist)
-    * [Extras](#extras)
-    * [Datenintegrität](#datenintegrität)
-* [Module](#module)
+* [Benutzeroberfläche](#benutzeroberfläche)
+* [Nutzung](#nutzung)
     * [Anwendung](#anwendung)
         * [Nutzer](#nutzer)
         * [Anleitung](#Anleitung)
@@ -50,6 +50,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [CSV Prozessor](#csv-prozessor)
     * [ERP Anbindung](#erp-anbindung)
 * [Tips](#tips)
+* [Datenintegrität](#datenintegrität)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
 * [Voraussetzungen](#voraussetzungen)
     * [Installation](#installation)
@@ -72,10 +73,12 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
 
 Die aktuellste Dokumentation ist verfügbar auf [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
 
-# Ziele
+# Einleitung
+
+## Ziele
 Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 13485 und der internen Kommunikation unterstützen. Sie wird als Web-Anwendung auf einem Server verwendet. Datensicherheitsmaßnahmen sind auf die Nutzung innerhalb eines Netzwerks ausgelegt, welches nicht aus dem Internet erreichbar ist. Die Ausgestaltung ermöglicht es der Belegschaft Daten abzurufen und bereitzustellen wo andere Branchensoftware aufgrund ihrer Lizenzmodelle nur eingeschränkt verwendet werden kann.
 
-Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App für Hilfsmittel als Sonderanfertigungen in kleinen und mittelständigen Unternehmen. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
+Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App für Hilfsmittel als Sonderanfertigungen in kleinen und mittelständigen Unternehmen.
 
 ## Wesentliche Aspekte
 * Transparenz: direkter Zugriff auf Daten
@@ -91,9 +94,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Automatische Planungen, Erinnerungen und Benachrichtigungen
 * Blockchain gesicherte Aufzeichnungsdaten
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
-* keine künstliche Intelligenz: volle Datenhoheit behalten
-
-![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de-fullpage.png)
+* Keine künstliche Intelligenz: volle Datenhoheit behalten
 
 ## Erforderliche Infrastruktur 
 Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Dokumenten, Textvorschlägen und Auditvorlagen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
@@ -103,65 +104,69 @@ Das oberste Ziel ist die Ausstattung der gesamten Belegschaft oder zumindest von
 Für technische Details siehe [Voraussetzungen](#voraussetzungen).
 
 ## Was es nicht ist
-Abgesehen von einigen architektonischen Entscheidungen zur Erfüllung regulatorischer Anforderungen ist die Anwendung kein vollständig voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
+Abgesehen von einigen architektonischen Entscheidungen zur Erfüllung regulatorischer Anforderungen ist die Anwendung **kein vollständig voreingestelltes Qualitätsmanagementsystem**. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
 
-Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Artikellisten (z.B. Preislisten) der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden. Auch ERP Datenexporte können genutzt werden und wenn es gut läuft auch saubere Daten durch die [ERP-Anbindung](#erp-anbindung) importiert werden.
-
+Die Anwendung **ersetzt kein ERP-System**. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Artikellisten (z.B. Preislisten) der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden. Auch ERP Datenexporte können genutzt werden und wenn es gut läuft auch saubere Daten durch die [ERP-Anbindung](#erp-anbindung) importiert werden.  
 Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation. Obwohl Bestellungen in einer zweiten Datenbank gespeichert und für einen verlängerten Zeitraum abrufbar sind, beinhalten diese Daten wahrscheinlich keine regulatorisch relevanten Informationen die nicht ohnehin im ERP-System abgebildet werden sollten.
 
-## Extras
-* Textempfehlungen
-    * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
-* Dateiverteilung
-    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien mit integriertem STL/OBJ-Betrachter um vereinfacht Informationen austauschen zu können.
-* CSV-Filterung
-    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
-* Zeitzonen und Bundesländer
-    * Die Anwendung kann unterschiedliche Zeitzonen und Bundesländer in Bezug auf Feiertage verarbeiten, je nach Standortverteilung.
-
 [Übersicht](#übersicht)
 
-## Datenintegrität
+# Benutzeroberfläche
+Die Benutzeroberfläche ist leicht verständlichen und einfache gestaltet. Mit Ausnahme des Menüs haben Symbole meist nur eine unterstützende Rolle, da jedes Bedienelement mit Text beschrieben ist. Mit dem Ziel so generationenübergreifend, intuitiv und [barrierefrei](#erklärung-zur-barrierefreiheit) wie möglich zu sein, sind vermeintlich selbsterklärende Symbole auf ein Minimum beschränkt.
 
-### Identifikation
-Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein Token erstellt der als QR-Code exportiert und bei der Anmeldung gescannt werden kann. Dadurch muss weniger getippt werden. Eine zusätzliche PIN ist allerdings aus Datenschutzgründen erforderlich.
+Es ist zweifellos erforderlich sich mit der Anwendung vertraut zu machen, aber es gibt kein Kapitel welches die Bedeutung von Symbolen und Bedienelementen erläutern muss. Als Web-Anwendung folgen die meisten Eingabefelder dem Standardverhalten des genutzen Browsers und werden nur anders dargestellt, wenn er der Lesbarkeit oder zusätzlichen informativen Optionen dient.
 
-### Aufzeichnungen
-Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
+Die Informationsfülle wird von zugewiesenen Rollen und Fachbereichen beeinflusst um die Überforderung gering zu halten. Alles blau-eingefärbte ist anklickbar. Man sieht nichts, was einen nicht betrifft. Rückmeldungen, wie die Benutzeroberfläche noch verständlicher wird, sind willkommen.
 
-Aufzeichnungen werden in einem [Blockchain Datenformat](#blockchain-gesicherte-inhalte) gespeichert. Jeder Versuch die Daten zu manipulieren invalidiert die gesamte Aufzeichnung aufgrund widersprüchlicher Hashes und Prüfsummen.
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de-fullpage.png)
 
-Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
-> Artikel 26  
-> Anforderungen an fortgeschrittene elektronische Signaturen  
-> Eine fortgeschrittene elektronische Signatur erfüllt alle folgenden Anforderungen:  
-> (a) Sie ist eindeutig dem Unterzeichner zugeordnet.  
-> (b) Sie ermöglicht die Identifizierung des Unterzeichners.  
-> (c) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
-> (d) Sie ist so mit den auf diese Weise unterzeichneten Daten verbunden, dass eine nachträgliche Veränderung der Daten erkannt werden kann.
-
-bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.  
-bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.  
-bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung der Unterschrift oder der Daten macht die gesamte Aufzeichnung ungültig.
-
-Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
-
-### Verschiedenes
-Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
-
-Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftliche oder gestempelte Datumsangaben auf Papierdokumenten kann jedoch aktuell nicht erkannt werden.
-
-[Übersicht](#übersicht)
-
-# Module
+# Nutzung
 
 ## Anwendung
 ![sample application menu](http://toh.erroronline.one/caro/anwendung%20menu%20de.png)
 
 ### Nutzer
-Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich. Nutzer können unterschiedliche Berechtigungen erhalten. Diese Berechtigungen steuern, welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
+Für sie wurde die Anwendung kreiert.  
+Das Verfahren der Personenvalidierung vor der Nutzernanlage sollte aus Datenschutzgründen beschrieben werden.
 
-Manche Berechtigungen/Einschränkungen sind jedoch systemisch festgelegt:
+#### Bei der Anlage eines Nutzers wird ein eindeutiger Nutzername vergeben, verfügbare Berechtigungen, Bereiche und die Zeitüberschreitung für die Anwendung unter Berücksichtigung von Barrierefreiheit oder typischer Arbeitsumgebung festgelegt.
+
+Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht verknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird.
+
+Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Nutzer können unterschiedliche Berechtigungen erhalten. So wie der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich ist, steuern Berechtigungen welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
+
+Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden. Nur die Inhalte, deren zugeordnete Berechtigungen oder Bereiche die selbe Schnittmenge haben werden angezeigt oder in Benachrichtigungen eingeschlossen.
+
+#### Es kann ein Profilbild gewählt werden, andernfalls wird ein Standardbild aus den Initialien erzeugt.
+
+Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben (da die Anwendung nicht zwischen individuellen oder Standardbildern unterscheiden kann).
+
+#### Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden.
+
+#### Arbeitszeiten und Einstellungen zum Urlaubsanspruch erlauben den Nutzern die Zeiterfassung.
+
+Das Format ist YYYY-MM-DD XX  
+Siehe [Zeiterfassung](#zeiterfassung) für weitere Informationen.
+
+#### Bekannte Schulungen und Fähigkeiten können erfasst werden.
+
+Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden.
+
+#### Neuausstellung eines Anmelde-Tokens sofern zutreffend.
+
+Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Die Zwei-Faktor-PIN ist Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
+
+![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
+
+Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern. *In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.*
+
+#### Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden.
+
+Ist das Datum erreicht wird ein neuer Token generiert und macht alle laufenden Anmeldungen ungültig. Nutzer sind dann noch nicht gelöscht, können aber die Anwendung nicht ohne Weiteres nutzen.
+
+![user screenshot](http://toh.erroronline.one/caro/user%20de-fullpage.png)
+
+Manche Berechtigungen/Einschränkungen sind unabhängig von der Anwendungskonfoguration systemisch festgelegt:
 
 Einträge zur Zeiterfassung sind nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das gilt auch für den Anwendungsadministrator. Dienstfrei-Einträge sind jedoch für jeden personifizierten Nutzer möglich.
 
@@ -188,26 +193,6 @@ Einträge zur Zeiterfassung sind nur erreichbar, wenn eine Wochenarbeitszeit fü
     * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen.
     * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitenden der Leitungsebene erteilt werden
 
-Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
-
-Das Verfahren der Personenvalidierung vor der Nutzernanlage sollte aus Datenschutzgründen beschrieben werden.
-
-Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden.
-
-Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Die Zwei-Faktor-PIN ist Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
-
-![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
-
-Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern.
-
-Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht verknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben.
-
-Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden. Ist das Datum erreicht wird ein neuer Token generiert und macht alle laufenden Anmeldungen ungültig. Nutzer sind dann noch nicht gelöscht, können aber die Anwendung nicht ohne Weiteres nutzen.
-
-> In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.
-
-![user screenshot](http://toh.erroronline.one/caro/user%20de-fullpage.png)
-
 ```mermaid
 graph TD;
     application((Anwendung))-->login[Anmeldung];
@@ -224,14 +209,14 @@ graph TD;
     Fähigkeiten, Schulungen, Anmelde-Token, Dokumente,
     Arbeitszeiten, Urlaubstage bearbeiten"];
     edit_user-.->user_settings;
-    edit_user-.->export_token[Token exportieren];
     user_settings-.->user_db;
     edit_user-.->delete_user[Nutzer löschen];
     delete_user-.->user_db;
 
     permission==>own_profile((eigenes Profil));
     own_profile==>profile["Informationen einsehen,
-    Profilbild und Anwendungeinstellungen anpassen"];
+    Profilbild und Anwendungeinstellungen anpassen,
+    Anmelde-Token erneuern"];
     profile==>user_db;
 
     permission-->|PIN vorhanden|orders(("Bestellungen
@@ -249,13 +234,15 @@ Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihre
 [Übersicht](#übersicht)
 
 ### Anleitung
-Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt. Die Anleitung und die Bearbeitungsschaltfläche (für berechtigte Nutzer) wird in dem Bereich *Über CARO App* angezeigt.
+Die Anwendung stellt im Bereich *Über CARO App* eine Schnellübersicht der Funktionen dar. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt.
+
+Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
 
 ## Kommunikation
 ![sample communication menu](http://toh.erroronline.one/caro/kommunikation%20menu%20de.png)
 
 ### Unterhaltungen
-Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeitende. Neue Nachrichten lösen eine Systembenachrichtigung aus. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung, Links und HTML wird jedoch nur von administrativen Nutzern angezeigt.
+Das interne Nachrichtensystem dient ausschließlich der internen Kommunikation und Systembenachrichtigungen und habt keinen Aufzeichnungscharakter. Nachrichten werden in der Übersicht als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeitende. Neue Nachrichten lösen eine Systembenachrichtigung aus. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung, Links und HTML wird jedoch nur von administrativen Nutzern angezeigt.
 
 Die Anwendung sendet im Bedarfsfall Nachrichten an Nutzergruppen. Um das Risiko des Abstumpfens aufgrund einer Überzahl an Nachrichten zu reduzieren werden wiederkehrende Erinnerungen weitestgehend thematisch gruppiert.
 
@@ -413,8 +400,6 @@ Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzei
 Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
 
 Vorschläge vorheriger Eingaben werden in der Datenbank mit Verweis auf den zugewiesenen Bereich des Dokuments abgelegt um eine thematische Relevanz sicherzustellen. Die Datenbank für Vorschläge kann über das [Wartungsmodul](#wartung) aktualisiert werden.
-
-> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
 
 #### *Caveat:*
 Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
@@ -1830,6 +1815,38 @@ Die Verbindung zur ERP-Schnittstelle kann wärend der Laufzeit im [Wartungs-Modu
 * Barcodes oder QR-Codes an Lagerplätzen kann eine Nachbestellung beschleunigen.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de-fullpage.png)
+
+[Übersicht](#übersicht)
+
+# Datenintegrität
+
+## Identifikation
+Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein Token erstellt der als QR-Code exportiert und bei der Anmeldung gescannt werden kann. Dadurch muss weniger getippt werden. Eine zusätzliche PIN ist allerdings aus Datenschutzgründen erforderlich.
+
+## Aufzeichnungen
+Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
+
+Aufzeichnungen werden in einem [Blockchain Datenformat](#blockchain-gesicherte-inhalte) gespeichert. Jeder Versuch die Daten zu manipulieren invalidiert die gesamte Aufzeichnung aufgrund widersprüchlicher Hashes und Prüfsummen.
+
+Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
+> Artikel 26  
+> Anforderungen an fortgeschrittene elektronische Signaturen  
+> Eine fortgeschrittene elektronische Signatur erfüllt alle folgenden Anforderungen:  
+> (a) Sie ist eindeutig dem Unterzeichner zugeordnet.  
+> (b) Sie ermöglicht die Identifizierung des Unterzeichners.  
+> (c) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
+> (d) Sie ist so mit den auf diese Weise unterzeichneten Daten verbunden, dass eine nachträgliche Veränderung der Daten erkannt werden kann.
+
+bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.  
+bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.  
+bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung der Unterschrift oder der Daten macht die gesamte Aufzeichnung ungültig.
+
+Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
+
+## Verschiedenes
+Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
+
+Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftliche oder gestempelte Datumsangaben auf Papierdokumenten kann jedoch aktuell nicht erkannt werden.
 
 [Übersicht](#übersicht)
 

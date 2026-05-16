@@ -36,13 +36,13 @@ Things are still in motion. Images may be outdated.
 * tidy, rephrase readme
 
 ## Content
-* [Aims](#aims)
+* [Introducion](#introducion)
+    * [Aims](#aims)
     * [Key aspects](#key-aspects)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
-    * [Extras](#extras)
-    * [Data integrity](#data-integrity)
-* [Modules](#modules)
+* [Interface](#interface)
+* [Application useage](#application-useage)
     * [Application](#application)
         * [Users](#users)
         * [Manual](#manual)
@@ -83,6 +83,7 @@ Things are still in motion. Images may be outdated.
     * [CSV processor](#csv-processor)
     * [ERP Interface](#erp-interface)
 * [Tips](#tips)
+* [Data integrity](#data-integrity)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -165,10 +166,12 @@ Things are still in motion. Images may be outdated.
 
 The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
 
-# Aims
+# Introducion
+
+## Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a network environment not accessible from the web. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
-Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App for custom-made aids in small- and medium-sized companies. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
+Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App for custom-made aids in small- and medium-sized companies.
 
 ## Key aspects
 * Transparency: instant access to data
@@ -186,8 +189,6 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Device agnostic: web-application accessible by any suitable device
 * No artificial intelligence: you have absolute data authority
 
-![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20en-fullpage.png)
-
 ## Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation, text templates and audit templates).
 
@@ -196,65 +197,69 @@ Main goal is a distribution of mobile devices to the whole staff or at least key
 For technical details see [prerequisites](#prerequisites). 
 
 ## What it is not
-Beside some architectural decisions to fit regulatory requirements the app is not a fully preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
+Beside some architectural decisions to fit regulatory requirements the app is **not a fully preset quality management system**. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if you're lucky you can import tidy data through the [ERP Interface](#erp-interface).
-
+The application **does not replace an ERP system**. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if you're lucky you can import tidy data through the [ERP Interface](#erp-interface).  
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose. Albeit orders being stored in a secondary database and accessible for a prolonged timespan, this data is unlikely to contain relevant data regarding regulatory topics in addition to accumulating ERP data.
 
-## Extras
-* Text recommendations
-    * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
-* File sharing
-    * The application has a [sharepoint](#files) for files and an integrated STL/OBJ-viewer to easily exchange information.
-* CSV filtering
-    * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
-* Timezones and states
-    * The application can handle different timezones and states regarding holidays, depending on your sites.
-
 [Content](#content)
 
-## Data integrity
+# Interface
+The interface is designed to be consistent easy to use and recognizable. Except for the menu icons mostly have just a supplementary role, as every button is described with text. Trying to be as trans-generational, intuitively understandable and [accessible](#accessibility-statement) as possible, assumed self explanatory icons are reduced to a bare minimum.
 
-### Identification
-As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things reasonably easy a unique token has to be created that can be exported as an QR code that is scannable on login. This reduces the need for typing. An additional pin has to be provided for data safety reasons, though.
+Undeniably there is a need to get used to the application, but you can be assured there is no need for a chapter on explaining the meaning of icons and buttons. As a web-application most inputs follow the standardized behaviour of the used browser and are only overridden by a custom behaviour where it enhances legibility or additional informative options.
 
-### Records
-An encoded user identifier is added to the payload of submitted form data, the server verifies the identity and data integrity with a checksum.
+Information load is influenced by assigned roles and units to ensure the least possible overload. Everything blue is clickable. You will not see what is no concern of you. Your feedback on how to make the interface even more comprehensible is most welcome.
 
-Records are stored in a [blockchain data format](#blockchain-secured-content). Any attempts on tampering with the data corrupts the whole record due to inconsistent hashes and checksums.
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20en-fullpage.png)
 
-Documents can contain a digital signature pad. According to eIDAS
-> Article 26  
-> Requirements for advanced electronic signatures  
-> An advanced electronic signature shall meet the following requirements:  
-> (a) it is uniquely linked to the signatory;  
-> (b) it is capable of identifying the signatory;  
-> (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
-> (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.
-
-regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatories identity is ensured because the signature takes place in person at the working site.  
-regarding (c): handwritten signatures are solely under the signatories control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
-regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes of the signature or the data invalidate the whole record.
-
-Consult your data protection supervisor if this is sufficient for an electronic signature.
-
-### Miscellaneous
-Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
-
-Timestamps are not qualified. A reduced validity than manual or stamped dates on paper documents is currently not discernible.
-
-[Content](#content)
-
-# Modules
+# Application useage
 
 ## Application
 ![sample application menu](http://toh.erroronline.one/caro/application%20menu%20en.png)
 
 ### Users
-The application provides a dedicated role management for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
+These are what the application has been built for.  
+Please consider describing how you validate the person you are registering as a new user for data safety reasons.
 
-Some permissions/restrictions are default set though:
+#### On adding a new user select a unique user name, set available permissions, assigned units and the application timeout considering accessibility or usual workplace conditions.
+
+Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. 
+
+The application provides a dedicated role management for registered users. Users can have different permissions. As the whole content is only accessible on login, set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables), too. The provided example is considered a decent choice, but it is up to you.
+
+Users can have multiple assigned organizational units and permissions. Only contents whose assigned permissions or units intersect are displayed and notified of.
+
+#### A profile picture can be set, otherwise a default picture with the initials is used.  
+
+Custom set pictures can be restored to default. The profile picture will always be overwritten with the default image following a name change (since the application is not aware if the profile picture is custom or default).
+
+#### A generated order authorization pin can be used to approve orders.  
+
+#### Working time and vacation settings allow the user the use of timetracking.  
+
+The format is YYYY-MM-DD XX  
+See [timesheet](#timesheet) for reference.
+
+#### Known trainings and skill levels can be set.
+
+Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified.
+
+#### Select the creation of a new login token if applicable.
+
+The generated access token can be exported and, for example, used as a laminated card. The two-factor-pin is part of the export and is to be cut off and disposed of prior to laminating.
+
+![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
+
+The token lacks any further identification, like the application name or logo, by intent to obfuscate its use. *On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.*
+
+#### Assign a date of an automated access denial for data safety reasons if applicable.
+
+Once the date is met a new token is generated, invalidating all current sessions. The user is not deleted yet but not able to access the application without further action.
+
+![user screenshot](http://toh.erroronline.one/caro/user%20en-fullpage.png)
+
+Some permissions/restrictions are default set independent from the applications configuration:
 
 Contributing to timesheets is accessible only if weekly hours are defined for the user - even the application admin. Off-duty days are accessible for every personalized user though.
 
@@ -281,26 +286,6 @@ Contributing to timesheets is accessible only if weekly hours are defined for th
     * default user CARO App has this permission. Use it to initially implement new users.
     * assign only to trusted, preferably administative staff members
 
-Users can have multiple assigned organizational units and permissions.
-
-Please describe how you validate the person you are registering as a new user for data safety reasons.
-
-On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified.
-
-The generated access token can be exported and, for example, used as a laminated card. The two-factor-pin is part of the export and is to be cut off and disposed of prior to laminating.
-
-![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
-
-The token lacks any further identification, like the application name or logo, by intent to obfuscate its use.
-
-Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. The profile picture will always be overwritten with the default image following a name change.
-
-Users can be assigned a date of an automated access denial for data safety reasons. Once the date is met a new token is generated, invalidating all current sessions. The user is not deleted yet but not able to access the application without further action.
-
-> On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.
-
-![user screenshot](http://toh.erroronline.one/caro/user%20en-fullpage.png)
-
 ```mermaid
 graph TD;
     application((application))-->login[login];
@@ -316,14 +301,14 @@ graph TD;
     unit, photo, order auth pin, skills, trainings,
     login token, user documents, work hours, vacation days"];
     edit_user-.->user_settings;
-    edit_user-.->export_token[export token];
     user_settings-.->user_db;
     edit_user-.->delete_user[delete user];
     delete_user-.->user_db;
 
     permission==>own_profile((own profile));
     own_profile==>profile["view information,
-    renew photo, application settings"];
+    renew photo, application settings,
+    renew login token"];
     profile==>user_db;
 
     permission-->|has pin|orders((approve orders))
@@ -340,13 +325,15 @@ Users can see their information in the profile section for transparency reasons.
 [Content](#content)
 
 ### Manual
-Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables). The manual and its edit-button (for authorized users) will be displayed in the *About CARO App*-section.
+The application provides a quick reference manual within the *About CARO App*-section. On installation a default manual will be inserted in the [default language](#runtime-variables).
+
+Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the displayed entries for others.
 
 ## Communication
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)
 
 ### Conversations
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. [Markdown](#markdown) is available, anchors and direct html is displayed in messages from administrative users only though.
+The internal message system is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart in the initial overview. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. [Markdown](#markdown) is available, anchors and direct html is displayed in messages from administrative users only though.
 
 The application can send messages to user groups if reasonable. To reduce the risk of dulling due to spamming, regular reminder messages are mostly grouped by topic.
 
@@ -502,8 +489,6 @@ Most input types can be optional declared as required. *Multiple* means another 
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
 Recommendations of former inputs are stored with a reference to the assigned unit of the used document to ensure a topical relevance. The recommendation database can be updated through the [maintenance](#maintenance) module.
-
-> [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but may limit the analytical possibilities for the data dump.
 
 #### *Caveat:*
 Some elements are only processible as proper records.
@@ -1206,7 +1191,7 @@ As some anticipated uses of the filter probably affect regulatory topics, filter
 Possible usecases can be:
 * filtering case lists for post market surveillance,
 * sorting [ERP-Interface data dumps](#custom-database-dumps),
-* preparing iventory lists for counting,
+* preparing inventory lists for counting,
 * etc.
 
 ## Regulatory evaluations and summaries
@@ -1926,6 +1911,38 @@ The connection can be disabled/enabled during runtime from within the [maintenan
 * Use barcodes or qr-codes in your storages to speed up reorders.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20en-fullpage.png)
+
+[Content](#content)
+
+# Data integrity
+
+## Identification
+As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things reasonably easy a unique token has to be created that can be exported as an QR code that is scannable on login. This reduces the need for typing. An additional pin has to be provided for data safety reasons, though.
+
+## Records
+An encoded user identifier is added to the payload of submitted form data, the server verifies the identity and data integrity with a checksum.
+
+Records are stored in a [blockchain data format](#blockchain-secured-content). Any attempts on tampering with the data corrupts the whole record due to inconsistent hashes and checksums.
+
+Documents can contain a digital signature pad. According to eIDAS
+> Article 26  
+> Requirements for advanced electronic signatures  
+> An advanced electronic signature shall meet the following requirements:  
+> (a) it is uniquely linked to the signatory;  
+> (b) it is capable of identifying the signatory;  
+> (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
+> (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.
+
+regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatories identity is ensured because the signature takes place in person at the working site.  
+regarding (c): handwritten signatures are solely under the signatories control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
+regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes of the signature or the data invalidate the whole record.
+
+Consult your data protection supervisor if this is sufficient for an electronic signature.
+
+## Miscellaneous
+Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
+
+Timestamps are not qualified. A reduced validity than manual or stamped dates on paper documents is currently not discernible.
 
 [Content](#content)
 
