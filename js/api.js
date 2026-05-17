@@ -1074,6 +1074,78 @@ export const api = {
 	},
 
 	/**
+	 *                                 _   _
+	 *   ___ ___ ___ ___ _ _ _____ ___| |_| |___ ___
+	 *  |  _| . |   |_ -| | |     | .'| . | | -_|_ -|
+	 *  |___|___|_|_|___|___|_|_|_|__,|___|_|___|___|
+	 *
+	 *
+	 *
+	 * @param {string} method
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request
+	 */
+	consumables: (method, payload = {}, ...request) => {
+		request = [...request];
+		if (method === "get") api.history.write(["consumables", ...request]);
+
+		request.splice(0, 0, "consumables");
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog(
+					{
+						type: "input",
+						header: data.dialog.header,
+						render: data.dialog.render,
+						options: data.dialog.options,
+					},
+					"FormData"
+				).then((response) => {
+					if (response) api.consumables("put", response, "mdrsamplecheck", data.dialog.productid);
+					else new Toast(api._lang.GET("order.sample_check.failure"), "error");
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.insert) {
+				let render = new Assemble(data.insert);
+				switch (request[2]) {
+					case "productselection":
+						let article = document.querySelector("#_productselectionDialog form article");
+						let sibling = article.children[3], // as per assemble after button, label, hint and hidden input
+							deletesibling;
+						sibling = sibling.nextSibling;
+						if (sibling) {
+							do {
+								deletesibling = sibling;
+								sibling = sibling.nextSibling;
+								deletesibling.remove();
+							} while (sibling);
+						}
+						render.initializeSection(null, article.children[3]);
+						render.processAfterInsertion();
+						break;
+					default:
+						let search = document.querySelector("main form, main div").firstElementChild;
+						search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
+						render.processAfterInsertion();
+				}
+			}
+			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.redirect) api.order("get", null, ...data.redirect);
+			if (data.data) _client.order.approved(data.data);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
 	 *               ___ _ _ _
 	 *   ___ ___ _ _|  _|_| | |_ ___ ___
 	 *  |  _|_ -| | |  _| | |  _| -_|  _|
@@ -1894,15 +1966,15 @@ export const api = {
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						}
+						};
 						break;
 					default:
 						payload = _.getInputs("[data-usecase=purchase]", true);
 				}
 				break;
 			case "put":
-				switch(request[1]){
-					case "prepared": 
+				switch (request[1]) {
+					case "prepared":
 						successFn = function (data) {
 							new Toast(data.response.msg, data.response.type);
 							if (data.data) _serviceWorker.notif.consumables(data.data);
@@ -1920,7 +1992,7 @@ export const api = {
 						break;
 					default:
 						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
-				}		
+				}
 				break;
 			case "patch":
 				if (request[4] instanceof FormData) {
@@ -1949,6 +2021,55 @@ export const api = {
 	},
 
 	/**
+	 *             _
+	 *   ___ ___ _| |___ ___
+	 *  | . |  _| . | -_|  _|
+	 *  |___|_| |___|___|_|
+	 *
+	 *
+	 * @param {string} method
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request
+	 */
+	order: (method, payload = {}, ...request) => {
+		request = [...request];
+		if (method === "get") api.history.write(["order", ...request]);
+
+		request.splice(0, 0, "order");
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.cancel_button")] = false;
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("order.manual_match"),
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.insert) {
+				let render = new Assemble(data.insert);
+				let search = document.querySelector("main form, main div").firstElementChild;
+				search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
+				render.processAfterInsertion();
+			}
+			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.redirect) api.order("get", null, ...data.redirect);
+			if (data.data) _client.order.approved(data.data);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
 	 *                         _
 	 *   ___ ___ ___ ___ ___ _| |
 	 *  |  _| -_|  _| . |  _| . |
@@ -1958,15 +2079,162 @@ export const api = {
 	 * imports data from other records
 	 *
 	 * @param {string} method get|post|patch
-	 * @param  {array} request api method, occasional identifier to import from
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, occasional identifier to import from
 	 */
-	record: (method, ...request) => {
+	record: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["record", ...request]);
 
 		request.splice(0, 0, "record");
-		let payload,
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				switch (request[1]) {
+					case "import":
+						new Dialog({
+							type: "input",
+							header: api._lang.GET("assemble.render.merge"),
+							options: options,
+							render: data.response.msg,
+						}).then((response) => {
+							if (response && api._lang.GET("erpquery.integrations.data_import") in response) {
+								let result = {};
+								// deconstruct key:value<br>...
+								for (const match of response[api._lang.GET("erpquery.integrations.data_import")].matchAll(/(.+?): (.*?)(?:<br>|$)/gm)) {
+									result[match[1]] = match[2];
+								}
+								data = {
+									data: result,
+									response: {
+										msg: api._lang.GET("record.import.success"),
+									},
+								};
+								successFn(data);
+							}
+						});
+						break;
+					default:
+				}
+				new Dialog({
+					type: "input",
+					render: data.dialog.render,
+					options: data.dialog.options,
+				});
+			}
+			if (data.render) {
+				const render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.data) {
+				switch (request[1]) {
+					case "records":
+						if (api._settings.user.app_settings.recordsLayout) {
+							switch (api._settings.user.app_settings.recordsLayout) {
+								// in case other options may become implemented also see user.php profile
+								case "table":
+									_client.record.table(data.data);
+									break;
+								default:
+									_client.record.tile(data.data);
+							}
+						} else _client.record.tile(data.data);
+						break;
+					case "import":
+						let inputs = document.querySelectorAll("input, textarea, select");
+						let groupname, files, a;
+						for (const input of inputs) {
+							if (input.type === "file") {
+								if (Object.keys(data.data).includes(input.name.replace("[]", ""))) {
+									files = data.data[input.name.replace("[]", "")].split(", ");
+									for (const file of files) {
+										a = document.createElement("a");
+										a.href = file;
+										a.target = "_blank";
+										a.append(document.createTextNode(file));
+										input.parentNode.insertBefore(a, input);
+									}
+									if (files) input.parentNode.insertBefore(document.createElement("br"), input);
+								}
+							} else if (input.type === "radio") {
+								// nest to avoid overriding values of other radio elements
+								input.checked = Object.keys(data.data).includes(input.name) && data.data[input.name] === input.value;
+							} else if (input.type === "checkbox") {
+								groupname = input.dataset.grouped;
+								input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(" | ").includes(input.name);
+							} else {
+								if (Object.keys(data.data).includes(input.name)) input.value = data.data[input.name];
+								// append multiple text-/number inputs / selects / productselections that have been added dynamically
+								let dynamicMultiples = Object.keys(data.data)
+									.filter((name) => {
+										return name.match(new RegExp(String.raw`${input.name}\(\d+\)$`, "g"));
+									})
+									.sort();
+								if (dynamicMultiples.length) {
+									let type = input.previousSibling.dataset.type,
+										element = input.nextSibling, // label
+										clone = { type: type, attributes: { name: null } },
+										content = {};
+									if (input.attributes.multiple) clone.attributes.multiple = true;
+									if (input.attributes.required) clone.attributes.required = true;
+									if (input.attributes["data-loss"]) clone.attributes["data-loss"] = input.attributes["data-loss"].value;
+									if (input.attributes.title) clone.attributes.title = input.attributes.title.value;
+									switch (type) {
+										case "select":
+											for (const opt of input.children) {
+												if (opt.localName === "optgroup") {
+													for (const option of opt.children) {
+														content[option.innerHTML] = [];
+													}
+												} else content[opt.innerHTML] = [];
+											}
+											break;
+										default:
+											clone.attributes.value = null;
+									}
+									dynamicMultiples.forEach((name) => {
+										if (element.nextSibling && element.nextSibling.classList.contains("hint")) element = element.nextSibling;
+										clone.attributes.name = name;
+										clone.attributes.value = data.data[name];
+										switch (type) {
+											case "select":
+												Object.keys(content).forEach((key) => {
+													if (key === data.data[name]) content[key].selected = true;
+													else delete content[key].selected;
+												});
+												clone.content = content;
+												break;
+											case "productselection":
+											case "scanner":
+												element = element.nextSibling; // button
+												break;
+										}
+										if (!document.getElementsByName(name)[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
+										element = document.getElementsByName(name)[0].nextSibling; // label
+									});
+								}
+							}
+						}
+						break;
+				}
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (method === "get" && (!payload || !Object.keys(payload).length)) {
+			payload = {
+				_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
+				_unit: document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value : null,
+				_state: document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value : null,
+			};
+			for (const [key, value] of Object.entries(payload)) {
+				if (!value) delete payload[key];
+			}
+		}
+		api.send(method, request, successFn, null, payload);
+		/*				let payload,
 			successFn = function (data) {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				if (data.render !== undefined) {
@@ -2169,7 +2437,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload);
+		api.send(method, request, successFn, null, payload);*/
 	},
 
 	/**
@@ -2180,40 +2448,38 @@ export const api = {
 	 *              |_|                             |___|
 	 *
 	 * @param {string} method
-	 * @param  {array} request
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request
 	 */
-	responsibility: (method, ...request) => {
+	responsibility: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["responsibility", ...request]);
 
 		request.splice(0, 0, "responsibility");
-		let payload,
-			successFn = function (data) {
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				responsibilities: api._lang.GET("responsibility.navigation.responsibility"),
-			};
-		switch (method) {
-			case "get":
-				successFn = function (data) {
-					if (data.render) {
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-						api.preventDataloss.start();
-					}
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				};
-				break;
-			case "post":
-			case "put":
-				payload = _.getInputs("[data-usecase=responsibility]", true);
-				break;
-			default:
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog(
+					{
+						type: "input",
+						header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
+						render: data.dialog.render,
+						options: data.dialog.options,
+					},
+					"FormData"
+				).then((response) => {
+					if (response) api.tool("post", response, "markdown", request[2] || null);
+				});
+			}
+			if (data.render) {
+				const render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -2227,54 +2493,44 @@ export const api = {
 	 * displays form to edit risks or overview, according to permissions
 	 *
 	 * @param {string} method get|post|patch
-	 * @param  {array} request api method
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method
 	 * @returns request
 	 */
-	risk: (method, ...request) => {
+	risk: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["risk", ...request]);
 
 		request.splice(0, 0, "risk");
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				risk: api._lang.GET("risk.navigation.risk_management"),
-				search: api._lang.GET("risk.search"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "search":
-						successFn = function (data) {
-							let search = document.querySelector("main form").firstElementChild;
-							if (data.render && data.render.content) {
-								const render = new Assemble(data.render);
-								search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.preventDataloss.start();
-						};
-				}
-				break;
-			case "post":
-			case "patch":
-				payload = _.getInputs("[data-usecase=risk]", true);
-				break;
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("texttemplate.navigation.texts"),
+					render: data.dialog.render,
+					options: data.dialog.options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.insert) {
+				let render = new Assemble(data.insert);
+				let search = document.querySelector("main form").firstElementChild;
+				search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
+				render.processAfterInsertion();
+			}
+			if (data.data !== undefined) _client.texttemplate.data = data.data;
+			if (data.selected !== undefined && data.selected.length) {
+				Composer.importTextTemplate(data.selected);
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -2288,72 +2544,38 @@ export const api = {
 	 * displays text template frontend either as body or within a modal
 	 *
 	 * @param {string} method get|post
-	 * @param  {array} request api method, occasional modal destination
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, occasional modal destination
 	 */
-	texttemplate: (method, ...request) => {
+	texttemplate: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["texttemplate", ...request]);
 
 		request.splice(0, 0, "texttemplate");
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				chunk: api._lang.GET("texttemplate.navigation.chunks"),
-				template: api._lang.GET("texttemplate.navigation.templates"),
-				text: api._lang.GET("texttemplate.navigation.texts"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[3]) {
-					case "modal":
-						successFn = function (data) {
-							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("texttemplate.navigation.texts"), render: data.render });
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.data !== undefined) _client.texttemplate.data = data.data;
-							if (data.selected !== undefined && data.selected.length) {
-								Composer.importTextTemplate(data.selected);
-							}
-						};
-						break;
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.data !== undefined) _client.texttemplate.data = data.data;
-							if (data.selected !== undefined && data.selected.length) {
-								Composer.importTextTemplate(data.selected);
-							}
-							api.preventDataloss.start();
-						};
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "template":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						if (!(payload = Composer.composeNewTextTemplate())) return;
-						break;
-					default:
-						payload = _.getInputs("[data-usecase=texttemplate]", true);
-				}
-				break;
-			case "delete":
-				break;
-			default:
-				return;
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("texttemplate.navigation.texts"),
+					render: data.dialog.render,
+					options: data.dialog.options,
+				});
+			}
+			if (data.render) {
+				const render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+
+				api.preventDataloss.start();
+			}
+			if (data.data) _client.texttemplate.data = data.data;
+			if (data.selected && data.selected.length) {
+				Composer.importTextTemplate(data.selected);
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -2369,125 +2591,37 @@ export const api = {
 	 * displays some common calculation options
 	 *
 	 * @param {string} method get
-	 * @param  {array} request api method, occasionally passed values for 2d codes
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, occasionally passed values for 2d codes
 	 */
-	tool: (method, ...request) => {
+	tool: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["tool", ...request]);
 
 		request.splice(0, 0, "tool");
-		let payload,
-			successFn = function (data) {
-				if (data.render) {
-					api.update_header(title[request[1]]);
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				code: api._lang.GET("tool.navigation.digital_codes"),
-				calculator: api._lang.GET("tool.navigation.calculator"),
-				scanner: api._lang.GET("tool.navigation.scanner"),
-				zip: api._lang.GET("tool.navigation.zip"),
-				image: api._lang.GET("tool.navigation.image"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "markdown":
-						successFn = function (data) {
-							if (data.render) {
-								const options = {};
-								options[api._lang.GET("tool.markdown.cancel")] = false;
-								options[api._lang.GET("tool.markdown.convert")] = { value: true, class: "reducedCTA" };
-								new Dialog(
-									{
-										type: "input",
-										header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
-										render: data.render,
-										options: options,
-									},
-									"FormData"
-								).then((response) => {
-									if (response) api.tool("post", "markdown", request[2] || null, response);
-								});
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					case "code_qr":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-					default:
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "calculator":
-						payload = _.getInputs("[data-usecase=tool_calculator]", true);
-						break;
-					case "code":
-						payload = _.getInputs("[data-usecase=tool_create_code]", true);
-						break;
-					case "markdown":
-						payload = request[3];
-						delete request[3];
-						successFn = function (data) {
-							if (data.render) {
-								const options = {};
-								options[api._lang.GET("tool.markdown.cancel")] = false;
-								options[api._lang.GET("tool.markdown.convert")] = { value: true, class: "reducedCTA" };
-								new Dialog(
-									{
-										type: "input",
-										header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
-										render: data.render,
-										options: options,
-									},
-									"FormData"
-								).then((response) => {
-									if (response) api.tool("post", "markdown", request[2] || null, response);
-								});
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					case "image":
-						payload = _.getInputs("[data-usecase=tool_image]", true);
-						break;
-					case "zip":
-						payload = _.getInputs("[data-usecase=tool_zip]", true);
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-						break;
-				}
-				break;
-			default:
-				return;
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog(
+					{
+						type: "input",
+						header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
+						render: data.dialog.render,
+						options: data.dialog.options,
+					},
+					"FormData"
+				).then((response) => {
+					if (response) api.tool("post", response, "markdown", request[2] || null);
+				});
+			}
+			if (data.render) {
+				const render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -2500,107 +2634,42 @@ export const api = {
 	 * user manager and display of profile
 	 *
 	 * @param {string} method get|post|put|patch|delete
-	 * @param  {array} request api method, name|id
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, name|id
 	 */
-	user: (method, ...request) => {
+	user: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get" && !["training"].includes(request[0])) api.history.write(["user", ...request]);
 
 		request.splice(0, 0, "user");
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-				if (data.response.id) api.user("get", request[1], data.response.id);
-			},
-			title = {
-				profile: api._lang.GET("application.navigation.user_profile"),
-				user: api._lang.GET("application.navigation.user_manager"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "training":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-								options[api._lang.GET("general.cancel_button")] = false;
-								new Dialog(
-									{
-										type: "input",
-										render: data.render,
-										options: options,
-									},
-									"FormData"
-								).then((response) => {
-									if (!response) return;
-									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", 2 in request && request[2] ? request[2] : "null", response);
-								});
-							}
-						};
-						break;
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-				}
-				break;
-			case "post":
-			case "put":
-				if (3 in request && request[3] && request[3] instanceof FormData) {
-					// training
-					payload = request[3]; // form data object passed by utility.js
-					delete request[3];
-				} else {
-					payload = _.getInputs("[data-usecase=user]", true);
-					successFn = function (data) {
-						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						if (data.render !== undefined) {
-							const options = {};
-							options[api._lang.GET("general.ok_button")] = false;
-							new Dialog({
-								type: "input",
-								render: data.render,
-								options: options,
-							});
-						}
-					};
-					break;
-				}
-				break;
-			case "patch":
-				// profile
-				successFn = function (data) {
-					if (data.render) {
-						const options = {};
-						options[api._lang.GET("general.ok_button")] = false;
-						new Dialog({
-							type: "input",
-							render: data.render,
-							options: options,
-						});
-					}
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.data) {
-						api._settings.user.app_settings = data.data;
-						api.update_user_settings();
-					}
-				};
-				payload = _.getInputs("[data-usecase=user]", true);
-				break;
-			case "delete":
-				break;
-			default:
-				return;
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				new Dialog(
+					{
+						type: "input",
+						render: data.dialog.render,
+						options: data.dialog.options,
+					},
+					"FormData"
+				).then((response) => {
+					if (!response) return;
+					if (request[1] === "training") api.user((method = 2 in request && request[2] !== "null" ? "put" : "post"), (payload = response), "training", 2 in request && request[2] ? request[2] : "null");
+				});
+			}
+			if (data.render) {
+				const render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+			}
+			if (data.redirect) api.user("get", null, request[1], data.redirect);
+			if (data.config) {
+				Object.assign(api._settings, data.config);
+				api.update_user_settings();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 };

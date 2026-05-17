@@ -16,9 +16,9 @@ require_once('./_calendarutility.php');
 
 class USER extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_prefilledTrainingUser = null;
+    public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private mixed $_prefilledTrainingUser = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -226,25 +226,30 @@ class USER extends API {
 				// update user
 				if ($this->_sqlinterface->EXECUTE('user_post', $user) !== false) {
 					$response = [
-						'response' =>  [
-							'id' => $user[':id'],
+						'redirect' => $user[':id'],
+						'toast' => [
 							'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
 							'type' => 'success'
 						],
-						'data' => $settings
+						'config' => $this->auth()
 					];
 
-					if ($renewCredentials) $response['render'] = [
-						[
-							'type' => 'image',
-							'description' => $this->_lang->GET('user.export_login_credentials'),
-							'attributes' => [
-								'name' => $user[':name'] . '_token.png',
-								'url' => 'data:image/png;base64, ' . base64_encode($this->token($exportToken[':token'] ?? '', $user[':name'], $exportToken[':two_factor'] ?? ''))
-							],
-							'dimensions' => [
-								'width' => 1024,
-								'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
+					if ($renewCredentials) $response['dialog'] = [
+						'options' => [
+							$this->_lang->GET('general.ok_button') => false
+						],
+						'render' =>	[
+							[
+								'type' => 'image',
+								'description' => $this->_lang->GET('user.export_login_credentials'),
+								'attributes' => [
+									'name' => $user[':name'] . '_token.png',
+									'url' => 'data:image/png;base64, ' . base64_encode($this->token($exportToken[':token'] ?? '', $user[':name'], $exportToken[':two_factor'] ?? ''))
+								],
+								'dimensions' => [
+									'width' => 1024,
+									'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
+								]
 							]
 						]
 					];
@@ -252,14 +257,17 @@ class USER extends API {
 					$this->response($response);
 				}
 				else $this->response([
-					'response' => [
-						'id' => $user[':id'],
+					'redirect' => $user[':id'],
+					'toast' => [
 						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
 
 				break;
 			case 'GET':
+				$response = [
+					'title' => $this->_lang->GET('application.navigation.user_profile')
+				];
 				$user = $this->_sqlinterface->EXECUTE('user_get', [
 					':ids' => $_SESSION['user']['id'],
 					':names' => $_SESSION['user']['name']
@@ -420,7 +428,7 @@ class USER extends API {
 					'content' => array_intersect(['patient'], $_SESSION['user']['permissions']) ? $user_data[0] : [$user_data],
 					'form' => [
 						'data-usecase' => 'user',
-						'action' => "javascript:api.user('patch', 'profile')"
+						'action' => "javascript:api.user('patch', '[data-usecase=user]', 'profile')"
 					]
 				];
 
@@ -721,7 +729,7 @@ class USER extends API {
 					':names' => $submittedName
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				if (UTILITY::forbiddenName($user[':name']) || ($nametaken && $nametaken['id'] !== $user[':id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($user[':name']) || ($nametaken && $nametaken['id'] !== $user[':id'])) $this->response(['toast' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user[':name']]), 'type' => 'error']]);
 		
 				// checked permission levels
 				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.permissions'))){
@@ -754,7 +762,7 @@ class USER extends API {
 							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 							// append datetime value and contract value
 							if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-								'response' => [
+								'toast' => [
 									'msg' => $this->_lang->GET('user.timesheet_format_error'),
 									'type' => 'error'
 								]]);
@@ -907,39 +915,43 @@ class USER extends API {
 							':qmo' => implode(', ', $roles['qmo']),
 							':prrc' => implode(', ', $roles['prrc']),
 							':hazardous_materials' => implode(', ', $roles['hazardous_materials']),
-							':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
-							':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
-							':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
+							':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', null, \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
+							':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', null, \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
+							':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', null, \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
 							':admin' => implode(', ', $roles['admin'])
 						];
 						$this->alertUserGroup(['user' => [$user[':name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
 					}
 					$response = [
-						'response' => [
-							'id' => $user[':id'] ? : $this->_sqlinterface->_pdo->lastInsertId(),
+						'redirect' => $user[':id'] ? : $this->_sqlinterface->_pdo->lastInsertId(),
+						'toast' => [
 							'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
 							'type' => 'success'
 						]
 					];
-					if ($renewCredentials) $response['render'] = [
-						[
-							'type' => 'image',
-							'description' => $this->_lang->GET('user.export_login_credentials'),
-							'attributes' => [
-								'name' => $user[':name'] . '_token.png',
-								'url' => 'data:image/png;base64, ' . base64_encode($this->token($exportToken[':token'] ?? '', $user[':name'], $exportToken[':two_factor'] ?? ''))
-							],
-							'dimensions' => [
-								'width' => 1024,
-								'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
+					if ($renewCredentials) $response['dialog'] = [
+						'options' => [
+							$this->_lang->GET('general.ok_button') => false
+						],
+						'render' => [
+							[
+								'type' => 'image',
+								'description' => $this->_lang->GET('user.export_login_credentials'),
+								'attributes' => [
+									'name' => $user[':name'] . '_token.png',
+									'url' => 'data:image/png;base64, ' . base64_encode($this->token($exportToken[':token'] ?? '', $user[':name'], $exportToken[':two_factor'] ?? ''))
+								],
+								'dimensions' => [
+									'width' => 1024,
+									'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
+								]
 							]
 						]
 					];
 					$this->response($response);
 				}
 				else $this->response([
-					'response' => [
-						'id' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
@@ -947,7 +959,9 @@ class USER extends API {
 			case 'GET':
 				$datalist = [];
 				$options = ['...' . $this->_lang->GET('user.existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
-				$response = [];
+				$response = [
+					'title' => $this->_lang->GET('application.navigation.user_manager')
+				];
 				$max_idle_prolonging_factor = 12;
 
 				// prepare existing users lists
@@ -978,7 +992,7 @@ class USER extends API {
 					'invalidation_date' => '',
 					'two_factor' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $response['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $response['toast'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// gather available permissions
 				$permissions = [];
@@ -1004,7 +1018,7 @@ class USER extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('user.training.add_training'),
-								'onclick' => "api.user('get', 'training', 'null', " . $user['id'] . ")"
+								'onclick' => "api.user('get', null, 'training', 'null', " . $user['id'] . ")"
 							]
 						]
 					]
@@ -1052,7 +1066,7 @@ class USER extends API {
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.training.delete_confirm_header', [':name' => $row['name']]) ."', options:{".
 								"'" . $this->_lang->GET('user.training.delete_confirm_cancel') . "': false,".
 								"'" . $this->_lang->GET('user.training.delete_confirm_ok') . "': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.user('delete', 'training', ". $row['id'] . ");}})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.user('delete', null, 'training', ". $row['id'] . ");}})"
 						]
 					];
 					if ($planned){
@@ -1061,7 +1075,7 @@ class USER extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('user.training.edit'),
 								'class' => 'inlinebutton',
-								'onclick' => "this.disabled = true; api.user('get', 'training', " . $row['id'] . ");"
+								'onclick' => "this.disabled = true; api.user('get', null, 'training', " . $row['id'] . ");"
 							]
 						];
 					}
@@ -1105,7 +1119,7 @@ class USER extends API {
 							'type' => 'select',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.existing_user_select'),
-								'onchange' => "api.user('get', 'user', this.value)"
+								'onchange' => "api.user('get', null, 'user', this.value)"
 							],
 							'content' => $options
 						],
@@ -1113,7 +1127,7 @@ class USER extends API {
 							'type' => 'search',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.existing_user'),
-								'onkeydown' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.user('get', null, 'user', this.value); return false;}"
 							],
 							'datalist' => array_values(array_unique($datalist))
 						]
@@ -1230,19 +1244,19 @@ class USER extends API {
 								'onclick' => $user['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
 									"'".$this->_lang->GET('user.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('user.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
+									"}}).then(confirmation => {if (confirmation) api.user('delete', null, 'user', ". $user['id'] . ")})" : '',
 								'disabled' => $user['id'] < 2
 							]
 						]
 					]],
 					'form' => [
 						'data-usecase' => 'user',
-						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
+						'action' => $user['id'] ? "javascript:api.user('put', '[data-usecase=user]', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', '[data-usecase=user]', 'user')"
 					]];
 
 					// append image options
 					if ($user['image']) {
-								$response['render']['content'][2] = [
+						$response['render']['content'][2] = [
 							[
 								[
 									'type' => 'image',
@@ -1304,15 +1318,13 @@ class USER extends API {
 				if ($this->_sqlinterface->EXECUTE('user_delete', [
 					':id' => $user['id']
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.user_deleted', [':name' => $user['name']]),
-						'id' => false,
 						'type' => 'deleted'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.user_not_deleted', [':name' => $user['name']]),
-						'id' => $user['id'],
 						'type' => 'error'
 					]]);
 				break;
@@ -1457,12 +1469,12 @@ class USER extends API {
 				}
 				$this->_sqlinterface->EXECUTE($sqlQueryStack);
 				if (count($notfound) !== count($usernames)) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.training.save_success') . (count($notfound) ? ' ' . $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]) :''),
 						'type' => count($notfound) ? 'info' : 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]),
 						'type' => 'error'
 					]]);
@@ -1508,67 +1520,76 @@ class USER extends API {
 					}
 				}
 
-				$response = ['render' => ['content' => [
-					[
+				$response = ['dialog' => [
+					'options' => [
+						$this->_lang->GET('general.cancel_button') => false,
+						$this->_lang->GET('general.ok_button') => [
+							'value' => true,
+							'class' => 'reducedCTA'
+						]
+					],
+					'render' => [
 						[
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.name'),
-								'value' => $prefill['user']
-							],
-							'hint' => $this->_lang->GET('user.training.name_hint'),
-							'datalist' => $datalist['user']
-						], [
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.add_training'),
-								'value' => $prefill['training']
-							],
-							'datalist' => $datalist['training']
-						], [
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.schedule_timespan'),
-								'value' => $prefill['timespan']
-							],
-							'hint' => $this->_lang->GET('user.training.schedule_timespan_hint'),
-						], [
-							'type' => 'hr'
-						], [
-							'type' => 'date',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.add_date')
-							],
-						], [
-							'type' => 'date',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.add_expires')
-							],
-						], [
-							'type' => 'number',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.add_experience_points')
-							],
-						], [
-							'type' => 'checkbox',
-							'attributes' => [
-								'name' => $this->_lang->GET("user.training.add_evaluation")
-							],
-							'content' => [
-								$this->_lang->GET('user.training.add_evaluation_unreasonable') => []
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.name'),
+									'value' => $prefill['user']
+								],
+								'hint' => $this->_lang->GET('user.training.name_hint'),
+								'datalist' => $datalist['user']
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.add_training'),
+									'value' => $prefill['training']
+								],
+								'datalist' => $datalist['training']
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.schedule_timespan'),
+									'value' => $prefill['timespan']
+								],
+								'hint' => $this->_lang->GET('user.training.schedule_timespan_hint'),
+							], [
+								'type' => 'hr'
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.add_date')
+								],
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.add_expires')
+								],
+							], [
+								'type' => 'number',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.add_experience_points')
+								],
+							], [
+								'type' => 'checkbox',
+								'attributes' => [
+									'name' => $this->_lang->GET("user.training.add_evaluation")
+								],
+								'content' => [
+									$this->_lang->GET('user.training.add_evaluation_unreasonable') => []
+								]
+							], [
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.training.add_document')
+								],
+								'hint' => $this->_lang->GET('user.training.add_hint')
 							]
-						], [
-							'type' => 'file',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.training.add_document')
-							],
-							'hint' => $this->_lang->GET('user.training.add_hint')
 						]
 					]
-				]]];
+				]];
 				if ($prefill['user']) {
-					$response['render']['content'][0][0]['attributes']['readonly'] = true;
-					unset($response['render']['content'][0][0]['hint']);
+					$response['dialog']['render'][0][0]['attributes']['readonly'] = true;
+					unset($response['dialog']['render'][0][0]['hint']);
 				}
 
 				$this->response($response);
@@ -1585,13 +1606,13 @@ class USER extends API {
 					]);
 
 					$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.training.delete_confirmed'),
 						'type' => 'deleted'
 					]]);
 				}
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.training.delete_failed'),
 						'type' => 'error'
 					]]);

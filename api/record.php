@@ -18,13 +18,14 @@ require_once('./_calendarutility.php');
 
 class RECORD extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_appendDate = null;
-	private $_passedIdentify = null;
-	private $_documentExport = null;
-	private $_caseState = null;
-	private $_caseStateValue = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private mixed $_appendDate = null;
+	private mixed $_passedIdentify = null;
+	private mixed $_documentExport = null;
+	private mixed $_caseState = null;
+	private ?string $_caseStateValue = null;
+	private mixed $_modalDocument = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -35,7 +36,7 @@ class RECORD extends API {
 
 		$this->_requestedID = $this->_appendDate = REQUEST[2] ?? null;
 		$this->_passedIdentify = $this->_documentExport = $this->_caseState = REQUEST[3] ?? '';
-		$this->_caseStateValue = REQUEST[4] ?? null;
+		$this->_caseStateValue = $this->_modalDocument = REQUEST[4] ?? null;
 	}
 
 
@@ -99,7 +100,7 @@ class RECORD extends API {
 							$successMsg = $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]);
 						}
 						else $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('record.lifespan.forbidden'),
 							'type' => 'error'
 						]]);
@@ -139,16 +140,16 @@ class RECORD extends API {
 					}
 					$case[':case_state'] = UTILITY::json_encode($case_state) ? : null;
 					$case[':content'] = UTILITY::json_encode($records) ? : null;
-					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]);
+					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case[':context']][$this->_caseState]]);
 
 					if ($this->_sqlinterface->EXECUTE('records_post', $case)) $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $successMsg,
 							'type' => 'success'
 						]]);
 				}
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('record.error'),
 						'type' => 'error'
 					]]);
@@ -209,25 +210,25 @@ class RECORD extends API {
 		if ($casestate)	{
 				$message = $this->_lang->GET('record.casestate_change_message_content', [
 				':user' => $_SESSION['user']['name'],
-				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . rawurlencode($identifier) . '\')"> ' . strip_tags($identifier) . '</a>',
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', null, \'record\', \'' . rawurlencode($identifier) . '\')"> ' . strip_tags($identifier) . '</a>',
 				':casestate' => $this->_lang->GET($casestatestate === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $context . '.' . $casestate, [], true)], true)
 			], true);
 		}
 		elseif ($inquiry) {
 				$message = $this->_lang->GET('record.inquiry_message_content', [
 				':user' => $_SESSION['user']['name'],
-				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . rawurlencode($identifier) . '\')"> ' . strip_tags($identifier) . '</a>',
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', null, \'record\', \'' . rawurlencode($identifier) . '\')"> ' . strip_tags($identifier) . '</a>',
 				':inquiry' => strip_tags($inquiry)
 			], true);
 		}
 
 		if ((array_values((array)$this->_payload) || $recipient) && $this->alertUserGroup(['permission' => $permission, 'unit' => array_values((array)$this->_payload), 'user' => $recipient], $message)) $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('message.message.send_success'),
 				'type' => 'success'
 			]]);
 		else $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('message.message.send_failure', [':number' => '']),
 				'type' => 'error'
 			]]);
@@ -262,10 +263,11 @@ class RECORD extends API {
 			':identifier' => $this->_requestedID
 		]);
 		$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.mark_as_closed_info'),
 				'type' => 'success'
-			]]);
+			]
+		]);
 	}
 
 	/**
@@ -279,11 +281,14 @@ class RECORD extends API {
 	public function document(){
 		// prepare existing documents lists
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
-		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['toast' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
-		$response = ['header' => $document['name'], 'render' => [
-			'content' => []
-		]];
+		$response = [
+			'title' => $document['name'],
+			'render' => [
+				'content' => []
+			]
+		];
 
 		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, make images available on fileserver database strategy
 		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
@@ -391,7 +396,7 @@ class RECORD extends API {
 		}
 		if (saveable($response['render']['content']) && !array_intersect(['group'], $_SESSION['user']['permissions'])) $response['render']['form'] = [
 			'data-usecase' => 'record',
-			'action' => "javascript:api.record('post', 'record')",
+			'action' => "javascript:api.record('post', '[data-usecase=record]', 'record')",
 			'data-confirm' => true];
 
 		$context = [
@@ -526,7 +531,7 @@ class RECORD extends API {
 						'value' => $this->_lang->GET('assemble.render.export'),
 						'onclick' => "const formdata = new FormData(); "
 							. "formdata.append('_document_id', " . $document['id'] . "); "
-							. "api.document('post', 'export', null, formdata);"
+							. "api.document('post', '[data-usecase=record]', 'export', null, formdata);"
 						]
 				];
 			} 
@@ -553,6 +558,17 @@ class RECORD extends API {
 		}
 		if (isset($response['render']['content'][0][0]['type'])) array_push($response['render']['content'][0], ...$context); // append to first article within a section
 		else array_push($response['render']['content'][0][0], ...$context);
+
+		if ($this->_modalDocument){
+			$response['dialog'] = [
+				'options' => [
+					$this->_lang->GET("general.ok_button") => false,
+				],
+				'render' => $response['render']['content']
+			];
+			unset($response['render']);
+		}
+
 		$this->response($response);
 	}
 	
@@ -610,17 +626,16 @@ class RECORD extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-
-		$body = [];
-		array_push($body, 
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_proceed'),
-				'content' => $downloadfiles
-			]
-		);
 		$this->response([
-			'render' => $body,
+			'dialog' => [
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('record.export_proceed'),
+						'content' => $downloadfiles
+					]
+				]
+			],
 		]);
 	}
 
@@ -655,27 +670,29 @@ class RECORD extends API {
 				$tool->code_qr(UTILITY::propertySet($this->_payload, '_type') ? : 'sheet', $content, $content);
 				break;
 			case 'GET':
-				$response = ['render' =>
-				[
-					'content' => [
-						[
+				$response = [
+					'title' => $this->_lang->GET("record.navigation.create_identifier"),
+					'render' => [
+						'content' => [
 							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('record.create_identifier_info')
-								]
-							], [
-								'type' => 'scanner',
-								'hint' => $this->_lang->GET('record.create_identifier_hint'),
-								'attributes' => [
-									'name' => $this->_lang->GET('record.create_identifier'),
-									'maxlength' => CONFIG['limits']['length']['identifier'],
-									'id' => '_identifier'
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('record.create_identifier_info')
+									]
+								], [
+									'type' => 'scanner',
+									'hint' => $this->_lang->GET('record.create_identifier_hint'),
+									'attributes' => [
+										'name' => $this->_lang->GET('record.create_identifier'),
+										'maxlength' => CONFIG['limits']['length']['identifier'],
+										'id' => '_identifier'
+									]
 								]
 							]
 						]
 					]
-				]];
+				];
 				// display available options according to CONFIG
 				foreach (CONFIG['label'] as $type => $setting){
 					$response['render']['content'][] = [
@@ -751,7 +768,7 @@ class RECORD extends API {
 				} 
 				$this->response([
 					'data' => $result,
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('record.import.success'),
 						'type' => 'success'
 					]
@@ -765,14 +782,14 @@ class RECORD extends API {
 				$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
 				if ($options = $ERPQUERY->patientlookup('radio'))
 				$this->response([
-					'response' => [
-						'msg' => $options
+					'dialog' => [
+						'render' => $options
 					]
 				]);
 			}
 		}
 		$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.import.error'),
 				'type' => 'error'
 			]]);
@@ -852,22 +869,50 @@ class RECORD extends API {
 		}
 		// summarize required documents
 		foreach (array_diff($necessarydocuments, $considered) as $needed){
-			$documents[$needed] = ['href' => "javascript:api.record('get', 'document', '" . $needed . "', '" . $this->_passedIdentify . "')"];
+			$documents[$needed] = ['href' => "javascript:api.record('get', null, 'document', '" . $needed . "', '" . $this->_passedIdentify . "')"];
 		}
-
-		if ($documents) $response['render'] = [
-			[
-				'type' => 'links',
-				'description' => $this->_lang->GET('record.append_missing_document', [':bundle' => $this->_requestedID]),
-				'content' => $documents
-			]
+		$response = [
+			'dialog' => []
 		];
-		else $response['render'] =[
-			[
-				'type' => 'textsection',
-				'content' => $this->_lang->GET('record.append_missing_document_unneccessary'),
-			]
-		];
+		if ($documents) {
+			$response = [
+				'dialog' => [
+					'options' => [
+						$this->_lang->GET("general.cancel_button") => false,
+						$this->_lang->GET("record.import.ok") => [
+							'value' => true,
+							'class' => 'reducedCTA'
+						]
+					],
+					'render' => [
+						[
+							'type' => 'links',
+							'description' => $this->_lang->GET('record.append_missing_document', [':bundle' => $this->_requestedID]),
+							'content' => $documents
+						]
+					]
+				]
+			];
+		}
+		else {
+			$response = [
+				'dialog' => [
+					'options' => [
+						$this->_lang->GET("general.cancel_button") => false,
+						$this->_lang->GET("record.import.ok") => [
+							'value' => true,
+							'class' => 'reducedCTA'
+						]
+					],
+					'render' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('record.append_missing_document_unneccessary'),
+						]
+					]
+				]
+			];
+		}
 		$this->response($response);
 	}
 
@@ -917,7 +962,7 @@ class RECORD extends API {
 					':id' => $document_id
 				]);
 
-				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['toast' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 				if (strlen($entry_datetime) > 16) { // yyyy-mm-ddThh:ii datetime-locale format
 					$entry_datetime = $this->_date['usertime']->format('Y-m-d H:i');
@@ -948,7 +993,7 @@ class RECORD extends API {
 				if (!$identifier) {
 					if (!in_array($context, array_keys($this->_lang->_USER['documentcontext']['identify']))) $identifier = $document_name . ' ' . $entry_datetime;
 					else $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('record.error'),
 							'type' => 'error'
 						]]);
@@ -1139,7 +1184,7 @@ class RECORD extends API {
 								$necessarydocuments = $row['content'] ? explode(',', $row['content']) : [];
 								if ($necessarydocuments && ($documentindex = array_search($document_name, $necessarydocuments)) !== false) { // position of the current document within bundle
 									if (isset($necessarydocuments[++$documentindex]) && in_array($necessarydocuments[$documentindex], $validDocuments)) { // the next document is set and valid
-										$recommended[$necessarydocuments[$documentindex]] = ['href' => "javascript:api.record('get', 'document', '" . $necessarydocuments[$documentindex] . "', '" . $identifier . "')"];
+										$recommended[$necessarydocuments[$documentindex]] = ['href' => "javascript:api.record('get', null, 'document', '" . $necessarydocuments[$documentindex] . "', '" . $identifier . "')"];
 									}
 								}
 							}
@@ -1147,12 +1192,15 @@ class RECORD extends API {
 						ksort($recommended);
 						if ($recommended && !array_intersect(['patient'], $_SESSION['user']['permissions']))
 							$this->response([
-								'response' => [
+								'toast' => [
 									'msg' => $this->_lang->GET('record.saved'),
 									'type' => 'success'
 								],
-								'render' => [
-									'content' => [
+								'dialog' => [
+									'options' => [
+										$this->_lang->GET("general.ok_button") => false
+									],
+									'render' => [
 										[
 											'type' => 'links',
 											'description' => $this->_lang->GET('record.recommended_continue'),
@@ -1162,7 +1210,7 @@ class RECORD extends API {
 								]
 							]);
 						$this->response([
-							'response' => [
+							'toast' => [
 								'msg' => $this->_lang->GET('record.saved'),
 								'type' => 'success'
 							],
@@ -1170,14 +1218,17 @@ class RECORD extends API {
 					}
 				}
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('record.error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
 				if (array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
-				$response = ['render' => []];
+				$response = [
+					'title'	=> $this->_lang->GET("record.navigation.summaries") . ' - ' . $this->_requestedID,
+					'render' => []
+				];
 				$body = [];
 				// summarize content
 				$content = $this->summarizeRecord('full');
@@ -1263,12 +1314,12 @@ class RECORD extends API {
 							'value' => $this->_lang->GET('record.note_save'),
 							'onclick' => "const formdata = new FormData(); "
 								. "formdata.append('" . $this->_lang->GET('record.note') . "', document.getElementById('_quicknote').value); "
-								. "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'note', formdata);"
+								. "api.record('patch', formdata, 'casestate', '" . $this->_requestedID . "', 'note');"
 
 						]
 					]
 				];
-				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', this.dataset.casestate, this.checked);"
+				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('patch', null, 'casestate', '" . $this->_requestedID . "', this.value, this.checked);"
 					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
  					. UTILITY::json_encode($notification_recipients)
 					. "'), options: JSON.parse('"
@@ -1276,7 +1327,7 @@ class RECORD extends API {
 						$this->_lang->GET('general.cancel_button') => false,
 						$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 					])
-					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, response); }});"
+					."')}).then((response) => { if (response) { response.casestate = this.value; response.casestatestate = this.checked; api.record('post', response, 'casestatealert'); }});"
 					], $content['case_state'])){
 
 					// forced unit
@@ -1284,7 +1335,7 @@ class RECORD extends API {
 					foreach($this->_lang->_USER['units'] as $key => $value){
 						$unit[$value] = [
 							'value' => $key,
-							'onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'unit', this.value);"
+							'onchange' => "api.record('patch', null, 'casestate', '" . $this->_requestedID . "', 'unit', this.value);"
 						];
 						if ($content['unit'] === $key) $unit[$value]['checked'] = true;
 					}
@@ -1293,7 +1344,7 @@ class RECORD extends API {
 					foreach($this->_lang->_USER['record']['lifespan']['years'] as $years => $description){
 						$retention[$description] = [
 							'value' => $years,
-							'onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'lifespan', this.value);"
+							'onchange' => "api.record('patch', null, 'casestate', '" . $this->_requestedID . "', 'lifespan', this.value);"
 						];
 						if ($content['lifespan'] == $years) $retention[$description]['checked'] = true;
 						if(!PERMISSION::permissionFor('recordscasestate')) $retention[$description]['disabled'] = true;
@@ -1305,7 +1356,7 @@ class RECORD extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('record.erp_case_number'),
 							'value' => $content['erp_case_number'] ? : '',
-							'onkeydown' => "if (event.key==='Enter') api.record('patch', 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
+							'onkeydown' => "if (event.key==='Enter') api.record('patch', null, 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
 							'id' => '_erpcasenumbers'
 						]
 					];
@@ -1339,7 +1390,7 @@ class RECORD extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('erpquery.casedata.casepositions_button'),
 								'onclick' => "let v = document.getElementById('_erpcasenumbers').value, formdata; " .
-								"if (v) { formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', v); api.record('post', 'erpcasepositions', null, formdata);}"
+								"if (v) { formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', v); api.record('post', formdata, 'erpcasepositions');}"
 							]
 						];
 					}
@@ -1363,7 +1414,7 @@ class RECORD extends API {
 								$this->_lang->GET('general.cancel_button') => false,
 								$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 							])
-							."')}, 'FormData').then((response) => { if (response) { api.record('post', 'casestatealert', null, response); }});"
+							."')}, 'FormData').then((response) => { if (response) { api.record('post', response, 'casestatealert'); }});"
 					]
 				];
 
@@ -1437,7 +1488,7 @@ class RECORD extends API {
 							'type' => 'button',
 							'attributes' => [
 								'title' => $this->_lang->GET('record.append_document'),
-								'onclick' => "api.record('get', 'document', '" . $document . "', '" . $this->_requestedID . "')",
+								'onclick' => "api.record('get', null, 'document', '" . $document . "', '" . $this->_requestedID . "')",
 								'data-type' => 'additem',
 								'class' => 'inlinebutton'
 							]
@@ -1450,8 +1501,8 @@ class RECORD extends API {
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
 								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
-								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
+								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
+								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 							]
 						]);
@@ -1480,7 +1531,7 @@ class RECORD extends API {
 					if (array_intersect($necessarydocuments, $includedDocuments)){
 						foreach (array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
 							if (in_array($recommended, $validDocuments)) // document is permitted
-							$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
+							$recommendation[$recommended] = ['href' => "javascript:api.record('get', null, 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
 						}
 						if ($recommendation) $body[] = [[
 							'type' => 'collapsible',
@@ -1559,7 +1610,7 @@ class RECORD extends API {
 								)) . "'), options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-								"}}, 'FormData').then(response => { if (response) api.record('post', 'retype', null, response)})"
+								"}}, 'FormData').then(response => { if (response) api.record('post', response, 'retype')})"
 							]
 						];
 					}
@@ -1569,7 +1620,7 @@ class RECORD extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('user.training.add_training'),
-								'onclick' => "api.user('get', 'training')"
+								'onclick' => "api.user('get', null, 'training')"
 							]
 						];
 					}
@@ -1614,7 +1665,7 @@ class RECORD extends API {
 							) .
 							"'), options:{'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-							"}}, 'FormData').then(response => { if (response) api.record('post', 'reidentify', null, response)})"
+							"}}, 'FormData').then(response => { if (response) api.record('post', response, 'reidentify')})"
 						]
 					];
 				}
@@ -1648,7 +1699,7 @@ class RECORD extends API {
 							'type' => 'select',
 							'attributes' => [
 								'name' => $this->_lang->GET('record.match_bundles'),
-								'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
+								'onchange' => "if (this.value != '0') api.record('get', null, 'matchbundles', this.value, '" . $this->_requestedID . "')"
 							],
 							'hint' => $this->_lang->GET('record.match_bundles_hint'),
 							'content' => $bundles
@@ -1664,8 +1715,8 @@ class RECORD extends API {
 									'value' => $this->_lang->GET('record.export'),
 									'data-type' => 'download',
 									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
-									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
+									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'fullexport\', \'" . $this->_requestedID . "\')'}},".
+									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
 									"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 								]
 							]
@@ -1692,7 +1743,7 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) ."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', null, 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}
@@ -1704,7 +1755,7 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) . "': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', null, 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}
@@ -1724,7 +1775,7 @@ class RECORD extends API {
 							'attributes' => [
 								'data-type' => 'certificate',
 								'value' => $this->_lang->GET('record.verify.verify'),
-								'onclick' => "api.record('get', 'verify', '" . $this->_requestedID . "')"
+								'onclick' => "api.record('get', null, 'verify', '" . $this->_requestedID . "')"
 							]
 						];
 
@@ -1746,6 +1797,7 @@ class RECORD extends API {
 	 */
 	public function records(){
 		$response = [
+			'title'	=> $this->_lang->GET("record.navigation.summaries"),
 			'render' => ['content' => []],
 			'data' => []
 		];
@@ -1846,7 +1898,7 @@ class RECORD extends API {
 		$assignable = true;
 		$organizational_units[$this->_lang->GET('record.mine')] = [
 			'name' => $this->_lang->PROPERTY('order.organizational_unit'),
-			'onchange' => "api.record('get', 'records');"
+			'onchange' => "api.record('get', null, 'records');"
 		];
 		if (!$this->_payload->_unit) $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
 		foreach ($available_units as $unit){
@@ -1857,7 +1909,7 @@ class RECORD extends API {
 			$organizational_units[$this->_lang->_USER['units'][$unit]] = [
 				'value' => $unit,
 				'name' => $this->_lang->PROPERTY('order.organizational_unit'),
-				'onchange' => "api.record('get', 'records');"
+				'onchange' => "api.record('get', null, 'records');"
 			];
 			if ($this->_payload->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
@@ -1865,7 +1917,7 @@ class RECORD extends API {
 			$organizational_units[$this->_lang->GET('record.unassigned')] = [
 				'value' => '_unassigned',
 				'name' => $this->_lang->PROPERTY('order.organizational_unit'),
-				'onchange' => "api.record('get', 'records');"
+				'onchange' => "api.record('get', null, 'records');"
 			];
 			if ($this->_payload->_unit === '_unassigned') $organizational_units[$this->_lang->GET('record.unassigned')]['checked'] = true;
 		}
@@ -1882,7 +1934,7 @@ class RECORD extends API {
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
-						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records');}",
+						'onkeydown' => "if (event.key === 'Enter') {api.record('get', null, 'records');}",
 						'value' => $this->_payload->_filter ?? ''
 					],
 					'datalist' => $recorddatalist
@@ -1898,7 +1950,7 @@ class RECORD extends API {
 					'casedocumentation',
 					'radio',
 					[
-						'onchange' => "api.record('get', 'records');"
+						'onchange' => "api.record('get', null, 'records');"
 					],
 					isset($this->_payload->_state) ? '{"' . $this->_payload->_state . '":1}' : (isset($_SESSION['user']['app_settings']['primaryRecordState']) ? '{"' . $_SESSION['user']['app_settings']['primaryRecordState'] . '":1}': null),
 					[
@@ -2016,54 +2068,54 @@ class RECORD extends API {
 		similar_text($similar_new_id, $similar_entry_id, $percent);
 
 		if (!$thresholdconfirmation && $percent < CONFIG['likeliness']['record_reidentify_similarity']) {
-				// similar dialog on reidentify button within record method
-				$response = ['render' => ['content' => [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('record.reidentify_warning', [':percent' => CONFIG['likeliness']['record_reidentify_similarity']])
-						],
-						'content' => $entry_id . " \n-> " . $new_id
+			// similar dialog on reidentify button within record method
+			$response = ['dialog' => ['content' => [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('record.reidentify_warning', [':percent' => CONFIG['likeliness']['record_reidentify_similarity']])
 					],
-					[
-						'type' => 'button',
-						'attributes' => [
-							'data-type' => 'merge',
-							'value' => $this->_lang->GET('record.reidentify'),
-							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . UTILITY::json_encode(
+					'content' => $entry_id . " \n-> " . $new_id
+				],
+				[
+					'type' => 'button',
+					'attributes' => [
+						'data-type' => 'merge',
+						'value' => $this->_lang->GET('record.reidentify'),
+						'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . UTILITY::json_encode(
+							[
 								[
-									[
-										'type' => 'scanner',
-										'hint' => $this->_lang->GET('record.create_identifier_hint'),
-										'attributes' => [
-											'name' => $this->_lang->GET('record.create_identifier'),
-											'maxlength' => CONFIG['limits']['length']['identifier'],
-											'value' => $new_id
-										]
-									],
-									[
-										'type' => 'checkbox',
-										'content' => [
-											$this->_lang->GET('record.reidentify_confirm') => ['required' => true],
-											$this->_lang->GET('record.reidentify_similarity_confirm') => ['required' => true]
-										]
-									],
-									[
-										'type' => 'hidden',
-										'attributes' => [
-											'name' => '_previousIdentifier',
-											'value' => $entry_id
-										]
+									'type' => 'scanner',
+									'hint' => $this->_lang->GET('record.create_identifier_hint'),
+									'attributes' => [
+										'name' => $this->_lang->GET('record.create_identifier'),
+										'maxlength' => CONFIG['limits']['length']['identifier'],
+										'value' => $new_id
+									]
+								],
+								[
+									'type' => 'checkbox',
+									'content' => [
+										$this->_lang->GET('record.reidentify_confirm') => ['required' => true],
+										$this->_lang->GET('record.reidentify_similarity_confirm') => ['required' => true]
+									]
+								],
+								[
+									'type' => 'hidden',
+									'attributes' => [
+										'name' => '_previousIdentifier',
+										'value' => $entry_id
 									]
 								]
-							) .
-							"'), options:{'" . $this->_lang->GET('general.cancel_button') . "': false,".
-							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-							"}}, 'FormData').then(response => { if (response) api.record('post', 'reidentify', null, response)})"
-						]
+							]
+						) .
+						"'), options:{'" . $this->_lang->GET('general.cancel_button') . "': false,".
+						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+						"}}, 'FormData').then(response => { if (response) api.record('post', response, 'reidentify')})"
 					]
-				]]];
-				$this->response($response);
+				]
+			]]];
+			$this->response($response);
 		}
 		
 		// check if new id (e.g. scanned) is already taken
@@ -2103,7 +2155,7 @@ class RECORD extends API {
 					':id' => $merge['id'],
 					':unit' => $merge['unit']
 			])) $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
 					'type' => 'success'
 				]]);
@@ -2113,7 +2165,7 @@ class RECORD extends API {
 			$original['content'] = json_decode($original['content'], true);
 
 			if (($original['content'] = BLOCKCHAIN::merge($original['content'], $merge['content'])) === false) $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $original['identifier']]),
 					'type' => 'error'
 				]]);
@@ -2136,13 +2188,13 @@ class RECORD extends API {
 			]) && $this->_sqlinterface->EXECUTE('records_delete', [
 					':id' => $merge['id']
 			])) $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('record.reidentify_merged'),
 					'type' => 'success'
 				]]);
 		}
 		$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.reidentify_failure'),
 				'type' => 'error'
 			]]);		
@@ -2194,13 +2246,13 @@ class RECORD extends API {
 					':id' => $original['id'],
 					':unit' => $original['unit']
 			])) $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('record.saved'),
 					'type' => 'success'
 				]]);
 		}
 		$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.error'),
 				'type' => 'error'
 			]]);
@@ -2377,7 +2429,7 @@ class RECORD extends API {
 						switch ($type){
 							case 'document':
 							case 'full':
-								$summary['content'][$document][$key][] = $displayvalue . ' ~*(' . $entry['author'] . ")*~"; // append all entries
+								$summary['content'][$document][$key][] = $displayvalue . ' --*(' . $entry['author'] . ")*--"; // append all entries
 								break;
 							case 'simplified':
 							case 'simplifieddocument':
@@ -2486,12 +2538,12 @@ class RECORD extends API {
 		]);
 		$case = $case ? $case[0] : null;
 		if (!$case || ! BLOCKCHAIN::verified($this->_sqlinterface, json_decode($case['content'], true))) $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.verify.corrupt', [':identifier' => $this->_requestedID]),
 				'type' => 'error'
 			]]);
 		$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('record.verify.passed', [':identifier' => $this->_requestedID]),
 				'type' => 'success'
 			]]);

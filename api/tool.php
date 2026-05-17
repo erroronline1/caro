@@ -20,11 +20,11 @@ class TOOL extends API {
 	 */
 
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedType = null;
-	private $_code_label = null;
-	private $_code_qr = null;
-	private $_code_text = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private ?string $_requestedType = null;
+	private ?string $_code_label = null;
+	private ?string $_code_qr = null;
+	private ?string $_code_text = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -302,30 +302,35 @@ class TOOL extends API {
 			}
 		}
 
-		$response['render'] = ['form' => [
-			'data-usecase' => 'tool_calculator',
-			'action' => "javascript:api.tool('post', 'calculator', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
-		],
-		'content' => [
-			[
-				[
-					'type' => 'select',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.calculator.select_type'),
-						'onchange' => "api.tool('get', 'calculator', this.value)"
-					],
-					'content' => [
-						$this->_lang->GET('tool.calculator.pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
-						$this->_lang->GET('tool.calculator.poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
-						$this->_lang->GET('tool.calculator.thread') => $this->_requestedType === 'thread' ? ['value' => 'thread', 'selected' => true] : ['value' => 'thread'],
-						$this->_lang->GET('tool.calculator.ma') => $this->_requestedType === 'ma' ? ['value' => 'ma', 'selected' => true] : ['value' => 'ma'],
-						$this->_lang->GET('tool.calculator.cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
-						$this->_lang->GET('tool.calculator.price') => $this->_requestedType === 'price' ? ['value' => 'price', 'selected' => true] : ['value' => 'price'],
-					]
+		$response = [
+			'title' => $this->_lang->GET('tool.navigation.calculator'),
+			'render' => [
+				'form' => [
+					'data-usecase' => 'tool_calculator',
+					'action' => "javascript:api.tool('post', '[data-usecase=tool_calculator]', 'calculator', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
 				],
-				$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
+				'content' => [
+					[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.calculator.select_type'),
+								'onchange' => "api.tool('get', null, 'calculator', this.value)"
+							],
+							'content' => [
+								$this->_lang->GET('tool.calculator.pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
+								$this->_lang->GET('tool.calculator.poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
+								$this->_lang->GET('tool.calculator.thread') => $this->_requestedType === 'thread' ? ['value' => 'thread', 'selected' => true] : ['value' => 'thread'],
+								$this->_lang->GET('tool.calculator.ma') => $this->_requestedType === 'ma' ? ['value' => 'ma', 'selected' => true] : ['value' => 'ma'],
+								$this->_lang->GET('tool.calculator.cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
+								$this->_lang->GET('tool.calculator.price') => $this->_requestedType === 'price' ? ['value' => 'price', 'selected' => true] : ['value' => 'price'],
+							]
+						],
+						$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
+					]
+				]
 			]
-		]];
+		];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -434,23 +439,28 @@ class TOOL extends API {
 			if ($this->_requestedType === $type) $options[$properties['name']]['selected'] = true;
 		}
 
-		$response['render'] = ['form' => [
-			'data-usecase' => 'tool_create_code',
-			'action' => "javascript:api.tool('post', 'code', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
-		],
-		'content' => [
-			[
-				[
-					'type' => 'select',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.code.code_select_type'),
-						'onchange' => "api.tool('get', 'code', this.value)"
-					],
-					'content' => $options
+		$response = [
+			'title' => $this->_lang->GET('tool.navigation.digital_codes'),
+			'render' => [
+				'form' => [
+					'data-usecase' => 'tool_create_code',
+					'action' => "javascript:api.tool('post', '[data-usecase=tool_create_code]', 'code', '" . ($this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
 				],
-				$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
+				'content' => [
+					[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.code.code_select_type'),
+								'onchange' => "api.tool('get', null, 'code', this.value)"
+							],
+							'content' => $options
+						],
+						$types[$this->_requestedType && isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
+					]
+				]
 			]
-		]];
+		];
 
 		if ($this->_requestedType){
 			if ($types[$this->_requestedType]['code'] && count((array_keys((array) $this->_payload)))){
@@ -499,7 +509,7 @@ class TOOL extends API {
 		$code_qr = $code_qr ?? $this->_code_qr ?? null;
 		$code_text = $code_text ?? $this->_code_text ?? null;
 
-		if (!$code_qr && !$code_text ) $this->response(['response' => [
+		if (!$code_qr && !$code_text ) $this->response(['toast' => [
 			'msg' => $this->_lang->GET('record.create_identifier_error'),
 			'type' => 'error'
 		]]);
@@ -520,15 +530,19 @@ class TOOL extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$body = [
-			[
-				'type' => 'links',
-				'description' => $this->_lang->GET('record.create_identifier_proceed'),
-				'content' => $downloadfiles
-			]
-		];
 		$this->response([
-			'render' => $body
+			'dialog' => [
+				'options' => [
+					$this->_lang->GET('general.ok_button') => false
+				],
+				'render' => [
+					[
+						'type' => 'links',
+						'description' => $this->_lang->GET('record.create_identifier_proceed'),
+						'content' => $downloadfiles
+					]
+				]
+			]
 		]);
 	}
 
@@ -545,55 +559,60 @@ class TOOL extends API {
 		$watermark = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image.options_watermark'));
 		$label = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image.label'));
 
-		$response['render'] = ['form' => [
-			'data-usecase' => 'tool_image',
-			'action' => "javascript:api.tool('post', 'image')"
-		],
-		'content' => [
-			[
-				[
-					'type' => 'file',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.image.source'),
-						'multiple' => true,
-						'accept' => '.jpg,.jpeg,.png,.gif'
+		$response = [
+			'title' => $this->_lang->GET('tool.navigation.image'),
+			'render' => [
+				'form' => [
+					'data-usecase' => 'tool_image',
+					'action' => "javascript:api.tool('post', '[data-usecase=tool_image]', 'image')"
+				],
+				'content' => [
+					[
+						[
+							'type' => 'file',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.image.source'),
+								'multiple' => true,
+								'accept' => '.jpg,.jpeg,.png,.gif'
+							]
+						],
+						[
+							'type' => 'br'
+						],
+						[
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.image.options')
+							],
+							'content' => [
+								$this->_lang->GET('tool.image.options_watermark') => $watermark ? ['checked' => true] : []
+							]
+						],
+						[
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.image.label'),
+								'value' => $label ? : ''
+							]
+						],
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.image.size'),
+							],
+							'content' => [
+								'...' => !$size? ['selected' => true]: [],
+								'800 x 600' => $size === '800 x 600' ? ['selected' => true]: [],
+								'1024 x 768' => $size === '1024 x 768' ? ['selected' => true]: [],
+								'1280 x 1024' => $size === '1280 x 1024' ? ['selected' => true]: [],
+								'1600 x 1200' => $size === '1600 x 1200' ? ['selected' => true]: [],
+								'3200 x 2400' => $size === '3200 x 2400' ? ['selected' => true]: [],
+							]
+						],
 					]
-				],
-				[
-					'type' => 'br'
-				],
-				[
-					'type' => 'checkbox',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.image.options')
-					],
-					'content' => [
-						$this->_lang->GET('tool.image.options_watermark') => $watermark ? ['checked' => true] : []
-					]
-				],
-				[
-					'type' => 'text',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.image.label'),
-						'value' => $label ? : ''
-					]
-				],
-				[
-					'type' => 'select',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.image.size'),
-					],
-					'content' => [
-						'...' => !$size? ['selected' => true]: [],
-						'800 x 600' => $size === '800 x 600' ? ['selected' => true]: [],
-						'1024 x 768' => $size === '1024 x 768' ? ['selected' => true]: [],
-						'1280 x 1024' => $size === '1280 x 1024' ? ['selected' => true]: [],
-						'1600 x 1200' => $size === '1600 x 1200' ? ['selected' => true]: [],
-						'3200 x 2400' => $size === '3200 x 2400' ? ['selected' => true]: [],
-					]
-				],
+				]
 			]
-		]];
+		];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -646,10 +665,21 @@ class TOOL extends API {
 	 * 
 	 */
 	public function markdown(){
+		$response = [
+			'dialog' => [
+				'options' => [
+					$this->_lang->GET('tool.markdown.cancel') => false,
+					$this->_lang->GET('tool.markdown.convert') => [
+						'value' => true,
+						'class' => 'reducedCTA'
+					]
+				],
+				'render' => []
+			]
+		];
 		switch ($this->_requestedType){
 			case "table":
 				// table conversion
-				$response = ['render' => ['content' => []]];
 				$csv = [];
 				$md = '';
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]['tmp_name']) {
@@ -663,7 +693,7 @@ class TOOL extends API {
 						]);
 					}
 					catch(\Exception $e){
-						$response['render']['content'][] = [
+						$response['dialog']['render'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('tool.markdown.csverror'),
@@ -684,7 +714,7 @@ class TOOL extends API {
 						]);
 					}
 					catch (\Exception $e){
-						$response['render']['content'][] = [
+						$response['dialog']['render'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('tool.markdown.csverror'),
@@ -702,14 +732,14 @@ class TOOL extends API {
 						'download' => pathinfo($tempFile)['basename']
 					];
 				}
-				$response['render']['content'][] = [
+				$response['dialog']['render'][] = [
 					'type' => 'file',
 					'attributes' => [
 						'name' => $this->_lang->GET('tool.markdown.csvupload'),
 						'accept' => '.csv'
 					]
 				];
-				$response['render']['content'][] = [
+				$response['dialog']['render'][] = [
 					'type' => 'textarea',
 					'attributes' => [
 						'name' => $this->_lang->GET('tool.markdown.editor'),
@@ -717,7 +747,7 @@ class TOOL extends API {
 					]
 				];
 				if ($csv) {
-					$response['render']['content'][] = [
+					$response['dialog']['render'][] = [
 						'type' => 'links',
 						'description' => $this->_lang->GET('tool.markdown.csvdownload'),
 						'content' => $csv
@@ -726,35 +756,33 @@ class TOOL extends API {
 				break;
 			default: // quick reference and editor
 				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
-				$response = ['render' => [
-					'content' => [
+				$response['dialog']['render'] = [
+					[
 						[
-							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
-								],
-								'mdcontent' => $this->_lang->GET('tool.markdown.quick_reference')
-							], [
-								'type' => 'textarea',
-								'attributes' => [
-									'name' => $this->_lang->get('tool.markdown.editor'),
-									'rows' => 16,
-									'value' => $markdown ? : ''
-								]
-							], [
-								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('tool.markdown.csv_conversion'),
-									'onclick' => "api.tool('get', 'markdown', 'table')",
-									'class' => 'inlinebutton'
-								]
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
+							],
+							'mdcontent' => $this->_lang->GET('tool.markdown.quick_reference')
+						], [
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->get('tool.markdown.editor'),
+								'rows' => 16,
+								'value' => $markdown ? : ''
+							]
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('tool.markdown.csv_conversion'),
+								'onclick' => "api.tool('get', null, 'markdown', 'table')",
+								'class' => 'inlinebutton'
 							]
 						]
 					]
-				]];
+				];
 				if ($markdown) {
-					$response['render']['content'][] = [
+					$response['dialog']['render'][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -776,23 +804,28 @@ class TOOL extends API {
 	 *
 	 */
 	public function scanner(){
-		$response['render'] = ['content' => [
-			[
-				[
-					'type' => 'scanner',
-					'description' => $this->_lang->GET('tool.navigation.scanner'),
-					'destination' => 'tool_scanner'
-				], [
-					'type' => 'textarea',
-					'attributes' => [
-						'name' => $this->_lang->GET('tool.scanner.result'),
-						'rows' => 8,
-						'readonly' => true,
-						'id' => 'tool_scanner'
+		$response = [
+			'title' => $this->_lang->GET('tool.navigation.scanner'),
+			'render' => [
+				'content' => [
+					[
+						[
+							'type' => 'scanner',
+							'description' => $this->_lang->GET('tool.navigation.scanner'),
+							'destination' => 'tool_scanner'
+						], [
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.scanner.result'),
+								'rows' => 8,
+								'readonly' => true,
+								'id' => 'tool_scanner'
+							]
+						]
 					]
 				]
 			]
-		]];
+		];
 		$this->response($response);
 	}
 
@@ -804,37 +837,40 @@ class TOOL extends API {
 	 *        |_|  
 	 */
 	public function zip(){
-		$response['render'] = [
-			'form' => [
-				'data-usecase' => 'tool_zip',
-				'action' => "javascript:api.tool('post', 'zip')"
-			],
-			'content' => [
-				[
+		$response = [
+			'title' => $this->_lang->GET('tool.navigation.zip'),
+			'render' => [
+				'form' => [
+					'data-usecase' => 'tool_zip',
+					'action' => "javascript:api.tool('post', '[data-usecase=tool_zip]', 'zip')"
+				],
+				'content' => [
 					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.add_hint')
-						],
-						'content' => $this->_lang->GET('tool.zip.add_hint_content')
-					], [
-						'type' => 'file',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.add'),
-							'multiple' => true
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.zip.add_hint')
+							],
+							'content' => $this->_lang->GET('tool.zip.add_hint_content')
+						], [
+							'type' => 'file',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.zip.add'),
+								'multiple' => true
+							]
 						]
-					]
-				], [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.extract_hint')
-						],
-						'content' => $this->_lang->GET('tool.zip.extract_hint_content')
 					], [
-						'type' => 'file',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.extract'),
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.zip.extract_hint')
+							],
+							'content' => $this->_lang->GET('tool.zip.extract_hint_content')
+						], [
+							'type' => 'file',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.zip.extract'),
+							]
 						]
 					]
 				]
@@ -883,16 +919,19 @@ class TOOL extends API {
 						'download' => $zipname .'.zip'
 					];
 				}
-				$body = [];
-				array_push($body, 
-					[[
-						'type' => 'links',
-						'description' =>  $this->_lang->GET('tool.zip.download'),
-						'content' => $downloadfiles
-					]]
-				);
 				$this->response([
-					'render' => $body,
+					'dialog' => [
+						'options' => [
+							$this->_lang->GET('general.ok_button') => false
+						],
+						'render' => [
+							[
+							'type' => 'links',
+							'description' =>  $this->_lang->GET('tool.zip.download'),
+							'content' => $downloadfiles
+							]
+						],
+					]
 				]);
 		}
 

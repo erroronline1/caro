@@ -14,10 +14,10 @@ namespace CARO\API;
 // add and edit text recommendations
 class TEXTTEMPLATE extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[1];
-    private $_requestedID = null;
-	private $_modal = null;
-	private $_clientimport = null;
+    public ?string $_requestedMethod = REQUEST[1];
+    private mixed $_requestedID = null;
+	private ?bool $_modal = null;
+	private ?string $_clientimport = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -64,14 +64,14 @@ class TEXTTEMPLATE extends API {
 				$pattern = substr_replace($pattern, '+?', -1, 0);
 
 				foreach ([...CONFIG['forbidden']['names'], $pattern] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['toast' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 				}
 
 				$exists = null;
 				$all = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
 				foreach ($all as $entry){
 					if ($entry['type'] === 'template') continue;
-					if ($entry['name'] !== $chunk[':name'] && (str_starts_with($entry['name'], $chunk[':name']) || str_starts_with($chunk[':name'], $entry['name']))) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_name_taken'), 'type' => 'error']]);
+					if ($entry['name'] !== $chunk[':name'] && (str_starts_with($entry['name'], $chunk[':name']) || str_starts_with($chunk[':name'], $entry['name']))) $this->response(['toast' => ['msg' => $this->_lang->GET('texttemplate.error_name_taken'), 'type' => 'error']]);
 					if ($entry['name'] === $chunk[':name']){
 						$exists = $entry;
 						break;
@@ -84,14 +84,12 @@ class TEXTTEMPLATE extends API {
 				}
 
 				if ($this->_sqlinterface->EXECUTE('texttemplate_post', $chunk)) $this->response([
-					'response' => [
-						'name' => $chunk[':name'],
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.chunk.saved', [':name' => $chunk[':name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.chunk.not_saved'),
 						'type' => 'error'
 					]]);
@@ -120,7 +118,7 @@ class TEXTTEMPLATE extends API {
 					'content' => '',
 					'type' => ''
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.chunk.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $response['toast'] = ['msg' => $this->_lang->GET('texttemplate.chunk.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing chunks lists
 				$chunks = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
@@ -162,7 +160,7 @@ class TEXTTEMPLATE extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.chunk.select', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							'onchange' => "api.texttemplate('get', 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+							'onchange' => "api.texttemplate('get', null, 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 						],
 						'content' => $templates
 					];
@@ -175,7 +173,7 @@ class TEXTTEMPLATE extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.chunk.all', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							'onchange' => "api.texttemplate('get', 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+							'onchange' => "api.texttemplate('get', null, 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 						],
 						'content' => $templates
 					];
@@ -192,102 +190,105 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
-				$response['render'] = [
-					'form' => [
-						'data-usecase' => 'texttemplate',
-						'action' => "javascript:api.texttemplate('post', 'chunk')"],
-					'content' => [
-						[
+				$response = [
+					'title' => $this->_lang->GET('texttemplate.navigation.chunks') . ($chunk['name'] ? ' - '. $chunk['name'] : ''),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'texttemplate',
+							'action' => "javascript:api.texttemplate('post', '[data-usecase=texttemplate]', 'chunk')"],
+						'content' => [
 							[
 								[
-									'type' => 'collapsible',
-									'attributes' => [
-										'class' => 'em16'
-									],
-									'content' => [
-										[
-											'type' => 'search',
-											'numeration' => 'prevent',
-											'attributes' => [
-												'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-												'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
-											],
-											'datalist' => array_values(array_unique($chunkdatalist))
+									[
+										'type' => 'collapsible',
+										'attributes' => [
+											'class' => 'em16'
 										],
-										...$renderoptions
+										'content' => [
+											[
+												'type' => 'search',
+												'numeration' => 'prevent',
+												'attributes' => [
+													'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
+													'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', null, 'chunk', this.value); return false;}"
+												],
+												'datalist' => array_values(array_unique($chunkdatalist))
+											],
+											...$renderoptions
+										]
 									]
-								]
-							],
-							[
+								],
 								[
-									'type' => 'collapsible',
-									'attributes' => [
-										'class' => 'em16'
-									],
-									'content' => [
-										[
-											'type' => 'search',
-											'numeration' => 'prevent',
-											'attributes' => [
-												'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-												'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
-											],
-											'datalist' => array_values(array_unique($chunkdatalist))
+									[
+										'type' => 'collapsible',
+										'attributes' => [
+											'class' => 'em16'
 										],
-										...$renderalloptions
+										'content' => [
+											[
+												'type' => 'search',
+												'numeration' => 'prevent',
+												'attributes' => [
+													'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
+													'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', null, 'chunk', this.value); return false;}"
+												],
+												'datalist' => array_values(array_unique($chunkdatalist))
+											],
+											...$renderalloptions
+										]
 									]
 								]
-							]
-						], [
-							[
-								'type' => 'text',
-								'hint' => $this->_lang->GET('texttemplate.chunk.name_hint'),
-								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.chunk.name'),
-									'value' => $chunk['name'],
-									'pattern' => '[A-Za-z0-9]+',
-									'required' => true,
-									'data-loss' => 'prevent'
+							], [
+								[
+									'type' => 'text',
+									'hint' => $this->_lang->GET('texttemplate.chunk.name_hint'),
+									'attributes' => [
+										'name' => $this->_lang->GET('texttemplate.chunk.name'),
+										'value' => $chunk['name'],
+										'pattern' => '[A-Za-z0-9]+',
+										'required' => true,
+										'data-loss' => 'prevent'
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => $this->_lang->GET('texttemplate.chunk.type'),
+										'onchange' => "document.getElementById('insertchunk').disabled = this.value == 'replacement';",
+										'required' => true
+									],
+									'content' => [
+										'...' . $this->_lang->GET('texttemplate.template.insert_default') => ['value' => '0'],
+										$this->_lang->GET('texttemplate.chunk.types.replacement') => ['value' => 'replacement'],
+										$this->_lang->GET('texttemplate.chunk.types.text') => ['value' => 'text'],
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'id' => 'insertchunk',
+										'disabled' => $chunk['type'] !== 'text',
+										'name' => $this->_lang->GET('texttemplate.chunk.insert_name'),
+										'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+									],
+									'content' => $insertreplacement
+								], [
+									'type' => 'textarea',
+									'hint' => $this->_lang->GET('texttemplate.chunk.content_hint', [':genus' => implode(', ', $this->_lang->_USER['texttemplate']['use']['genus'])]),
+									'attributes' => [
+										'name' => $this->_lang->GET('texttemplate.chunk.content'),
+										'value' => $chunk['content'],
+										'rows' => 8,
+										'id' => 'content',
+										'required' => true,
+										'data-loss' => 'prevent'
+									],
+									'autocomplete' => $replacements
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => $this->_lang->GET('texttemplate.chunk.unit')
+									],
+									'content' => $units
 								]
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.chunk.type'),
-									'onchange' => "document.getElementById('insertchunk').disabled = this.value == 'replacement';",
-									'required' => true
-								],
-								'content' => [
-									'...' . $this->_lang->GET('texttemplate.template.insert_default') => ['value' => '0'],
-									$this->_lang->GET('texttemplate.chunk.types.replacement') => ['value' => 'replacement'],
-									$this->_lang->GET('texttemplate.chunk.types.text') => ['value' => 'text'],
-								]
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'id' => 'insertchunk',
-									'disabled' => $chunk['type'] !== 'text',
-									'name' => $this->_lang->GET('texttemplate.chunk.insert_name'),
-									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
-								],
-								'content' => $insertreplacement
-							], [
-								'type' => 'textarea',
-								'hint' => $this->_lang->GET('texttemplate.chunk.content_hint', [':genus' => implode(', ', $this->_lang->_USER['texttemplate']['use']['genus'])]),
-								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.chunk.content'),
-									'value' => $chunk['content'],
-									'rows' => 8,
-									'id' => 'content',
-									'required' => true,
-									'data-loss' => 'prevent'
-								],
-								'autocomplete' => $replacements
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.chunk.unit')
-								],
-								'content' => $units
 							]
 						]
 					]
@@ -326,7 +327,7 @@ class TEXTTEMPLATE extends API {
 							"'" .
 							$this->_lang->GET('texttemplate.delete_confirm', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$chunk['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $chunk['name']]) .
 							"': {value: true, class: 'reducedCTA'}," .
-							"}}).then(response => {if (response) api.texttemplate('delete', 'chunk', " . $chunk['id'] . ")})"
+							"}}).then(response => {if (response) api.texttemplate('delete', null, 'chunk', " . $chunk['id'] . ")})"
 						]
 					]);
 				}
@@ -342,14 +343,12 @@ class TEXTTEMPLATE extends API {
 						':id' => $this->_requestedID
 					])
 				) $this->response([
-						'response' => [
-							'name' => $template['name'],
+						'toast' => [
 							'msg' => $this->_lang->GET('texttemplate.delete_success', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']]),
 							'type' => 'success'
 						]]);
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.delete_error'),
 						'type' => 'error'
 					]]);
@@ -403,7 +402,7 @@ class TEXTTEMPLATE extends API {
 				}
 
 				//check forbidden names
-				if ($pattern = UTILITY::forbiddenName($template[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
+				if ($pattern = UTILITY::forbiddenName($template[':name'])) $this->response(['toast' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 
 				// sanitize linked files, keep only if valid 
 				$template[':linked_files'] = explode(', ', $template[':linked_files'] ? : '');
@@ -412,14 +411,12 @@ class TEXTTEMPLATE extends API {
 
 				// else post new template
 				if ($this->_sqlinterface->EXECUTE('texttemplate_post', $template)) $this->response([
-					'response' => [
-						'name' => $template[':name'],
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.template.saved', [':name' => $template[':name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.template.not_saved'),
 						'type' => 'error'
 					]]);
@@ -451,7 +448,7 @@ class TEXTTEMPLATE extends API {
 					'type' => '',
 					'linked_files' => '',
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['toast'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$templates = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
@@ -491,7 +488,7 @@ class TEXTTEMPLATE extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.template.select', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							'onchange' => "api.texttemplate('get', 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+							'onchange' => "api.texttemplate('get', null, 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 						],
 						'content' => $templates
 					];
@@ -504,7 +501,7 @@ class TEXTTEMPLATE extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.template.all', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							'onchange' => "api.texttemplate('get', 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+							'onchange' => "api.texttemplate('get', null, 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 						],
 						'content' => $templates
 					];
@@ -539,6 +536,7 @@ class TEXTTEMPLATE extends API {
 					if (in_array($path, $template['linked_files'])) $linked_files[$path]['checked'] = true;
 				}
 
+				$response['title'] = $this->_lang->GET("texttemplate.navigation.templates") . ($template['name'] ? ' - '. $template['name']: '');
 				$response['data'] = $chunks;
 				$response['selected'] = $template['content'] ? json_decode($template['content'], true): [];
 				$response['render'] = ['content' => [
@@ -555,7 +553,7 @@ class TEXTTEMPLATE extends API {
 										'numeration' => 'prevent',
 										'attributes' => [
 											'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', null, 'template', this.value); return false;}"
 										],
 										'datalist' => array_values(array_unique($templatedatalist))
 									],
@@ -575,7 +573,7 @@ class TEXTTEMPLATE extends API {
 										'numeration' => 'prevent',
 										'attributes' => [
 											'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', null, 'template', this.value); return false;}"
 										],
 										'datalist' => array_values(array_unique($templatedatalist))
 									],
@@ -625,7 +623,7 @@ class TEXTTEMPLATE extends API {
 									"'" .
 									$this->_lang->GET("assemble.compose.document.confirm") .
 									"': {value: true, class: 'reducedCTA'}," .
-									"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
+									"}}).then(confirmation => {if (confirmation) api.texttemplate('post', Composer.composeNewTextTemplate(), 'template')})",
 							]
 						]
 					], [
@@ -683,14 +681,12 @@ class TEXTTEMPLATE extends API {
 						':id' => $this->_requestedID
 					])
 				) $this->response([
-						'response' => [
-							'name' => $template['name'],
+						'toast' => [
 							'msg' => $this->_lang->GET('texttemplate.delete_success', [':type' => $this->_lang->_USER['texttemplate']['chunk']['types'][$template['type']] ?? $this->_lang->_USER['texttemplate']['template']['template'], ':name' => $template['name']]),
 							'type' => 'success'
 						]]);
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('texttemplate.delete_error'),
 						'type' => 'error'
 					]]);
@@ -719,7 +715,7 @@ class TEXTTEMPLATE extends API {
 			'name' => '',
 		];
 
-		if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['toast'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing templates lists
 		$templates = $this->_sqlinterface->EXECUTE('texttemplate_datalist');
@@ -747,7 +743,14 @@ class TEXTTEMPLATE extends API {
 				}
 			}
 		}
-		$response['render'] = ['content' => [[]]];
+		$response = [
+			'title' => $this->_lang->GET("texttemplate.navigation.texts"),
+			'render' => [
+				'content' => [
+					[]
+				]
+			]
+		];
 
 		// sort templates to units for easier access
 		foreach ($options as $unit => $templates) {
@@ -756,7 +759,7 @@ class TEXTTEMPLATE extends API {
 					'type' => 'select',
 					'attributes' => [
 						'name' => $this->_lang->GET('texttemplate.use.text_select', [':unit' => $this->_lang->_USER['units'][$unit]]),
-						'onchange' => "if (this.value) api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+						'onchange' => "if (this.value) api.texttemplate('get', null, 'text', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 					],
 					'content' => $templates
 				]
@@ -928,17 +931,25 @@ class TEXTTEMPLATE extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('texttemplate.navigation.chunks'),
-					'onclick' => "api.texttemplate('get', 'chunk')"
+					'onclick' => "api.texttemplate('get', null, 'chunk')"
 				]
 			];
 			$response['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('texttemplate.navigation.templates'),
-					'onclick' => "api.texttemplate('get', 'template'" . ($template['id'] ? ", " . $template['id'] : "") . ")"
+					'onclick' => "api.texttemplate('get', null, 'template'" . ($template['id'] ? ", " . $template['id'] : "") . ")"
 				]
 			];
 		}
+		if ($this->_modal){
+			$response['dialog'] = [
+				'render' => $response['render']['content']
+			];
+			unset($response['render']);
+			unset($response['title']);
+		}
+
 		$this->response($response);
 	}
 }

@@ -15,9 +15,9 @@ namespace CARO\API;
 class RISK extends API {
 
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_search = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private ?string $_search = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -125,15 +125,13 @@ class RISK extends API {
 						break;
 				}
 				if ($this->_sqlinterface->EXECUTE('risk_post', $risk)) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('risk.risk_saved'),
-						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('risk.risk_save_error'),
-						'id' => false,
 						'type' => 'error'
 					]]);
 				break;
@@ -233,7 +231,7 @@ class RISK extends API {
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('risk.new'),
-									'onclick' => "api.risk('get', 'risk', '" . $type . "')"
+									'onclick' => "api.risk('get', null, 'risk', '" . $type . "')"
 								]
 							]
 						]
@@ -245,7 +243,7 @@ class RISK extends API {
 								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $process,
-									'onchange' => "if (this.value && this.value !== '...') api.risk('get', 'risk', this.value)"
+									'onchange' => "if (this.value && this.value !== '...') api.risk('get', null, 'risk', this.value)"
 								],
 								'content' => $dbrisks
 							];
@@ -263,7 +261,7 @@ class RISK extends API {
 						if (PERMISSION::permissionFor('riskmanagement')) {
 							$response['render']['form'] = [
 								'data-usecase' => 'risk',
-								'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', 'risk', " . $risk['id'] . ")"
+								'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', '[data-usecase=risk]', 'risk', " . $risk['id'] . ")"
 							];
 
 							$response['render']['content'][] = [
@@ -411,7 +409,7 @@ class RISK extends API {
 					if (PERMISSION::permissionFor('riskmanagement')) {
 						$response['render']['form'] = [
 							'data-usecase' => 'risk',
-							'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', 'risk', " . $risk['id'] . ")"
+							'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', '[data-usecase=risk]', 'risk', " . $risk['id'] . ")"
 						];
 	
 						// fallback for occasional level changes in languagefile during runtime
@@ -675,7 +673,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.proof'),
 									],
-									'mdcontent' => implode("  \n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
+									'mdcontent' => implode("  \n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', null, \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
 								]
 							];
 						}
@@ -722,7 +720,7 @@ class RISK extends API {
 					'type' => 'search',
 					'attributes' => [
 						'name' => $this->_lang->GET('risk.search'),
-						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', encodeURIComponent(this.value)); return false;}",
+						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', null, 'search', encodeURIComponent(this.value)); return false;}",
 						'value' => $parameter['search'] ? : ''
 					]
 				]
@@ -755,8 +753,8 @@ class RISK extends API {
 			$slides[$slide][$tile][] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
-					'onkeydown' => "if (event.key==='Enter') api.risk('get', 'risk', " . $row['id'] . ")",
+					'onclick' => "api.risk('get', null, 'risk', " . $row['id'] . ")",
+					'onkeydown' => "if (event.key==='Enter') api.risk('get', null, 'risk', " . $row['id'] . ")",
 					'role' => 'link',
 					'tabindex' => '0',
 					'title' => $this->_lang->GET('risk.tile_title', [':type' => $this->_lang->_USER['risk']['type'][$row['type']]])
@@ -786,14 +784,13 @@ class RISK extends API {
 	 */
 	public function search(){
 		if ($result = $this->risksearch(['search' => $this->_search])) {
-			$this->response(['render' => ['content' => $result]]);
+			$this->response(['insert' => ['content' => $result]]);
 		}
 		$this->response([
-			'response' => [
+			'toast' => [
 			'msg' => $this->_lang->GET('risk.not_found', [':search' => $this->_search]),
 			'type' => 'error'
 		]]);
-
 	}
 }
 ?>

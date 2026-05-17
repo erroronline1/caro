@@ -14,9 +14,9 @@ namespace CARO\API;
  // add, edit and delete responsibilities
 class RESPONSIBILITY extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_unit = null;
+    public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private ?string $_unit = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -57,19 +57,24 @@ class RESPONSIBILITY extends API {
 						':assigned_users' => UTILITY::json_encode(($responsibility['assigned_users'])),
 						':proxy_users' => $responsibility['proxy_users']
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.accepted_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.accepted_error'),
 						'type' => 'error'
 					]]);
 				
 				break;
 			case 'GET':
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET("responsibility.navigation.responsibility"),
+					'render' => [
+						'content' => []
+					]
+				];
 				$responsibilities = $this->_sqlinterface->EXECUTE('user_responsibility_get_all');
 				$available_units = [];
 				$selected = [];
@@ -98,15 +103,15 @@ class RESPONSIBILITY extends API {
 				$organizational_units = [];
 				$available_units = array_unique($available_units);
 				sort($available_units);
-				$organizational_units[$this->_lang->GET('responsibility.my')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null', '_my')"];
+				$organizational_units[$this->_lang->GET('responsibility.my')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', null, 'responsibilities', 'null', '_my')"];
 				if ($this->_unit === '_my') $organizational_units[$this->_lang->GET('responsibility.my')]['checked'] = true;
-				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null')"];
+				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', null, 'responsibilities', 'null')"];
 				if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 				foreach ($available_units as $unit){
 					if (!$unit) {
 						continue;
 					}
-					$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null', '" . $unit . "')"];
+					$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', null, 'responsibilities', 'null', '" . $unit . "')"];
 					if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 				}
 
@@ -116,7 +121,7 @@ class RESPONSIBILITY extends API {
 						'content' => $organizational_units,
 						'attributes' => [
 							'name' => $this->_lang->GET('order.organizational_unit'),
-							'onchange' => "api.responsibility('get', 'responsibilities', this.value)"
+							'onchange' => "api.responsibility('get', null, 'responsibilities', this.value)"
 						]
 					]
 				];
@@ -137,7 +142,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', null, 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
@@ -149,7 +154,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('patch', null, 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $proxy[$user['name']]['disabled'] = true;
 						}
@@ -187,7 +192,7 @@ class RESPONSIBILITY extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('responsibility.edit'),
-								'onclick' => "api.responsibility('get', 'responsibility', " . $row['id'] . ")"
+								'onclick' => "api.responsibility('get', null, 'responsibility', " . $row['id'] . ")"
 							]
 						];
 
@@ -200,7 +205,7 @@ class RESPONSIBILITY extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('responsibility.new'),
-								'onclick' => "api.responsibility('get', 'responsibility', 'null')"
+								'onclick' => "api.responsibility('get', null, 'responsibility', 'null')"
 							]
 						]
 					];
@@ -270,26 +275,30 @@ class RESPONSIBILITY extends API {
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
 						':task' => strip_tags($responsibility[':responsibility']),
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility'). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', null, \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility'). '</a>',
 					], true)));
 
 					$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.save_success'),
 						'type' => 'success'
 					]]);
 				} else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.save_error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$response = ['render' => ['form' => [
-					'data-usecase' => 'responsibility',
-					'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', 'responsibility', " . intval($this->_requestedID) . ")"
-					],
-					'content' => []]
+				$response = [
+					'title' => $this->_lang->GET("responsibility.navigation.responsibility"),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'responsibility',
+							'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', '[data-usecase=responsibility]', 'responsibility', " . intval($this->_requestedID) . ")"
+						],
+						'content' => []
+					]
 				];
 				$responsibility = $this->_sqlinterface->EXECUTE('user_responsibility_get', [
 					':id' => intval($this->_requestedID)
@@ -385,7 +394,7 @@ class RESPONSIBILITY extends API {
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.delete_confirm') ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.responsibility('delete', 'responsibility', ". $responsibility['id'] . ")})"
+								"}}).then(confirmation => {if (confirmation) api.responsibility('delete', null, 'responsibility', ". $responsibility['id'] . ")})"
 						]
 					];
 				}
@@ -468,12 +477,12 @@ class RESPONSIBILITY extends API {
 				if ($this->_sqlinterface->EXECUTE('user_responsibility_delete', [
 					':id' => $this->_requestedID
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.delete_success'),
 						'type' => 'deleted'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.delete_error'),
 						'type' => 'error'
 					]]);

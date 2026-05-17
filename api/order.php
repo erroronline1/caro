@@ -14,11 +14,11 @@ namespace CARO\API;
 // place and process orders
 class ORDER extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_filterTerm = null;
-	private $_orderState = null;
-	private $_stateSet = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private ?string $_filterTerm = null;
+	private ?string $_orderState = null;
+	private ?string $_stateSet = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -48,7 +48,7 @@ class ORDER extends API {
 				$orders = $this->_sqlinterface->EXECUTE('order_get_approved_order_by_ids', [
 					':ids' => array_map(fn($id) => intval($id), explode('_', $this->_requestedID))
 				]);
-				if (!$orders) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
+				if (!$orders) $this->response(['toast' => ['msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 
 				foreach($orders as $order) {
 					// resolve order data
@@ -69,16 +69,14 @@ class ORDER extends API {
 									$this->statistics_update($this->_requestedID); // write to statistics about a cancelled order
 									if ($this->delete_approved_order($order)) {
 										$response = [
-										'response' => [
-											'id' => false,
+										'toast' => [
 											'msg' => $this->_lang->GET('order.deleted'),
 											'type' => 'deleted'
 										],
-										'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+										'notif' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 									}
 									else $response = [
-										'response' => [
-											'id' => $this->_requestedID,
+										'toast' => [
 											'msg' => $this->_lang->GET('order.delete_failed'),
 											'type' => 'error'
 										]];
@@ -280,15 +278,13 @@ class ORDER extends API {
 								])) {
 									$this->_requestedID = $this->_sqlinterface->_pdo->lastInsertId();
 									$response = [
-									'response' => [
-										'id' => $this->_requestedID,
+									'toast' => [
 										'msg' => $this->_lang->GET('order.saved'),
 										'type' => 'success'
 									]];
 								}
 								else $response = [
-									'response' => [
-										'id' => false,
+									'toast' => [
 										'msg' => $this->_lang->GET('order.save_failed'),
 										'type' => 'error'
 									]];
@@ -297,11 +293,11 @@ class ORDER extends API {
 					}
 					// construct result toast
 					$response = $response ?? [
-						'response' => [
+						'toast' => [
 							'msg' => in_array($this->_orderState, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_orderState) : $this->_lang->GET('order.order_type_' . ($this->_stateSet === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_orderState)]),
 							'type' => 'info'
 						],
-						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+						'notif' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
 					];
 
 					// update order statistics
@@ -341,13 +337,17 @@ class ORDER extends API {
 				if ($filter['unit']) $units = $filter['unit']; // override units with selected filter
 				else $filter['unit'] = $units; // override filter with user units if not selected 
 
-				$response = ['data' => [
-					'filter' => $filter,
-					'state' => $this->_orderState ? : 'unprocessed', // preset the appropriate language key
-					'order' => [],
-					'approval' => [],
-					'allowedstateupdates'=> [],
-					'stockfilter' => false]];
+				$response = [
+					'title' => $this->_lang->GET("order.navigation.approved_orders"),
+					'data' => [
+						'filter' => $filter,
+						'state' => $this->_orderState ? : 'unprocessed', // preset the appropriate language key
+						'order' => [],
+						'approval' => [],
+						'allowedstateupdates'=> [],
+						'stockfilter' => false
+					]
+				];
 
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
@@ -594,7 +594,7 @@ class ORDER extends API {
 										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer']['name'], ':product' => $data['name']]) .
 										"', render:'" . $this->_lang->GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']['name']]) .
 										"', options:{'" . $this->_lang->GET('general.prevent_dataloss_cancel') . "': false, '" . $this->_lang->GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
-	 									"if (confirmation) {api.purchase('patch', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
+	 									"if (confirmation) {api.order('patch', null, 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
 										"else {this.checked = false; return}" .
 										"});";
 								}
@@ -694,16 +694,14 @@ class ORDER extends API {
 				
 				if ($order && !in_array('group', $_SESSION['user']['permissions']) && $this->delete_approved_order($order)) {
 					$response = [
-					'response' => [
-						'id' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('order.deleted'),
 						'type' => 'deleted'
 					],
-					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+					'notif' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 				}
 				else $response = [
-					'response' => [
-						'id' => $this->_requestedID,
+					'toast' => [
 						'msg' => $this->_lang->GET('order.delete_failed'),
 						'type' => 'error'
 					]];
@@ -804,16 +802,16 @@ class ORDER extends API {
 			'download' => pathinfo($file)['basename']
 		];
 
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('order.export_hint'),
-				'content' => $downloadfiles
-			]]
-		);
 		$this->response([
-			'render' => $body,
+			'dialog' => [
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('order.export_hint'),
+						'content' => $downloadfiles
+					]
+				]
+			],
 		]);
 	}
 
@@ -840,13 +838,12 @@ class ORDER extends API {
 						':order_data' => UTILITY::json_encode($processedOrderData['order_data'])
 					]);
 					$response = [
-						'response' => [
-							'id' => $this->_requestedID ? : $this->_sqlinterface->_pdo->lastInsertId(),
+						'toast' => [
 							'msg' => $this->_lang->GET('order.saved_to_prepared'),
 							'type' => 'info',
-							'redirect' => ['order']
 						],
-						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+						'redirect' => ['order'],
+						'notif' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
 					];
 					break;
 				}
@@ -855,12 +852,12 @@ class ORDER extends API {
 				$response = $this->postApprovedOrder($processedOrderData);
 
 				// delete prepared order if successfully approved
-				if ($response['response']['msg'] === $this->_lang->GET('order.saved') && $this->_requestedID){
+				if ($response['toast']['msg'] === $this->_lang->GET('order.saved') && $this->_requestedID){
 					$this->_sqlinterface->EXECUTE('order_delete_prepared_orders', [
 						':id' => intval($this->_requestedID)
 						]);
-					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
-					$response['response']['redirect'] = ['order'];
+					$response['notif'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['redirect'] = ['order'];
 				}
 
 				break;
@@ -970,91 +967,96 @@ class ORDER extends API {
 
 				function order_return($order = []) { return $order['order_type'] === 'return' ? [] : ['disabled' => true];}
 
-				$response['render'] = ['form' => [
-					'data-usecase' => 'purchase',
-					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
-				],
-				'content' => [
-					...$search->productsearch('order')
-					,
-					[
-						[
-							'type' => 'radio',
-							'attributes' => [
-								'name' => $this->_lang->GET('order.organizational_unit')
-							],
-							'content' => $organizational_units
-						], [
-							'type' => 'text',
-							'hint' => $this->_lang->GET('order.commission_hint'),
-							'attributes' => [
-								'required' => true,
-								'name' => $this->_lang->GET('order.commission'),
-								'value' => $order['commission'] ?? '',
-								'data-loss' => 'prevent',
-								'id' => 'commission'
-							],
-							'datalist' => $this->_lang->_DEFAULT['order']['commission_defaults']
-						], [
-							'type' => 'scanner',
-							'destination' => 'commission'
-						], [
-							'type' => 'scanner',
-							'attributes' => [
-								'name' => $this->_lang->GET('order.administrative_mark'),
-								'value' => $order['administrative_mark'] ?? '',
-								'data-loss' => 'prevent',
-							]
-						], [
-							'type' => 'select',
-							'content' => $order_type,
-							'attributes' => [
-								'name' => $this->_lang->GET('order.order_type'),
-								'onchange' => "document.getElementById('_return_reason').disabled = this.value !== 'return'; if (this.value !== 'return') document.getElementById('_return_reason').value = '...'"
-							]
-						], [
-							'type' => 'select',
-							'content' => $return_reasons,
-							'attributes' => [
-								'id' => '_return_reason',
-								'name' => $this->_lang->GET('order.return_reason'),
-								...order_return($order)
-							]
-						], [
-							'type' => 'date',
-							'attributes' => [
-								'name' => $this->_lang->GET('order.delivery_date'),
-								'value' => $order['delivery_date'] ?? ''
-							]
-						], [
-							'type' => 'textarea',
-							'attributes' => [
-								'name' => $this->_lang->GET('order.additional_info'),
-								'value' => $order['additional_info'] ?? '',
-								'data-loss' => 'prevent'
-							]
-						]
-					],[
-						[
+				$response = [
+					'title' => $this->_lang->GET("order.navigation.order"),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'order',
+							'action' => $this->_requestedID ? "javascript:api.order('put', '[data-usecase=order]', 'order', '" . $this->_requestedID . "')" : "javascript:api.order('post', '[data-usecase=order]', 'order')"
+						],
+						'content' => [
+							...$search->productsearch('order')
+							,
 							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => $this->_lang->GET('order.attach_file'),
-									'multiple' => true
+								[
+									'type' => 'radio',
+									'attributes' => [
+										'name' => $this->_lang->GET('order.organizational_unit')
+									],
+									'content' => $organizational_units
+								], [
+									'type' => 'text',
+									'hint' => $this->_lang->GET('order.commission_hint'),
+									'attributes' => [
+										'required' => true,
+										'name' => $this->_lang->GET('order.commission'),
+										'value' => $order['commission'] ?? '',
+										'data-loss' => 'prevent',
+										'id' => 'commission'
+									],
+									'datalist' => $this->_lang->_DEFAULT['order']['commission_defaults']
+								], [
+									'type' => 'scanner',
+									'destination' => 'commission'
+								], [
+									'type' => 'scanner',
+									'attributes' => [
+										'name' => $this->_lang->GET('order.administrative_mark'),
+										'value' => $order['administrative_mark'] ?? '',
+										'data-loss' => 'prevent',
+									]
+								], [
+									'type' => 'select',
+									'content' => $order_type,
+									'attributes' => [
+										'name' => $this->_lang->GET('order.order_type'),
+										'onchange' => "document.getElementById('_return_reason').disabled = this.value !== 'return'; if (this.value !== 'return') document.getElementById('_return_reason').value = '...'"
+									]
+								], [
+									'type' => 'select',
+									'content' => $return_reasons,
+									'attributes' => [
+										'id' => '_return_reason',
+										'name' => $this->_lang->GET('order.return_reason'),
+										...order_return($order)
+									]
+								], [
+									'type' => 'date',
+									'attributes' => [
+										'name' => $this->_lang->GET('order.delivery_date'),
+										'value' => $order['delivery_date'] ?? ''
+									]
+								], [
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => $this->_lang->GET('order.additional_info'),
+										'value' => $order['additional_info'] ?? '',
+										'data-loss' => 'prevent'
+									]
 								]
-							]
-						],[
-							[
-								'type' => 'photo',
-								'attributes' => [
-									'name' => $this->_lang->GET('order.attach_photo'),
-									'multiple' => true
+							],[
+								[
+									[
+										'type' => 'file',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.attach_file'),
+											'multiple' => true
+										]
+									]
+								],[
+									[
+										'type' => 'photo',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.attach_photo'),
+											'multiple' => true
+										]
+									]
 								]
-							]
+							],
+							$authorize,
 						]
-					],
-					$authorize,
-				]];
+					]
+				];
 
 				// append identification for group members
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
@@ -1187,10 +1189,10 @@ class ORDER extends API {
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
 								"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
 								"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
+								"}}).then(confirmation => {if (confirmation) api.order('delete', null, 'order', " . $this->_requestedID . ")})"
 						]]
 					]);
-					$response['header'] = $this->_lang->GET('order.edit_prepared_order');
+					$response['title'] = $this->_lang->GET('order.edit_prepared_order');
 				}
 
 				break;
@@ -1217,15 +1219,13 @@ class ORDER extends API {
 					':id' => intval($this->_requestedID)
 				])) {
 					$response = [
-					'response' => [
-						'id' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('order.deleted'),
 						'type' => 'deleted'
 					]];
 				}
 				else $response = [
-					'response' => [
-						'id' => $this->_requestedID,
+					'toast' => [
 						'msg' => $this->_lang->GET('order.delete_failed'),
 						'type' => 'error'
 					]];
@@ -1275,16 +1275,14 @@ class ORDER extends API {
 		$errors = array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']));
 		if (!$errors) {
 			$response = [
-				'response' => [
-					'id' => false,
+				'toast' => [
 					'msg' => $this->_lang->GET('order.saved'),
 					'type' => 'success'
 				]
 			];
 		}
 		else $response = [
-			'response' => [
-				'id' => false,
+			'toast' => [
 				'msg' => $this->_lang->GET('order.save_failed'),
 				'type' => 'error'
 			]];
@@ -1363,7 +1361,7 @@ class ORDER extends API {
 				}
 
 				// if successfully posted as approved delete prepared order
-				if (isset($response['response']['msg']) && $response['response']['msg'] === $this->_lang->GET('order.saved')){
+				if (isset($response['toast']['msg']) && $response['toast']['msg'] === $this->_lang->GET('order.saved')){
 					$this->_sqlinterface->EXECUTE('order_delete_prepared_orders', [
 						':id' => $success
 					]);
@@ -1393,20 +1391,26 @@ class ORDER extends API {
 						array_push($organizational_orders, $row);
 					}
 				}
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET('order.navigation.prepared_orders'),
+					'render' => [
+						'content' => []
+					]
+				];
 
 				// users with order authorization can access all prepared orders by request
 				if ($_SESSION['user']['orderauth']){
 					$organizational_units = [];
-					$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared')"];
+					$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.order('get', null, 'prepared')"];
 					foreach ($this->_lang->_USER['units'] as $unit => $description){
-						$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
+						$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.order('get', null, 'prepared', '" . $unit . "')"];
 					}
 					if (!$this->_requestedID) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 					else $organizational_units[$this->_lang->GET('units.' . $this->_requestedID)]['checked'] = true;
 					$response['render']['content'][] = [
-						['type' => 'radio',
-						'attributes' => [
+						[
+							'type' => 'radio',
+							'attributes' => [
 							'name' => $this->_lang->GET('order.organizational_unit')
 						],
 						'content' => $organizational_units
@@ -1463,7 +1467,7 @@ class ORDER extends API {
 								'mdcontent' => $items,
 								'mdrestrictions' => [
 									'safeMode' => true,
-									'limitTo' => ['list', 'emphasis', 'larger', 'linebreak']
+									'limitTo' => ['list', 'emphasis', 'fontsize', 'linebreak']
 								]
 							],[
 								'type' => 'textsection',
@@ -1477,7 +1481,7 @@ class ORDER extends API {
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('order.edit_prepared_order'),
-									'onclick' => "api.purchase('get', 'order', " . $order['id']. ")"
+									'onclick' => "api.order('get', null, 'order', " . $order['id']. ")"
 								]
 							]
 						]);
@@ -1539,7 +1543,7 @@ class ORDER extends API {
 						// append if any authorization methods and orders are available
 						if ($authorize){
 							array_push($response['render']['content'], $authorize);
-							$response['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];	
+							$response['render']['form'] = ['action' => "javascript:api.order('put', '[data-usecase=order]', 'prepared')", 'data-usecase' => 'order'];	
 						}
 					}
 				}
@@ -1707,7 +1711,7 @@ class ORDER extends API {
 						':incorporated' => UTILITY::json_encode($product['incorporated'])
 					]);
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
-						'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . strip_tags(implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']])) . '</a>'
+						'<a href="javascript:void(0);" onclick="api.consumables(\'get\', null, \'product\', ' . $product['id'] . ')">' . strip_tags(implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']])) . '</a>'
 						. "  \n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => preg_replace('/\\\\n|\\n/', "\n  ", strip_tags($decoded_order_data['additional_info']))], true)
 					);
 				}
