@@ -609,7 +609,7 @@ class FILEHANDLER{
 		// match the first directory
 		preg_match('/^([\w\d]+)(?:\/|$)/m', $path, $relative);
 		// replace with config setting if applicable
-		if ($relative && CONFIG['fileserver'][$relative[1]] ?? false) $path = substr_replace($path, CONFIG['fileserver'][$relative[1]], 0, strlen($relative[1]));
+		if ($relative && (CONFIG['fileserver'][$relative[1]] ?? false)) $path = substr_replace($path, CONFIG['fileserver'][$relative[1]], 0, strlen($relative[1]));
 		// delete unset tokens if applicable
 		return preg_replace('/:[\w\d]+\//', '', $path);
 	}
