@@ -1367,7 +1367,7 @@ class ORDER extends API {
 					]);
 					require_once('./notification.php');
 					$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['notif'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;
 			case 'GET':
