@@ -197,7 +197,13 @@ CLASS TABLE{
 		}
 
 		foreach($response as &$path){
-			$path = $this->_filehandler->saveToFilesystem($path, $this->_filehandler->directory('tmp') . '/' . $dst);
+			$path = $this->_filehandler->saveToFilesystem(
+				tmpname: $path,
+				destination: [
+					'physical' => $this->_filehandler->directory('tmp') . '/' . $dst,
+					'relative' => 'tmp/' . $dst
+				]
+			);
 		}
 		return $response;
 	}
@@ -398,7 +404,13 @@ CLASS TABLE{
 			}
 		}
 		$writer->close();
-		$path = $this->_filehandler->saveToFilesystem($tmp_name, $this->_filehandler->directory('tmp') . '/' . $dst);
+		$path = $this->_filehandler->saveToFilesystem(
+			tmpname: $tmp_name,
+			destination: [
+				'physical' => $this->_filehandler->directory('tmp') . '/' . $dst,
+				'relative' => 'tmp/' . $dst
+			]
+		);
 
 		return [$path];
 	}
