@@ -14,9 +14,9 @@ namespace CARO\API;
 // write and read user messages
 class MEASURE extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_requestedVote = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedID = null;
+	private mixed $_requestedVote = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -35,6 +35,9 @@ class MEASURE extends API {
 	 * add, edit or view measures
 	 */
 	public function measure(){
+		$response = [
+			'title' => $this->_lang->GET('measure.navigation.measure')
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// set up general properties
@@ -48,20 +51,18 @@ class MEASURE extends API {
 					// get users and trigger system message to all
 					$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
-						':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('measure.navigation.measure', [], true). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', null, \'measure\')">' . $this->_lang->GET('measure.navigation.measure', [], true). '</a>',
 					], true)));
 
 					$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.suggestion_saved'),
-						'id' => $this->_sqlinterface->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.suggestion_save_error'),
-						'id' => false,
 						'type' => 'error'
 					]]);
 				break;
@@ -88,12 +89,12 @@ class MEASURE extends API {
 					if ($this->_sqlinterface->EXECUTE('measure_delete', [
 						':id' => $this->_requestedID
 					])) $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('measure.deleted'),
 							'type' => 'deleted'
 						]]);
 					else $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('measure.delete_error'),
 							'type' => 'error'
 						]]);
@@ -110,22 +111,21 @@ class MEASURE extends API {
 						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
 							':user' => $_SESSION['user']['name'],
 							':content' => strip_tags(substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : '')),
-							':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('measure.navigation.measure'). '</a>',
+							':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', null, \'measure\')">' . $this->_lang->GET('measure.navigation.measure'). '</a>',
 						], true)));
 					$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.measure_saved'),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.measure_save_error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$response = [];
 				// get measures and assemble selection
 				$measures = $this->_sqlinterface->EXECUTE('measure_get');
 
@@ -159,7 +159,7 @@ class MEASURE extends API {
 									"'".$this->_lang->GET('general.ok_button')."': {value: true},".
 									"'".$this->_lang->GET('general.cancel_button')."': {value: false, class: 'reducedCTA'},".
 								"}}, 'FormData').then(response => {if (response) {".
-									"api.measure('post', 'measure', null, response);}})"
+									"api.measure('post', response, 'measure', null);}})"
 						]
 					]
 				]];
@@ -194,7 +194,7 @@ class MEASURE extends API {
 								'value' => $approval,
 								'data-type' => 'upvote',
 								'class' => 'inlinebutton' . ($uservote > 0 ? ' voted': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
+								'onclick' => "api.measure('put', null, 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
 								'title' => $this->_lang->GET('measure.thumbs_up') . ($uservote > 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $approval - ($uservote > 0 ? $uservote : 0)])
 							],
 						];
@@ -204,7 +204,7 @@ class MEASURE extends API {
 								'value' => $rejection,
 								'data-type' => 'downvote',
 								'class' => 'inlinebutton' . ($uservote < 0 ? ' voted': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
+								'onclick' => "api.measure('put', null, 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
 								'title' => $this->_lang->GET('measure.thumbs_down') . ($uservote < 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $rejection + ($uservote < 0 ? $uservote : 0)])
 							],
 						];
@@ -250,7 +250,7 @@ class MEASURE extends API {
 									])
 									."'), options:{".
 										"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-									"}}, 'FormData').then(response => {if (response) { api.measure('put', 'measure', " . $measure['id'] . ", response); this.disabled = true;}});"
+									"}}, 'FormData').then(response => {if (response) { api.measure('put', response, 'measure', " . $measure['id'] . "); this.disabled = true;}});"
 							]
 						];
 					}
@@ -284,7 +284,7 @@ class MEASURE extends API {
 				if (intval($this->_requestedVote) > 0) $this->_requestedVote = 1; 
 				elseif (intval($this->_requestedVote) < 0) $this->_requestedVote = -1;
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.vote_error'),
 						'type' => 'error'
 					]]);
@@ -301,12 +301,12 @@ class MEASURE extends API {
 					':votes' => UTILITY::json_encode($measure['votes']),
 					':id' => $measure['id']
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.vote_confirm'),
 						'type' => $voted
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('measure.vote_error'),
 						'type' => 'error'
 					]]);

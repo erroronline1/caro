@@ -15,8 +15,8 @@ namespace CARO\API;
 
 class MAINTENANCE extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedType = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedType = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -42,9 +42,14 @@ class MAINTENANCE extends API {
 				$this->response([], 404);
 				break;
 			default: // get
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET('maintenance.navigation.maintenance'),
+					'render' => [
+						'content' => []
+					]
+				];
 				if (!is_file($logfile)) {
-					$response['response'] = ['msg' => $this->_lang->GET('maintenance.cron.not_found'), 'type' => 'info'];
+					$response['toast'] = ['msg' => $this->_lang->GET('maintenance.cron.not_found'), 'type' => 'info'];
 					return $response;
 				}
 				$cron = file($logfile);
@@ -60,7 +65,7 @@ class MAINTENANCE extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('maintenance.cron.delete', [':count' => count($cron) - 1]),
-						'onclick' => "api.maintenance('delete', 'task', 'cron_log')"
+						'onclick' => "api.maintenance('delete', null,'task', 'cron_log')"
 					]
 				];
 		}
@@ -76,7 +81,12 @@ class MAINTENANCE extends API {
 	 * temporarily disable erp-connection by overloading CONFIG['system']['erp']
 	 */
 	private function erp_connection(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('maintenance.navigation.maintenance'),
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				// reactivate erp_connection by restoring initial config
@@ -131,11 +141,11 @@ class MAINTENANCE extends API {
 
 		$selection = [
 			$this->_lang->GET('maintenance.erp_connection.enabled') => [
-				'onchange' => "api.maintenance('put', 'task', 'erp_connection')",
+				'onchange' => "api.maintenance('put', null,'task', 'erp_connection')",
 				'class' => 'green'
 			],
 			$this->_lang->GET('maintenance.erp_connection.disabled') => [
-				'onchange' => "api.maintenance('delete', 'task', 'erp_connection')",
+				'onchange' => "api.maintenance('delete', null, 'task', 'erp_connection')",
 				'class' => 'red'
 			]
 		];
@@ -147,7 +157,7 @@ class MAINTENANCE extends API {
 		$response['render']['content'][] = [
 			[
 				'type' => 'textsection',
-				'mdcontent' => $this->_lang->GET('maintenance.erp_connection.explanation', [':announcement' => '<a href="javascript: api.message(\'get\', \'announcements\')" class="inline">' . $this->_lang->GET('message.announcement.new') . '</a>'])
+				'mdcontent' => $this->_lang->GET('maintenance.erp_connection.explanation', [':announcement' => '<a href="javascript: api.message(\'get\', null, \'announcements\')" class="inline">' . $this->_lang->GET('message.announcement.new') . '</a>'])
 			],
 			[
 				'type' => 'radio',
@@ -170,7 +180,12 @@ class MAINTENANCE extends API {
 	 * entry point
 	 */ 
 	public function task(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('maintenance.navigation.maintenance'),
+			'render' => [
+				'content' => []
+			]
+		];
 		$selecttypes = ['...' => []];
 		
 		$methods = [
@@ -195,7 +210,7 @@ class MAINTENANCE extends API {
 				'content' => $selecttypes,
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.checks_select_type'),
-					'onchange' => "if (this.value !== '...') api.maintenance('get', 'task', this.value)"
+					'onchange' => "if (this.value !== '...') api.maintenance('get', null, 'task', this.value)"
 				]
 			]
 		];
@@ -204,7 +219,8 @@ class MAINTENANCE extends API {
 			if ($append = $this->{$this->_requestedType}()) {
 				if (isset($append['render']['content']) && $append['render']['content']) array_push($response['render']['content'], ...$append['render']['content']);
 				if (isset($append['render']['form']) && $append['render']['form']) $response['render']['form'] = $append['render']['form'];
-				if (isset($append['response']) && $append['response']) $response['response'] = $append['response'];
+				if (isset($append['toast']) && $append['toast']) $response['toast'] = $append['toast'];
+				if (isset($append['dialog']) && $append['dialog']) $response['dialog'] = $append['dialog'];
 			}
 		}
 		$this->response($response);
@@ -220,7 +236,11 @@ class MAINTENANCE extends API {
 	 * 
 	 */
 	private function documents_snapshot(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($selection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.documents_snapshot.type_selection'))) {
@@ -337,7 +357,16 @@ class MAINTENANCE extends API {
 						'download' => $snapshot .'.zip'
 					];
 
-					$this->response(['links' => $downloadfiles]);
+					$this->response([
+						'dialog' => [
+							'render' => [
+								[
+									'type' => 'links',
+									'constent' => $downloadfiles
+								]
+							]
+						]
+					]);
 				}
 			case 'GET':
 				$response['render']['content'][] = [
@@ -360,7 +389,7 @@ class MAINTENANCE extends API {
 				];
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.maintenance('post', '[data-usercase=maintenance]', 'task', '" . $this->_requestedType . "')"
 				];
 		}
 		return $response;
@@ -381,10 +410,14 @@ class MAINTENANCE extends API {
 		require_once('./erpquery.php');
 		$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
 
-		$response = ['render' => ['content' => $ERPQUERY->productsupdate()]];
+		$response = [
+			'render' => [
+				'content' => $ERPQUERY->productsupdate()
+			]
+		];
 		$response['render']['form'] = [
 			'data-usecase' => 'maintenance',
-			'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+			'action' => "javascript:api.maintenance('post', '[data-usercase=maintenance]', 'task', '" . $this->_requestedType . "')"
 		];
 
 		return $response;
@@ -401,7 +434,11 @@ class MAINTENANCE extends API {
 	 * csv for easiest handling
 	 */
 	private function records_datalist(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
@@ -415,7 +452,7 @@ class MAINTENANCE extends API {
 					$source = new TABLE($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name'][0], $sourceproperties['extension']);
 					$source = $source->dump([]);
 					if (!$source || !$source[array_key_first($source)]) {
-						$response['response'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
+						$response['toast'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
 						$response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
@@ -485,7 +522,7 @@ class MAINTENANCE extends API {
 				else {
 					$datalists = $this->_sqlinterface->EXECUTE('records_datalist_get', [':unit' => $unit]);
 					if (!$datalists){
-						$response['response'] = [
+						$response['toast'] = [
 							'msg' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							'type' => 'error'
 						];
@@ -528,7 +565,6 @@ class MAINTENANCE extends API {
 				break;
 			case 'GET':
 				// display options and explanation
-
 				$response['render']['content'][] = [
 					'type' => 'textsection',
 					'attributes' => [
@@ -557,7 +593,7 @@ class MAINTENANCE extends API {
 				];
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.maintenance('post', '[data-usecase=maintenance]', 'task', '" . $this->_requestedType . "')"
 				];
 		}
 		return $response;
@@ -571,7 +607,11 @@ class MAINTENANCE extends API {
 	 *            |_|               |_____|     |___|
 	 */
 	private function request_log(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$from = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.request_log.from'));
@@ -591,13 +631,21 @@ class MAINTENANCE extends API {
 							'download' =>'CONFIDENTIAL CARO REQUEST LOG.csv'
 						];
 					}
-					$this->response(['links' => $downloadfiles]);
+					$this->response([
+						'dialog' => [
+							'render' => [
+								[
+									'type' => 'links',
+									'content' => $downloadfiles
+								]
+							]
+						]
+					]);
 				}
-				var_dump($log);
 			case 'GET':
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.maintenance('post', '[data-usecase=maintenance]', 'task', '" . $this->_requestedType . "')"
 				];
 				$response['render']['content'] = [
 					[
@@ -637,7 +685,11 @@ class MAINTENANCE extends API {
 	 * import and update lists from csv files matching the structure of this applications risk exports
 	 */
 	private function riskupdate(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => [
+				'content' => []
+			]
+		];
 		$risks = $this->_sqlinterface->EXECUTE('risk_datalist');
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -718,7 +770,7 @@ class MAINTENANCE extends API {
 				$datalist = new Listprocessor($content);
 
 				if (!isset($datalist->_list[1])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => implode('<br />', $datalist->_log),
 						'type' => 'error'
 					]
@@ -807,7 +859,7 @@ class MAINTENANCE extends API {
 
 				$this->response(
 					[
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('maintenance.riskupdate.response', [':new' => $new, ':update' => $update]) . ($anomalies ? implode(', ', $anomalies) : ''),
 							'type' => 'info'
 						]
@@ -856,7 +908,7 @@ class MAINTENANCE extends API {
 				];
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.maintenance('post', '[data-usecase=maintenance]', 'task', '" . $this->_requestedType . "')"
 				];
 		}
 		return $response;
@@ -871,7 +923,11 @@ class MAINTENANCE extends API {
 	 * update vendor productlist filters and information with an uploaded template file
 	 */
 	private function vendorupdate(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// store within temp to remain for put action, display matches and selection
@@ -891,7 +947,7 @@ class MAINTENANCE extends API {
 					$json = file_get_contents($this->_filehandler->translate_path($file[0]['path']));
 					$json = json_decode($json, true);
 					if (!$json)	{
-						$response['response'] = [
+						$response['toast'] = [
 							'msg' => $this->_lang->GET('maintenance.vendorupdate.format_error'),
 							'type' => 'error'
 						];
@@ -935,11 +991,11 @@ class MAINTENANCE extends API {
 					}
 					$response['render']['form'] = [
 						'data-usecase' => 'maintenance',
-						'action' => "javascript:api.maintenance('put', 'task', '" . $this->_requestedType . "')"
+						'action' => "javascript:api.maintenance('put', '[data-usecase=maintenance]', 'task', '" . $this->_requestedType . "')"
 					];	
 				}
 				else {
-					$response['response'] = [
+					$response['toast'] = [
 						'msg' => $this->_lang->GET('maintenance.vendorupdate.file_error'),
 						'type' => 'error'
 					];
@@ -1041,7 +1097,7 @@ class MAINTENANCE extends API {
 				];
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.maintenance('post', '[data-usecase=maintenance]', 'task', '" . $this->_requestedType . "')"
 				];
 		}
 		return $response;

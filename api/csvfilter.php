@@ -17,7 +17,7 @@ require_once('./_csvprocessor.php');
 
 class CSVFILTER extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[1];
+    public ?string $_requestedMethod = REQUEST[1];
     private $_requestedID = null;
 
 	public function __construct($_class_vars  = []){
@@ -47,8 +47,7 @@ class CSVFILTER extends API {
 
 				// check if requested filter is found
 				if (!$filter) $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found'),
 						'type' => 'error'
 					]]);
@@ -57,8 +56,7 @@ class CSVFILTER extends API {
 				// check if input file is provided
 				$inputfile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['tmp_name'][0] : null;
 				if (!$inputfile) $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('csvfilter.use.filter_no_input_file'),
 						'type' => 'error'
 					]]);
@@ -83,8 +81,7 @@ class CSVFILTER extends API {
 						if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
 							$comparefile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]) && isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex] : null;
 							if (!$comparefile) $this->response([
-								'response' => [
-									'name' => false,
+								'toast' => [
 									'msg' => $this->_lang->GET('csvfilter.use.filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
 									'type' => 'error'
 								]]);
@@ -186,14 +183,26 @@ class CSVFILTER extends API {
 				}
 				
 				$this->response([
-					'log' => array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $datalist->_log),
-					'links' => $downloadfiles
+					'dialog' => [
+						'render' => [
+							[
+								'type' => 'textsection',
+								'content' => implode("\n", array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $datalist->_log))
+							],
+							[
+								'type' => 'links',
+								'content' => $downloadfiles
+							]
+						]
+					]
 				]);
 				break;
 			case 'GET':
 				$filterdatalist = [];
 				$options = ['...' . $this->_lang->GET('csvfilter.use.filter_select') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$response = [];
+				$response = [
+					'title' => $this->_lang->GET('csvfilter.navigation.filter')
+				];
 
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
@@ -213,7 +222,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['toast'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$filters = $this->_sqlinterface->EXECUTE('csvfilter_datalist');
@@ -241,14 +250,14 @@ class CSVFILTER extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.use.filter_select'),
-									'onchange' => "api.csvfilter('get', 'filter', this.value)"
+									'onchange' => "api.csvfilter('get', null, 'filter', this.value)"
 								],
 								'content' => $options
 							], [
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.edit.filter'),
-									'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', null, 'filter', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($filterdatalist))
 							]
@@ -339,7 +348,7 @@ class CSVFILTER extends API {
 					// append form
 					$response['render']['form'] = [
 						'data-usecase' => 'csvfilter',
-						'action' => "javascript:api.csvfilter('post', 'filter', " . $filter['id'] . ")"
+						'action' => "javascript:api.csvfilter('post', '[data-usecase=csvfilter]', 'filter', " . $filter['id'] . ")"
 					];
 				}
 
@@ -349,7 +358,7 @@ class CSVFILTER extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('csvfilter.navigation.filter_manager'),
-								'onclick' => "api.csvfilter('get', 'rule'" . ($filter['id'] ? ", " . $filter['id'] : "") . ")"
+								'onclick' => "api.csvfilter('get', null, 'rule'" . ($filter['id'] ? ", " . $filter['id'] : "") . ")"
 							]
 						]
 					];
@@ -387,7 +396,7 @@ class CSVFILTER extends API {
 				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
 
 				// ensure valid json for filters
-				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.filter_content_hint'), 'type' => 'error']]);
+				if ($filter[':content'] && !json_decode($filter[':content'], true)) $this->response(['toast' => ['msg' => $this->_lang->GET('csvfilter.edit.filter_content_hint'), 'type' => 'error']]);
 				$filter[':content'] = UTILITY::json_encode(json_decode($filter[':content'], true), JSON_PRETTY_PRINT);
 
 				// get filter passed by id
@@ -425,8 +434,7 @@ class CSVFILTER extends API {
 						}
 						$filter[':approval'] = UTILITY::json_encode($filter[':approval']) ? : null;
 						if ($this->_sqlinterface->EXECUTE('csvfilter_post', $filter)) $this->response([
-							'response' => [
-								'name' => $filter[':name'],
+							'toast' => [
 								'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
 								'type' => 'success'
 							]]);	
@@ -435,36 +443,38 @@ class CSVFILTER extends API {
 				}
 
 				// check forbidden names
-				if (UTILITY::forbiddenName($filter[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($filter[':name'])) $this->response(['toast' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 
 				// post filter
 				if ($this->_sqlinterface->EXECUTE('csvfilter_post', $filter)) {
 					if (!$filter[':id']){
 						// alert roles of a new filter to be approved
 						$filter_id = $this->_sqlinterface->_pdo->lastInsertId();
-						$message = $this->_lang->GET('csvfilter.edit.filter_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.csvfilter(\'get\', \'rule\', ' . $filter_id . ')"> ' . $filter[':name'] . '</a>'], true);
+						$message = $this->_lang->GET('csvfilter.edit.filter_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.csvfilter(\'get\', null, \'rule\', ' . $filter_id . ')"> ' . $filter[':name'] . '</a>'], true);
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('csvrules', true)], $message);
 					}
 
 					$this->response([
-						'response' => [
-							'name' => $filter[':name'],
+						'toast' => [
 							'msg' => $this->_lang->GET('csvfilter.edit.filter_saved', [':name' => $filter[':name']]),
 							'type' => 'success'
-						]]);
+						]
+					]);
 				}
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('csvfilter.edit.filter_not_saved'),
 						'type' => 'error'
-					]]);
+					]
+				]);
 				break;
 			case 'GET':
 				$filterdatalist = [];
 				$options = ['...' . $this->_lang->GET('csvfilter.edit.filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$alloptions = ['...' . $this->_lang->GET('csvfilter.edit.filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$response = [];
+				$response = [
+					'title' => $this->_lang->GET('csvfilter.navigation.filter_manager')
+				];
 
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
@@ -484,7 +494,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['toast'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$filters = $this->_sqlinterface->EXECUTE('csvfilter_datalist');
@@ -506,7 +516,7 @@ class CSVFILTER extends API {
 				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',
-						'action' => "javascript:api.csvfilter('post', 'rule' " . ($filter['id'] ? ',' . $filter['id'] : '') . ")"],
+						'action' => "javascript:api.csvfilter('post', '[data-usecase=csvfilter]', 'rule' " . ($filter['id'] ? ',' . $filter['id'] : '') . ")"],
 					'content' => [
 						[
 							[
@@ -514,14 +524,14 @@ class CSVFILTER extends API {
 									'type' => 'select',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter_select'),
-										'onchange' => "api.csvfilter('get', 'rule', this.value)"
+										'onchange' => "api.csvfilter('get', null, 'rule', this.value)"
 									],
 									'content' => $options
 								], [
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter'),
-										'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', null, 'rule', this.value); return false;}"
 									],
 									'datalist' => array_values(array_unique($filterdatalist))
 								]
@@ -530,7 +540,7 @@ class CSVFILTER extends API {
 									'type' => 'select',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter_all'),
-										'onchange' => "api.csvfilter('get', 'rule', this.value)"
+										'onchange' => "api.csvfilter('get', null, 'rule', this.value)"
 									],
 									'content' => $alloptions
 								]
@@ -617,7 +627,7 @@ class CSVFILTER extends API {
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('csvfilter.edit.delete_confirm_header', [':name' => $filter['name']]) ."', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
-								"}}).then(confirmation => {if (confirmation) {api.csvfilter('delete', 'rule', " . $filter['id'] . "); this.disabled = true;}})"
+								"}}).then(confirmation => {if (confirmation) {api.csvfilter('delete', null, 'rule', " . $filter['id'] . "); this.disabled = true;}})"
 							]
 						]);
 
@@ -637,14 +647,12 @@ class CSVFILTER extends API {
 						':id' => $this->_requestedID
 					])
 				) $this->response([
-						'response' => [
-							'name' => $filter['name'],
+						'toast' => [
 							'msg' => $this->_lang->GET('csvfilter.edit.delete_success', [':name' => $filter['name']]),
 							'type' => 'success'
 						]]);
 				else $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('csvfilter.edit.delete_error'),
 						'type' => 'error'
 					]]);

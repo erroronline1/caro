@@ -553,7 +553,7 @@ export const api = {
 									// faulty certificate or whatever
 									else
 										_serviceWorker.notif.interval = setInterval(() => {
-											api.notification("get", "notifs");
+											api.notification("get", null, "notifs");
 										}, _serviceWorker.notif.interval_duration * 2);
 
 									if (api._unauthorizedRequest.request && api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
@@ -703,7 +703,7 @@ export const api = {
 						observer.disconnect();
 						// trigger notifications only after navigation has been successufully added to the dom
 						if (_serviceWorker.worker) _serviceWorker.postMessage("getnotifications");
-						else api.notification("get", "notifs");
+						else api.notification("get", null, "notifs");
 					});
 					observer.observe(document.querySelector("nav"), {
 						childList: true,
@@ -1154,54 +1154,35 @@ export const api = {
 	 * loads, executes and manages csv filters
 	 *
 	 * @param {string} method get|post
+	 * @param {null|object|string} payload either pass FormData or a query selector string
 	 * @param {array} request api method
-	 * @returns request
 	 */
-	csvfilter: (method, ...request) => {
+	csvfilter: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["csvfilter", ...request]);
 
 		request.splice(0, 0, "csvfilter");
-		let payload,
-			successFn = function (data) {
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.log !== undefined) {
-					const dialog = {
-						header: api._lang.GET("csvfilter.use.download"),
-						type: "input",
-						render: [
-							{ type: "textsection", content: data.log.join("\n") },
-							{ type: "links", content: data.links },
-						],
-					};
-					new Dialog(dialog);
-				}
-			},
-			title = {
-				rule: api._lang.GET("csvfilter.navigation.filter_manager"),
-				filter: api._lang.GET("csvfilter.navigation.filter"),
-			};
-		switch (method) {
-			case "get":
-				successFn = function (data) {
-					if (data.render) {
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-						api.preventDataloss.start();
-					}
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				};
-				break;
-			case "post":
-				payload = _.getInputs("[data-usecase=csvfilter]", true);
-				break;
-			case "delete":
-				break;
-			default:
-				return;
-		}
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("csvfilter.use.download"),
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1214,160 +1195,66 @@ export const api = {
 	 * document component and document management with creation, editing and approval
 	 *
 	 * @param {string} method get|post|put|delete
+	 * @param {null|object|string} payload either pass FormData or a query selector string
 	 * @param  {array} request api method, name|id
-	 * @returns request
 	 */
-	document: (method, ...request) => {
+	document: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["document", ...request]);
 
 		request.splice(0, 0, "document");
-		let successFn = function (data) {
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.render !== undefined) {
-					const options = {};
-					options[api._lang.GET("general.ok_button")] = false;
-					new Dialog({
-						type: "input",
-						render: data.render,
-						options: options,
-					});
-				}
-			},
-			payload,
-			title = {
-				component_editor: api._lang.GET("assemble.navigation.manage_components"),
-				document_editor: api._lang.GET("assemble.navigation.manage_documents"),
-				approval: api._lang.GET("assemble.navigation.manage_approval"),
-				bundle: api._lang.GET("assemble.navigation.manage_bundles"),
-				bundles: api._lang.GET("assemble.navigation.bundles"),
-				documents: api._lang.GET("assemble.navigation.documents"),
-			},
-			composedComponent;
-		switch (method) {
-			case "get":
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render;
 				switch (request[1]) {
-					case "component":
-						successFn = function (data) {
-							if (data.render) {
-								data.render.content.name = data.render.name;
-								if (data.render.content) Composer.importDocument([data.render.content]);
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
 					case "component_editor":
-						Composer.componentIdentify = 0;
-						Composer.componentSignature = 0;
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-								const render = new Compose(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								if (data.render.component) Composer.importComponent(data.render.component);
-								// create multipart form for file uploads
-								Composer.addComponentMultipartFormToMain();
-								api.preventDataloss.start();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
 					case "document_editor":
 						Composer.componentIdentify = 0;
 						Composer.componentSignature = 0;
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-								const render = new Compose(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								if (data.render.components) Composer.importDocument(data.render.components);
-								api.preventDataloss.start();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					case "documentfilter":
-						api.preventDataloss.monitor = false;
-						successFn = function (data) {
-							if (data.data) {
-								const all = document.querySelectorAll("[data-filtered]"),
-									exceeding = document.querySelectorAll("[data-filtered_max]");
-								for (const element of all) {
-									if (data.filter === undefined || data.filter == "some") element.style.display = data.data.includes(element.dataset.filtered) ? api.filter(element.localName) : "none";
-									else element.style.display = data.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? api.filter(element.localName) : "none";
-								}
-							}
-						};
+						render = new Compose(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
 						break;
 					default:
-						api.update_header(title[request[1]]);
-						successFn = function (data) {
-							api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-							if (data.render) {
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
+						render = new Assemble(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
 				}
-				break;
-			case "put":
-				switch (request[1]) {
-					case "approval":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
-							if (data.data) _serviceWorker.notif.records(data.data);
-						};
-						payload = _.getInputs("[data-usecase=approval]", true);
-						break;
-				}
-				break;
-			case "post":
+			}
+			if (data.data) {
+			}
+			if (data.selected) {
 				switch (request[1]) {
 					case "component":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
-						};
-						composedComponent = Composer.composeNewComponent();
-						if (!composedComponent) return;
-						Composer.addComponentStructureToComponentForm(composedComponent);
-						payload = _.getInputs("[data-usecase=component_editor_form]", true);
+						Composer.importDocument(data.selected.content);
 						break;
-					case "document":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
-						};
-						if (!(payload = Composer.composeNewDocument())) return;
+					case "component_editor":
+						Composer.importComponent(data.selected);
+						// create multipart form for file uploads
+						Composer.addComponentMultipartFormToMain();
+						api.preventDataloss.start();
 						break;
-					case "bundle":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						payload = _.getInputs("[data-usecase=bundle]", true);
-						break;
-					case "export":
-						payload = _.getInputs("[data-usecase=record]", true);
+					case "document_editor":
+						Composer.importDocument(data.selected);
+						api.preventDataloss.start();
 						break;
 				}
-				if (request[3]) {
-					payload = request[3]; // form data object passed by utility.js
-					delete request[3];
-				}
-				break;
-			case "delete":
-				successFn = function (data) {
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
-				};
-				break;
-		}
+			}
+			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.redirect) api.document("get", null, ...data.redirect);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1380,68 +1267,35 @@ export const api = {
 	 * available data requests for regular users regarding erp data if applicable
 	 *
 	 * @param {string} method get|post
-	 * @param  {array} request api method
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method
 	 */
-	erpquery: (method, ...request) => {
+	erpquery: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["erpquery", ...request]);
 
 		request.splice(0, 0, "erpquery");
-		let payload,
-			successFn = async function (data) {
-				if (data.render) {
-					if (request[2]) await window.Masonry.breakpoints(false);
-					api.update_header(title[request[1]] + (request[2] && request[2] !== "null" && api._lang._USER.erpquery.navigation[request[2]] ? " - " + api._lang.GET("erpquery.navigation." + request[2]) : ""));
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				erpquery: api._lang.GET("erpquery.navigation.erpquery"),
-				csvdump: api._lang.GET("erpquery.navigation.csvdump"),
-				eupload: api._lang.GET("erpquery.navigation.upload"),
-			};
-
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					default:
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "csvdump":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.log !== undefined) {
-								const dialog = {
-									header: api._lang.GET("csvfilter.use.download"),
-									type: "input",
-									render: [
-										{ type: "textsection", content: data.log.join("\n") },
-										{ type: "links", content: data.links },
-									],
-								};
-								new Dialog(dialog);
-							}
-						};
-						break;
-					case "upload":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-				}
-				payload = _.getInputs("[data-usecase=erpquery]", true);
-				break;
-			case "put":
-			case "delete":
-			default:
-				return;
-		}
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("maintenance.record_datalist.download"),
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1454,82 +1308,55 @@ export const api = {
 	 * displays and manages provided files, either administrative managed or open sharepoint
 	 *
 	 * @param {string} method get|post|delete
+	 * @param {null|object|string} payload either pass FormData or a query selector string
 	 * @param  {array} request api method, search term  | requested directory name, requested filename
-	 * @returns request
 	 */
-	file: async (method, ...request) => {
+	file: async (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["file", ...request]);
 
 		request.splice(0, 0, "file");
-		let successFn = function (data) {
-				if (data.render) {
-					api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
-			},
-			payload,
-			title = {
-				files: api._lang.GET("file.navigation.files"),
-				sharepoint: api._lang.GET("file.navigation.sharepoint"),
-				filemanager: api._lang.GET("file.navigation.file_manager"),
-				externalfilemanager: api._lang.GET("file.navigation.external_file_manager"),
-			};
 
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "filter":
-						if (request[4] === "filereference") {
-							// filereference coming from assemble.js widget
-							api.preventDataloss.monitor = false;
-							successFn = function (data) {
-								let article = document.querySelector("#_fileselectionDialog form article");
-								let sibling = article.children[2], // as per assemble after label and hidden input
-									deletesibling;
-								sibling = sibling.nextSibling;
-								if (sibling) {
-									do {
-										deletesibling = sibling;
-										sibling = sibling.nextSibling;
-										deletesibling.remove();
-									} while (sibling);
-								}
-								if (data.data) {
-									const options = _client.record.filereference(data.data);
-									const render = new Assemble(options);
-									render.initializeSection(null, article.children[2]);
-									render.processAfterInsertion();
-								}
-								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-								api.preventDataloss.monitor = true;
-							};
-						} else {
-							successFn = function (data) {
-								if (data.data) {
-									const all = document.querySelectorAll("[data-filtered]");
-									for (const file of all) {
-										file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
-									}
-								}
-								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							};
-						}
-						break;
+		if (request[4] === "filereference") api.preventDataloss.monitor = false;
+
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.redirect) api.order("get", null, ...data.redirect);
+			if (data.data) {
+				if (request[4] === "filereference") {
+					// this is no real api endpoint but used for routing the behaviour of the successFn
+					let article = document.querySelector("#_fileselectionDialog form article");
+					let sibling = article.children[2], // as per assemble after label and hidden input
+						deletesibling;
+					sibling = sibling.nextSibling;
+					if (sibling) {
+						do {
+							deletesibling = sibling;
+							sibling = sibling.nextSibling;
+							deletesibling.remove();
+						} while (sibling);
+					}
+					const options = _client.record.filereference(data.data);
+					const render = new Assemble(options);
+					render.initializeSection(null, article.children[2]);
+					render.processAfterInsertion();
+					api.preventDataloss.monitor = true;
+				} else {
+					const all = document.querySelectorAll("[data-filtered]");
+					for (const file of all) {
+						file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
+					}
 				}
-				break;
-			case "post":
-				successFn = function (data) {
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.response !== undefined && data.response.redirect !== undefined) api.file("get", ...data.response.redirect);
-				};
-				payload = _.getInputs("[data-usecase=file]", true);
-				break;
-		}
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1541,46 +1368,36 @@ export const api = {
 	 *
 	 *
 	 * @param {string} method
-	 * @param  {array} request
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request
 	 */
-	maintenance: (method, ...request) => {
+	maintenance: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["maintenance", ...request]);
 
 		request.splice(0, 0, "maintenance");
-		let payload,
-			successFn = function (data) {
-				if (data.render) {
-					api.update_header(title[request[1]]);
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-					api.preventDataloss.start();
-				}
-				if (data.links) {
-					new Dialog({
-						type: "input",
-						render: [
-							{ type: "textsection", content: api._lang.GET("maintenance.record_datalist.download") },
-							{ type: "links", content: data.links },
-						],
-					});
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				task: api._lang.GET("maintenance.navigation.maintenance"),
-			};
-		switch (method) {
-			case "get":
-				break;
-			case "post":
-			case "put":
-				payload = _.getInputs("[data-usecase=maintenance]", true);
-				break;
-			default:
-		}
+
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("maintenance.record_datalist.download"),
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+				api.preventDataloss.start();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1593,47 +1410,24 @@ export const api = {
 	 * handles proposals and measures
 	 *
 	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, measure id, vote / message form data
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, measure id, vote / message form data
 	 */
-	measure: (method, ...request) => {
+	measure: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["measure", ...request]);
 
 		request.splice(0, 0, "measure");
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-			},
-			title = {
-				measure: api._lang.GET("measure.navigation.measure"),
-			};
-
-		switch (method) {
-			case "get":
-				successFn = function (data) {
-					if (data.render) {
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-					}
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				};
-				break;
-			case "put":
-			case "post":
-				if (3 in request && request[3] && request[3] instanceof FormData) {
-					// passed formdata
-					payload = request[3];
-					delete request[3];
-				}
-				break;
-			case "delete":
-				break;
-			default:
-				return;
-		}
+		let successFn = function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+			}
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1646,377 +1440,61 @@ export const api = {
 	 * handles internal messenger
 	 *
 	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, conversation partner id / message form data
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, conversation partner id / message form data
 	 */
-	message: (method, ...request) => {
+	message: (method, payload = {}, ...request) => {
 		request = [...request];
 		if (method === "get") api.history.write(["message", ...request]);
 
 		request.splice(0, 0, "message");
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.redirect) api.message("get", ...data.response.redirect);
-				if (data.links) {
-					new Dialog({
-						type: "input",
-						render: [
-							{ type: "textsection", content: api._lang.GET("maintenance.record_datalist.download") },
-							{ type: "links", content: data.links },
-						],
-					});
-				}
-			},
-			title = {
-				announcements: api._lang.GET("message.navigation.announcements"),
-				conversation: api._lang.GET("message.navigation.conversations"),
-				register: api._lang.GET("message.navigation.register"),
-				whiteboards: api._lang.GET("message.navigation.whiteboard"),
-			};
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("maintenance.record_datalist.download"),
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				if (request[1] === "conversation" && request[2]) await window.Masonry.breakpoints(false);
 
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "announcement":
-					case "announcements":
-					case "whiteboard":
-					case "whiteboards":
-						successFn = async function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					default:
-						successFn = async function (data) {
-							if (data.render) {
-								if (request[2]) await window.Masonry.breakpoints(false);
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								if (request[2]) window.scrollTo(0, document.body.scrollHeight);
-							}
-							if (data.data) _serviceWorker.notif.communication(data.data);
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-				}
-				break;
-			case "post":
-			case "put":
-				switch (request[1]) {
-					case "announcement":
-					case "announcements":
-						if (3 in request && request[3] && request[3] instanceof FormData) {
-							// passed formdata
-							payload = request[3];
-							delete request[3];
-						}
-						break;
-					default:
-						if (2 in request && request[2] && request[2] instanceof FormData) {
-							// passed formdata
-							payload = request[2];
-							delete request[2];
-						} else payload = _.getInputs("[data-usecase=message]", true);
-				}
-				break;
-			case "delete":
-				switch (request[1]) {
-					case "announcement":
-					case "announcements":
-					case "whiteboard":
-						break;
-					default:
-						// passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
-						payload = request[2];
-						delete request[2];
-				}
-				break;
-			default:
-				return;
-		}
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+
+				if (request[1] === "conversation" && request[2]) window.scrollTo(0, document.body.scrollHeight);
+			}
+			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.redirect) api.message("get", null, ...data.redirect);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
+	 *           _   _ ___ _         _   _
+	 *   ___ ___| |_|_|  _|_|___ ___| |_|_|___ ___
+	 *  |   | . |  _| |  _| |  _| .'|  _| | . |   |
+	 *  |_|_|___|_| |_|_| |_|___|__,|_| |_|___|_|_|
+	 *
 	 * fallback in case of serviceworker failing to register due to outdated ssl certificate
+	 * @param {string} method
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request
 	 */
-	notification: (method, ...request) => {
+	notification: (method, payload = {}, ...request) => {
 		request = [...request];
 
 		request.splice(0, 0, "notification");
-		let payload,
-			successFn = function (data) {
-				_serviceWorker.onMessage({ data: data });
-			};
-		api.send(method, request, successFn, null, payload);
-	},
-
-	/**
-	 *                   _
-	 *   ___ _ _ ___ ___| |_ ___ ___ ___
-	 *  | . | | |  _|  _|   | .'|_ -| -_|
-	 *  |  _|___|_| |___|_|_|__,|___|___|
-	 *  |_|
-	 * handles vendor and product management
-	 * handles orders
-	 *
-	 * @param {string} method get|post|put|patch|delete
-	 * @param  {array} request api method, id / name / filter term, occasionally subrequest, occasionally message
-	 * @returns request
-	 */
-	purchase: (method, ...request) => {
-		request = [...request];
-		if (method === "get" && !["search"].includes(request[0])) api.history.write(["purchase", ...request]);
-
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportproductlist", "search"].includes(request[0])) request.splice(0, 0, "consumables");
-		else request.splice(0, 0, "order");
-
-		let payload,
-			successFn = function (data) {
-				new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.redirect !== undefined) {
-					api.purchase("get", ...data.response.redirect);
-					return;
-				}
-				if (data.response.type !== "error" && data.response.id) {
-					api.purchase("get", request[1], data.response.id);
-					return;
-				}
-				if (data.data) _serviceWorker.notif.consumables(data.data);
-			},
-			title = {
-				vendor: api._lang.GET("consumables.navigation.vendor"),
-				product: api._lang.GET("consumables.navigation.product"),
-				order: api._lang.GET("order.navigation.order"),
-				prepared: api._lang.GET("order.navigation.prepared_orders"),
-				approved: api._lang.GET("order.navigation.approved_orders"),
-				pendingincorporations: api._lang.GET("consumables.navigation.incorporated_pending"),
-			};
-		if (request[2] === api._lang.GET("consumables.vendor.edit_existing_vendors_new")) request.splice(2, 1);
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "search":
-						switch (request[2]) {
-							case "productselection": // coming from assemble.js widget
-								successFn = function (data) {
-									let article = document.querySelector("#_productselectionDialog form article");
-									let sibling = article.children[3], // as per assemble after button, label, hint and hidden input
-										deletesibling;
-									sibling = sibling.nextSibling;
-									if (sibling) {
-										do {
-											deletesibling = sibling;
-											sibling = sibling.nextSibling;
-											deletesibling.remove();
-										} while (sibling);
-									}
-									if (data.render && data.render.content) {
-										const render = new Assemble(data.render);
-										render.initializeSection(null, article.children[3]);
-										render.processAfterInsertion();
-									}
-									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-								};
-								break;
-							default: // product management or order
-								api.preventDataloss.monitor = false;
-								successFn = function (data) {
-									let search = document.querySelector("main form, main div").firstElementChild;
-									if (data.render && data.render.content) {
-										const render = new Assemble(data.render);
-										search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
-										render.processAfterInsertion();
-									}
-									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-									api.preventDataloss.monitor = request[4] === "editconsumables";
-								};
-						}
-						payload = request[3]; // form data object with search and vendor key
-						delete request[3];
-						break;
-					case "incorporation":
-						successFn = function (data) {
-							if (data.render) {
-								new Dialog(
-									{
-										type: "input",
-										header: api._lang.GET("order.incorporation.incorporation"),
-										render: data.render.content,
-										options: data.render.options,
-									},
-									"FormData"
-								).then((response) => {
-									if (response) api.purchase("post", "incorporation", data.render.productid, response);
-									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
-								});
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					case "mdrsamplecheck":
-						successFn = function (data) {
-							if (data.render) {
-								new Dialog(
-									{
-										type: "input",
-										header: api._lang.GET("order.sample_check.sample_check", { ":vendor": data.render.vendor }),
-										render: data.render.content,
-										options: data.render.options,
-									},
-									"FormData"
-								).then((response) => {
-									if (response) api.purchase("put", "mdrsamplecheck", data.render.productid, response);
-									else new Toast(api._lang.GET("order.sample_check.failure"), "error");
-								});
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					case "export":
-						payload = _client.order.approvedFilter();
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-						break;
-					case "product":
-						if (request[2] && typeof request[2] !== "number") {
-							// pass article info as query parameters for adding unknown articles to database from orders
-							payload = JSON.parse(request[2]);
-							delete request[2];
-						}
-					// no break intentional
-					case "approved":
-						// avoid override for product request if payload isset
-						payload = payload || _client.order.approvedFilter();
-					// no break intentional
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								api.preventDataloss.start();
-							}
-							if (request[1] === "approved" && data.data) {
-								api.update_header(title[request[1]]);
-								_client.order.approved(data.data);
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.links !== undefined) {
-								const dialog = {
-									type: "input",
-									render: [{ type: "links", content: data.links }],
-								};
-								new Dialog(dialog);
-							}
-						};
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "search":
-						payload = request[3]; // form data object passed by utility.js
-						delete request[3];
-						successFn = function (data) {
-							const options = {};
-							options[api._lang.GET("general.cancel_button")] = false;
-							new Dialog({
-								type: "input",
-								header: api._lang.GET("order.manual_match"),
-								render: data.render.content,
-								options: options,
-							});
-						};
-						break;
-					case "incorporation":
-					case "mdrsamplecheck":
-						payload = request[3]; // form data object passed by utility.js
-						delete request[3];
-						successFn = function (data) {
-							if (data.render) {
-								new Dialog(
-									{
-										type: "input",
-										header: api._lang.GET("order.sample_check.sample_check", { ":vendor": data.render.vendor }),
-										render: data.render.content,
-										options: data.render.options,
-									},
-									"FormData"
-								).then((response) => {
-									if (response) api.purchase("put", "mdrsamplecheck", data.render.productid, response);
-									else new Toast(api._lang.GET("order.sample_check.failure"), "error");
-								});
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					default:
-						payload = _.getInputs("[data-usecase=purchase]", true);
-				}
-				break;
-			case "put":
-				switch (request[1]) {
-					case "prepared":
-						successFn = function (data) {
-							new Toast(data.response.msg, data.response.type);
-							if (data.data) _serviceWorker.notif.consumables(data.data);
-							api.purchase("get", "prepared");
-						};
-						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
-						break;
-					case "incorporation":
-					case "mdrsamplecheck":
-						payload = request[3]; // form data object passed by utility.js
-						delete request[3];
-						successFn = function (data) {
-							new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					default:
-						payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
-				}
-				break;
-			case "patch":
-				if (request[4] instanceof FormData) {
-					payload = request[4];
-					delete request[4];
-				} else payload = _.getInputs("[data-usecase=purchase]", true);
-				successFn = function (data) {
-					new Toast(data.response.msg, data.response.type);
-					if (data.data) _serviceWorker.notif.consumables(data.data);
-					if (data.response !== undefined && data.response.redirect !== undefined) api.purchase("get", ...data.response.redirect);
-				};
-				break;
-			case "delete":
-				switch (request[1]) {
-					case "mdrsamplecheck":
-						successFn = function (data) {
-							new Toast(data.response.msg, data.response.type);
-						};
-						break;
-				}
-				break;
-			default:
-				return;
-		}
+		let successFn = function (data) {
+			_serviceWorker.onMessage({ data: data });
+		};
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -2066,6 +1544,7 @@ export const api = {
 			if (data.title) api.update_header(data.title);
 		};
 		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (!payload || !Object.keys(payload).length) payload = _client.order.approvedFilter();
 		api.send(method, request, successFn, null, payload);
 	},
 

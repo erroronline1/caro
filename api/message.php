@@ -14,10 +14,10 @@ namespace CARO\API;
 // write and read user messages
 class MESSAGE extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_conversation = null;
-	private $_announcement = null;
-	private $_requestedID = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_conversation = null;
+	private mixed $_announcement = null;
+	private mixed $_requestedID = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -63,13 +63,13 @@ class MESSAGE extends API {
 				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
 
 				if ($this->_sqlinterface->EXECUTE('announcement_post', $announcement)) $this->response([
-					'response' => [
+					'redirect' => ['announcements'],
+					'toast' => [
 						'msg' => $this->_lang->GET('message.announcement.saved_success'),
-						'type' => 'success',
-						'redirect' => ['announcements']
+						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.announcement.saved_error'),
 						'type' => 'error'
 					]]);
@@ -78,12 +78,12 @@ class MESSAGE extends API {
 				if ($this->_sqlinterface->EXECUTE('announcement_delete', [
 					':id' => $this->_announcement
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.announcement.deleted_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.announcement.deleted_error'),
 						'type' => 'error'
 					]]);
@@ -102,7 +102,12 @@ class MESSAGE extends API {
 	 */
 	public function announcements(){
 		$announcements = $this->_sqlinterface->EXECUTE('announcement_get_all');
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('message.navigation.announcements'),
+			'render' => [
+				'content' => []
+			]
+		];
 
 		$units = [];
 		foreach($this->_lang->_USER['units'] as $key => $value){
@@ -122,7 +127,7 @@ class MESSAGE extends API {
 						)
 						."'), options:{".
 							"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-						"}}, 'FormData').then(response => {if (response) { api.message('post', 'announcement', 0, response);}});"
+						"}}, 'FormData').then(response => {if (response) { api.message('post', response, 'announcement');}});"
 				]
 			];
 		}
@@ -175,7 +180,7 @@ class MESSAGE extends API {
 							)
 							."'), options:{".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-							"}}, 'FormData').then(response => {if (response) { api.message('put', 'announcement', " . $announcement['id'] . ", response); this.disabled = true;}});"
+							"}}, 'FormData').then(response => {if (response) { api.message('put', response, 'announcement', " . $announcement['id'] . "); this.disabled = true;}});"
 					]
 				];
 				$content[] = [
@@ -185,7 +190,7 @@ class MESSAGE extends API {
 						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.announcement.delete_confirm') ."', options:{".
 							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
-						"}}).then(confirmation => {if (confirmation) {api.message('delete', 'announcement', " . $announcement['id'] . "); this.disabled = true;}})"
+						"}}).then(confirmation => {if (confirmation) {api.message('delete', null, 'announcement', " . $announcement['id'] . "); this.disabled = true;}})"
 					]
 				];
 			}
@@ -202,7 +207,7 @@ class MESSAGE extends API {
 	 *                                                                       
 	 * reusable form generator
 	 */
-	private function announcementform($preset){
+	private function announcementform($preset = []){
 		$highlights = [];
 		foreach($this->_lang->_USER['message']['announcement']['highlights'] as $key => $translation){
 			$highlights[$translation] = ['value' => $key, 'class' => $key === 'null' ? '' : $key];
@@ -275,7 +280,12 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				$datalist = [];
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET('message.navigation.conversations'),
+					'render' => [
+						'content' => []
+					]
+				];
 				// prepare existing users lists
 				$user = $this->_sqlinterface->EXECUTE('user_get_datalist');
 				$administrativeUser = [];
@@ -345,7 +355,7 @@ class MESSAGE extends API {
 									"}}).then(confirmation => { if (confirmation) {" .
 										"let ids = [];" .
 										"document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
-										"api.message('delete', 'conversation', {_selectedconversation: ids.join('_')});" . // passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
+										"api.message('delete', {_selectedconversation: ids.join('_')}, 'conversation');" . // passed message ids to delete as query string [Bad Request - Invalid URL](https://stackoverflow.com/a/46366685)
 									"} })"
 							]
 						]
@@ -382,12 +392,12 @@ class MESSAGE extends API {
 						];
 						$response['render']['form'] = [
 							'data-usecase' => 'message',
-							'action' => "javascript:api.message('post', 'message', '_')"
+							'action' => "javascript:api.message('post', '[data-usecase=message]', 'message', '_')"
 						];
 					}
 					require_once('./notification.php');
 					$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
-					$response['data'] = ['message_unseen' => $notifications->messageunseen()];
+					$response['notif'] = ['message_unseen' => $notifications->messageunseen()];
 				}
 				else {
 					// display "mailbox"
@@ -428,7 +438,7 @@ class MESSAGE extends API {
 										'unseen' => $unseen
 									],
 									'attributes' =>  [
-										'onclick' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
+										'onclick' => "api.message('get', null, 'conversation', '" . $conversation['conversation_user'] . "')",
 									]
 								]
 							];
@@ -443,9 +453,9 @@ class MESSAGE extends API {
 					':ids' => array_map(fn($id) => intval($id), explode('_', UTILITY::propertySet($this->_payload, '_selectedconversation') ? : ''))
 				]);
 				$this->response([
-					'response' => [
+					'redirect' => ['conversation'],
+					'toast' => [
 						'msg' => $this->_lang->GET('message.message.delete_success'),
-						'redirect' => ['conversation'],
 						'type' => 'deleted'
 					]]);
 				// for some weird reason safari does return an error response albeit messages being deleted. does not occur on desktop.
@@ -480,7 +490,7 @@ class MESSAGE extends API {
 					':names' => preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.to')) ? : '')
 				]);
 				if (!$recipients) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.to'))]),
 						'type' => 'error'
 					]]);
@@ -488,7 +498,7 @@ class MESSAGE extends API {
 				if (($self = array_search($_SESSION['user']['id'], array_column($recipients, 'id'))) !== false) {
 					unset($recipients[$self]);
 					if (!$recipients) $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('message.message.send_failure_self'),
 							'type' => 'error'
 						]]);
@@ -499,9 +509,8 @@ class MESSAGE extends API {
 					if ($recipient['id'] < 2) continue;
 					$message = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message_to', [':user' => $recipient['name']]));
 					if (!$message) $this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('message.message.send_failure', [':number' => count($recipients)]),
-							'redirect' => false,
 							'type' => 'error'
 						]]);
 					$sqlQueryStack = $this->_sqlinterface->PACK($sqlQueryStack, $this->_sqlinterface->PREPARE('message_post_message', [
@@ -512,15 +521,14 @@ class MESSAGE extends API {
 				}
 				$success = array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)) / 2; // message_post_message affects 2 rows for sender and receiver
 				if ($success === count($recipients)) $this->response([
-					'response' => [
+					'redirect' => ['conversation', count($recipients) < 2 ? $recipients[0]['id'] : 0],
+					'toast' => [
 						'msg' => $this->_lang->GET('message.message.send_success'),
-						'redirect' => ['conversation', count($recipients) < 2 ? $recipients[0]['id'] : 0],
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.message.send_failure', [':number' => count($recipients) - $success]),
-						'redirect' => false,
 						'type' => 'error'
 					]]);
 				break;
@@ -538,7 +546,12 @@ class MESSAGE extends API {
 	public function register(){
 		// prepare existing users lists
 		$users = $this->_sqlinterface->EXECUTE('user_get_datalist');
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('message.navigation.register'),
+			'render' => [
+				'content' => []
+			]
+		];
 
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		// preset groups with given order from language file
@@ -648,7 +661,12 @@ class MESSAGE extends API {
 	 * temporary notes 
 	 */
 	public function whiteboard(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('message.navigation.whiteboard'),
+			'render' => [
+				'content' => []
+			]
+		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
@@ -686,9 +704,9 @@ class MESSAGE extends API {
 					if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
 				}
 
+				$paths = [];
 				if ($this->_sqlinterface->EXECUTE('whiteboard_post', $whiteboard)) {
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.doodle_export')) && $_FILES["_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')]){
-						$paths = [];
 						foreach ($this->_filehandler->storeUploadedFiles(
 							input: [
 								"_DOODLE".$this->_lang->PROPERTY('message.whiteboard.doodle')
@@ -700,28 +718,30 @@ class MESSAGE extends API {
 								'prefix' => $whiteboard[':name']
 							]
 						) as $file){
-							$paths[pathinfo($file)['basename']] = [
+							$paths[pathinfo($file['path'])['basename']] = [
 								'href' => $this->_filehandler->getFileLink($file['path']),
 								'download' => pathinfo($file['path'])['basename']
 							];
 						}
-						$this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
-								'type' => 'success'
-							],
-							'links' => $paths
-						]);
 					}
-
-					$this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
-						'type' => 'success'
-					]]);
+					$response = [
+						'toast' => [
+							'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
+							'type' => 'success'
+						]
+					];
+					if ($paths) $response['dialog'] = [
+						'render' => [
+							[
+								'type' => 'links',
+								'content' => $paths
+							]
+						]
+					];
+					$this->response($response);
 				}
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.whiteboard.saved_error'),
 						'type' => 'error'
 					]]);
@@ -734,7 +754,7 @@ class MESSAGE extends API {
 
 				$response['render']['form'] = [
 					'data-usecase' => 'message',
-					'action' => "javascript:api.message('" . ($whiteboard ? 'put' : 'post') . "', 'whiteboard', " . $this->_requestedID . ")"
+					'action' => "javascript:api.message('" . ($whiteboard ? 'put' : 'post') . "', '[data-usecase=message]', 'whiteboard', " . $this->_requestedID . ")"
 
 				];
 				$response['render']['content'][] = [
@@ -782,7 +802,7 @@ class MESSAGE extends API {
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.whiteboard.delete_confirm') ."', options:{".
 									"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 									"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
-								"}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', " . $whiteboard['id'] . "); this.disabled = true;}})"
+								"}}).then(confirmation => {if (confirmation) {api.message('delete', null, 'whiteboard', " . $whiteboard['id'] . "); this.disabled = true;}})"
 								]
 							]
 						];
@@ -814,12 +834,12 @@ class MESSAGE extends API {
 				if ($this->_sqlinterface->EXECUTE('whiteboard_delete', [
 					':id' => $this->_requestedID
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.whiteboard.deleted_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('message.whiteboard.deleted_error'),
 						'type' => 'error'
 					]]);
@@ -836,17 +856,22 @@ class MESSAGE extends API {
 	 * temporary notes overview and navigation
 	 */
 	public function whiteboards(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('message.navigation.whiteboard'),
+			'render' => [
+				'content' => []
+			]
+		];
 
 		$whiteboards = $adminview = [];
 		foreach($this->_sqlinterface->EXECUTE('whiteboard_get_all') as $whiteboard){
 			$whiteboard['user_name'] = $whiteboard['user_name'] ? : $this->_lang->GET('general.deleted_user');
 			if ($whiteboard['organizational_unit']) $whiteboard['organizational_unit'] = explode(',', $whiteboard['organizational_unit']);
 			if (!$whiteboard['organizational_unit'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || in_array('common', $whiteboard['organizational_unit']) || array_intersect($_SESSION['user']['units'], $whiteboard['organizational_unit'])){
-				$whiteboards[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', 'whiteboard', " . $whiteboard['id'] . ")"];
+				$whiteboards[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', null, 'whiteboard', " . $whiteboard['id'] . ")"];
 			}
 			else {
-				$adminview[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', 'whiteboard', " . $whiteboard['id'] . ")"];
+				$adminview[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', null, 'whiteboard', " . $whiteboard['id'] . ")"];
 			}
 		}
 
@@ -855,7 +880,7 @@ class MESSAGE extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('message.whiteboard.new'),
-					'onclick' => "api.message('get', 'whiteboard')"
+					'onclick' => "api.message('get', null, 'whiteboard')"
 				]
 			]
 		];

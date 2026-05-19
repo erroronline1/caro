@@ -16,7 +16,7 @@ namespace CARO\API;
 // other methods can and should be reusable from within the application where implemented
 class ERPQUERY extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
+	public ?string $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 
 	public function __construct($_class_vars  = []){
@@ -38,7 +38,12 @@ class ERPQUERY extends API {
 	 * calls $this->_requestedType method if set
 	 */
 	public function erpquery(){
-		$response['render'] = ['content' => []];
+		$response = [
+			'title' => $this->_lang->GET('erpquery.navigation.erpquery'),
+			'render' => [
+				'content' => []
+			]
+		];
 		$selecttypes = ['...' => []];
 		
 		$categories = [];
@@ -58,7 +63,7 @@ class ERPQUERY extends API {
 				'content' => $selecttypes,
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.checks_select_type'),
-					'onchange' => "if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"
+					'onchange' => "if (this.value !== '...') api.erpquery('get', null, 'erpquery', this.value)"
 				]
 			]
 		];
@@ -68,7 +73,7 @@ class ERPQUERY extends API {
 				array_push($response['render']['content'] , ...$append);
 				$response['render']['form'] = [
 					'data-usecase' => 'erpquery',
-					'action' => "javascript:api.erpquery('post', 'erpquery', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.erpquery('post', null, 'erpquery', '" . $this->_requestedType . "')"
 				];
 			}
 		}
@@ -206,7 +211,7 @@ class ERPQUERY extends API {
 					foreach($cases as $case){
 						$description = $case['caseid'] . ' - ' . $case['text'];
 						if ($case['info']) $description .= ' - ' . $case['info'];
-						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "let formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', 'erpcasepositions', null, formdata);"];
+						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "let formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', formdata, 'erpcasepositions');"];
 					}
 					$content[] = [
 						'type' => 'links',
@@ -282,7 +287,7 @@ class ERPQUERY extends API {
 								':amount' => $order['amount'],
 								':delivered_full' => $order['delivered_full'] ? $this->convertFromServerTime($order['delivered_full']) : '?'
 							]
-						)] = ['href' => "javascript: setTimeout(api.purchase('get', 'order'), 100); setTimeout(api.purchase('get', 'search', 'order', {vendor: encodeURIComponent('" . $order['vendor'] . "'), search: encodeURIComponent('" . $order['article_no'] . "')}), 1000)"];
+						)] = ['href' => "javascript: setTimeout(api.order('get', null, 'order'), 100); setTimeout(api.consumables('get', {vendor: encodeURIComponent('" . $order['vendor'] . "'), search: encodeURIComponent('" . $order['article_no'] . "')}, 'search', 'order'), 1000)"];
 					}
 					$content[] = [
 						'type' => 'links',
@@ -483,8 +488,7 @@ class ERPQUERY extends API {
 			case 'POST':
 				$result = ERPINTERFACE->customcsvdump($this->_requestedType, (array) $this->_payload);
 				if ($result === null || !$result) $this->response([
-					'response' => [
-						'name' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('erpquery.null'),
 						'type' => 'error'
 					]]);
@@ -495,8 +499,15 @@ class ERPQUERY extends API {
 						'download' => $resultinfo['basename']
 					];				
 				$this->response([
-					'log' => [],
-					'links' => $downloadfiles
+					'dialog' => [
+						'render' => [
+							[
+								'type' => 'links',
+								'description' => $this->_lang->GET('csvfilter.use.download'),
+								'content' => $downloadfiles
+							]
+						]
+					]
 				]);
 
 				break;
@@ -508,17 +519,20 @@ class ERPQUERY extends API {
 				}
 
 				// append filter selection
-				$response['render'] = [
-					'content' => [
-						[
+				$response = [
+					'title' => $this->_lang->GET('erpquery.navigation.csvdump'),
+					'render' => [
+						'content' => [
 							[
-								'type' => 'select',
-								'attributes' => [
-									'name' => $this->_lang->GET('erpquery.csvdump.select'),
-									'onchange' => "api.erpquery('get', 'csvdump', this.value)"
-								],
-								'content' => $options,
-								'hint' => $this->_lang->GET('erpquery.csvdump.select_hint')
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => $this->_lang->GET('erpquery.csvdump.select'),
+										'onchange' => "api.erpquery('get', null, 'csvdump', this.value)"
+									],
+									'content' => $options,
+									'hint' => $this->_lang->GET('erpquery.csvdump.select_hint')
+								]
 							]
 						]
 					]
@@ -527,7 +541,7 @@ class ERPQUERY extends API {
 				if ($this->_requestedType){
 					$response['render']['form'] = [
 						'data-usecase' => 'erpquery',
-						'action' => "javascript:api.erpquery('post', 'csvdump', '" . $this->_requestedType . "')"
+						'action' => "javascript:api.erpquery('post', '[data-usecase=erpquery]', 'csvdump', '" . $this->_requestedType . "')"
 					];
 					$options = ERPINTERFACE->customcsvdump($this->_requestedType);
 
@@ -606,13 +620,13 @@ class ERPQUERY extends API {
 					]
 				);
 				if ($upload) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('erpquery.upload.success'),
 						'type' => 'success'
 					]]);
 
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('erpquery.upload.failure'),
 						'type' => 'error'
 					]]);
@@ -624,22 +638,25 @@ class ERPQUERY extends API {
 				}
 
 				// append filter selection
-				$response['render'] = [
-					'content' => [
-						[
+				$response = [
+					'title' => $this->_lang->GET('erpquery.navigation.upload'),
+					'render' => [
+						'content' => [
 							[
-								'type' => 'select',
-								'attributes' => [
-									'name' => $this->_lang->GET('erpquery.upload.select'),
-									'required' => true
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => $this->_lang->GET('erpquery.upload.select'),
+										'required' => true
+									],
+									'content' => $options,
 								],
-								'content' => $options,
-							],
-							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => $this->_lang->GET('erpquery.upload.file'),
-									'required' => true
+								[
+									'type' => 'file',
+									'attributes' => [
+										'name' => $this->_lang->GET('erpquery.upload.file'),
+										'required' => true
+									]
 								]
 							]
 						]
@@ -647,7 +664,7 @@ class ERPQUERY extends API {
 				];
 				$response['render']['form'] = [
 					'data-usecase' => 'erpquery',
-					'action' => "javascript:api.erpquery('post', 'upload')"
+					'action' => "javascript:api.erpquery('post', '[data-usecase=erpquery]', 'upload')"
 				];
 		}
 		$this->response($response);

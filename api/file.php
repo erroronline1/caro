@@ -14,11 +14,11 @@ namespace CARO\API;
 // add, edit and delete files
 class FILE extends API {
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	public $_requestedFolder = null;
-	public $_requestedId = null;
-	public $_requestedFile = null;
-	public $_accessible = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	public mixed $_requestedFolder = null;
+	public mixed $_requestedId = null;
+	public mixed $_requestedFile = null;
+	public mixed $_accessible = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -96,13 +96,13 @@ class FILE extends API {
 					$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('file_external_documents_post'), $insertions);
 					$success = boolval(array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)));
 					if ($success){		
-						$this->response(['response' => [
+						$this->response(['toast' => [
 							'msg' => $this->_lang->GET('file.manager.new_file_created'),
 							'type' => 'success'
 						]]);
 					}
 				}
-				$this->response(['response' => [
+				$this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
 					'type' => 'error'
 				]]);
@@ -140,21 +140,26 @@ class FILE extends API {
 						$response = $this->_lang->GET('file.external_file.regulatory_context');
 				}
 				// process prepared database update
-				if ($this->_requestedId && $this->_sqlinterface->EXECUTE($prepare, $tokens)) $this->response(['response' => [
+				if ($this->_requestedId && $this->_sqlinterface->EXECUTE($prepare, $tokens)) $this->response(['toast' => [
 						'msg' => $response,
 						'type' => 'success'
 					]]);
-				else $this->response(['response' => [
+				else $this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
 					'type' => 'error'
 				]]);
 				break;
 			case 'GET':
-				$response = ['render' => ['form' => [
-					'data-usecase' => 'file',
-					'action' => "javascript:api.file('post', 'externalfilemanager')"],
-					'content' => []
-				]];
+				$response = [
+					'title' => $this->_lang->GET('file.navigation.external_file_manager'),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'file',
+							'action' => "javascript:api.file('post', '[data-usecase=file]', 'externalfilemanager')"
+						],
+						'content' => []
+					]
+				];
 
 				// retrieve all external documents per database
 				$files = $this->_sqlinterface->EXECUTE('file_external_documents_get');		
@@ -165,7 +170,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value)}",
+								'onkeydown' => "if (event.key === 'Enter') {api.file('get', null, 'filter', 'external_documents', this.value)}",
 								'id' => 'filefilter'
 							]
 						]
@@ -237,8 +242,8 @@ class FILE extends API {
 									'type' => 'checkbox',
 									'content' => [
 										$this->_lang->GET('file.external_file.available') => ($file['activated'] && !$file['retired']
-										? ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
-										: ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
+										? ['checked' => true, 'onchange' => "api.file('put', null, 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
+										: ['onchange' => "api.file('put', null, 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
 									],
 								],
 								[
@@ -246,7 +251,7 @@ class FILE extends API {
 									'content' => $regulatory_context,
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.document.regulatory_context'),
-										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
+										'onchange' => "api.file('put', null, 'externalfilemanager', '" . $file['id'] . "', this.value)",
 										'data-filtered' => $file['path']
 									],
 									'numeration' => 'none'
@@ -303,17 +308,19 @@ class FILE extends API {
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('file.manager.new_folder')));
 				if ($new_folder){
 					// check forbidden names
-					if (UTILITY::forbiddenName($new_folder)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
+					if (UTILITY::forbiddenName($new_folder)) $this->response(['toast' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 
 					// create new folder if not present
 					$new_folder = $this->_filehandler->directory('files_documents', [':dir' => $new_folder]);
 					if (!is_dir($new_folder)) $this->_filehandler->createDirectory($new_folder);
 
-					$this->response(['response' => [
-						'msg' => $this->_lang->GET('file.manager.new_folder_created', [':name' => $new_folder]),
+					$this->response([
 						'redirect' => ['filemanager'],
-						'type' => 'success'
-						]]);
+						'toast' => [
+							'msg' => $this->_lang->GET('file.manager.new_folder_created', [':name' => $new_folder]),
+							'type' => 'success'
+						]
+					]);
 				}
 
 				// store uploaded files to reqested folder
@@ -328,25 +335,30 @@ class FILE extends API {
 							'token' => [':dir' => $destination]
 						]
 					);
-					$this->response(['response' => [
-						'msg' => $this->_lang->GET('file.manager.new_file_created'),
+					$this->response([
 						'redirect' => ['filemanager', $destination],
-						'type' => 'success'
-					]]);
+						'toast' => [
+							'msg' => $this->_lang->GET('file.manager.new_file_created'),
+							'type' => 'success'
+						]
+					]);
 				}
-				$this->response(['response' => [
+				$this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
 					'type' => 'error'
 				]]);
 		break;
 			case 'GET':
-				$response = ['render' => [
-					'form' => [
-						'data-usecase' => 'file',
-						'action' => "javascript:api.file('post', 'filemanager')"
-					],
-					'content' => []
-				]];
+				$response = [
+					'title' => $this->_lang->GET('file.navigation.file_manager'),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'file',
+							'action' => "javascript:api.file('post', '[data-usecase=file]', 'filemanager')"
+						],
+						'content' => []
+					]
+				];
 
 				// default view lists available custom directories within files_documents
 				if (!$this->_requestedFolder){
@@ -363,7 +375,7 @@ class FILE extends API {
 									'type' => 'links',
 									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => $this->convertFromServerTime($filedate->format('Y-m-d H:i'))]),
 									'content' => [
-										$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]
+										$foldername => ['href' => "javascript:api.file('get', null, 'filemanager', '" . $foldername . "')"]
 									]
 								],
 								[
@@ -373,7 +385,7 @@ class FILE extends API {
 										'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
-											"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $foldername . "')})"
+											"}}).then(confirmation => {if (confirmation) api.file('delete', null, 'filemanager', '" . $foldername . "')})"
 									]
 								]
 							);
@@ -386,7 +398,7 @@ class FILE extends API {
 							'type' => 'links',
 							'description' => $this->_lang->GET('file.navigation.sharepoint'),
 							'content' => [
-								$this->_lang->GET('file.navigation.sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]
+								$this->_lang->GET('file.navigation.sharepoint') => ['href' => "javascript:api.file('get', null, 'filemanager', 'sharepoint')"]
 							]
 						]
 					);
@@ -414,7 +426,7 @@ class FILE extends API {
 								'type' => 'filtered',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.file_filter_label'),
-									'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value)}",
+									'onkeydown' => "if (event.key === 'Enter') {api.file('get', null, 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value)}",
 									'id' => 'filefilter'
 								]
 							]
@@ -458,7 +470,7 @@ class FILE extends API {
 											'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
-												"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
+												"}}).then(confirmation => {if (confirmation) api.file('delete', null, 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
 										]
 									]
 								);
@@ -494,12 +506,14 @@ class FILE extends API {
 			case 'DELETE':
 				if (in_array($this->_requestedFolder, ['sharepoint'])) $success = $this->_filehandler->delete($this->_filehandler->directory($this->_requestedFolder) . '/' . $this->_requestedFile);
 				else $success = $this->_filehandler->delete($this->_filehandler->directory('files_documents', [':dir' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
-				if ($success) $this->response(['response' => [
-					'msg' => $this->_lang->GET('file.manager.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
+				if ($success) $this->response([
 					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null],
-					'type' => 'deleted'
-				]]);
-				else $this->response(['response' => [
+					'toast' => [
+						'msg' => $this->_lang->GET('file.manager.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
+						'type' => 'deleted'
+					]
+				]);
+				else $this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
 					'type' => 'error'
 				]]);
@@ -518,30 +532,33 @@ class FILE extends API {
 	public function files(){
 		// append file filter
 		$this->_filehandler = new FILEHANDLER();
-		$response['render'] = [
-		'content' => [
-				[
-					[
-						'type' => 'filtered',
-						'attributes' => [
-							'name' => $this->_lang->GET('file.file_filter_label'),
-							'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', encodeURIComponent(this.value));}",
-							'id' => 'filesearch'
+		$response = [
+			'title' => $this->_lang->GET('file.navigation.files'),
+			'render' => [
+				'content' => [
+						[
+							[
+								'type' => 'filtered',
+								'attributes' => [
+									'name' => $this->_lang->GET('file.file_filter_label'),
+									'onkeydown' => "if (event.key === 'Enter') {api.file('get', null, 'filter', '" . ($this->_requestedFolder ? : 'null') . "', encodeURIComponent(this.value));}",
+									'id' => 'filesearch'
+								]
+							]
 						]
 					]
 				]
-			]
-		];
+			];
 		// append filter by folder option
 		$options = [
-			$this->_lang->GET('file.navigation.files') => (!$this->_requestedFolder || $this->_requestedFolder == 'null') ? ['checked' => true] : ['onchange' => "api.file('get', 'files')"],
-			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', 'files', 'external_documents')"],
+			$this->_lang->GET('file.navigation.files') => (!$this->_requestedFolder || $this->_requestedFolder == 'null') ? ['checked' => true] : ['onchange' => "api.file('get', null, 'files')"],
+			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', null, 'files', 'external_documents')"],
 
 		];
 		foreach ($this->_filehandler->listDirectories($this->_filehandler->directory('files_documents') ,'asc') as $folder){
 			$folder = pathinfo($folder)['basename'];
 			$options[$folder] = $this->_requestedFolder === $folder ? ['checked' => true] : [];
-			$options[$folder]['onchange'] = "api.file('get', 'files', '" . $folder . "')";
+			$options[$folder]['onchange'] = "api.file('get', null, 'files', '" . $folder . "')";
 		}
 		$response['render']['content'][count($response['render']['content']) - 1 ][] = [
 			'type' => 'radio',
@@ -607,7 +624,7 @@ class FILE extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('file.navigation.file_manager'),
-						'onclick' => "api.file('get', 'filemanager')"
+						'onclick' => "api.file('get', null, 'filemanager')"
 					]
 				]
 			];
@@ -618,7 +635,7 @@ class FILE extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('file.navigation.external_file_manager'),
-						'onclick' => "api.file('get', 'externalfilemanager')"
+						'onclick' => "api.file('get', null, 'externalfilemanager')"
 					]
 				]
 			];
@@ -712,25 +729,30 @@ class FILE extends API {
 							'prefix' => $_SESSION['user']['name']
 						]
 					);
-					$this->response(['response' => [
-						'msg' => $this->_lang->GET('file.manager.new_file_created'),
-						'redirect' => ['sharepoint'],
-						'type' => 'success'
-					]]);
+					$this->response([
+							'redirect' => ['sharepoint'],
+							'toast' => [
+							'msg' => $this->_lang->GET('file.manager.new_file_created'),
+							'type' => 'success'
+						]
+					]);
 				}
-				$this->response(['response' => [
+				$this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
 					'type' => 'error'
 				]]);
 		break;
 			case 'GET':
-				$response = ['render' => [
-					'form' => [
-						'data-usecase' => 'file',
-						'action' => "javascript:api.file('post', 'sharepoint')"
-					],
-					'content' => []
-				]];
+				$response = [
+					'title' => $this->_lang->GET('file.navigation.sharepoint'),
+					'render' => [
+						'form' => [
+							'data-usecase' => 'file',
+							'action' => "javascript:api.file('post', '[data-usecase=file]', 'sharepoint')"
+						],
+						'content' => []
+					]
+				];
 
 				// delete expired files
 				// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
@@ -758,7 +780,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value)}",
+								'onkeydown' => "if (event.key === 'Enter') {api.file('get', null,'filter', 'sharepoint', this.value)}",
 								'id' => 'filefilter'
 							]
 						]

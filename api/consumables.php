@@ -16,7 +16,7 @@ require_once('./_csvprocessor.php');
 // add, edit and delete vendors and products
 class CONSUMABLES extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[1];
+    public ?string $_requestedMethod = REQUEST[1];
 	private mixed $_requestedID = null;
 	private mixed $_usecase = '';
 	private string $filefiltersample = <<<'END'
@@ -153,7 +153,7 @@ class CONSUMABLES extends API {
 		]);
 		$vendor = $vendor ? $vendor[0] : [];
 		if (!$vendor) $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found'),
 				'type' => 'error'
 			]]);
@@ -161,7 +161,7 @@ class CONSUMABLES extends API {
 			':ids' => $vendor['id']
 		]);
 		if (!$products) $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('consumables.vendor.productlist_empty'),
 				'type' => 'error'
 			]]);
@@ -205,7 +205,15 @@ class CONSUMABLES extends API {
 			'download' => pathinfo($tempFile)['basename']
 		];
 		$this->response([
-			'links' => $downloadfiles
+			'dialog' => [
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('order.export_hint'),
+						'content' => $downloadfiles
+					]
+				]
+			],
 		]);
 	}
 
@@ -238,7 +246,7 @@ class CONSUMABLES extends API {
 						':ids' => [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)]
 				]);
 				if (!$products) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.incorporation.failure'),
 						'type' => 'error'
 					]]);
@@ -344,7 +352,7 @@ class CONSUMABLES extends API {
 					}
 				}
 				if (!$check) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.incorporation.failure'),
 						'type' => 'error'
 					]]);
@@ -403,7 +411,7 @@ class CONSUMABLES extends API {
 				}
 				if (array_filter($this->_sqlinterface->EXECUTE($sqlQueryStack), Fn($v) => !in_array(gettype($v), ['integer', 'NULL', 'boolean']))){
 					$this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('order.incorporation.failure'),
 							'type' => 'error'
 						]
@@ -411,7 +419,7 @@ class CONSUMABLES extends API {
 				}
 
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.incorporation.success'),
 						'type' => 'success'
 					]]);			
@@ -423,7 +431,7 @@ class CONSUMABLES extends API {
 					':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
-				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $response['toast'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// get incorporation- and sample-check-documents, chain for eligible products
 				$incorporationdocument = $document->recentdocument('document_document_get_by_context', [
@@ -502,8 +510,8 @@ class CONSUMABLES extends API {
 				}
 
 				// append incorporation elements so far to render output
-				$response['render'] = [
-					'content' => [
+				$response['dialog'] = [
+					'render' => [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -526,13 +534,14 @@ class CONSUMABLES extends API {
 							$this->_lang->GET('order.incorporation.cancel') => false,
 							$this->_lang->GET('order.incorporation.submit') => [ 'value' => true, 'class' => 'reducedCTA']
 					],
-					'productid' => $product['id']
+					'productid' => $product['id'],
+					'header' => $this->_lang->GET('order.incorporation.incorporation')
 				];
 
 				// actual add option to adopt previous, if any similar incorporations have been identified
 				if ($matches[0]){
-					array_push($response['render']['content'], ...$matches);
-					$response['render']['content'][] = [
+					array_push($response['dialog']['render'], ...$matches);
+					$response['dialog']['render'][] = [
 						[
 							'type' => 'text',
 							'hint' => $this->_lang->GET('order.incorporation.matching_previous_hint'),
@@ -546,7 +555,7 @@ class CONSUMABLES extends API {
 				}
 
 				// add text input for denial statement
-				$response['render']['content'][] = [
+				$response['dialog']['render'][] = [
 					[
 						'type' => 'textarea',
 						'hint' => $this->_lang->GET('order.incorporation.denied_hint'),
@@ -581,7 +590,7 @@ class CONSUMABLES extends API {
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $this->response([
-					'response' => [
+					'toadt' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -618,7 +627,7 @@ class CONSUMABLES extends API {
 				])['content']);
 
 				if (!$inputnames) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -644,7 +653,7 @@ class CONSUMABLES extends API {
 					}
 				}
 				if (!$check) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -690,13 +699,13 @@ class CONSUMABLES extends API {
 							':name' => $_SESSION['user']['name']
 						], true) . " \n" . implode("\n", [strip_tags($product['vendor_name']), strip_tags($product['article_no']), strip_tags($product['article_name']), strip_tags($checkcontent)]));
 					$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.success'),
 						'type' => 'success'
 					]]);
 				}
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -706,8 +715,9 @@ class CONSUMABLES extends API {
 				$product = $this->_sqlinterface->EXECUTE('consumables_get_product', [
 					':ids' => intval($this->_requestedID)
 				]);
+				$response = [];
 				$product = $product ? $product[0] : null;
-				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 				// check if sample_check has been already satisfied, for the various frontend display options do currently not allow for an automated update
 				if ($vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
@@ -723,7 +733,7 @@ class CONSUMABLES extends API {
 							$check = new \DateTime($vendorproduct['checked']);
 							if (intval($check->diff($this->_date['servertime'])->format('%a')) < $vendor['products']['samplecheck_interval'])
 								$this->response([
-									'response' => [
+									'toast' => [
 										'msg' =>  $this->_lang->GET('order.sample_check.satisfied', [':vendor' => $vendor['name']]),
 										'type' => 'success'
 									]
@@ -732,38 +742,40 @@ class CONSUMABLES extends API {
 					}
 				}
 
-				$response = ['render' => [
-					'content' => [
-						[
+				$response = [
+					'dialog' => [
+						'render' => [
 							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => implode(' ', [
-										$product['article_no'],
-										$product['article_name'],
-										$product['vendor_name']])
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => implode(' ', [
+											$product['article_no'],
+											$product['article_name'],
+											$product['vendor_name']])
+									]
+								], [
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => $this->_lang->GET("order.sample_check.checked_order"),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order')) ?: '',
+										'readonly' => true,
+										'rows' => 4
+									]
 								]
-							], [
-								'type' => 'textarea',
-								'attributes' => [
-									'name' => $this->_lang->GET("order.sample_check.checked_order"),
-									'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.sample_check.checked_order')) ?: '',
-									'readonly' => true,
-									'rows' => 4
-								]
-							]
+							],
+							...$document->recentdocument('document_document_get_by_context', [
+								':context' => 'mdr_sample_check_document'
+							])['content']
 						],
-						...$document->recentdocument('document_document_get_by_context', [
-							':context' => 'mdr_sample_check_document'
-						])['content']
-					],
-					'options' => [
-						$this->_lang->GET('order.sample_check.cancel') => false,
-						$this->_lang->GET('order.sample_check.submit') => ['value' => true, 'class' => 'reducedCTA']
-					],
-					'productid' => $product['id'],
-					'vendor' => $product['vendor_name']
-				]];
+						'options' => [
+							$this->_lang->GET('order.sample_check.cancel') => false,
+							$this->_lang->GET('order.sample_check.submit') => ['value' => true, 'class' => 'reducedCTA']
+						],
+						'productid' => $product['id'],
+						'header' => $this->_lang->GET('order.sample_check.sample_check', [':vendor' => $product['vendor_name']])
+					]
+				];
 				$this->response($response);
 				break;
 			case 'DELETE':
@@ -775,7 +787,7 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 
 				if (!$product || !$product['checked'] || !$product['sample_checks']) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -789,12 +801,12 @@ class CONSUMABLES extends API {
 					':sample_checks' => count($product['sample_checks']) ? UTILITY::json_encode($product['sample_checks']) : null,
 					':ids' => intval($this->_requestedID)
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.revoked'),
 						'type' => 'deleted'
 					]]);
 				$this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
@@ -812,7 +824,12 @@ class CONSUMABLES extends API {
 	 */
 	public function pendingincorporations(){
 		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('consumables.navigation.incorporated_pending'),
+			'render' => [
+				'content' => []
+			]
+		];
 		$links = [];
 		$allproducts = $this->_sqlinterface->EXECUTE('consumables_get_products');
 		foreach ($allproducts as $product) {
@@ -821,18 +838,18 @@ class CONSUMABLES extends API {
 			// get latest incorporation entry;
 			$product['incorporated'] = array_pop($product['incorporated']);
 			if (isset($product['incorporated']['_denied'])) continue;
-			elseif ($product['incorporated'] && !PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.purchase('get', 'product', " . $product['id'] . ")"];
+			elseif ($product['incorporated'] && !PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.consumables('get', null, 'product', " . $product['id'] . ")"];
 		}
 		if ($links){
 			$response['render']['content'][] = [
 				[
 					'type' => 'links',
 					'content' => $links
-					]
+				]
 			];
-			$this->response($response);
 		}
-		else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('consumables.product.incorporation_no_approvals'))]]);
+		else $response['render']['content'] = $this->noContentAvailable($this->_lang->GET('consumables.product.incorporation_no_approvals'));
+		$this->response($response);
 	}
 
 	/**
@@ -883,7 +900,7 @@ class CONSUMABLES extends API {
 					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
-				if (!$vendor) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
+				if (!$vendor) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 
 				// fileuploads happen on success only, but providing files protects this document from removal
@@ -925,14 +942,14 @@ class CONSUMABLES extends API {
 					}
 
 					$this->response([
-					'response' => [
+					'toast' => [
 						'id' => intval($this->_sqlinterface->_pdo->lastInsertId()),
 						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'id' => false,
 						'name' => $this->_lang->GET('consumables.product.not_saved'),
 						'type' => 'error'
@@ -946,7 +963,7 @@ class CONSUMABLES extends API {
 						':ids' => intval($this->_requestedID)
 				]);
 				$product = $product ? $product[0] : null;
-				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $response['toast'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// hand over payload to product properties
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null;
@@ -990,13 +1007,12 @@ class CONSUMABLES extends API {
 					elseif ($product['incorporated']) $product['incorporated'] = UTILITY::json_encode($product['incorporated']);
 					else $product['incorporated'] = null;
 				}
-
 				// validate vendor
 				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
 					':id' => $product['vendor_name']
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
-				if (!$vendor) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
+				if (!$vendor) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
@@ -1145,16 +1161,14 @@ class CONSUMABLES extends API {
 					':thirdparty_order' => $product['thirdparty_order'],
 					':last_order' => $product['last_order']
 				])) $this->response([
-					'response' => [
-						'id' => intval($this->_requestedID),
+					'toast' => [
 						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchhidden || $_batchalias || $_batchupdate || $_batchincorporation ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 						],
-						'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+						'notif' => ['consumables_pendingincorporation' => $notifications->consumables()]
 					]);
 				else $this->response([
-					'response' => [
-						'id' => intval($this->_requestedID),
+					'toast' => [
 						'msg' => $this->_lang->GET('consumables.product.not_saved'),
 						'type' => 'error'
 					]]);
@@ -1196,7 +1210,7 @@ class CONSUMABLES extends API {
 					'thirdparty_order' => '',
 					'last_order' => null
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['toast'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// gather documents
 				$documents = ['valid' => [], 'expired' => []];
@@ -1275,7 +1289,12 @@ class CONSUMABLES extends API {
 				}
 
 				// render search and selection
-				$response = ['render' => ['content' => $this->productsearch('product')]]; 
+				$response = [
+					'title' => $product['article_name'] ? (($product['article_no'] ? $product['article_no'] . ' ': '') . $product['article_name']) : $this->_lang->GET('consumables.navigation.product'),
+					'render' => [
+						'content' => $this->productsearch('product')
+					]
+				]; 
 		
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) {
@@ -1378,7 +1397,7 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', null, 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
@@ -1504,8 +1523,8 @@ class CONSUMABLES extends API {
 					// append form for authorized users
 					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited') || PERMISSION::permissionFor('incorporation')){
 						$response['render']['form'] = [
-						'data-usecase' => 'purchase',
-						'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
+						'data-usecase' => 'consumables',
+						'action' => $product['id'] ? "javascript:api.consumables('put', '[data-usecase=consumables]', 'product', '" . $product['id'] . "')" : "javascript:api.consumables('post', '[data-usecase=consumables]', 'product')",
 						'data-confirm' => true
 						];
 					}
@@ -1617,7 +1636,7 @@ class CONSUMABLES extends API {
 								'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
 									"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck.revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 									"if (response !== false) {" .
-									"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled = true" .
+									"api.consumables('delete', null, 'mdrsamplecheck', " . $product['id']. "); this.disabled = true" .
 									"}});"
 							]
 						];
@@ -1631,7 +1650,7 @@ class CONSUMABLES extends API {
 							$labels[] = [
 								'type' => 'button',
 								'attributes' => [
-									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
+									'onclick' => "const _searchlabel = document.getElementById('_searchlabel').value, _searchlabel2 = document.getElementById('_searchlabel2').value ; if (_searchlabel) api.tool('get', null, 'code_qr', '" . $type . "', _searchlabel, _searchlabel2);",
 									'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 								]
 							];
@@ -1789,7 +1808,7 @@ class CONSUMABLES extends API {
 									'onclick' => $product['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
-										"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
+										"}}).then(confirmation => {if (confirmation) api.consumables('delete', null, 'product', " . $product['id'] . ")})" : ""
 								]
 							]
 						]
@@ -1808,15 +1827,13 @@ class CONSUMABLES extends API {
 			if ($this->_sqlinterface->EXECUTE('consumables_delete_unprotected_product', [
 				':id' => $product['id']
 			])) $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('consumables.product.deleted', [':name' => $product['article_name']]),
-					'id' => false,
 					'type' => 'deleted'
 				]]);
 			else $this->response([
-				'response' => [
+				'toast' => [
 					'msg' => $this->_lang->GET('consumables.product.not_deleted', [':name' => $product['article_name']]),
-					'id' => $product['id'],
 					'type' => 'error'
 				]]);
 			break;
@@ -1898,7 +1915,7 @@ class CONSUMABLES extends API {
 						'type' => 'search',
 						'attributes' => [
 							'name' => $this->_lang->GET('consumables.product.search'),
-							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', '" . $usecase . "', data); return false;}",
+							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.consumables('get', data, 'search', '" . $usecase . "'); return false;}",
 							'id' => 'productsearch',
 							'value' => $parameter['search'] ? : ''
 						]
@@ -1910,7 +1927,7 @@ class CONSUMABLES extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('consumables.product.add_new'),
-							'onclick' => "api.purchase('get', 'product')",
+							'onclick' => "api.consumables('get', null, 'product')",
 						]
 					]
 					]);
@@ -1947,7 +1964,7 @@ class CONSUMABLES extends API {
 						'type' => 'search',
 						'attributes' => [
 							'name' => $this->_lang->GET('consumables.product.search'),
-							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', '" . $usecase . "', data); return false;}",
+							'onkeydown' => "if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.consumables('get', data, 'search', '" . $usecase . "'); return false;}",
 							'id' => 'productsearch',
 							'value' => $parameter['search'] ? : ''
 						]
@@ -1994,7 +2011,7 @@ class CONSUMABLES extends API {
 								"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false},".
 								"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true, class: 'reducedCTA'},".
 							"}}, 'FormData').then(response => {if (response) {".
-								"api.purchase('post', 'search', 'manualorder', response);".
+								"api.consumables('post', response, 'search', 'manualorder');".
 								"api.preventDataloss.monitor = true;}".
 								"if (document.getElementById('modal')) document.getElementById('modal').replaceChildren();})", // clear modal to avoid messing up input names
 						]
@@ -2023,8 +2040,8 @@ class CONSUMABLES extends API {
 						$slides[$slide][$tiles][] = [
 						'type' => 'tile',
 						'attributes' => [
-							'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
-							'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'product', " . $row['id'] . ")",
+							'onclick' => "api.consumables('get', null, 'product', " . $row['id'] . ")",
+							'onkeydown' => "if (event.key==='Enter') api.consumables('get', null, 'product', " . $row['id'] . ")",
 							'role' => 'link',
 							'tabindex' => '0',
 							'title' => $this->_lang->GET('consumables.product.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
@@ -2141,25 +2158,25 @@ class CONSUMABLES extends API {
 				
 				// also see productsearch
 				$tile = [
-						'type' => 'tile',
-						'attributes' => [
-							'onclick' => "_client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
-							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
-							'role' => 'link',
-							'tabindex' => '0',
-							'title' => $this->_lang->GET('order.tile_title', [':product' => $manual['article_name'], ':vendor' => $manual['vendor_name']])
-						],
-						'content' => [
-							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => '',
-									'data-type' => 'cart'
-								],
-								'content' => $manual['vendor_name'] . ' ' . $manual['article_no'] . ' ' . $manual['article_name'] . ' ' . $manual['article_unit']
-							]
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "_client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
+						'onkeydown' => "if (event.key==='Enter') _client.order.addProduct({unit: '" . $manual['article_unit'] . "', ordernumber: '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', productname: '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', vendor: '" . $manual['vendor_name'] . "'}); return false;",
+						'role' => 'link',
+						'tabindex' => '0',
+						'title' => $this->_lang->GET('order.tile_title', [':product' => $manual['article_name'], ':vendor' => $manual['vendor_name']])
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => '',
+								'data-type' => 'cart'
+							],
+							'content' => $manual['vendor_name'] . ' ' . $manual['article_no'] . ' ' . $manual['article_name'] . ' ' . $manual['article_unit']
 						]
-					];
+					]
+				];
 				if ($result && $result[0]){
 					array_unshift($result[0][0], $tile);
 				}
@@ -2182,7 +2199,7 @@ class CONSUMABLES extends API {
 					]
 				);
 
-				$this->response(['render' => ['content' => $result]]);
+				$this->response(['dialog' => ['render' => $result]]);
 
 				break;
 			default:
@@ -2190,14 +2207,15 @@ class CONSUMABLES extends API {
 					'search' => UTILITY::propertySet($this->_payload, 'search') ? : null,
 					'vendor' => UTILITY::propertySet($this->_payload, 'vendor') ? : null
 				])){
-					$this->response(['render' => ['content' => $result]]);
+					$this->response(['insert' => ['content' => $result]]);
 				}
 		}
 		$this->response([
-			'response' => [
-			'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => UTILITY::propertySet($this->_payload, 'search')]),
-			'type' => 'error'
-		]]);
+			'toast' => [
+				'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => UTILITY::propertySet($this->_payload, 'search')]),
+				'type' => 'error'
+			]
+		]);
 	}
 
 	/**
@@ -2253,7 +2271,7 @@ class CONSUMABLES extends API {
 
 		if (!(isset($productlist->_list[1]) && count($productlist->_list[1]))) {
 			$this->response([
-			'response' => [
+			'toast' => [
 				'msg' => implode("\n", $log),
 				'type' => 'error'
 			]]);
@@ -2534,18 +2552,18 @@ class CONSUMABLES extends API {
 				
 
 				// check forbidden names
-				if (UTILITY::forbiddenName($vendor[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($vendor[':name'])) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor[':name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
 				if ($vendor[':products']['filefilter']){
-					if (!json_decode($vendor[':products']['filefilter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
+					if (!json_decode($vendor[':products']['filefilter'], true)) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 					// prettify
 					else {
 						$vendor[':products']['filefilter'] = UTILITY::json_encode(json_decode($vendor[':products']['filefilter'], true), JSON_PRETTY_PRINT);
 					}
 				}
 				if ($vendor[':products']['erpfilter']){
-					if (!json_decode($vendor[':products']['erpfilter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('erpquery.consumables.erpfilter')]), 'type' => 'error']]);
+					if (!json_decode($vendor[':products']['erpfilter'], true)) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('erpquery.consumables.erpfilter')]), 'type' => 'error']]);
 					// prettify
 					else {
 						$vendor[':products']['erpfilter'] = UTILITY::json_encode(json_decode($vendor[':products']['erpfilter'], true), JSON_PRETTY_PRINT);
@@ -2566,7 +2584,7 @@ class CONSUMABLES extends API {
 					$source = $importfilter = [];
 	
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
-						if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
+						if (!$vendor[':products']['filefilter']) $this->response(['toast' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 
 						// read data from file and set primary source
 						require_once('./_table.php');
@@ -2661,8 +2679,7 @@ class CONSUMABLES extends API {
 				// check if any required fields have been left out, else construct evaluation data
 				if ($missing = $document->unmatchedrequired($evaluationdocument, $evaluation)) {
 					$this->response([
-						'response' => [
-							'id' => $vendor[':id'],
+						'toast' => [
 							'msg' => $this->_lang->GET('general.missing_form_data') . "\n". implode("\n- ", $missing),
 							'type' => 'error'
 						]]);
@@ -2748,8 +2765,7 @@ class CONSUMABLES extends API {
 					}
 
 					$this->response([
-					'response' => [
-						'id' => $vendor[':id'],
+					'toast' => [
 						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor[':name']]) .
 							$productlistImportError .
 							(isset($productlistImportResult[1]) ? " \n \n" . implode(" \n", $productlistImportResult[1]) : '') .
@@ -2758,8 +2774,7 @@ class CONSUMABLES extends API {
 					]]);
 				}
 				else $this->response([
-					'response' => [
-						'id' => false,
+					'toast' => [
 						'name' => $this->_lang->GET('consumables.vendor.not_saved'),
 						'type' => 'error'
 					]]);
@@ -2767,7 +2782,9 @@ class CONSUMABLES extends API {
 			case 'GET':
 				$datalist = [];
 				$options = ['...' . (PERMISSION::permissionFor('vendors') ? $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') : '') => (!$this->_requestedID) ? ['selected' => true] : []];
-				$response = [];
+				$response = [
+					'title' => $this->_lang->GET('consumables.navigation.vendor'),
+				];
 				
 				// select single vendor based on id or name
 				$vendor = $this->_sqlinterface->EXECUTE('consumables_get_vendor', [
@@ -2785,7 +2802,7 @@ class CONSUMABLES extends API {
 					'evaluation' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') && !$vendor['id'])
-					$response['response'] = ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+					$response['toast'] = ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// resolve objects
 				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
@@ -2852,14 +2869,14 @@ class CONSUMABLES extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.information_vendor'),
-									'onchange' => "api.purchase('get', 'vendor', this.value)"
+									'onchange' => "api.consumables('get', null, 'vendor', this.value)"
 								],
 								'content' => $options
 							], [
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.consumables('get', null, 'vendor', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($datalist))
 							]
@@ -2948,14 +2965,14 @@ class CONSUMABLES extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors'),
-									'onchange' => "api.purchase('get', 'vendor', this.value)"
+									'onchange' => "api.consumables('get', null, 'vendor', this.value)"
 								],
 								'content' => $options
 							], [
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.consumables('get', null, 'vendor', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($datalist))
 							]
@@ -3050,8 +3067,8 @@ class CONSUMABLES extends API {
 						]
 					],
 					'form' => [
-						'data-usecase' => 'purchase',
-						'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
+						'data-usecase' => 'consumables',
+						'action' => $vendor['id'] ? "javascript:api.consumables('put', '[data-usecase=consumables]', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.consumables('post', '[data-usecase=consumables]', 'vendor')",
 						'data-confirm' => true
 					]];
 
@@ -3236,7 +3253,7 @@ class CONSUMABLES extends API {
 									'type' => 'button',
 									'attributes' => [
 										'value' => $this->_lang->GET('consumables.vendor.productlist_export'),
-										'onclick' => "api.purchase('get', 'exportproductlist', " . $vendor['id']. ")"
+										'onclick' => "api.consumables('get', null, 'exportproductlist', " . $vendor['id']. ")"
 									],
 									'hint' => $this->_lang->GET('consumables.vendor.productlist_export_hint')
 								]
@@ -3280,7 +3297,7 @@ class CONSUMABLES extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('texttemplate.navigation.texts'),
-								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . UTILITY::json_encode([
+								'onclick' => "api.texttemplate('get', null, 'text', 'false', 'modal', '" . UTILITY::json_encode([
 									':PRODUCTS' => '_select_special_attention_products',
 									':CUSTOMERID' => '_vendor_customer_id',
 									':EXPIREDDOCUMENTS' => '_recently_expired_documents'
@@ -3290,7 +3307,7 @@ class CONSUMABLES extends API {
 						$response['render']['content'][] = $texttemplate;
 					}
 				}
-				if ($vendor['name']) $response['header'] = $vendor['name'];
+				if ($vendor['name']) $response['title'] = $vendor['name'];
 				$this->response($response);
 				break;
 		}
