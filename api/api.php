@@ -42,50 +42,50 @@ class API {
 	/**
 	 * preset all passed parameters
 	 */
-	public $_payload = null;
+	public ?object $_payload = null;
 
 	/**
 	 * preset database connection
 	 */
-	public $_sqlinterface;
+	public ?object $_sqlinterface;
 	
 	/**
 	 * preset standard response code
 	 */
-	private $_httpResponse = 200;
+	private int $_httpResponse = 200;
 
 	/**
 	 * message array for accumulated user messages
 	 * to be populated by message as key and user ids as value array
 	 * see alertUserGroup() and alertUserGroupSubmit()
 	 */
-	private $_messages = [];
+	private array $_messages = [];
 
 	/**
 	 * make languagemodel LANG class and its methods available
 	 */
-	public $_lang = null;
+	public ?object $_lang = null;
 
 	/**
 	 * make filehandler FILEHANDLER class and its methods available
 	 */
-	public $_filehandler = null;
+	public ?object $_filehandler = null;
 
 	/**
 	 * public preset of descendant classes property to execute requested method as per REQUEST[1]
 	 */
-	public $_requestedMethod = null;
+	public ?string $_requestedMethod = null;
 
 	/**
 	 * public preset of authentified user data
 	 */
-	public $_auth = [];
+	public array $_auth = [];
 
 	/**
 	 * public date settings to be updated by user settings
 	 * containing location, timezone, date format and current date as DateTime-object
 	 */
-	public $_date = [];
+	public array $_date = [];
 
 	/**
 	 * constructor prepares payload and database connection
@@ -286,8 +286,8 @@ class API {
 			}
 		}
 		// append login screen
-		$response = ['render' =>
-			[
+		$response = [
+			'render' =>	[
 				'content' => [
 					[
 						[
@@ -309,13 +309,15 @@ class API {
 				]
 			],
 			'config' => [
-				'application' => [
-					'language' =>  $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
-					'debugging' => CONFIG['application']['debugging'] ?? false,
-					'is_development' => CONFIG['application']['is_development'] ?? false,
+				'config' => [
+					'application' => [
+						'language' =>  $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
+						'debugging' => CONFIG['application']['debugging'] ?? false,
+						'is_development' => CONFIG['application']['is_development'] ?? false,
+					],
 				],
-			],
-			'language' => $this->_lang->GETALL(),
+				'language' => $this->_lang->GETALL(),
+			]
 		];
 
 		if (!$reAuthUser){
