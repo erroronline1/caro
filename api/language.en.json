@@ -864,10 +864,12 @@
 			"break": "Break",
 			"break_time": "Break hours and minutes",
 			"bulk_approve": "Approve all above :number entries",
+			"deleted": "Entry has been deleted.",
 			"disapproved": "Entry has been disapproved.",
 			"end": "End",
 			"end_date": "End date",
 			"end_time": "End time",
+			"error":"Error saving entry! Please try again.",
 			"error_missing": "Entries can only be created with a start- and end-date and -time as well as breaks! Please try again.",
 			"export": {
 				"proceed": "Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.",
@@ -890,6 +892,7 @@
 			"irregular": "Off duty",
 			"monthly_summary": "Summary for this month",
 			"new": "Add new times",
+			"not_found": "Entry has probably been deleted.",
 			"pto": {
 				"regular": "Regular working day",
 				"sickleave": "Sick leave",
@@ -910,6 +913,7 @@
 			"start": "Start",
 			"start_date": "Start date",
 			"start_time": "Start time",
+			"success": "Entry has been saved.",
 			"vacation_warning": "You have :number days of vacation left. Please plan ahead!",
 			"workinghourscorrection": "Working hours correction",
 			"yearly_summary": "Summary for this year"

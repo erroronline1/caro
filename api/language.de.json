@@ -864,10 +864,12 @@
 			"break": "Pause",
 			"break_time": "Pause in Stunden und Minuten",
 			"bulk_approve": "Alle obigen :number Einträge freigeben",
+			"deleted": "Der Eintrag wurde gelöscht",
 			"disapproved": "Die Freigabe wurde zurückgezogen.",
 			"end": "Ende",
 			"end_date": "Enddatum",
 			"end_time": "Endzeit",
+			"error": "Es trat ein Fehler beim Speichern des Eintrags aus. Bitte versuche es erneut.",
 			"error_missing": "Einträge können nur mit Start- und Enddatum und -zeit, sowie Pausenzeiten erstellt werden! Bitte versuche es erneut.",
 			"export": {
 				"proceed": "Öffne den Link, speichere oder drucke die Zusammenfassung. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
@@ -890,6 +892,7 @@
 			"irregular": "Dienstfrei",
 			"monthly_summary": "Zusammenfassung für diesen Monat",
 			"new": "Neue Zeiterfassung hinzufügen",
+			"not_found": "Der Eintrag wurde vermutlich gelöscht.",
 			"pto": {
 				"regular": "regulärer Arbeitstag",
 				"sickleave": "krank",
@@ -910,6 +913,7 @@
 			"start": "Start",
 			"start_date": "Startdatum",
 			"start_time": "Startzeit",
+			"success":"Der Eintrag wurde gespeichert",
 			"vacation_warning": "Du hast noch :number Tage Urlaub übrig. Bitte plane die Tage ein!",
 			"workinghourscorrection": "Arbeitszeitkorrektur",
 			"yearly_summary": "Zusammenfassung für dieses Jahr"
