@@ -607,8 +607,14 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.tasks.cancel') . "': false, '" . $this->_lang->GET('calendar.tasks.submit') . "': {'value': true, class: 'reducedCTA'}}, callback: function(){" . $dialog_callback . "}}, 'FormData')" .
-			".then(response => {if (response) {api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "', response);}})";
+		return 'new _client.Dialog({type:"input", header: "", render: ' . UTILITY::json_encode($inputs) . ', options:{"' . $this->_lang->GET('calendar.tasks.cancel') . '": false, "' . $this->_lang->GET('calendar.tasks.submit') . '": {"value": true, class: "reducedCTA"}}, callback: function(){' . $dialog_callback . '}}, "FormData")' .
+			'.then(response => {if (response) {'.
+			'let units = [];'.
+			'for (const [key, value] of response.entries()) {'.
+			'if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));'.
+			'}'.
+			'if (units.length) response.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));'.
+			'api.calendar("' . ($columns[':id'] ? 'put': 'post') . '", response, "' . $columns[':type'] . '");}})';
 	}
 	
 	/**
