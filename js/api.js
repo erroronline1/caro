@@ -134,12 +134,6 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, [200, 203, 207, 511])
 			.then(async (data) => {
-				if (data.body && (data.body.user || data.body.config || data.body.language)) {
-					if (data.body.user) api._settings.user = data.body.user;
-					if (data.body.config) api._settings.config = data.body.config;
-					if (data.body.language) api._lang._USER = data.body.language;
-				}
-
 				if (data.error) {
 					const date = new Date();
 					let error;
@@ -164,17 +158,24 @@ export const api = {
 					api.loadindicator(request, false);
 					clearInterval(_serviceWorker.notif.interval);
 					_serviceWorker.notif.interval = null;
+					if (data.body.config) {
+						Object.assign(api._settings, data.body.config);
+						if ("language" in data.body.config) {
+							api._lang._USER = data.body.config.language;
+						}
+						api.update_user_settings();
+					}
 
 					// add class. without being logged in the entry point always returns this error
 					if (api._settings.config.application && api._settings.config.application.is_development) {
 						document.querySelector("body>header").classList.add("is_development");
 					}
 
-					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
+					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, payload: payload, request: request };
 					const options = {};
 					options[api._lang.GET("general.ok_button")] = true;
 					options[api._lang.GET("application.navigation.signout_user", { ":name": api._settings.user.name || "" })] = {
-						onclick: "api.application('delete', 'authentify'); api.application('get', 'start')",
+						onclick: "api.application('delete', null, 'authentify'); api.application('get', null, 'start')",
 						class: "reducedCTA",
 						value: false,
 						type: "button",
@@ -187,7 +188,7 @@ export const api = {
 						},
 						"FormData"
 					).then((response) => {
-						api.application("post", "authentify", response);
+						api.application("post", response, "authentify");
 					});
 					return;
 				}
@@ -264,10 +265,18 @@ export const api = {
 		document.querySelector("#menustart").focus();
 	},
 
+	/**
+	 *             _     _                                           _   _   _
+	 *   _ _ ___ _| |___| |_ ___       _ _ ___ ___ ___       ___ ___| |_| |_|_|___ ___ ___
+	 *  | | | . | . | .'|  _| -_|     | | |_ -| -_|  _|     |_ -| -_|  _|  _| |   | . |_ -|
+	 *  |___|  _|___|__,|_| |___|_____|___|___|___|_|  _____|___|___|_| |_| |_|_|_|_  |___|
+	 *      |_|                 |_____|               |_____|                     |___|
+	 *
+	 */
 	update_user_settings: async function () {
-		if (!api._settings.user.app_settings.theme) {
-			api._settings.user.app_settings.theme = "light";
-		}
+		if (!api._settings.user.app_settings) api._settings.user.app_settings = { theme: "light" };
+		if (!api._settings.user.app_settings.theme) api._settings.user.app_settings.theme = "light";
+
 		for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
 			switch (key) {
 				case "forceDesktop":
@@ -368,7 +377,7 @@ export const api = {
 					// if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
 					api.session_timeout.events = null;
 					new Toast(null, null, null, "sessionwarning");
-					api.application("get", "authentify");
+					api.application("get", null, "authentify");
 					return;
 				}
 				if (api._settings.config.lifespan.session.idle > 0 && remaining_visual > 0) {
@@ -508,22 +517,29 @@ export const api = {
 	 * manages manual
 	 *
 	 * @param {string} method get|post|put|delete
+	 * @param {null|object|string} payload either pass FormData or a query selector string
 	 * @param {array} request api method, logintoken|manual id
-	 * @returns request
 	 */
-	application: async (method, ...request) => {
+	application: async (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get" && !["menu", "authentify"].includes(request[0])) api.history.write(["application", ...request]);
-
+		if (method === "get" && !["menu", "authentify"].includes(request[0])) api.history.write(["application", payload, ...request]);
 		request.splice(0, 0, "application");
-		let successFn, payload;
-		switch (request[1]) {
-			case "authentify":
-				switch (method) {
-					case "delete":
-						successFn = async function (data) {
+		let successFn = async function (data) {
+			if (data.config) {
+				Object.assign(api._settings, data.config);
+				if ("language" in data.config) {
+					api._lang._USER = data.config.language;
+				}
+				api.update_user_settings();
+			}
+
+			switch (request[1]) {
+				case "authentify":
+					switch (method) {
+						case "delete":
 							api._settings.user = data.user || {};
 							api._settings.config = data.config || {};
+
 							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
 							api.history.reset();
 
@@ -531,16 +547,8 @@ export const api = {
 							for (const opendialog of Object.values(document.querySelectorAll("dialog[open]"))) {
 								opendialog.remove();
 							}
-
-							api.application("get", "start");
-						};
-						break;
-					case "post":
-						successFn = function (data) {
-							if (data.user) api._settings.user = data.user;
-							api.update_user_settings();
-							if (data.config) api._settings.config = data.config;
-
+							break;
+						case "post":
 							// sometimes an error occures, try to show what's happening
 							try {
 								if (data.user) {
@@ -559,252 +567,187 @@ export const api = {
 									if (api._unauthorizedRequest.request && api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
 										// resend last request
 										const call = api._unauthorizedRequest.request.shift();
-										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, api._unauthorizedRequest.payload, ...api._unauthorizedRequest.request);
 									}
 								}
 							} catch (error) {
 								_client.application.debug(error, api._unauthorizedRequest);
 							}
-						};
-						payload = request.pop();
-				}
-				break;
-			case "about":
-				successFn = function (data) {
-					api.update_header(api._lang.GET("application.navigation.about"));
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				};
-				break;
-			case "menu":
-				successFn = async function (data) {
-					// construct backend provided application menu
-					if (!data.render) return;
-
-					function skip(text, href, id = null) {
-						const ariaSkip = document.createElement("a");
-						ariaSkip.append(document.createTextNode(text));
-						ariaSkip.href = href;
-						if (id) ariaSkip.id = id;
-						return ariaSkip;
 					}
-					const menu = document.querySelector("nav"),
-						elements = [],
-						icons = {};
-					elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main", "menustart"));
+					break;
+			}
 
-					// set up icons css property
-					icons[api._lang.GET("application.navigation.header")] = "url('./media/bars.svg')";
-					icons[api._lang.GET("message.navigation.header")] = "url('./media/comment.svg')";
-					icons[api._lang.GET("record.navigation.header")] = "url('./media/file-signature.svg')";
-					icons[api._lang.GET("calendar.navigation.header")] = "url('./media/calendar-alt.svg')";
-					icons[api._lang.GET("consumables.navigation.header")] = "url('./media/shopping-bag.svg')";
-					icons[api._lang.GET("file.navigation.header")] = "url('./media/folders.svg')";
-					icons[api._lang.GET("tool.navigation.header")] = "url('./media/tools.svg')";
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.render) {
+				switch (request[1]) {
+					case "menu":
+						function skip(text, href, id = null) {
+							const ariaSkip = document.createElement("a");
+							ariaSkip.append(document.createTextNode(text));
+							ariaSkip.href = href;
+							if (id) ariaSkip.id = id;
+							return ariaSkip;
+						}
+						const menu = document.querySelector("nav"),
+							elements = [],
+							icons = {};
+						elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main", "menustart"));
 
-					let label, input, div, button, span;
+						// set up icons css property
+						icons[api._lang.GET("application.navigation.header")] = "url('./media/bars.svg')";
+						icons[api._lang.GET("message.navigation.header")] = "url('./media/comment.svg')";
+						icons[api._lang.GET("record.navigation.header")] = "url('./media/file-signature.svg')";
+						icons[api._lang.GET("calendar.navigation.header")] = "url('./media/calendar-alt.svg')";
+						icons[api._lang.GET("consumables.navigation.header")] = "url('./media/shopping-bag.svg')";
+						icons[api._lang.GET("file.navigation.header")] = "url('./media/folders.svg')";
+						icons[api._lang.GET("tool.navigation.header")] = "url('./media/tools.svg')";
 
-					// back nav
-					button = document.createElement("button");
-					button.type = "button";
-					button.title = api._lang.GET("general.history.back");
-					button.classList.add("inactive");
-					button.onclick = () => {
-						api.history.go("back");
-					};
-					button.style.maskImage = "url('./media/angle-left.svg')";
-					elements.push(button);
+						let label, input, div, button, span;
 
-					// iterate over main categories
-					let group,
-						items,
-						menuentries = Object.keys(data.render);
-					for (let i = 0; i < menuentries.length; i++) {
-						group = menuentries[i];
-						items = data.render[menuentries[i]];
-						label = document.createElement("label");
+						// back nav
+						button = document.createElement("button");
+						button.type = "button";
+						button.title = api._lang.GET("general.history.back");
+						button.classList.add("inactive");
+						button.onclick = () => {
+							api.history.go("back");
+						};
+						button.style.maskImage = "url('./media/angle-left.svg')";
+						elements.push(button);
 
-						// set up label and notification element
-						label.htmlFor = "userMenu" + group;
-						label.setAttribute("data-notification", 0);
-						label.title = group;
-						div = document.createElement("div");
-						div.style.maskImage = icons[group];
-						div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
-						label.append(div);
+						// iterate over main categories
+						let group,
+							items,
+							menuentries = Object.keys(data.render);
+						for (let i = 0; i < menuentries.length; i++) {
+							group = menuentries[i];
+							items = data.render[menuentries[i]];
+							label = document.createElement("label");
 
-						// set up radio input for css checked condition
-						input = document.createElement("input");
-						input.type = "radio";
-						input.name = "userMenu";
-						input.id = "userMenu" + group;
-						// accessibility settings
-						input.tabIndex = -1;
-						input.setAttribute("inert", true);
-						input.title = group;
+							// set up label and notification element
+							label.htmlFor = "userMenu" + group;
+							label.setAttribute("data-notification", 0);
+							label.title = group;
+							div = document.createElement("div");
+							div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
+							if (group === api._lang.GET("application.navigation.header") && api._settings.user.image) {
+								div.style.maskImage = "none";
+								div.style.backgroundImage = "url('" + api._settings.user.image + "')";
+								div.style.backgroundSize = "cover";
+								div.style.borderRadius = "50%";
+							} else div.style.maskImage = icons[group];
+							label.append(div);
 
-						// set up div containing subsets of category
-						div = document.createElement("div");
-						div.classList.add("options");
-						div.role = "menu";
-						span = document.createElement("span");
-						span.append(document.createTextNode(group));
-						div.append(span);
-						div.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+							// set up radio input for css checked condition
+							input = document.createElement("input");
+							input.type = "radio";
+							input.name = "userMenu";
+							input.id = "userMenu" + group;
+							// accessibility settings
+							input.tabIndex = -1;
+							input.setAttribute("inert", true);
+							input.title = group;
 
-						// iterate over subset
-						for (const [description, attributes] of Object.entries(items)) {
-							// create button to access subsets action
-							if ("onclick" in attributes) {
-								button = document.createElement("button");
-								for (const [attribute, value] of Object.entries(attributes)) {
-									button.setAttribute(attribute, value);
+							// set up div containing subsets of category
+							div = document.createElement("div");
+							div.classList.add("options");
+							div.role = "menu";
+							span = document.createElement("span");
+							span.append(document.createTextNode(group));
+							div.append(span);
+							div.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+
+							// iterate over subset
+							for (const [description, attributes] of Object.entries(items)) {
+								// create button to access subsets action
+								if ("onclick" in attributes) {
+									button = document.createElement("button");
+									for (const [attribute, value] of Object.entries(attributes)) {
+										button.setAttribute(attribute, value);
+									}
+									button.type = "button";
+									button.classList.add("discreetButton");
+									button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
+									button.setAttribute("data-notification", 0);
+									button.appendChild(document.createTextNode(description));
+									button.role = "menuitem";
+									div.append(button);
 								}
-								button.type = "button";
-								button.classList.add("discreetButton");
-								button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
-								button.setAttribute("data-notification", 0);
-								button.appendChild(document.createTextNode(description));
-								button.role = "menuitem";
-								div.append(button);
+								// create description element
+								else {
+									span = document.createElement("span");
+									span.append(document.createTextNode(description));
+									div.append(span);
+								}
 							}
-							// create description element
-							else {
-								span = document.createElement("span");
-								span.append(document.createTextNode(description));
-								div.append(span);
+
+							elements.push(label);
+							elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main"));
+
+							if (menuentries[i + 1]) {
+								elements.push(skip(api._lang.GET("application.navigation.ariaSkipMenuOption", { ":option": menuentries[i + 1] }), "#userMenu" + menuentries[i + 1]));
 							}
+							elements.push(input);
+							elements.push(div); // div must come immidiately after input
 						}
 
-						elements.push(label);
-						elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main"));
-
-						if (menuentries[i + 1]) {
-							elements.push(skip(api._lang.GET("application.navigation.ariaSkipMenuOption", { ":option": menuentries[i + 1] }), "#userMenu" + menuentries[i + 1]));
-						}
-						elements.push(input);
-						elements.push(div); // div must come immidiately after input
-					}
-
-					// forth nav
-					button = document.createElement("button");
-					button.type = "button";
-					button.title = api._lang.GET("general.history.forth");
-					button.classList.add("inactive");
-					button.onclick = () => {
-						api.history.go("forth");
-					};
-					button.style.maskImage = "url('./media/angle-right.svg')";
-					elements.push(button);
-					elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMenu"), "#menustart"));
-
-					const observer = new MutationObserver(async (mutations) => {
-						observer.disconnect();
-						// trigger notifications only after navigation has been successufully added to the dom
-						if (_serviceWorker.worker) _serviceWorker.postMessage("getnotifications");
-						else api.notification("get", null, "notifs");
-					});
-					observer.observe(document.querySelector("nav"), {
-						childList: true,
-						subtree: true,
-					});
-
-					menu.replaceChildren(...elements);
-				};
-				break;
-			case "start":
-				successFn = async function (data) {
-					// set application and user settings
-
-					if (api._settings.user) await _serviceWorker.register();
-					else {
-						clearInterval(_serviceWorker.notif.interval);
-						_serviceWorker.notif.interval = null;
-						_serviceWorker.terminate();
-					}
-
-					await api.application("get", "menu");
-					api.history.buttoncolor();
-
-					// replace "please sign in" with user name for landing page
-					let signin = api._lang.GET("application.navigation.signin"),
-						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
-					api.update_header(
-						api._lang.GET("general.welcome_header", {
-							":user": api._settings.user.name ? " " + api._settings.user.name : greeting,
-						})
-					);
-
-					// update default language
-					if (api._settings.config.application && api._settings.config.application.language) {
-						document.querySelector("html").lang = api._settings.config.application.language;
-						_client._tts.voice = null;
-					}
-
-					// update application menu icon with user image
-					if (api._settings.user.image) {
-						let applicationLabel;
-						while (!applicationLabel) {
-							await _.sleep(50);
-							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("application.navigation.header") + "]");
-						}
-						applicationLabel.style.maskImage = "none";
-						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
-						applicationLabel.style.backgroundSize = "cover";
-						applicationLabel.style.borderRadius = "50%";
-					}
-
-					// override css properties with user settings
-					if (api._settings.user.app_settings) {
-						api.update_user_settings();
-					}
-
-					// ensure proper flagging in case of window refreshs
-					if (api._settings.config.application && api._settings.config.application.is_development) {
-						document.querySelector("body>header").classList.add("is_development");
-					}
-
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-
-					if (request[2])
-						//search
-						document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
-				};
-				break;
-			case "manual":
-				switch (method) {
-					case "get":
-						successFn = function (data) {
-							api.update_header(api._lang.GET("application.navigation.manual_manager"));
-							const render = new Assemble(data.render);
-							document.getElementById("main").replaceChildren(render.initializeSection());
-							render.processAfterInsertion();
+						// forth nav
+						button = document.createElement("button");
+						button.type = "button";
+						button.title = api._lang.GET("general.history.forth");
+						button.classList.add("inactive");
+						button.onclick = () => {
+							api.history.go("forth");
 						};
+						button.style.maskImage = "url('./media/angle-right.svg')";
+						elements.push(button);
+						elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMenu"), "#menustart"));
+
+						const observer = new MutationObserver(async (mutations) => {
+							observer.disconnect();
+							// trigger notifications only after navigation has been successufully added to the dom
+							if (_serviceWorker.worker) _serviceWorker.postMessage("getnotifications");
+							else api.notification("get", null, "notifs");
+						});
+						observer.observe(document.querySelector("nav"), {
+							childList: true,
+							subtree: true,
+						});
+
+						menu.replaceChildren(...elements);
+
+						api.history.buttoncolor();
 						break;
-					case "delete":
-						successFn = function (data) {
-							new Toast(data.response.msg, data.response.type);
-							api.application("get", request[1], data.response.id);
-						};
-						break;
+					case "start":
+						if (api._settings.user) await _serviceWorker.register();
+						else {
+							clearInterval(_serviceWorker.notif.interval);
+							_serviceWorker.notif.interval = null;
+							_serviceWorker.terminate();
+						}
+						await api.application("get", null, "menu");
+						await _.sleep(100);
+						// ensure proper flagging in case of window refreshs
+						if (api._settings.config.application && api._settings.config.application.is_development) {
+							document.querySelector("body>header").classList.add("is_development");
+						}
+					// no break by intent
 					default:
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response.id) api.application("get", request[1], data.response.id);
-						};
-						payload = _.getInputs("[data-usecase=manual]", true);
-						break;
+						const render = new Assemble(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
+
+						if (request[2])
+							//search
+							document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
 				}
-				break;
-			case "cron_log":
-				break;
-			default:
-				return;
-		}
-		await api.send(method, request, successFn, null, payload);
+			}
+			if (data.notif) _serviceWorker.notif.calendar(data.notif);
+			if (data.redirect) api.application("get", null, ...data.redirect);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -816,153 +759,52 @@ export const api = {
 	 * displays audit contents
 	 *
 	 * @param {string} method get|post|put|delete
+	 * @param {null|object|string} payload either pass FormData or a query selector string
 	 * @param {array} request api method
-	 * @returns request
 	 */
-	audit: (method, ...request) => {
+	audit: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get" && !request[0].startsWith("export")) api.history.write(["audit", ...request]);
-
+		if (method === "get" && !request[0].startsWith("export")) api.history.write(["audit", payload, ...request]);
 		request.splice(0, 0, "audit");
-		let payload,
-			successFn = function (data) {
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.render !== undefined) {
-					const options = {};
-					options[api._lang.GET("general.ok_button")] = false;
-					new Dialog({
-						type: "input",
-						render: data.render,
-						options: options,
-					});
-				}
-			},
-			title = {
-				audit: api._lang.GET("audit.navigation.audit"),
-				audittemplate: api._lang.GET("audit.navigation.templates"),
-				checks: api._lang.GET("audit.navigation.regulatory"),
-				managementreview: api._lang.GET("audit.navigation.management_review"),
-			};
-		switch (method) {
-			case "get":
+		if (["import"].contains(request[1])) api.preventDataloss.stop();
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
 				switch (request[1]) {
-					case "audit":
 					case "managementreview":
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								_client.audit.managementreview();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.preventDataloss.start();
-						};
+						_client.audit.managementreview();
+					case "audit":
+					case "import":
+						api.preventDataloss.start();
+				}
+			}
+			if (data.selected) {
+				switch (request[1]) {
+					case "import":
+						document.getElementById("TemplateObjectives").value += "\n\n" + data.selected;
 						break;
 					case "audittemplate":
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.selected && data.selected.length) Composer.importAuditTemplate(data.selected);
-							api.preventDataloss.start();
-						};
+						Composer.importAuditTemplate(data.selected);
 						break;
-					case "export":
-						// take whatever request param is formdata
-						for (const [index, value] of Object.entries(request)) {
-							if (value instanceof FormData) {
-								payload = value;
-								delete request[index];
-								break;
-							}
-						}
-						// if not set get inputs with usecase
-						if (!payload) payload = _.getInputs("[data-usecase=audit]", false);
-						break;
-					case "import":
-						switch (request[2]) {
-							case "auditsummary":
-								api.preventDataloss.stop();
-								successFn = function (data) {
-									if (data.data) document.getElementById("TemplateObjectives").value += "\n\n" + data.data;
-									api.preventDataloss.start();
-								};
-								break;
-						}
-						break;
-					default:
-						// take whatever request param is formdata
-						for (const [index, value] of Object.entries(request)) {
-							if (value instanceof FormData) {
-								payload = value;
-								delete request[index];
-								break;
-							}
-						}
-						// if not set get inputs with usecase
-						if (!payload) payload = _.getInputs("[data-usecase=audit]", false);
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] + (request[2] && request[2] !== "null" ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
 				}
-				break;
-			case "post":
-				if (3 in request && request[3] && request[3] instanceof FormData) {
-					// passed formdata
-					payload = request[3];
-					delete request[3];
-					if (["export"].includes(request[1])) break; // export checks that are called via post to call default successFn displaying a download link
-					successFn = function (data) {
-						if (data.render) {
-							api.update_header(title[request[1]] + (request[2] ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
-							const render = new Assemble(data.render);
-							document.getElementById("main").replaceChildren(render.initializeSection());
-							render.processAfterInsertion();
-						}
-						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					};
-				} else if (request[1] === "audittemplate") {
-					if (!(payload = Composer.composeNewAuditTemplate())) return;
-					successFn = function (data) {
-						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						if (data.id) api.audit("get", "audittemplate", null, data.id);
-					};
-				} else payload = _.getInputs("[data-usecase=audit]", true);
-				break;
-			case "put":
-				if (4 in request && request[4] && request[4] instanceof FormData) {
-					// passed formdata
-					payload = request[4];
-					delete request[4];
-					successFn = function (data) {
-						if (data.render) {
-							api.update_header(title[request[1]] + (request[2] ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
-							const render = new Assemble(data.render);
-							document.getElementById("main").replaceChildren(render.initializeSection());
-							render.processAfterInsertion();
-						}
-						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					};
-				} else if (request[1] === "audittemplate") {
-					if (!(payload = Composer.composeNewAuditTemplate())) return;
-					successFn = function (data) {
-						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					};
-				} else payload = _.getInputs("[data-usecase=audit]", true);
-				break;
-		}
+			}
+			if (data.notif) _serviceWorker.notif.calendar(data.notif);
+			if (data.redirect) api.audit("get", null, ...data.redirect);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -975,101 +817,38 @@ export const api = {
 	 * planning and editing calendar entries
 	 *
 	 * @param {string} method get|post|put|patch|delete
-	 * @param  {array} request api method, name|id
-	 * @returns request
+	 * @param {null|object|string} payload either pass FormData or a query selector string
+	 * @param {array} request api method, name|id
 	 */
-	calendar: (method, ...request) => {
+	calendar: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get" && !["monthlyTimesheets", "yearlyTimesheets"].includes(request[0])) api.history.write(["calendar", ...request]);
-
+		if (method === "get" && !["monthlyTimesheets", "yearlyTimesheets"].includes(request[0])) api.history.write(["calendar", payload, ...request]);
 		request.splice(0, 0, "calendar");
-		let payload,
-			successFn = function (data) {
-				if (data.render) {
-					api.update_header(title[request[1]]);
-					const render = new Assemble(data.render);
-					document.getElementById("main").replaceChildren(render.initializeSection());
-					render.processAfterInsertion();
-				}
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.id !== undefined) {
-					let id = document.getElementsByName("_longtermid");
-					if (id && id[0]) id[0].value = data.response.id;
-				}
-				if (data.data) _serviceWorker.notif.calendar(data.data);
-				if (["post", "put", "delete"].includes(method) && ["tasks", "timesheet", "worklists"].includes(request[1])) api.history.go("forth"); // updates the view after any change
-			},
-			title = {
-				appointment: api._lang.GET("calendar.navigation.appointment"),
-				tasks: api._lang.GET("calendar.navigation.tasks"),
-				timesheet: api._lang.GET("calendar.navigation.timesheet"),
-				longtermplanning: api._lang.GET("calendar.navigation.longtermplanning"),
-				worklists: api._lang.GET("calendar.navigation.worklists"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "monthlyTimesheets":
-					case "yearlyTimesheets":
-						successFn = function (data) {
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "appointment":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.render !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								});
-							}
-						};
-						payload = _.getInputs("[data-usecase=appointment]", true);
-						break;
-					case "longtermplanning":
-						if (!(payload = _client.calendar.longtermplanning())) payload = _.getInputs("[data-usecase=longtermplanning]", true);
-						break;
-					default:
-						payload = request[2];
-						delete request[2];
-						// set unit language keys instead of values
-						let units = [];
-						for (const [key, value] of payload.entries()) {
-							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
-						}
-						if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
-				}
-				break;
-			case "put":
-				payload = request[2];
-				delete request[2];
-				// set unit language keys instead of values
-				let units = [];
-				for (const [key, value] of payload.entries()) {
-					if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
-				}
-				if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
-			case "patch":
-			case "delete":
-				break;
-			default:
-				return;
-		}
+		let successFn = async function (data) {
+			if (data.toast) new Toast(data.toast.msg, data.toast.type);
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					render: data.dialog.render,
+					options: options,
+				});
+			}
+			if (data.render) {
+				let render = new Assemble(data.render);
+				document.getElementById("main").replaceChildren(render.initializeSection());
+				render.processAfterInsertion();
+			}
+			if (data.selected) {
+				let id = document.getElementsByName("_longtermid");
+				if (id && id[0]) id[0].value = data.selected;
+			}
+			if (data.notif) _serviceWorker.notif.calendar(data.notif);
+			if (data.redirect) api.calendar("get", null, ...data.redirect);
+			if (data.title) api.update_header(data.title);
+		};
+		if (typeof payload === "string") payload = _.getInputs(payload, true);
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1087,8 +866,7 @@ export const api = {
 	 */
 	consumables: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["consumables", ...request]);
-
+		if (method === "get") api.history.write(["consumables", payload, ...request]);
 		request.splice(0, 0, "consumables");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1159,8 +937,7 @@ export const api = {
 	 */
 	csvfilter: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["csvfilter", ...request]);
-
+		if (method === "get") api.history.write(["csvfilter", payload, ...request]);
 		request.splice(0, 0, "csvfilter");
 		let successFn = async function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1200,8 +977,7 @@ export const api = {
 	 */
 	document: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["document", ...request]);
-
+		if (method === "get") api.history.write(["document", payload, ...request]);
 		request.splice(0, 0, "document");
 		let successFn = async function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1250,7 +1026,7 @@ export const api = {
 						break;
 				}
 			}
-			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.notif) _serviceWorker.notif.records(data.notif);
 			if (data.redirect) api.document("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
@@ -1272,8 +1048,7 @@ export const api = {
 	 */
 	erpquery: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["erpquery", ...request]);
-
+		if (method === "get") api.history.write(["erpquery", payload, ...request]);
 		request.splice(0, 0, "erpquery");
 		let successFn = async function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1313,12 +1088,9 @@ export const api = {
 	 */
 	file: async (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["file", ...request]);
-
+		if (method === "get") api.history.write(["file", payload, ...request]);
 		request.splice(0, 0, "file");
-
 		if (request[4] === "filereference") api.preventDataloss.monitor = false;
-
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
 			if (data.render) {
@@ -1373,10 +1145,8 @@ export const api = {
 	 */
 	maintenance: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["maintenance", ...request]);
-
+		if (method === "get") api.history.write(["maintenance", payload, ...request]);
 		request.splice(0, 0, "maintenance");
-
 		let successFn = async function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
 			if (data.dialog) {
@@ -1415,8 +1185,7 @@ export const api = {
 	 */
 	measure: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["measure", ...request]);
-
+		if (method === "get") api.history.write(["measure", payload, ...request]);
 		request.splice(0, 0, "measure");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1445,8 +1214,7 @@ export const api = {
 	 */
 	message: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["message", ...request]);
-
+		if (method === "get") api.history.write(["message", payload, ...request]);
 		request.splice(0, 0, "message");
 		let successFn = async function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1469,7 +1237,7 @@ export const api = {
 
 				if (request[1] === "conversation" && request[2]) window.scrollTo(0, document.body.scrollHeight);
 			}
-			if (data.notif) _serviceWorker.notif.consumables(data.notif);
+			if (data.notif) _serviceWorker.notif.communication(data.notif);
 			if (data.redirect) api.message("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
@@ -1490,7 +1258,6 @@ export const api = {
 	 */
 	notification: (method, payload = {}, ...request) => {
 		request = [...request];
-
 		request.splice(0, 0, "notification");
 		let successFn = function (data) {
 			_serviceWorker.onMessage({ data: data });
@@ -1511,8 +1278,7 @@ export const api = {
 	 */
 	order: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["order", ...request]);
-
+		if (method === "get") api.history.write(["order", payload, ...request]);
 		request.splice(0, 0, "order");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1563,8 +1329,7 @@ export const api = {
 	 */
 	record: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["record", ...request]);
-
+		if (method === "get") api.history.write(["record", payload, ...request]);
 		request.splice(0, 0, "record");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1932,8 +1697,7 @@ export const api = {
 	 */
 	responsibility: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["responsibility", ...request]);
-
+		if (method === "get") api.history.write(["responsibility", payload, ...request]);
 		request.splice(0, 0, "responsibility");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1978,8 +1742,7 @@ export const api = {
 	 */
 	risk: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["risk", ...request]);
-
+		if (method === "get") api.history.write(["risk", payload, ...request]);
 		request.splice(0, 0, "risk");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -2028,8 +1791,7 @@ export const api = {
 	 */
 	texttemplate: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["texttemplate", ...request]);
-
+		if (method === "get") api.history.write(["texttemplate", payload, ...request]);
 		request.splice(0, 0, "texttemplate");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -2075,8 +1837,7 @@ export const api = {
 	 */
 	tool: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["tool", ...request]);
-
+		if (method === "get") api.history.write(["tool", payload, ...request]);
 		request.splice(0, 0, "tool");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -2118,10 +1879,14 @@ export const api = {
 	 */
 	user: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get" && !["training"].includes(request[0])) api.history.write(["user", ...request]);
-
+		if (method === "get" && !["training"].includes(request[0])) api.history.write(["user", payload, ...request]);
 		request.splice(0, 0, "user");
 		let successFn = function (data) {
+			if (data.config) {
+				Object.assign(api._settings, data.config);
+				if ("language" in data.config) api._lang._USER = data.config.language;
+				api.update_user_settings();
+			}
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
 			if (data.dialog) {
 				new Dialog(
@@ -2133,7 +1898,7 @@ export const api = {
 					"FormData"
 				).then((response) => {
 					if (!response) return;
-					if (request[1] === "training") api.user((method = 2 in request && request[2] !== "null" ? "put" : "post"), (payload = response), "training", 2 in request && request[2] ? request[2] : "null");
+					if (request[1] === "training") api.user(2 in request && request[2] !== "null" ? "put" : "post", response, "training", 2 in request && request[2] ? request[2] : "null");
 				});
 			}
 			if (data.render) {
@@ -2142,10 +1907,6 @@ export const api = {
 				render.processAfterInsertion();
 			}
 			if (data.redirect) api.user("get", null, request[1], data.redirect);
-			if (data.config) {
-				Object.assign(api._settings, data.config);
-				api.update_user_settings();
-			}
 			if (data.title) api.update_header(data.title);
 		};
 		if (typeof payload === "string") payload = _.getInputs(payload, true);

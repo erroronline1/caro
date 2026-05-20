@@ -18,12 +18,11 @@ require_once('./_tcpdfinterface.php');
 class CALENDAR extends API {
 
 	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedTimespan = null;
-	private $_requestedId = null;
-	private $_requestedDate = null;
-	private $_requestedComplete = null;
-	private $_requestedCalendarType = null;
+	public ?string $_requestedMethod = REQUEST[1];
+	private mixed $_requestedTimespan = null;
+	private mixed $_requestedId = null;
+	private mixed $_requestedDate = null;
+	private mixed $_requestedComplete = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -31,7 +30,6 @@ class CALENDAR extends API {
 
 		$this->_requestedTimespan = $this->_requestedId = REQUEST[2] ?? null;
 		$this->_requestedDate = $this->_requestedComplete = REQUEST[3] ?? null;
-		$this->_requestedCalendarType = REQUEST[4] ?? null;
 	}
 
 	/**
@@ -115,15 +113,16 @@ class CALENDAR extends API {
 						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['datetime'], true, false) . '.ics'
 					];
 
-					$body = [
-						[
-							'type' => 'links',
-							'description' => $this->_lang->GET('calendar.appointment.download'),
-							'content' => $downloadfiles
-						]
-					];
 					$this->response([
-						'render' => $body
+						'dialog' => [
+							'render' => [
+								[
+									'type' => 'links',
+									'description' => $this->_lang->GET('calendar.appointment.download'),
+									'content' => $downloadfiles
+								]
+							]
+						]
 					]);
 				}
 				$this->response([], 406);
@@ -131,10 +130,11 @@ class CALENDAR extends API {
 			case "GET":
 				// i'll leave payload options here, maybe there is a future use to call this with get parameters as preparation.
 				$response = [
+					'title' => $this->_lang->GET('calendar.navigation.appointment'),
 					'render' => [
 						'form' => [
 							'data-usecase' => 'appointment',
-							'action' => "javascript:api.calendar('post', 'appointment')"	
+							'action' => "javascript:api.calendar('post', '[data-usecase=appointment]', 'appointment')"	
 						],
 						'content' => [
 							[
@@ -194,8 +194,8 @@ class CALENDAR extends API {
 		]);
 		$calendarentry = $calendarentry ? $calendarentry[0] : null;
 		if (!$calendarentry) $this->response([], 404);
-
-		if ($this->_requestedCalendarType === 'timesheet'
+		
+		if ($calendarentry['type'] === 'timesheet'
 			&& !(PERMISSION::permissionFor('calendarfullaccess')
 			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
 			&& array_intersect(explode(',', $calendarentry['organizational_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
@@ -215,23 +215,23 @@ class CALENDAR extends API {
 			],
 		];
 		$alert = null;
-		if ($this->_requestedCalendarType === 'tasks') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
+		if ($calendarentry['type'] === 'tasks') $alert = intval($response[$calendarentry['type']][intval($this->_requestedComplete === 'true')]);
 
 		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		require_once('./notification.php');
 		$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
-			'response' => [
-				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
+			'toast' => [
+				'msg' => $response[$calendarentry['type']][intval($this->_requestedComplete === 'true')],
 				'type' => 'success'
 			],
-			'data' => [
+			'notif' => [
 				'calendar_uncompletedtasks' => $notifications->tasks(),
 				'calendar_uncompletedworklists' => $notifications->worklists()
 				]
 			]);
 		else $this->response([
-			'response' => [
+			'toast' => [
 				'msg' => $this->_lang->GET('calendar.tasks.not_found'),
 				'type' => 'error'
 			]]);
@@ -252,16 +252,21 @@ class CALENDAR extends API {
 	 */
 
 	 public function longtermplanning(){
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('calendar.navigation.longtermplanning'),
+			'render' => [
+				'content' => []
+				]
+			];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
-				$response = ['render' => [
+				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'longtermplanning',
-						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+						'action' => "javascript:api.calendar('post', _client.calendar.longtermplanning() || '[data-usecase=longtermplanning]', 'longtermplanning')"
 					],
-					'content' => []]
+					'content' => []
 				];
 
 				// new planning
@@ -408,14 +413,15 @@ class CALENDAR extends API {
 						':autodelete' => null
 					];
 					if ($this->_sqlinterface->EXECUTE('calendar_post', $columns)) $this->response([
-						'response' => [
-							'id' => $this->_sqlinterface->_pdo->lastInsertId(),
+						'toast' => [
 							'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
 							'type' => 'success'
-						]]);
+						],
+						'selected' => $this->_sqlinterface->_pdo->lastInsertId(),
+					]);
 
 					$this->response([
-						'response' => [
+						'toast' => [
 							'msg' => $this->_lang->GET('calendar.longtermplanning.save_error'),
 							'type' => 'error'
 						]
@@ -425,7 +431,7 @@ class CALENDAR extends API {
 			case 'GET':
 				if (PERMISSION::permissionFor('longtermplanning')) $response['render']['form'] = [
 						'data-usecase' => 'longtermplanning',
-						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+						'action' => "javascript:api.calendar('post', _client.calendar.longtermplanning() || '[data-usecase=longtermplanning]', 'longtermplanning')"
 					];
 				$select = [
 					'edit' => [
@@ -458,7 +464,7 @@ class CALENDAR extends API {
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.longtermplanning.select'),
-							'onchange' => "if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"
+							'onchange' => "if (this.value !== '0') api.calendar('get', null, 'longtermplanning', this.value);"
 						],
 						'content' => $select['edit']
 					]
@@ -504,7 +510,7 @@ class CALENDAR extends API {
 								'attributes' => [
 									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
 									'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
-										".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
+										".then(confirmation => {if (confirmation) api.calendar('delete', null, 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
 								]
 							], [
 								'type' => 'hidden',
@@ -577,12 +583,12 @@ class CALENDAR extends API {
 				if ($this->_sqlinterface->EXECUTE('calendar_delete', [
 					':ids' => [$this->_requestedId]
 				])) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
 						'type' => 'deleted'
 					]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_error'),
 						'type' => 'error'
 					]]);
@@ -748,16 +754,16 @@ class CALENDAR extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('calendar.timesheet.export.proceed'),
-				'content' => $downloadfiles
-			]]
-		);
 		$this->response([
-			'render' => $body,
+			'dialog' => [
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('calendar.timesheet.export.proceed'),
+						'content' => $downloadfiles
+					]
+				]
+			]
 		]);
 	}
 
@@ -886,23 +892,27 @@ class CALENDAR extends API {
 		if (!$this->_requestedId) $this->tasks(); // default view instead of redirect
 
 		// append filter inputs
-		$response = ['render' => ['content' => [
-			[
-				[
-					'type' => 'scanner',
-					'destination' => 'recordfilter', // assuming/hoping record identifiers are used to schedule events/tasks
-				], [
-					'type' => 'search',
-					'attributes' => [
-						'value' => $this->_requestedId,
-						'id' => 'recordfilter',
-						'name' => $this->_lang->GET('calendar.tasks.search'),
-						'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', encodeURIComponent(this.value))}",
-					],
-					'hint' => $this->_lang->GET('calendar.tasks.search_hint'),
+		$response = [
+			'render' => [
+				'content' => [
+					[
+						[
+							'type' => 'scanner',
+							'destination' => 'recordfilter', // assuming/hoping record identifiers are used to schedule events/tasks
+						], [
+							'type' => 'search',
+							'attributes' => [
+								'value' => $this->_requestedId,
+								'id' => 'recordfilter',
+								'name' => $this->_lang->GET('calendar.tasks.search'),
+								'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', null, 'search', encodeURIComponent(this.value))}",
+							],
+							'hint' => $this->_lang->GET('calendar.tasks.search_hint'),
+						]
+					]
 				]
 			]
-		]]];
+		];
 		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
 		$dbevents = $calendar->search($this->_requestedId ? : '');
 
@@ -961,7 +971,7 @@ class CALENDAR extends API {
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
 					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']])) ? 1 : null
 				];
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['toast' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
 
 				if ($event[':id'] && !PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 
@@ -974,35 +984,41 @@ class CALENDAR extends API {
 
 				// post or update event
 				if ($newid = $calendar->post($event)) $this->response([
-					'response' => [
-						'id' => $newid,
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.success'),
 						'type' => 'success'
 					],
-					'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
+					'notif' => ['calendar_uncompletedtasks' => $notifications->tasks()],
+					'redirect' => ['tasks', substr($event[':span_start'], 0, 10)],
+				]);
 				elseif ($event[':id']){
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
 					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
-						'response' => [
-							'id' => $newid,
+						'toast' => [
 							'msg' => $this->_lang->GET('calendar.tasks.success'),
 							'type' => 'success'
 						],
-						'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
+						'notif' => ['calendar_uncompletedtasks' => $notifications->tasks()],
+						'redirect' => ['tasks', substr($event[':span_start'], 0, 10)],
+					]);
 				}
 
 				$this->response([
-				'response' => [
-					'id' => false,
+				'toast' => [
 					'msg' => $this->_lang->GET('calendar.tasks.error'),
 					'type' => 'error'
 				]]);
 				break;
 			case 'GET':
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET('calendar.navigation.tasks'),
+					'render' => [
+						'content' => []
+					]
+				];
 
 				// set up calendar
 				$month = $calendar->render('month', ['tasks'], $this->_requestedTimespan);
@@ -1021,7 +1037,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'id' => 'recordfilter',
 							'name' => $this->_lang->GET('calendar.tasks.search'),
-							'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', encodeURIComponent(this.value))}",
+							'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', null, 'search', encodeURIComponent(this.value))}",
 						],
 						'hint' => $this->_lang->GET('calendar.tasks.search_hint'),
 					]
@@ -1039,7 +1055,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
-							'onclick' => "api.calendar('get', 'tasks', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'tasks', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
@@ -1047,7 +1063,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
-							'onclick' => "api.calendar('get', 'tasks', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'tasks', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -1126,13 +1142,13 @@ class CALENDAR extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.deleted'),
 						'type' => 'deleted'
 					],
-					'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
+					'notif' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.not_found'),
 						'type' => 'error'
 					]]);		
@@ -1176,7 +1192,7 @@ class CALENDAR extends API {
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
-			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'tasks')"];
+			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', null, 'complete', '" . $row['id'] . "', this.checked)"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.tasks.complete')]['checked'] = true;
@@ -1236,7 +1252,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.tasks.delete'),
 						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.tasks.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.tasks.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.calendar('delete', 'tasks', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
+							".then(confirmation => {if (confirmation) api.calendar('delete', null, 'tasks', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
 			}
@@ -1262,7 +1278,12 @@ class CALENDAR extends API {
 	 */
 	public function timesheet(){
 		$calendar = new CALENDARUTILITY($this->_sqlinterface, $this->_date);
-		$response = ['render' => ['content' => []]];
+		$response = [
+			'title' => $this->_lang->GET('calendar.navigation.timesheet'),
+			'render' => [
+				'content' => []
+			]
+		];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1318,32 +1339,33 @@ class CALENDAR extends API {
 				$event[':misc'] = UTILITY::json_encode($misc);
 
 				// match required properties
-				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['toast' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);
 
 				// post or update timesheet event
 				if ($newid = $calendar->post($event)) $this->response([
-					'response' => [
-						'id' => $newid,
-						'msg' => $this->_lang->GET('calendar.tasks.success'),
+					'toast' => [
+						'msg' => $this->_lang->GET('calendar.timesheet.success'),
 						'type' => 'success'
-					]]);
+					],
+					'redirect' => ['timesheet', substr($event[':span_start'], 0, 10)],
+				]);
 				elseif ($event[':id']){
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
 					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
-						'response' => [
-							'id' => $newid,
-							'msg' => $this->_lang->GET('calendar.tasks.success'),
+						'toast' => [
+							'msg' => $this->_lang->GET('calendar.timesheet.success'),
 							'type' => 'success'
-						]]);
+						],
+						'redirect' => ['timesheet', substr($event[':span_start'], 0, 10)],
+					]);
 				}
 				
 				$this->response([
-					'response' => [
-						'id' => false,
-						'msg' => $this->_lang->GET('calendar.tasks.error'),
+					'toast' => [
+						'msg' => $this->_lang->GET('calendar.timesheet.error'),
 						'type' => 'error'
 					]]);
 				break;
@@ -1368,7 +1390,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
-							'onclick' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
@@ -1376,7 +1398,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
-							'onclick' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -1458,7 +1480,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.timesheet.bulk_approve', [':number' => count($bulkapproval)]),
-							'onclick' => "api.calendar('patch', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
+							'onclick' => "api.calendar('patch', null, 'complete', '" . implode(',', $bulkapproval) . "', true)"
 						]
 					];
 				}
@@ -1473,7 +1495,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'data-type' => 'download',
 							'value' => $this->_lang->GET('calendar.timesheet.monthly_summary'),
-							'onclick' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
+							'onclick' => "api.calendar('get', null, 'monthlyTimesheets', '" . $this->_requestedDate . "')"
 						]
 					];
 				}
@@ -1519,7 +1541,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'data-type' => 'download',
 							'value' => $this->_lang->GET('calendar.timesheet.yearly_summary'),
-							'onclick' => "api.calendar('get', 'yearlyTimesheets', '" . $this->_requestedDate . "')"
+							'onclick' => "api.calendar('get', null, 'yearlyTimesheets', '" . $this->_requestedDate . "')"
 						]
 					];
 				break;
@@ -1535,13 +1557,13 @@ class CALENDAR extends API {
 				) $this->response([], 401);
 
 				if ($calendar->delete($this->_requestedId)) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('calendar.tasks.deleted'),
+					'toast' => [
+						'msg' => $this->_lang->GET('calendar.timesheet.deleted'),
 						'type' => 'deleted'
 					]]);
 				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('calendar.tasks.not_found'),
+					'toast' => [
+						'msg' => $this->_lang->GET('calendar.timesheet.not_found'),
 						'type' => 'error'
 					]]);
 				break;
@@ -1610,7 +1632,7 @@ class CALENDAR extends API {
 			];
 
 			// add completion toggle
-			$completed[$this->_lang->GET('calendar.timesheet.approve')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
+			$completed[$this->_lang->GET('calendar.timesheet.approve')] = ['onchange' => "api.calendar('patch', null, 'complete', '" . $row['id'] . "', this.checked)"];
 			// completion can only be done by authorized and supervisors of affected user unit
 			if (!(PERMISSION::permissionFor('calendarfullaccess')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
@@ -1664,7 +1686,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.tasks.delete'),
 						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.tasks.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.tasks.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.calendar('delete', 'tasks', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
+							".then(confirmation => {if (confirmation) api.calendar('delete', null, 'tasks', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
 			}
@@ -1788,16 +1810,16 @@ class CALENDAR extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('calendar.timesheet.export.proceed'),
-				'content' => $downloadfiles
-			]]
-		);
 		$this->response([
-			'render' => $body,
+			'dialog' => [
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('calendar.timesheet.export.proceed'),
+						'content' => $downloadfiles
+					]					
+				]
+			]
 		]);
 	}
 
@@ -1857,7 +1879,7 @@ class CALENDAR extends API {
 					];
 				}
 
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'] && $misc)) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'] && $misc)) $this->response(['toast' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
 
 				$event[':misc'] = UTILITY::json_encode($misc);
 
@@ -1870,35 +1892,41 @@ class CALENDAR extends API {
 
 				// post event
 				if ($newid = $calendar->post($event)) $this->response([
-					'response' => [
-						'id' => $newid,
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.success'),
 						'type' => 'success'
 					],
-					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
+					'notif' => ['calendar_uncompletedworklists' => $notifications->worklists()],
+					'selected' => $newid,
+				]);
 				elseif ($event[':id']) {
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
 					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
-						'response' => [
-							'id' => $newid,
+						'toast' => [
 							'msg' => $this->_lang->GET('calendar.tasks.success'),
 							'type' => 'success'
 						],
-						'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
+						'notif' => ['calendar_uncompletedworklists' => $notifications->worklists()],
+						'selected' => $newid,
+					]);
 				}
 
 				$this->response([
-					'response' => [
-						'id' => false,
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$response = ['render' => ['content' => []]];
+				$response = [
+					'title' => $this->_lang->GET('calendar.navigation.worklists'),
+					'render' => [
+						'content' => []
+					]
+				];
 
 				// set up calendar
 				$week = $calendar->render('week', ['worklists'], $this->_requestedTimespan);
@@ -1919,7 +1947,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.worklists.week_previous'),
-							'onclick' => "api.calendar('get', 'worklists', '" . $previousweek->format('Y-m-d') . "', '" . $previousweek->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'worklists', '" . $previousweek->format('Y-m-d') . "', '" . $previousweek->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
@@ -1927,7 +1955,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.worklists.week_next') . ' ',
-							'onclick' => "api.calendar('get', 'worklists', '" . $nextweek->format('Y-m-d') . "', '" . $nextweek->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', null, 'worklists', '" . $nextweek->format('Y-m-d') . "', '" . $nextweek->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -1985,13 +2013,13 @@ class CALENDAR extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.deleted'),
 						'type' => 'deleted'
 					],
-					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
+					'notif' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
 				else $this->response([
-					'response' => [
+					'toast' => [
 						'msg' => $this->_lang->GET('calendar.tasks.not_found'),
 						'type' => 'error'
 					]]);		
@@ -2033,7 +2061,7 @@ class CALENDAR extends API {
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
-			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'worklists')"];
+			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', null, 'complete', '" . $row['id'] . "', this.checked)"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.tasks.complete')]['checked'] = true;
@@ -2059,7 +2087,7 @@ class CALENDAR extends API {
 			$misc = json_decode($row['misc'] ? : '', true) ? : [];
 			$links = [];
 			foreach($misc as $station){
-				$links[$station['station']] = ['href' => "javascript: api.record('get', 'record', '" . $station['station'] . "')", 'data-type' => 'record' ];
+				$links[$station['station']] = ['href' => "javascript: api.record('get', null, 'record', '" . $station['station'] . "')", 'data-type' => 'record' ];
 			}
 			if ($links){
 				$events[count($events) - 1][] = [
@@ -2100,7 +2128,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.tasks.delete'),
 						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.tasks.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.tasks.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.calendar('delete', 'worklists', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
+							".then(confirmation => {if (confirmation) api.calendar('delete', null, 'worklists', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
 			}
