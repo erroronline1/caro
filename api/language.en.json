@@ -265,7 +265,7 @@
 			"new_topic": "New topic",
 			"not_saved": "The topic could not be saved",
 			"permissions": "Relevant for permissions",
-			"saved": "The manual topic ':name' has been saved",
+			"saved": "The manual topic :name has been saved",
 			"select_topic": "Select topic",
 			"title": "Title"
 		},
