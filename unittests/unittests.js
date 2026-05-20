@@ -2204,11 +2204,11 @@ export async function screenshot(lang = null, distinct = null) {
 	function* apicalls1(index) {
 		// with still fixed navigation
 		const targets = [
-			/* 7 */ { en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --filename "files ${lang}.png"` },
-			/* 8 */ { en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --filename "measure management ${lang}.png"` },
-			/* 9 */ { en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --filename "announcements ${lang}.png"` },
-			/* 10 */ { en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --filename "conversation ${lang}.png"` },
-			/* 11 */ { en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --filename "responsibility ${lang}.png"` },
+			/* 7 */ { en: "api.file('get', null, 'files')", de: "", screenshot: `:screenshot --filename "files ${lang}.png"` },
+			/* 8 */ { en: "api.measure('get', null, 'measure')", de: "", screenshot: `:screenshot --filename "measure management ${lang}.png"` },
+			/* 9 */ { en: "api.message('get', null, 'announcements')", de: "", screenshot: `:screenshot --filename "announcements ${lang}.png"` },
+			/* 10 */ { en: "api.message('get', null, 'conversation')", de: "", screenshot: `:screenshot --filename "conversation ${lang}.png"` },
+			/* 11 */ { en: "api.responsibility('get', null, 'responsibilities')", de: "", screenshot: `:screenshot --filename "responsibility ${lang}.png"` },
 		];
 		while (index < targets.length) {
 			console.log(targets[index].screenshot);
@@ -2221,23 +2221,23 @@ export async function screenshot(lang = null, distinct = null) {
 		// after unfixing navigation
 		const targets = [
 			/* 12 */ { en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
-			/* 13 */ { en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
-			/* 14 */ { en: "api.audit('get', 'audit', 4)", de: "api.audit('get', 'audit', 2)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
-			/* 15 */ { en: "api.audit('get', 'audittemplate', 4)", de: "api.audit('get', 'audittemplate', 2)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
-			/* 16 */ { en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
+			/* 13 */ { en: "api.application('get', null, 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
+			/* 14 */ { en: "api.audit('get', null, 'audit', 4)", de: "api.audit('get', null, 'audit', 2)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
+			/* 15 */ { en: "api.audit('get', null, 'audittemplate', 4)", de: "api.audit('get', null, 'audittemplate', 2)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
+			/* 16 */ { en: "api.audit('get', null, 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
 			/* 17 */ { en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
 			/* 18 */ { en: "api.calendar('get', 'tasks')", de: "", screenshot: `:screenshot --fullpage --filename "tasks ${lang}.png"` },
-			/* 19 */ { en: "api.document('get', 'document_editor', 'Basic data')", de: "api.document('get', 'document_editor', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
-			/* 20 */ { en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
-			/* 21 */ { en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
-			/* 22 */ { en: "api.record('get', 'document', 'Basic data')", de: "api.record('get', 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
-			/* 23 */ { en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
-			/* 24 */ { en: "api.texttemplate('get', 'text', 39)", de: "api.texttemplate('get', 'text', 37)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
-			/* 25 */ { en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
-			/* 26 */ { en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
+			/* 19 */ { en: "api.document('get', null, 'document_editor', 'Basic data')", de: "api.document('get', null, 'document_editor', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
+			/* 20 */ { en: "api.order('get', null, 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
+			/* 21 */ { en: "api.consumables('get', null, 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
+			/* 22 */ { en: "api.record('get', null, 'document', 'Basic data')", de: "api.record('get', null, 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+			/* 23 */ { en: "api.risk('get', null, 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
+			/* 24 */ { en: "api.texttemplate('get', null, 'text', 39)", de: "api.texttemplate('get', null, 'text', 37)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
+			/* 25 */ { en: "api.user('get', null, 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
+			/* 26 */ { en: "api.user('get', null, 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
 			/* 27 */ {
-				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO #tebvz0')",
-				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc')",
+				en: "api.record('get', null, 'record', 'Jane Doe *01.02.2003 DAFO #tebvz0')",
+				de: "api.record('get', null, 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc')",
 				screenshot: `:screenshot --fullpage --filename "record screen ${lang}.png"`,
 			}, // customize identifier
 		];
@@ -2258,10 +2258,10 @@ export async function screenshot(lang = null, distinct = null) {
 		const targets = [
 			{
 				en: async function () {
-					await api.application("get", "start");
+					await api.application("get", null, "start");
 					const data = new FormData();
 					data.append(api._lang.GET("tool.markdown.editor"), markdown.en);
-					await api.tool("post", "markdown", null, data);
+					await api.tool("post", data, "markdown", null);
 					await _.sleep(500);
 					const dialog = document.querySelectorAll("dialog")[0];
 					dialog.style.transform = "translateY(34%)";
@@ -2270,10 +2270,10 @@ export async function screenshot(lang = null, distinct = null) {
 					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
 				},
 				de: async function () {
-					await api.application("get", "start");
+					await api.application("get", null, "start");
 					const data = new FormData();
 					data.append(api._lang.GET("tool.markdown.editor"), markdown.de);
-					await api.tool("post", "markdown", null, data);
+					await api.tool("post", data, "markdown", null);
 					await _.sleep(500);
 					const dialog = document.querySelectorAll("dialog")[0];
 					dialog.style.transform = "translateY(34%)";
@@ -2297,75 +2297,75 @@ export async function screenshot(lang = null, distinct = null) {
 					const data = new FormData();
 					data.append(api._lang.GET("record.create_identifier"), "Jane Doe *01.02.2003 DAFO");
 					data.append("_type", "label");
-					api.record("post", "identifier", "appendDate", data);
+					api.record("post", data, "identifier", "appendDate");
 					console.log(`sample identifier code ${lang}.png`);
 				},
 				de: async function () {
 					const data = new FormData();
 					data.append(api._lang.GET("record.create_identifier"), "Erika Musterfrau *01.02.2003 UA-Prothese");
 					data.append("_type", "label");
-					api.record("post", "identifier", "appendDate", data);
+					api.record("post", data, "identifier", "appendDate");
 					console.log(`sample identifier code ${lang}.png`);
 				},
 			},
 			/* 30 */ {
 				en: async function () {
-					api.record("get", "document", "Basic data"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+					api.record("get", null, "document", "Basic data"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
 					await _.sleep(2000);
-					api.document("post", "export");
+					api.document("post", "[data-usecase=record]", "export");
 					console.log(`document export ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "document", "Basisdaten"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+					api.record("get", null, "document", "Basisdaten"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
 					await _.sleep(2000);
-					api.document("post", "export");
+					api.document("post", "[data-usecase=record]", "export");
 					console.log(`document export ${lang}.png`);
 				},
 			},
 			/* 31*/ {
 				en: async function () {
-					api.calendar("get", "appointment");
+					api.calendar("get", null, "appointment");
 					await _.sleep(2000);
 					document.getElementsByName(api._lang.GET("calendar.appointment.datetime"))[0].value = "2025-07-27T10:00";
 					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Cast for orthosis";
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Remember bringing shoes";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
 					await _.sleep(500);
-					api.calendar("post", "appointment");
+					api.calendar("post", "[data-usecase=appointment]","appointment");
 					console.log(`appointment ${lang}.png`);
 				},
 				de: async function () {
-					api.calendar("get", "appointment");
+					api.calendar("get", null,"appointment");
 					await _.sleep(2000);
 					document.getElementsByName(api._lang.GET("calendar.appointment.datetime"))[0].value = "2025-07-27T10:00";
 					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Gipsabdruck für Orthese";
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Bringen Sie Schuhe mit";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
 					await _.sleep(500);
-					api.calendar("post", "appointment");
+					api.calendar("post", "[data-usecase=appointment]","appointment");
 					console.log(`appointment ${lang}.png`);
 				},
 			},
 			/* 32 */ {
 				en: async function () {
-					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
+					api.record("get", null, "fullexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
+					api.record("get", null, "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 			},
 			/* 33 */ {
 				en: async function () {
-					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
+					api.record("get", null, "simplifiedexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
+					api.record("get", null, "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},

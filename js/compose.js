@@ -213,11 +213,11 @@ export class Composer {
 
 			// documentbutton value should have been assigned in previous loops
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
-				element.attributes.onclick = "api.record('get','displayonly', '" + element.attributes.value + "')";
+				element.attributes.onclick = "api.record('get', null, 'document', '" + element.attributes.value + "', '', 'asModal')";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_display_button", { ":document": element.attributes.value });
 			}
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_continue") && sibling.checked) {
-				element.attributes.onclick = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
+				element.attributes.onclick = "api.record('get', null, 'document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_continue_button", { ":document": element.attributes.value });
 			}
 
@@ -1395,7 +1395,12 @@ export class Compose extends Assemble {
 				"'" +
 				api._lang.GET("assemble.compose.component.confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(confirmation => {if (confirmation) api.document('post', 'component')})",
+				"}}).then(confirmation => {if (confirmation) {" +
+				"let composedComponent = Composer.composeNewComponent();" +
+				"if (!composedComponent) return;" +
+				"Composer.addComponentStructureToComponentForm(composedComponent);" +
+				"api.document('post', '[data-usecase=component_editor_form]', 'component')" +
+				"}})",
 			hidden: {
 				name: api._lang.GET("assemble.compose.component.availability"),
 				hint: api._lang.GET("assemble.compose.component.availability_hint"),
@@ -1697,7 +1702,11 @@ export class Compose extends Assemble {
 				"'" +
 				api._lang.GET("assemble.compose.document.confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(confirmation => {if (confirmation) api.document('post', 'document')})",
+				"}}).then(confirmation => {if (confirmation) {" +
+				"let document= Composer.composeNewDocument();" +
+				"if (!document) return;" +
+				"api.document('post', document, 'document')" +
+				"}})",
 			hidden: {
 				name: api._lang.GET("assemble.compose.document.availability"),
 				hint: api._lang.GET("assemble.compose.document.availability_hint"),
@@ -2175,7 +2184,7 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.raw"),
 				id: "_compose_raw",
 				"data-loss": "prevent",
-				style:"height:29em"
+				style: "height:29em",
 			},
 		};
 		result = result.concat(...this.code());
@@ -2425,7 +2434,7 @@ export class Compose extends Assemble {
 				value: api._lang.GET("tool.markdown.button"),
 				"data-type": "markdown",
 				class: "floatright",
-				onclick: "api.tool('get', 'markdown')",
+				onclick: "api.tool('get', null, 'markdown')",
 			},
 		};
 		result = result.concat(...this.button());

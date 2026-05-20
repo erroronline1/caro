@@ -3077,7 +3077,7 @@
 						"type": "documentbutton",
 						"attributes": {
 							"value": "Armierungsplan Orthetik I anzeigen",
-							"onclick": "api.record('get','displayonly', 'Armierungsplan Orthetik I')"
+							"onclick": "api.record('get', null, 'document', 'Armierungsplan Orthetik I', '', 'asModal')"
 						}
 					},
 					{

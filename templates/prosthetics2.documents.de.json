@@ -643,7 +643,7 @@
 						"type": "documentbutton",
 						"attributes": {
 							"value": "Armierungsplan Prothetik II anzeigen",
-							"onclick": "api.record('get','displayonly', 'Armierungsplan Prothetik II')"
+							"onclick": "api.record('get', null, 'document', 'Armierungsplan Prothetik II', '', 'asModal')"
 						}
 					},
 					{

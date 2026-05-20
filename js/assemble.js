@@ -1862,10 +1862,10 @@ export class Assemble {
 				daytile.children[daytile.children.length - 1].remove(); //remove trailing linebreak
 
 				daytile.onclick = function () {
-					api.calendar("get", apicall, day.date, day.date);
+					api.calendar("get", null, apicall, day.date, day.date);
 				};
 				daytile.onkeydown = function (event) {
-					if (event.key === "Enter") api.calendar("get", apicall, day.date, day.date);
+					if (event.key === "Enter") api.calendar("get", null, apicall, day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");
@@ -2307,7 +2307,7 @@ export class Assemble {
 	 * 		"type": "documentbutton",
 	 * 		"attributes": {
 	 * 			"value": "{selected document title} anzeigen",
-	 * 			"onclick": "api.record('get', 'displayonly', '{selected document title}')"
+	 * 			"onclick": "api.record('get', null, 'document', '{selected document title}', '', 'asModal')"
 	 * 		}
 	 * 	}
 	 * ```
@@ -2395,7 +2395,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("file.file_filter_label"),
-								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'filereference');}",
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', null, 'filter', 'null', encodeURIComponent(this.value), 'filereference');}",
 							},
 						},
 						{
@@ -3118,7 +3118,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("consumables.product.search"),
-								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); const data = {search: encodeURIComponent(this.value)}; api.purchase('get', 'search', 'productselection', data);}",
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); const data = {search: encodeURIComponent(this.value)}; api.consumables('get', data, 'search', 'productselection');}",
 								id: "productsearch",
 							},
 						},
@@ -3395,7 +3395,7 @@ export class Assemble {
 					"FormData"
 				).then((response) => {
 					if (response) {
-						api.record("post", "import", null, response);
+						api.record("post", response, "import", null);
 					}
 				});
 			};
@@ -3767,7 +3767,7 @@ export class Assemble {
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
 				value: api._lang.GET("texttemplate.navigation.texts"),
-				onclick: "api.texttemplate('get', 'text', 'false', 'modal')",
+				onclick: "api.texttemplate('get', null, 'text', 'false', 'modal')",
 				class: "floatright",
 			};
 			delete this.currentElement.hint;

@@ -520,7 +520,7 @@ class RECORD extends API {
 						'type' => 'submit',
 						'formnovalidate' => true,
 						'value' => $this->_lang->GET('assemble.render.export'),
-						'formaction' => "javascript:api.document('post', 'export')"
+						'formaction' => "javascript:api.document('post', '[data-usecase=record]', 'export')"
 					]
 				];
 			}
@@ -531,7 +531,7 @@ class RECORD extends API {
 						'value' => $this->_lang->GET('assemble.render.export'),
 						'onclick' => "const formdata = new FormData(); "
 							. "formdata.append('_document_id', " . $document['id'] . "); "
-							. "api.document('post', '[data-usecase=record]', 'export', null, formdata);"
+							. "api.document('post', formdata, 'export');"
 						]
 				];
 			} 

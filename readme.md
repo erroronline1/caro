@@ -34,6 +34,11 @@ Things are still in motion. Images may be outdated.
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
 * tidy, rephrase readme
+    * graph md, export and embed svg, utilize own pdf library instead of default use of markdownpdf (despite being great)
+* check if erpinterface import still works with api.js
+* check external file link in external documents
+
+
 
 ## Content
 * [Introducion](#introducion)
@@ -3185,14 +3190,16 @@ Variables for _stresstest.php can be adjusted within the top class variables in 
 # API documentation
 All REST-API endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 511 Network Authentication Required or 401 Unauthorized if not logged in.
 Response properties are
-* *render* (for assemble)
-* *user* (user settings on login/reload)
-* *config* (application settings on login/reload)
+* *title* (top header for module request)
+* *render* (for assembly of main)
+* *insert* (partial insertion into main, e.g. search results)
+* *dialog* (render content for dialog)
+* *toast* (state messages, message type)
+* *config* (application and user settings on login/reload)
 * *data* (filtered ids, record imports, notif numbers, approved order data to be assembled by _client.order.approved())
-* *header* (dynamic page title for documents, records and consumable edits)
-* *response* (state messages, message type, affected ids, redirect path params, names)
-* *log* (CSV-filter log)
-* *links* (CSV-filter result file)
+* *notif* (updates on menu notif numbers)
+* *selected* (selected content as data structure to be processed by frontend composer, e.g texttemplates, audittemplates, components, documents / ids, names to update form nodes, e.g. calendar)
+* *redirect (redirect path params)
 
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS Composer-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
@@ -3270,18 +3277,32 @@ graph TD;
 
 ## Application endpoints
 
-> POST ./api/api.php/application/authentify
+> GET ./api/api.php/application/about
 
-Returns user- and application settings on valid authentification, submission form otherwise.
+Returns general application information
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | optional | contains password for authentification |
+| none | | | |
 
 Sample response
 ```
-{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_dev.png","app_settings":{"forceDesktop":"on","annualvacation":"2023-01-01 30\r;2024-01-01 30","weeklyhours":"2024-05-01 5","initialovertime":"10","homeoffice":"on","primaryUnit":"prosthetics2","language":"en","theme":"light"},"cached_identity":"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"},"application":{"session_timeout_seconds":"1440"}}
+{"title":"About CARO App","render":{"content":[[[{"type":"textsection","attributes":{"name":".CARO App"},"content":"Die CARO App soll dich bei unserem Qualitätsmanagementsystem und den Arbeitsabläufen unterstützen.\nDu kannst deine Informationen einsehen, dein Foto und einige Einstellungen ändern. Dein Foto ist für alle Nutzer der Anwendung sichtbar, zum Beispiel bei der Nutzung des Nachrichtensystems."}],....
+```
+
+> DELETE ./api/api.php/application/authentify
+
+Destroys session and returns empty user- and application settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"redirect":["start"]}
 ```
 
 > GET ./api/api.php/application/authentify
@@ -3298,32 +3319,46 @@ Sample response
 ["Hardly anything is evil, but most things are hungry. Hunger looks very like evil from the wrong end of the cutlery. Or do you think that your bacon sandwich loves you back?"]
 ```
 
-> DELETE ./api/api.php/application/authentify
+> POST ./api/api.php/application/authentify
 
-Destroys session and returns empty user- and application settings.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"user":[],"config":{"application":{"defaultlanguage":"en", "debugging": true, "is_development": false}, "language": {....}}}
-```
-
-> GET ./api/api.php/application/info
-
-Returns general application information
+Returns user- and application settings on valid authentification, submission form otherwise.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none | | | |
+| payload | form data | optional | contains password for authentification |
 
 Sample response
 ```
-{"render":{"content":[{"type":"textsection","attributes":{"name":"CARO - Cloud Assisted Records and Operations"},"content":"Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and\/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful,....
+{"user":{"name":"error on line 1","image":"./api/api.php/file/stream/./fileserver/users/profilepic_error on line 1_dev.png","app_settings":{"idle":7200,"annualvacation":"2025-01-01 30","weeklyhours":"2025-11-01 38,5","forceDesktop":"on","theme":"light","autocomplete_forth":"Alt","autocomplete_back":"AltGraph","primaryUnit":"prosthetics2","recordsLayout":"table"},"fingerprint":"ce1a0813a05f2bf809259d8570b720ceda934305e842389694bc58e48943c60d","permissions":{"orderprocessing":true,"patient":false}},"config":{"application":{"language":"en","order_gtin_barcode":false,"debugging":true,"is_development":false},"lifespan":{"session":{"idle":7200}},"limits":{"qr_errorlevel":"L","messages":"25, 37, 50"},....
+```
+
+> DELETE ./api/api.php/application/manual/{id}
+
+Deletes a manual entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database entry id |
+
+Sample response
+```
+{"toast":{"msg":"Topic deleted","type":"deleted"}}
+```
+
+> GET ./api/api.php/application/manual/{id}
+
+Returns a form to add or edit a manual entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database entry id |
+
+Sample response
+```
+{"title":"Edit manual","render":{"content":[[{"type":"select","attributes":{"name":"Select topic","onchange":"api.application('get', null, 'manual', this.value)"},"content":{"...New topic":{"selected":true},".CARO App":{"value":1},"Aufzeichungen":{"value":7},"Bearbeitung von Dateien und Paketen":{"value":12},"Bearbeitung von Dokumenten":{"value":9},"Bearbeitung von Lieferanten und Produkten":{"value":15},"Bearbeitung von Nutzern und der Anleitung":{"value":2},"Bearbeitung von Textvorschlägen":{"value":6},"Bestellungen":{"value":13},"Dateien":{"value":11},"Kalender":{"value":10},"Konversationen":{"value":3},"Lieferanten und Produkte":{"value":14},"Regulatorische Auswertungen und Zusammenfassungen":{"value":17},"Risikomanagement":{"value":8},"Suchfunktion":{"value":20},"Textvorschläge":{"value":5},"Verbesserungsvorschläge":{"value":19},"Verzeichnis":{"value":4},"Wartung":{"value":18},....
 ```
 
 > POST/PUT ./api/api.php/application/manual/{id}
@@ -3338,35 +3373,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":"1","msg":"The manual topic '.CARO App' has been saved","type":"success"}}
-```
-
-> GET ./api/api.php/application/manual/{id}
-
-Returns a form to add or edit a manual entry.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database entry id |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select topic","onchange":"api.application('get', 'manual', this.value)"},"content":{"...New topic":[],".CARO App":{"value":1,"selected":true},"Audit":{"value":17},"Aufzeichungen":{"value":7},"Bearbeitung von Dateien und Paketen":{"value":12},"Bearbeitung von Dokumenten":{"value":9},"Bearbeitung von Lieferanten und Produkten":{"value":15},"Bearbeitung von Nutzern und der Anleitung":{"value":2},"Bearbeitung von Textvorschlägen":{"value":6},"Bestellungen":{"value":13},"Dateien":{"value":11},"Kalender":{"value":10},"Konversationen":{"value":3},"Lieferanten und Produkte":{"value":14},"Risikomanagement":{"value":8},"Textvorschläge":{"value":5},"Verzeichnis":{"value":4},"Werkzeuge":{"value":16},"sfsdfg":{"value":21}}},{"type":"text","attributes":{"name":"Title","value":".CARO App"}},...
-```
-
-> DELETE ./api/api.php/application/manual/{id}
-
-Deletes a manual entry.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database entry id |
-
-Sample response
-```
-{"response":{"msg":"Topic deleted","id":false,"type":"deleted"}}
+{"toast":{"msg":"The manual topic .CARO App has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/application/menu
@@ -3380,7 +3387,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Personnel register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
+{"render":{"Communication":{"Conversations":{"onclick":"api.message('get', null, 'conversation')"},"Announcements":{"onclick":"api.message('get', null, 'announcements')"},"Text recommendations":{"onclick":"api.texttemplate('get', null, 'text')"},"Personnel register":{"onclick":"api.message('get', null, 'register')"},"Responsibilities":{"onclick":"api.responsibility('get', null, 'responsibilities')"},"Improvement suggestions":{"onclick":"api.measure('get', null, 'measure')"},"Whiteboard":{"onclick":"api.message('get', null, 'whiteboards')"}},,....
 ```
 
 > GET ./api/api.php/application/start/{search}
@@ -3394,26 +3401,25 @@ Parameters
 
 Samble response
 ```
-{"user":"error on line 1","render":{"content":[[{"type":"tile","attributes":{"onpointerup":"api.purchase('get', 'approved')"},"content":[{"type":"textsection","content":"There are 4 orders awaiting processing","attributes":{"data-type":"purchase","name":"Approved orders"}}]},{"type":"tile","attributes":{"onpointerup":"api.record('get', 'records')"},"content":[{"type":"textsection","content":"There are 1 open cases for your assigned units","attributes":{"data-type":"record","name":"Records"}}]}],[{"type":"calendar","description":"Week 50 2024","content":[{"date":"2024-12-09","display":"Mon 9","today":false,"selected":false,"holiday":false},{"date":"2024-12-10","display":"Tue 10","today":false,"selected":false,"holiday":false},....
+{"title":"Welcome error on line 1","config":{"user":{"name":"error on line 1","image":"./api/api.php/file/stream/./fileserver/users/profilepic_error on line 1_dev.png","app_settings":{"idle":7200,"annualvacation":"2025-01-01 30","weeklyhours":"2025-11-01 38,5","forceDesktop":"on","theme":"light","autocomplete_forth":"Alt","autocomplete_back":"AltGraph","primaryUnit":"prosthetics2","recordsLayout":"table"},"fingerprint":"ce1a0813a05f2bf809259d8570b720ceda934305e842389694bc58e48943c60d","permissions":{"orderprocessing":true,"patient":false}},"config":{"application":{"language":"en","order_gtin_barcode":false,"debugging":true,"is_development":false},"lifespan":{"session":{"idle":7200}},....
 ```
 
 [Content](#content)
 
 ### Audit endpoints
 
-> POST/PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
+> DELETE ./api/api.php/audit/audit/null/{audit_id}
 
-Stores a new or updates an unclosed audit to the database.
+Deletes an unclosed audit.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | required for PUT | template id |
-| payload | form data | required | input data |
+| {audit_id} | path parameter | required | audit database id |
 
 Sample response
 ```
-{"response":{"msg":"Audit saved","id":"2","type":"success"}}
+{"toast":{"msg":"Audit deleted","type":"deleted"}}
 ```
 
 > GET ./api/api.php/audit/audit/{template_id}/{audit_id}
@@ -3428,21 +3434,50 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "button","attributes": {"value": "New Audit","onpointerup": "new _client.Dialog({type: 'input', header: 'New Audit', render: JSON.parse('[{\"type\":\"select\",\"attributes\":{\"name\":\"Select template\"},\"content\":{\"...\":{\"value\":\"0\"},\"Common 2025-02-03 07:41:00\":{\"value\":\"2\"}}}]'), options:{'No, I am not done yet': {value: true, class: 'reducedCTA'},'Ok': true}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['Select template'])});"}},{"type": "select","attributes": {"name": "Edit","onchange": "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"},"content": {"...": {"value": "0"},"Common 2025-02-04 13:56:00": {"value": "2"}}}]]}}
+{"title":"Internal audit","render":{"content":[[{"type":"button","attributes":{"value":"Prepare audit","onclick":"api.audit('get', null, 'audittemplate')"}},{"type":"select","attributes":{"name":"Start new audit with prepared template","onchange":"if (this.value !== '0') api.audit('get', null, 'audit', this.value);"},"content":{"...":{"value":"0"},"Prosthetics II 2025-11-16 17:12:54":{"value":1},"Office/Purchase - Beschaffung 2025-11-16 17:12:54":{"value":2},"Office/Purchase - Verwaltung 2025-11-16 17:12:54":{"value":3},"Office/Purchase - purchase 2026-05-01 00:02:30":{"value":4}}},{"type":"select","attributes":{"name":"Proceed with ongoing audit","onchange":"if (this.value !== '0') api.audit('get', null, 'audit', 'null', this.value);"},"content":{"...":{"value":"0"},"Prosthetics II 2026-05-19 19:51:57":{"value":16}}}]]}}
 ```
 
-> DELETE ./api/api.php/audit/audit/null/{audit_id}
+> POST/PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
 
-Deletes an unclosed audit.
+Stores a new or updates an unclosed audit to the database.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {audit_id} | path parameter | required | audit database id |
+| {template_id} | path parameter | required for PUT | template id |
+| payload | form data | required | input data |
 
 Sample response
 ```
-{"response":{"msg":"Order statistics have been deleted.","type":"success"}}
+{"toast":{"msg":"Audit saved","type":"success"},"redirect":["audit",5,13]}
+```
+
+> DELETE ./api/api.php/audit/audittemplate/null/{template_id}
+
+Deletes an audit template.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | audit database id |
+
+Sample response
+```
+{"toast":{"msg":"Template deleted","type":"success"}}
+```
+
+> GET ./api/api.php/audit/audittemplate/null/{template_id}
+
+Returns a selection to start or edit audit templates.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | optional | template database id |
+
+Sample response
+```
+{"title":"Prepare audit","render":{"content":[[{"type":"select","attributes":{"name":"Edit Template","onchange":"api.audit('get', null, 'audittemplate', 'null', this.value)"},"content":{"...New template":{"value":"0"},"Prosthetics II 2025-11-16 17:12:54":{"value":"1"},"Office/Purchase - Beschaffung 2025-11-16 17:12:54":{"value":"2"},"Office/Purchase - Verwaltung 2025-11-16 17:12:54":{"value":"3"},"Office/Purchase - purchase 2026-05-01 00:02:30":{"value":"4"},"Common 2026-05-19 19:54:48":{"value":"5","selected":true}}}],[{"type":"textsection","content":"created by error on line 1 on 2026-05-19 19:54:48"},{"type":"select","attributes":....
 ```
 
 > POST/PUT ./api/api.php/audit/audittemplate/null/{template_id}
@@ -3457,49 +3492,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Template saved","id":"3","type":"success"}}
-```
-
-> GET ./api/api.php/audit/audittemplate/null/{template_id}
-
-Returns a selection to start or edit audit templates.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | optional | template database id |
-
-Sample response
-```
-{"render": {"form": {"data-usecase": "audittemplate","action": "javascript:api.audit('post', 'audittemplate', 'null', )"},"content": [[{"type": "select","attributes": {"name": "Edit","onchange": "api.audit('get', 'audittemplate', 'null', this.value)"},"content": {"...New template": {"value": "0"},"Common 2025-02-03 07:41:00": {"value": "2"}}}],[{"type": "textsection","content": null},{"type": "select","attributes": {"name": "Organizational units","id": "TemplateUnit","data-loss": "prevent"},....
-```
-
-> DELETE ./api/api.php/audit/audittemplate/null/{template_id}
-
-Deletes an audit template.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | required | audit database id |
-
-Sample response
-```
-{"response":{"msg":"Template deleted","type":"success"}}
-```
-
-> DELETE ./api/api.php/audit/checks/{type}
-
-Legacy endpoint for possible future use. Currently without effect.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {type} | path parameter | required |  |
-
-Supposed sample response
-```
-{"response":{"msg":"... have been deleted.","type":"success"}}
+{"toast":{"msg":"Template saved","type":"success"}}
 ```
 
 > GET ./api/api.php/audit/checks/{type}?{param}
@@ -3514,12 +3507,12 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":{"value":"skillfulfilment"},"Employee skills and trainings":{"value":"userskills"},"Employee training evaluation":{"value":"trainingevaluation"},"Internal audits":{"value":"audits"},"Management reviews":{"value":"managementreviews"},"Products - Incorporations":{"value":"incorporation"},"Products - MDR sample check":{"value":"mdrsamplecheck"},"Record export":{"value":"records"},"Record verification":{"value":"recordverification"},"Risk management":{"value":"risks"},"Vendor list":{"value":"vendors"},"Vendor order statistics":{"value":"orderstatistics"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.audit('get', 'checks', this.value)"}}]]}}
+{"title":"Regulatory evaluations and summaries","render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":{"value":"skillfulfilment"},"Employee skills and trainings":{"value":"userskills"},"Employee training evaluation":{"value":"trainingevaluation"},"Internal audits":{"value":"audits"},"Management reviews":{"value":"managementreviews"},"Products - Incorporations":{"value":"incorporation"},"Products - MDR sample check":{"value":"mdrsamplecheck"},"Record export":{"value":"records"},"Record verification":{"value":"recordverification"},"Risk management":{"value":"risks"},"Vendor list":{"value":"vendors"},"Vendor order statistics":{"value":"orderstatistics"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.audit('get', null, 'checks', this.value)"}}]]}}
 ```
 
 > PUT ./api/api.php/audit/checks/{type}/{id}
 
-Updates data from the audit module. Currently implemented for user trainings only.
+Updates data from the audit module. Currently implemented for trainingevaluation only.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3530,12 +3523,12 @@ Parameters
  
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+{"title":"Regulatory evaluations and summaries","render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":,....
 ```
 
 > POST ./api/api.php/audit/checks/{type}
 
-Inserts data into the database. Currently implemented for user skills only (mandatory trainings for multiple users).
+Inserts mandatory trainings for multiple users OR displays a record verification
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3545,7 +3538,7 @@ Parameters
  
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+{"title":"Regulatory evaluations and summaries","render":{"content":[[{"type":"select","content":{"...":[],"Complaints":{"value":"complaints"},"Current documents - Appropriateness":{"value":"documentusage"},"Current documents - Regulatory issues considered":{"value":"regulatory"},"Current documents in use":{"value":"documents"},"Employee experience points":{"value":"userexperience"},"Employee skill fulfilment":,....
 ```
 
 > GET/POST ./api/api.php/audit/export/{type}?{param}
@@ -3556,12 +3549,11 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
-
 | {param} | query parameter/form data | optional | additional filters if applicable |
 
 Sample response
 ```
-{"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Current documents in use_2026-05-19 2009.pdf","download":"Current documents in use_2026-05-19 2009.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/audit/import/{type}/{param}
@@ -3576,36 +3568,7 @@ Parameters
 
 Sample response
 ```
-{"data":"...whatever text..."}
-```
-
-> POST/PUT ./api/api.php/audit/managementreview/null/{managementreview_id}
-
-Saves a new or Uudates an unclosed management review.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {managementreview_id} | path parameter | required for PUT | managementreview database id |
-| payload | form data | optional | input data |
-
-Sample response
-```
-{"response":{"msg":"Management review saved","id":"0","type":"success"}}
-```
-
-> GET ./api/api.php/audit/managementreview/null/{managementreview_id}
-
-Returns a selection to start or edit unclosed managementreviews or displays selected review.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {managementreview_id} | path parameter | optional | audit database id |
-
-Sample response
-```
-{"render":{"form":{"data-usecase":"audit","action":"javascript:api.audit('post', 'managementreview', 'null', )"},"content":[[{"type":"textarea","attributes":{"name":"Feedback","value":""}}],[{"type":"textarea","attributes":{"name":"Complaint handling","value":""}}],[{"type":"textarea","attributes":{"name":"Reporting to regulatory authorities","value":""}}],[{"type":"textarea","attributes":{"name":"Audits","value":""}}],....
+{"selected":"...whatever text..."}
 ```
 
 > DELETE ./api/api.php/audit/managementreview/null/{managementreview_id}
@@ -3619,24 +3582,39 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Management review has been deleted.","type":"success"}}
+{"toast":{"msg":"Management review deleted","type":"deleted"}}
 ```
 
-### Calendar endpoints
+> GET ./api/api.php/audit/managementreview/null/{managementreview_id}
 
-> POST ./api/api.php/calendar/appointment
-
-Initiates a new planning form or updates or stores a new longterm plan.
+Returns a selection to start or edit unclosed managementreviews or displays selected review.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | either new planning parameters or actual planning data to store |
+| {managementreview_id} | path parameter | optional | audit database id |
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Print out the PDF or send the ICS-file by mail or messenger","content":{"PDF handout with QR appointment":{"href":"./api/api.php/file/stream/./fileserver/tmp/PDF handout with QR appointment fitting 2025-04-25 10:00.pdf"},"ICS calendar file":{"href":"./api/api.php/file/stream/./fileserver/tmp/ICS calendar file fitting 2025-04-25 10:00.ics","download":"ICS calendar file fitting 2025-04-25 10:00.ics"}}}]}
+{"title":"Management review","render":{"content":[[{"type":"select","attributes":{"name":"Edit","onchange":"api.audit('get', null, 'managementreview', 'null', this.value)"},"content":{"...":{"value":"0"},"2026-05-19 20:13:59":{"value":17}}}],[{"type":"textsection","content":"Start anew with the last reviews data."}],[{"type":"textarea","attributes":{"name":"Introducion","value":"# Plain text (h1 header)\r\n(ATX)\r\n\r\nThis is a markdown flavour for basic text styling.  \r\nLines should end with two or more spaces....
 ```
+
+> POST/PUT ./api/api.php/audit/managementreview/null/{managementreview_id}
+
+Saves a new or updates an unclosed management review.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {managementreview_id} | path parameter | required for PUT | managementreview database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"toast":{"msg":"Management review saved","type":"success"},"redirect":["managementreview",null,13]}
+```
+
+### Calendar endpoints
 
 > GET ./api/api.php/calendar/appointment
 
@@ -3649,27 +3627,10 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"appointment","action":"javascript:api.calendar('post', 'appointment')"},"content":[[{"type":"date","attributes":{"name":"Date","value":""}},{"type":"time","attributes":{"name":"Time","value":""}},{"type":"text","hint":"e.g. cast for orthosis, fitting for prosthesis, etc.","attributes":{"name":"Occasion","value":""}},{"type":"text","hint":"e.g. remember bringing shoes","attributes":{"name":"Reminder","value":""}},{"type":"number","attributes":{"name":"Approximate duration (hours)","min":1,"max":200,"step":1,"value":1}}]]}}
+{"title":"Appointment notice","render":{"form":{"data-usecase":"appointment","action":"javascript:api.calendar('post', '[data-usecase=appointment]', 'appointment')"},"content":[[{"type":"datetime_local","attributes":{"name":"Date and time","value":""},"hint":"Date and time"},{"type":"text","hint":"e.g. cast for orthosis, fitting for prosthesis, etc.","attributes":{"name":"Occasion","value":""}},{"type":"text","hint":"e.g. remember bringing shoes","attributes":{"name":"Reminder","value":""}},{"type":"number","attributes":{"name":"Approximate duration (hours)","min":1,"max":200,"step":1,"value":1}}]]}}
 ```
 
-> PATCH ./api/api.php/calendar/complete/{id}/{bool}/{type}
-
-Marks scheduled events as complete or revoke state.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id or multiple comma separated |
-| {bool} | path parameter| required | true or false completed state |
-| {type} | path parameter | required | tasks, timesheet or worklists |
-| payload | form data | required | form data including user validation |
-
-Sample response
-```
-{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedtasks":1}}
-```
-
-> POST ./api/api.php/calendar/longtermplanning
+> POST ./api/api.php/calendar/appointment
 
 Initiates a new planning form or updates or stores a new longterm plan.
 
@@ -3680,21 +3641,23 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":"11", "msg":"Planning has been saved","type":"success"}}
+{"dialog":{"render":[{"type":"links","description":"Print out the PDF or send the ICS-file by mail or messenger","content":{"PDF handout with QR appointment":{"href":"./api/api.php/file/stream/./fileserver/tmp/PDF handout with QR appointment Fitting 2026-05-19 1819.pdf","download":"PDF handout with QR appointment Fitting 2026-05-19 1819.pdf"},"ICS calendar file":{"href":"./api/api.php/file/stream/./fileserver/tmp/ICS calendar file Fitting 2026-05-19 18:19.ics","download":"ICS calendar file Fitting 2026-05-19 18:19.ics"}}}]}}
 ```
 
-> GET ./api/api.php/calendar/longtermplanning/{id}
+> PATCH ./api/api.php/calendar/complete/{id}/{bool}
 
-Returns a selection of available longterm plans, selected plan if requested id matches, initiation form if permission is available.
+Marks scheduled events as complete or revoke state.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | defines the response, none if omitted |
+| {id} | path parameter | required | database id or multiple comma separated |
+| {bool} | path parameter| required | true or false completed state |
+| {type} | path parameter | required | tasks, timesheet or worklists |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select","onchange":"if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"},"content":{"...":{"value":"0"},"Apprentices training schedule 24":{"value":11}}}],[{"type":"text","attributes":{"name":"Subject","required":true}},{"type":"date","attributes":{"name":"Start","required":true}},{"type":"date","attributes":{"name":"End","required":true},"hint":"The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months."},{"type":"text","attributes":{"name":"Name","multiple":true}},{"type":"select","attributes":{"name":"Import existing plan for selected timespan"},"content":{"...":{"value":"0"},"Apprentices training schedule 24":{"value":11}}}]],"form":{"data-usecase":"longtermplanning","action":"javascript:api.calendar('post', 'longtermplanning')"}}}
+{"toast":{"msg":"Event has been marked as completed.","type":"success"},"notif":{"calendar_uncompletedtasks":1}}
 ```
 
 > DELETE ./api/api.php/calendar/longtermplanning/{id}
@@ -3708,7 +3671,35 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Planning deleted","type":"success"}}
+{"toast":{"msg":"Planning deleted","type":"success"}}
+```
+
+> GET ./api/api.php/calendar/longtermplanning/{id}
+
+Returns a selection of available longterm plans, selected plan if requested id matches, initiation form if permission is available.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | defines the response, none if omitted |
+
+Sample response
+```
+{"title":"Long term planning","render":{"content":[[{"type":"select","attributes":{"name":"Select","onchange":"if (this.value !== '0') api.calendar('get', null, 'longtermplanning', this.value);"},"content":{"...":{"value":"0"},"Apprentices training schedule - 2026-03-14":{"value":11}}}],[{"type":"text","attributes":{"name":"Subject","required":true}},{"type":"date","attributes":{"name":"Start","required":true,"onchange":"let start = new Date(this.value), minend; if (!start) return; minend = new Date(start.setDate(start.getDate() + 7 * 4)); document.getElementById('_spanend').min = minend.toISOString().substring(0, 10);"}},{"type":"date","attributes":{"name":"End","id":"_spanend","required":true},"hint":"The starting month will be set to the first, the ending month to the last day by default."},{"type":"select","attributes":{"name":"Periods"},"content":{"One week":[],"Two weeks":[],"Half month":[],"Month":[]}},{"type":"text","attributes":{"name":"Name","multiple":true}},{"type":"select","attributes":{"name":"Import existing plan for selected timespan"},"content":{"...":{"value":"0"},"Apprentices training schedule":{"value":11}}}]],"form":{"data-usecase":"longtermplanning","action":"javascript:api.calendar('post', _client.calendar.longtermplanning() || '[data-usecase=longtermplanning]', 'longtermplanning')"}}}
+```
+
+> POST ./api/api.php/calendar/longtermplanning
+
+Initiates a new planning form or updates or stores a new longterm plan.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | either new planning parameters or actual planning data to store |
+
+Sample response
+```
+{"toast":{"msg":"Planning has been saved","type":"success"},"selected":"11"}
 ```
 
 > GET ./api/api.php/calendar/monthlyTimesheets/{date Y-m-d}
@@ -3722,7 +3713,7 @@ Parameters
 
 Sample response
 ```
-{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":"./api/api.php/file/stream/./fileserver/tmp/Timesheet_2026-05-19 1823.pdf","download":"Timesheet_2026-05-19 1823.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/calendar/search/{search}
@@ -3736,7 +3727,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'tasks')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter"},{"type":"search","attributes":{"value":"test1","id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', null, 'search', encodeURIComponent(this.value))}"},"hint":"Subject or affected user"}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"text","name":"test1"},"content":"Date: 2026-04-24\nDue: 2026-05-01\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('patch', null, 'complete', '219', this.checked)"}},"hint":""},{"type":"button","attributes":{"value":"Edit","onclick":"new _client.Dialog....
 ```
 
 > DELETE ./api/api.php/calendar/tasks/{id}
@@ -3750,7 +3741,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Event has been deleted.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+{"toast":{"msg":"Task has been deleted.","type":"success"},"notif":{"calendar_uncompletedevents":1}}
 ```
 
 > GET ./api/api.php/calendar/tasks/{date Y-m-d}/{date Y-m-d}
@@ -3765,7 +3756,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
+{"title":"Tasks","render":{"content":[[{"type":"scanner","destination":"recordfilter"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', null, 'search', encodeURIComponent(this.value))}"},"hint":"Subject or affected user"}],[{"type":"calendar","description":"May 2026","content":[null,null,null,null,{"date":"2026-05-01","display":"Fri 1\n2","today":false,"selected":false,"holiday":true,"title":"Fri 2026-05-01: 2 entries"},{"date":"2026-05-02","display":"Sat 2","today":false,"selected":false,"holiday":true,"title":"Sat 2026-05-02: 0 entries"},{"date":"2026-05-03","display":"Sun 3","today":false,"selected":false,"holiday":true,"title":"Sun 2026-05-03: 0 entries"},....
 ```
 
 > POST/PUT ./api/api.php/calendar/tasks/{id}
@@ -3780,7 +3771,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":"9","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
+{"toast":{"msg":"Task has been saved.","type":"success"},"redirect":["timesheet","2026-05-19"],"notif":{"calendar_uncompletedevents":2}}
 ```
 
 > DELETE ./api/api.php/calendar/timesheet/{id}
@@ -3836,7 +3827,7 @@ Parameters
 
 Sample response
 ```
-{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Summary for this year":{"href":"./api/api.php/file/stream/./fileserver/tmp/Summary for this year_2025-11-21 2301.pdf","download":"Summary for this year_2025-11-21 2301.pdf"}}}]]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Summary for this year":{"href":"./api/api.php/file/stream/./fileserver/tmp/Summary for this year_2026-05-19 1826.pdf","download":"Summary for this year_2026-05-19 1826.pdf"}}}]}}
 ```
 
 [Content](#content)
@@ -3854,7 +3845,7 @@ Parameters
 
 Sample response
 ```
-{"links":{"Download 1726252272testlieferantproductlist.csv":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist.csv","download":"1726252272testlieferantproductlist.csv"},"Download 1726252272testlieferantprocudtlist_filefilter.txt":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist_filefilter.txt","download":"1726252272testlieferantproductlist_filefilter.txt"}}}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.","content":{"Download 2026-05-17 13-31-22 Otto Bock Healthcare GmbHproductlist.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/2026-05-17 13-31-22 Otto Bock Healthcare GmbHproductlist.csv","download":"2026-05-17 13-31-22 Otto Bock Healthcare GmbHproductlist.csv"},"Download 1779017482Otto Bock Healthcare GmbHproductlist_filefilter.txt":{"href":"./api/api.php/file/stream/./fileserver/tmp/1779017482Otto Bock Healthcare GmbHproductlist_filefilter.txt","download":"1779017482Otto Bock Healthcare GmbHproductlist_filefilter.txt"}}}]}}
 ```
 
 > GET/POST ./api/api.php/consumables/incorporation
@@ -3880,7 +3871,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Sample check has been revoked","type":"success"}}
+{"toast":{"msg":"Sample check has been revoked","type":"success"}}
 ```
 
 > GET/POST ./api/api.php/consumables/mdrsamplecheck/{id}
@@ -3895,7 +3886,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"textsection","attributes":{"name":160O10=1 Fingerorthese Otto Bock"}}],[{"attributes":[],"type":"checkbox","attributes":{"name":"sample check"},"content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
+{"dialog":{"render":[[{"type":"textsection","attributes":{"name":"99B25 Schlauch-Strumpf Otto Bock Healthcare GmbH"}},{"type":"textarea","attributes":{"name":"Product from order","value":"Stock item   Organizational unit: Prosthetics II Approved: 2026-04-17 19:51:45  verified by token through error on line 1","readonly":true,"rows":4}}],[{"type":"checkbox","attributes":{"name":"Allgemein"},"content":{"CE-Kennzeichnung mit aktueller EU-Konformitätserklärung":[],"Angabe des Herstellers, Importeurs oder EU-Repräsentanten falls zutreffend":[],"Sonderanfertigungskennzeichnung":[]....
 ```
 
 > PUT ./api/api.php/consumables/mdrsamplecheck/{id}
@@ -3910,7 +3901,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Sample check has been saved","type":"success"}}
+{"toast":{"msg":"Sample check has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/consumables/pendingincorporations
@@ -3924,7 +3915,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+{"title":"Pending incorporations","render":{"content":[[{"type":"nocontent","content":"Currently there are no products with pending incorporations, everything is tidied up :)"}]]}}
 ```
 
 > DELETE ./api/api.php/consumables/product/{id}
@@ -3938,7 +3929,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
+{"toast":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
 ```
 
 > GET ./api/api.php/consumables/product/{id}?{param}
@@ -3969,7 +3960,7 @@ Similar to vendor.
 
 Sample response
 ```
-{"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+{"toast":{"msg":"Product Schlauch-Strumpf has been saved","type":"success"},"notif":{"consumables_pendingincorporation":0}}
 ```
 
 > POST ./api/api.php/consumables/search/{usecase}
@@ -3984,7 +3975,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check. Please add information if the product has skin contact, an expiry date or if it is a trading good."},{"type":"textsection","attributes":{"name":"The first result is your manual order. Select this if there are no alternatives."}},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: '', ordernumber: '99b25', productname: '', vendor: 'Otto Bock Healthcare GmbH'}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: '', ordernumber: '99b25', productname: '', vendor: 'Otto Bock Healthcare GmbH'}); return false;","role":"link","tabindex":"0","title":"add  by Otto Bock Healthcare GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Otto Bock Healthcare GmbH 99b25  "}]},{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","role":"link","tabindex":"0","title":"add Schlauch-Strumpf by Otto Bock Healthcare GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"Stock item","data-type":"cart"},"content":"Otto Bock Healthcare GmbH 99B25 Schlauch-Strumpf Packung 4,03E+12"}]}]]]]}}
+{"dialog":{"render":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check. Please add information if the product has skin contact, an expiry date or if it is a trading good."},{"type":"textsection","attributes":{"name":"The first result is your manual order. Select this if there are no alternatives."}},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: '', ordernumber: '99b25', productname: 'strumpf', vendor: ''}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: '', ordernumber: '99b25', productname: 'strumpf', vendor: ''}); return false;","role":"link","tabindex":"0","title":"add strumpf by  to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":" 99b25 strumpf "}]},{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct({unit: 'Packung', ordernumber: '99B25', productname: 'Schlauch-Strumpf', vendor: 'Otto Bock Healthcare GmbH', productid: 4084}); return false;","role":"link","tabindex":"0","title":"add Schlauch-Strumpf by Otto Bock Healthcare GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"Stock item","data-type":"cart"},"mdcontent":"Otto Bock Healthcare GmbH 99B25 Schlauch-Strumpf Packung 4,03E+12  \n~2 for sdfgsdfg, workshop order (your units and common), 0 from other units, are being processed~","mdrestrictions":{"safeMode":true,"limitTo":["subscript","linebreak"]}}]}]]]]}}
 ```
 
 > GET ./api/api.php/consumables/search/{usecase}?{search}
@@ -3999,7 +3990,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"button","attributes":{"value":"Neuen Artikel hinzufügen","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"text","attributes":{"id":"productsearchvendor","data-type":"filtered","name":"Lieferanten eingrenzen","value":""},"datalist":[...,"Werkmeister GmbH & Co. KG","Werkzeug-Jäger GmbH","Wilhelm Julius Teufel GmbH"]},{"type":"search","attributes":{"name":"Suche Produkt nach Name oder Artikelnummer","onkeydown":"if (event.key === 'Enter') {const data = {vendor: encodeURIComponent(document.getElementById('productsearchvendor').value), search: encodeURIComponent(this.value)}; api.purchase('get', 'search', 'product', data); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Füge einen Artikel aus 1 Treffern hinzu"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 4084)","onkeydown":"if (event.key==='Enter') api.purchase('get', 'product', 4084)","role":"link","tabindex":"0","title":"Schlauch-Strumpf von Otto Bock Healthcare GmbH anzeigen"},"content":[{"type":"textsection","content":"Otto Bock Healthcare GmbH 99B25 Schlauch-Strumpf Packung"}]}]]]]}}
+{"insert":{"content":[[[{"type":"scanner","destination":"productsearch"},{"type":"text","attributes":{"id":"productsearchvendor","data-type":"filtered","name":"Filter vendors","value":""},"datalist":["Achim Ruthner GmbH","AET-GmbH","AIDAMED","Albrecht GmbH","ALPS SOUTH EUROPE s.r.o.","AMT Aromando Medizintechnik GmbH","Arthroven Gmbh","Aspen Medical Products GmbH","Basko Healthcare","Bauerfeind AG","Bionic Germany","Blatchford Europe GmbH","Bohle AG","Bort GmbH","BSN Medical GmbH","BSN-Jobst GmbH",....
 ```
 
 > GET ./api/api.php/consumables/vendor/{name|id}
@@ -4016,7 +4007,7 @@ Parameters
 Sample response
 ```
 
-{"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":{"selected":true},"AET GmbH (TSM)":{"value":"AET GmbH (TSM)"},"AMT Aromando Medzintechnik GmbH":{"value":"AMT Aromando Medzintechnik GmbH"},"Albrecht GmbH":{"value":"Albrecht GmbH"},"Arthroven GmbH":{"value":"Arthroven GmbH"},"Aspen Medical Products GmbH":{"value":"Aspen Medical Products GmbH"},"Basko Orthop\u00e4die Handelsgesellschaft mbH":{"value":"Basko Orthop\u00e4die Handelsgesellschaft mbH"},"Blatchford Europe GmbH (Endolite)":{"value":"Blatchford Europe GmbH (Endolite)"},"Bort GmbH":{"value":"Bort GmbH"},....
+{"title":"Vendors","render":{"content":[[{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.consumables('get', null, 'vendor', this.value)"},"content":{"...New vendor":{"selected":true},"AET-GmbH":{"value":"AET-GmbH"},"AIDAMED":{"value":"AIDAMED"},"ALPS SOUTH EUROPE s.r.o.":{"value":"ALPS SOUTH EUROPE s.r.o."},"AMT Aromando Medizintechnik GmbH":{"value":"AMT Aromando Medizintechnik GmbH"},"Achim Ruthner GmbH":{"value":"Achim Ruthner GmbH"},"Albrecht GmbH":{"value":"Albrecht GmbH"},"Arthroven Gmbh":....
 ```
 
 > POST/PUT ./api/api.php/consumables/vendor/{id}
@@ -4031,7 +4022,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+{"toast":{"msg":"Vendor Otto Bock has been saved","type":"info"}}
 ```
 
 [Content](#content)
@@ -4049,7 +4040,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0","selected":true},"Terminerinnerung":{"value":1}}},{"type":"search","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"},"datalist":["Terminerinnerung"]}]]}}
+{"title":"CSV filter","render":{"content":[[{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', null, 'filter', this.value)"},"content":{"...Select filter":{"value":"0","selected":true},"Inventurlisten nach Bereichen":{"value":12},"[pending approval] terminerinnerung caro csv":{"value":13},"[pending approval] terminerinnerung eva csv":{"value":14}}},{"type":"search","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.csvfilter('get', null, 'filter', this.value); return false;}"},"datalist":["Inventurlisten nach Bereichen","terminerinnerung caro csv","terminerinnerung eva csv"]}],[{"type":"button","attributes":{"value":"Manage CSV filter","onclick":"api.csvfilter('get', null, 'rule')"}}]]}}
 ```
 
 > POST ./api/api.php/csvfilter/filter/{id}
@@ -4064,7 +4055,7 @@ Parameters
 
 Sample response
 ```
-{"log":["[*] total rows: 46198","[*] applying filter: filter_by_expression nur an Personen geliefert......,"[*] remaining filtered: 104","[*] modifications done","[*] result - final rows: 104","[*] done! Nicht vergessen eMailadressen zu pr\u00fcfen und die neue Datei zu archivieren: "],"links":{"Download Einladungsfilter.csv":{"href":".\/fileserver\/tmp\/1718138675Einladungsfilter.csv","download":"Einladungsfilter.csv"}}}
+{"dialog":{"render":[["type":"textsection","content":"[*] total rows: 46198","[*] applying filter: filter_by_expression nur an Personen geliefert......,"[*] remaining filtered: 104","[*] modifications done","[*] result - final rows: 104","[*] done! Nicht vergessen eMailadressen zu pr\u00fcfen und die neue Datei zu archivieren: "],["type":"links","content":{"Download Einladungsfilter.csv":{"href":".\/fileserver\/tmp\/1718138675Einladungsfilter.csv","download":"Einladungsfilter.csv"}}]]}}
 ```
 
 > GET ./api/api.php/csvfilter/rule/{id}
@@ -4078,7 +4069,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung":{"value":1}}},{"type":"search","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"},"datalist":["Terminerinnerung"]}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung  created by error on line 1 on 2025-01-26 01:34:00":{"value":1}}}]],[{"type":"text","attributes":{"name":"Name","value":"","required":true,"data-loss":"prevent"}},{"type":"code","hint":"Please adhere to proper JSON format to describe a working CSV filter. A programmer can help you with that.","attributes":{"name":"Content","value":"","rows":16,"id":"content","required":true,"data-loss":"prevent"}}]]}}
+{"title":"Manage CSV filter","render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', '[data-usecase=csvfilter]', 'rule' )"},"content":[[[{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', null, 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Inventurlisten nach Bereichen":{"value":12}}},{"type":"search","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.csvfilter('get', null, 'rule', this.value); return false;}"},"datalist":["Inventurlisten nach Bereichen"]}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', null, 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Inventurlisten nach Bereichen  created by error on line 1 on 2025-12-13 00:59:43":{"value":12},....
 ```
 
 > POST ./api/api.php/csvfilter/rule/{id}
@@ -4093,7 +4084,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"name":"test","msg":"The filter named test has been saved.","type":"success"}}
+{"toast":{"msg":"The filter named test has been saved.","type":"success"}}
 ```
 
 > DELETE ./api/api.php/csvfilter/rule/{id}
@@ -4107,7 +4098,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"name":"test","msg":"Filter test deleted","type":"success"}}
+{"toast":{"name":"test","msg":"Filter test deleted","type":"success"}}
 ```
 
 [Content](#content)
@@ -4125,7 +4116,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.document('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select document to approve","onchange":"api.document('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
+{"render":{"content":[[{"type":"nocontent","content":"Currently there are no approvable components or documents, everything is tidied up :)"}]]}}
 ```
 
 > PUT ./api/api.php/document/approval/{id}
@@ -4140,21 +4131,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
-```
-
-> POST ./api/api.php/document/bundle
-
-Saves document bundle. Updates availability if name and content remain the same.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | bundle data |
-
-Sample response
-```
-{"response":{"name":"bundle1","msg":"Bundle saved. Hidden bundles are not reachable","type":"success"}}
+{"toast":{"msg":"Approval saved.<br />This element can now be used.","type":"success"},"redirect":["approval"],"notif":{"form_approval":4}}
 ```
 
 > GET ./api/api.php/document/bundle/{id}
@@ -4168,7 +4145,21 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.document('post', 'bundle')"},"content":[[[{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"Versorgungsdokumentation Prothetik II":{"value":152}}},{"type":"search","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"},"datalist":["Versorgungsdokumentation Prothetik II"]}],[{"type":"select","attributes":{"name":"Edit any existing bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},....
+{"title":"Manage document bundles","render":{"form":{"data-usecase":"bundle","action":"javascript:api.document('post', '[data-usecase=bundle]', 'bundle')"},"content":[[[{"type":"select","numeration":"prevent","attributes":{"name":"Edit existing latest bundle","onchange":"api.document('get', null, 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"Konfektionsversorgung":{"value":151},"Versorgungsdokumentation Arm Orthetik I":{"value":123},"Versorgungsdokumentation Bein Orthetik I":{"value":124},"Versorgungsdokumentation Kompressionstherapie Flachstrick Orthetik II":{"value":154},"Versorgungsdokumentation Kompressionstherapie Serie Orthetik II":{"value":153},"Versorgungsdokumentation NLO Orthetik I":{"value":125},"Versorgungsdokumentation Prothetik II":{"value":175},"Versorgungsdokumentation Rumpf Cranio Orthetik I":{"value":127},....
+```
+
+> POST ./api/api.php/document/bundle
+
+Saves document bundle. Updates availability if name and content remain the same.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | bundle data |
+
+Sample response
+```
+{"toast":{"msg":"Bundle saved. Hidden bundles are not reachable","type":"success"}}
 ```
 
 > GET ./api/api.php/document/bundles/{search}
@@ -4182,7 +4173,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'document', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'document', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'document', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'document', 'restricted documentation')"}}}]}}
+{"title":"Document bundles","render":{"content":[[{"type":"filtered","attributes":{"id":"_bundlefilter","name":"Filter","onkeydown":"if (event.key === 'Enter') {api.document('get', null, 'bundles', encodeURIComponent(this.value));}","value":""},"datalist":["Versorgungsdokumentation Prothetik II"]},{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"name":"Organizational unit","onchange":"api.document('get', null, 'bundles', encodeURIComponent(document.getElementById('_bundlefilter').value) || 'null')","checked":true},....
 ```
 
 > DELETE ./api/api.php/document/component/{id}
@@ -4196,7 +4187,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
+{"toast":{"msg":"Component deleted","type":"success"},"redirect":["component_editor"]}
 ```
 
 > GET ./api/api.php/document/component/{name|id}
@@ -4210,7 +4201,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","attributes":{"name":"incorporation"},"hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
+{"selected":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","attributes":{"name":"incorporation"},"hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
 ```
 
 > POST ./api/api.php/document/component
@@ -4224,7 +4215,7 @@ Parameters
 
 Sample response
 ```
-{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
+{"toast":{"msg":"Component adddocuments has been saved","type":"success"},"redirect":["component_editor"]}
 ```
 
 > GET ./api/api.php/document/component_editor/{name|id}
@@ -4238,7 +4229,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"textsection","attributes":{"name":"Edit existing latest approved component"}},{"type":"select","attributes":{"name":"Common","onchange":"api.document('get', 'component_editor', this.value)"},"content":{"...New component":{"value":"0","selected":true},"basisdaten":{"value":102},"datenverarbeitung auftragserteilung schweigepflichtentbindung":{"value":103},"empfangsbest\u00e4tigung":{"value":105},"erlaubnis zur ausstellung und ver\u00f6ffentlichung":{"value":106},"gebrauchsanweisung allgemein":{"value":109},"gebrauchsanweisung entsorgung":{"value":114},"gebrauchsanweisung handhabung":{"value":110},"gebrauchsanweisung instandhaltung":{"value":113},"gebrauchsanweisung k\u00f6rperpflege":{"value":111},....
+{"title":"Manage components - identify","render":{"content":[[[{"type":"collapsible","attributes":{"class":"em16"},"content":[{"type":"textsection","attributes":{"name":"Edit existing latest approved component"}},{"type":"search","numeration":"prevent","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.document('get', null, 'component_editor', encodeURIComponent(this.value)); return false;}"},"datalist":["Abgabeprotokoll Kompressionstherapie Orthetik II","Abgabeprotokoll Orthetik I","Abgabeprotokoll Prothetik II","Abgabeprotokoll Rumpf Korsett Orthetik I","Abgabeprotokoll Schaumstofflagerung Orthetik II","Anamnese Allgemein Orthetik I","Anamnese Arm Orthetik I","Anamnese Bein Orthetik I","Anamnese Kompressionstherapie Flachstrick Orthetik II","Anamnese Prothetik II","Anamnese Rumpf Cranio Orthetik I","Anamnese Rumpf Korsett Orthetik I",....
 ```
 
 > POST ./api/api.php/document/export
@@ -4252,7 +4243,7 @@ Parameters
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link and print the document.","content":{"Export empty document as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+{"dialog":{"render:{[{"type":"links","description":"Open the link and print the document.","content":{"Export empty document as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}}}
 ```
 
 > DELETE ./api/api.php/document/document/{id}
@@ -4291,26 +4282,12 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"filtered","attributes":{"name":"Filter","onkeydown":"if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}","onblur":"api.document('get', 'documentfilter', this.value); return false;"},"datalist":["Abgabeprotokoll Prothetik II","Lieferung","","Lieferprotokoll","Anamnese Prothetik II","Profilerhebung","Basisdaten","Checkliste Prothetik II","Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung","Empfangsbest\u00e4tigung","Erlaubnis zur Ausstellung und Ver\u00f6ffentlichung","Gebrauchsanweisung Prothetik II","Kunststofffertigungsauftrag Prothetik II","Ma\u00dfblatt Prothetik II","Silikonfertigungsauftrag","Versorgungsausf\u00fchrung","Versorgungsma\u00dfnahme","Anprobeprotokoll",....
+{"title":"Documents","render":{"content":[[{"type":"filtered","attributes":{"id":"_documentfilter","value":"","name":"Filter","onkeydown":"if (event.key === 'Enter') {api.document('get', null, 'documents', encodeURIComponent(this.value))}"},"datalist":["Abgabeprotokoll Kompressionstherapie Orthetik II","Abgabeprotokoll Orthetik I","Abgabeprotokoll Prothetik II","Abgabeprotokoll Rumpf Korsett Orthetik I","Abgabeprotokoll Schaumstofflagerung Orthetik II","Anamnese Arm Orthetik I","Anamnese Bein Orthetik I","Anamnese Kompressionstherapie Flachstrick Orthetik II","Anamnese Prothetik II","Anamnese Rumpf Cranio Orthetik I","Anamnese Rumpf Korsett Orthetik I","Anamnese Rumpf Mieder Orthetik I","Anamnese Schaumstofflagerung Orthetik II","Anprobeprotokoll","Armierungsplan Orthetik I","Armierungsplan Prothetik II","Basic data","Basisdaten","Checkliste Orthetik I","Checkliste Prothetik II",....
 ```
 
 [Content](#content)
 
 ### ERP Query endpoints
-
-> GET ./api/api.php/erpquery/erpquery/{type}
-
-Returns selection of available data queries, given type the result of the selected type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {type} | path parameter | optional | adds contents based on given type to response |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}]]}}
-```
 
 > GET ./api/api.php/erpquery/csvdump/{id}
 
@@ -4323,7 +4300,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.erpquery('get', 'csvdump', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
+{"title":"ERP database query","render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.erpquery('get', null, 'csvdump', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"random query":{"value":"random query"},"random query 2":{"value":"random query 2"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
 ```
 
 > POST ./api/api.php/erpquery/csvdump/{id}
@@ -4338,7 +4315,21 @@ Parameters
 
 Sample response
 ```
-{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
+{"dialog":{"render":[{"type":"links","description":"Download file. On exporting sensitive data you are responsible for their safety.","content":{"Download fictional_file.csv":{"href":"","download":"fictional_file.csv"}}}]}}
+```
+
+> GET ./api/api.php/erpquery/erpquery/{type}
+
+Returns selection of available data queries, given type the result of the selected type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+
+Sample response
+```
+{"title":"ERP customer and case data requests","render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', null, 'erpquery', this.value)"}}]]}}
 ```
 
 > GET ./api/api.php/erpquery/upload/
@@ -4352,21 +4343,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Usecase","required":true},"content":{"...Usecase":{"value":"0"},"ARTIKELMANAGER.csv as product database data source from erp export":{"value":"ARTIKELMANAGER"},"File named like EXPORT123.456.789.csv as case database data source from erp export":{"value":"VORGANGSEXPORT"},"AUSSCHLUSS.csv as case exceptions for comparison of erp export":{"value":"AUSSCHLUSS"}}},{"type":"file","attributes":{"name":"Source file","required":true}}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', 'upload')"}}}
-```
-
-> POST ./api/api.php/erpquery/upload/
-
-success or failure response on uploading erp data sources.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | file and intended name |
-
-Sample response
-```
-{"response":{"msg":"File successfully saved.","type":"success"}}
+{"title":"Submit ERP data files","render":{"content":[[{"type":"select","attributes":{"name":"Usecase","required":true},"content":{"...Usecase":{"value":"0"},"ARTIKELMANAGER.csv as product database data source from erp export":{"value":"ARTIKELMANAGER"},"File named like EXPORT123.456.789.csv as case database data source from erp export":{"value":"VORGANGSEXPORT"},"AUSSCHLUSS.csv as case exceptions for comparison of erp export":{"value":"AUSSCHLUSS"}}},{"type":"file","attributes":{"name":"Source file","required":true}}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', '[data-usecase=erpquery]', 'upload')"}}}
 ```
 
 > POST ./api/api.php/erpquery/erpquery/{type}
@@ -4381,7 +4358,21 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}],[{"type":"text","attributes":{"name":"Name","value":"Jane Doe"}},{"type":"date","attributes":{"name":"Date of birth","value":""}},{"type":"text","attributes":{"name":"ERP ID","value":""}}],[{"type":"textsection","content":"Name: Jane Doe<br>Geburtsdatum: 2003-02-01<br>Adresse: Somewhere over the Rainbow 5<br>Telefonnummer: 01234 56789"}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', 'erpquery', 'patientlookup')"}}}
+"title":"ERP customer and case data requests",{"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}],[{"type":"text","attributes":{"name":"Name","value":"Jane Doe"}},{"type":"date","attributes":{"name":"Date of birth","value":""}},{"type":"text","attributes":{"name":"ERP ID","value":""}}],[{"type":"textsection","content":"Name: Jane Doe<br>Geburtsdatum: 2003-02-01<br>Adresse: Somewhere over the Rainbow 5<br>Telefonnummer: 01234 56789"}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', 'erpquery', 'patientlookup')"}}}
+```
+
+> POST ./api/api.php/erpquery/upload/
+
+success or failure response on uploading erp data sources.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | file and intended name |
+
+Sample response
+```
+{"toast":{"msg":"File successfully saved.","type":"success"}}
 ```
 
 ### File endpoints
@@ -4397,7 +4388,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','externalfilemanager')"},"content":[[{"type":"filtered","attributes":{"name":"Filter by file name","onkeydown":"if (event.key ==='Enter'){api.file('get','filter','null', this.value); return false;}","onblur":"api.file('get','filter','null', this.value); return false;","id":"filefilter"}}],[{"type":"links","description":"Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
+{"title":"Manage external documents","render":{"form":{"data-usecase":"file","action":"javascript:api.file('post', '[data-usecase=file]', 'externalfilemanager')"},"content":[[{"type":"filtered","attributes":{"name":"Filter by file name","onkeydown":"if (event.key === 'Enter') {api.file('get', null, 'filter', 'external_documents', this.value)}","id":"filefilter"}}],[{"type":"links","description":"Introduced 2026-03-21 19:01:56 by error on line 1","content":{"anmeldung.pdf":{"href":"./api/api.php/file/stream/./fileserver/external_documents/anmeldung.pdf","data-filtered":"./api/api.php/file/stream/./fileserver/external_documents/anmeldung.pdf",....
 ```
 
 > POST ./api/api.php/file/externalfilemanager
@@ -4411,7 +4402,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Upload has been completed","type":"success"}}
+{"toasst":{"msg":"Upload has been completed","type":"success"}}
 ```
 
 > PUT ./api/api.php/file/externalfilemanager/{id}/{value}
@@ -4427,10 +4418,10 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Regulatory context has been updated","type":"success"}}
+{"toast":{"msg":"Regulatory context has been updated","type":"success"}}
 ```
 
-> GET ./api/api.php/file/filter/{directory}/{query}/{route}
+> GET ./api/api.php/file/filter/{directory}/{query}
 
 Returns a list of paths that have a similarity to query.
 
@@ -4439,7 +4430,6 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {directory} | path parameter | optional | specified sharepoint dir, user dir, other documents if null |
 | {query} | path parameter | optional | search string, returns all files if null |
-| {route} | path parameter | optional | additional string to handle response within frontent api |
 
 Sample response
 ```
@@ -4472,7 +4462,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
+{"redirect":["filemanager", null ],"toast":{"msg":"test3 has been permanently deleted","type":"success"}}
 ```
 
 > GET ./api/api.php/file/filemanager/{directory}
@@ -4486,7 +4476,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","onpointerup":"new Dialog({type:....
+{"title":"Manage files","render":{"form":{"data-usecase":"file","action":"javascript:api.file('post', '[data-usecase=file]', 'filemanager')"},"content":[[{"type":"links","description":"Folder created on 2026-04-30 23:58","content":{"3dstl":{"href":"javascript:api.file('get', null, 'filemanager', '3dstl')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","onclick":"new _client.Dialog({type: 'confirm', header: 'Sure to delete 3dstl?', options:{'No, thank you': false,'Yes, delete': {value: true, class: 'reducedCTA'},}}).then....
 ```
 
 > POST ./api/api.php/file/filemanager
@@ -4500,7 +4490,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
+{"redirect":["filemanager","test"],"toast":{"msg":"Upload has been completed","type":"success"}}
 ```
 
 > GET ./api/api.php/file/sharepoint
@@ -4514,7 +4504,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','sharepoint')"},"content":[[{"type":"filtered","attributes":{"name":"Filter by file name","onkeydown":"if (event.key ==='Enter'){api.file('get','filter','sharepoint', this.value); return false;}","onblur":"api.file('get','filter','sharepoint', this.value); return false;","id":"filefilter"}}],[{"type":"links","content":....
+{"title":"Open sharepoint","render":{"form":{"data-usecase":"file","action":"javascript:api.file('post', '[data-usecase=file]', 'sharepoint')"},"content":[[{"type":"nocontent","content":"Currently there are no files, everything is tidied up :)"}],[{"type":"file","attributes":{"name":"Share files","multiple":true,"required":true},"hint":"Files are available for 48 hours and will be deleted afterwards."}]]}}
 ```
 
 > POST ./api/api.php/file/sharepoint
@@ -4528,7 +4518,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Upload has been completed","redirect":["sharepoint"],"type":"success"}}
+{"redirect":["sharepoint"],"toast":{"msg":"Upload has been completed","type":"success"}}
 ```
 
 > GET ./api/api.php/file/stream/{path to file}
@@ -4539,6 +4529,8 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {path to file} | path parameter | true | relative path |
+
+Response is a binary/text stream depending on the file
 
 [Content](#content)
 
@@ -4572,7 +4564,7 @@ Parameters
 
 Sample response
 ```
-{"links":{"2025-07-13 00-36-50 Prosthetics II.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/2025-07-13 00-36-50 Prosthetics II.csv","download":"2025-07-13 00-36-50 Prosthetics II.csv"}}}
+{"dialog":{"render":[{"type":"links","content":{"Download CONFIDENTIAL CARO REQUEST LOG.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/CONFIDENTIAL CARO REQUEST LOG(2).csv","download":"CONFIDENTIAL CARO REQUEST LOG.csv"}}}]}}
 ```
 
 > PUT ./api/api.php/maintenance/task/{task}
@@ -4587,7 +4579,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Record datalist":{"value":"records_datalist"},"Vendor update":{"value":"vendorupdate","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}],{"type":"textsection","attributes":{"name":"Following vendors have been successfully updated:"},"content":"Ortho-Reha Neuhof GmbH"}]}}
+{"title":"Maintenance","render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Record datalist":{"value":"records_datalist"},"Vendor update":{"value":"vendorupdate","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}],{"type":"textsection","attributes":{"name":"Following vendors have been successfully updated:"},"content":"Ortho-Reha Neuhof GmbH"}]}}
 ```
 
 > GET ./api/api.php/maintenance/task/{task}
@@ -4601,9 +4593,8 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Current documents snapshot":{"value":"documents_snapshot"},"ERP-connection":{"value":"erp_connection"},"Record datalist":{"value":"records_datalist"},"Request Log":{"value":"request_log"},"Update table of riskanalysis contents":{"value":"riskupdate"},"Vendor update":{"value":"vendorupdate"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}]]}}
+{"title":"Maintenance","render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Current documents snapshot":{"value":"documents_snapshot"},"ERP-connection":{"value":"erp_connection"},"Record datalist":{"value":"records_datalist"},"Request Log":{"value":"request_log"},"Update table of riskanalysis contents":{"value":"riskupdate"},"Vendor update":{"value":"vendorupdate"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', null, 'task', this.value)"}}]]}}
 ```
-
 
 ### Measure endpoints
 
@@ -4618,7 +4609,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Suggestion saved","id":"15","type":"success"}}
+{"toast":{"msg":"Suggestion saved","type":"success"}}
 ```
 
 > PUT ./api/api.php/measure/measure/{id}
@@ -4633,7 +4624,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Measure saved","type":"success"}}
+{"toast":{"msg":"Measure saved","type":"success"}}
 ```
 
 > GET ./api/api.php/measure/measure
@@ -4647,7 +4638,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "button","attributes": {"value": "New suggestion","onpointerup": "new _client.Dialog({type: 'input', header: 'New suggestion', render: JSON.parse('[[{\"type\":\"textarea\",\"attributes\":{\"name\":\"Suggestion\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"submit anonymous\"},\"content\":{\"submit anonymous\":[]},\"hint\":\"Your name will not be stored nor displayed, your suggestion yet remains public.\"}]]'), options:{'Ok': true,'No, I am not done yet': {value: false, class: 'reducedCTA'},}}).then(response => {if (response)....
+{"title":"Improvement suggestions","render":{"content":[[{"type":"button","attributes":{"value":"New suggestion","onclick":"new _client.Dialog({type: 'input', header: 'New suggestion', render: JSON.parse('[[{\"type\":\"textarea\",\"attributes\":{\"name\":\"Suggestion\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"submit anonymous\"},\"content\":{\"submit anonymous\":[]},\"hint\":\"Your name will not be stored nor displayed, your suggestion yet remains public.\"}]]'), options:{'Ok': {value: true},'No, I am not done yet': {value: false, class: 'reducedCTA'},}}, 'FormData').then(response => {if (response) {api.measure('post', response, 'measure', null);}})"}}],[{"type":"textsection","attributes":{"name":"error on line 1 2026-05-17 15:06:06"},"content":"test"}....
 ```
 
 > PUT ./api/api.php/measure/vote/{id}/{vote}
@@ -4662,7 +4653,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Thank you for your opinion!","type":"success"}}
+{"toast":{"msg":"Thank you for your opinion!","type":"success"}}
 ```
 
 ### Message endpoints
@@ -4678,7 +4669,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Announcement deleted.","type":"success"}}
+{"toast":{"msg":"Announcement deleted.","type":"success"}}
 ```
 
 > POST/PUT ./api/api.php/message/announcement/{announcement id}
@@ -4693,7 +4684,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Announcement saved.","type":"success"}}
+{"redirect":["announcements"],"toast":{"msg":"Announcement saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/message/announcements
@@ -4707,21 +4698,21 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2025-07-05\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"Concerns just\"},\"content\":{\"Common\":[],\"Orthotics I\":[],\"Orthotics II\":[],\"Prosthetics I\":[],\"Prosthetics II\":[],\"CAD\":[],\"Polymer Tech\":[],\"Silicone Lab\":[],\"Office/Purchase\":[],\"Administration\":[]}}]]'), options:{'Ok': {value: true},}}, 'FormData').then(response => {if (response) { api.message('post', 'announcement', 0, response);}});"}},[{"type":"announcementsection","attributes":{"name":"This is a test announcement"},"content":....
+{"title":"Announcements","render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\",\"id\":\"announcement\"}},{\"type\":\"button\",\"attributes\":{\"value\":\"Markdown\",\"data-type\":\"markdown\",\"class\":\"floatright\",\"onclick\":\"_client.application.markdownpreview(\\\\\\\"announcement\\\\\\\")\"}},{\"type\":\"br\"},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2026-05-17\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"radio\",\"attributes\":{\"name\":\"hightlight\"},\"content\":{\"no highlighting\":{\"value\":\"null\",\"class\":\"\",\"checked\":true},\"green\":{\"value\":\"green\",\"class\":\"green\"},....
 ```
 
-> DELETE ./api/api.php/message/conversation
+> DELETE ./api/api.php/message/conversation?{_selectedconversation}
 
 Delete all messages of the conversation with the passed message ids.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | query string | required | _selectedconversation = int ids chained with _ |
+| {_selectedconversation} | query string | required | int ids chained with _ |
 
 Sample response
 ```
-{"response":{"msg":"Conversation successfully deleted","redirect": false,"type":"success"}}
+{"redirect":["conversation"],"toast":{"msg":"Messages successfully deleted","type":"deleted"}}
 ```
 
 > GET ./api/api.php/message/conversation/{user id}
@@ -4735,7 +4726,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/icon192.png","user":"CARO App","text":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
+{"title":"Conversations","render":{"content":[[{"type":"button","attributes":{"value":"Start new conversation","onclick":"_client.message.newMessage('Start new conversation', '', '', {}, 'test,testuser')"}}],[{"type":"message","content":{"img":"./api/api.php/file/stream/./media/favicon/icon192.png","user":"CARO App","text":"A new MDR §14 Sample check has been submitted by error on line 1. Review within Regulatory evaluations and summaries     Otto B...","date":"2026-05-17 13:34:06","unseen":0},"attributes":{"onclick":"api.message('get', null, 'conversation', '1')"}}]]}}
 ```
 
 > POST ./api/api.php/message/message
@@ -4749,7 +4740,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Message successfully sent","redirect": false,"type":"success"}}
+{"toast":{"msg":"Message successfully sent","redirect": false,"type":"success"}}
 ```
 
 > GET ./api/api.php/message/register
@@ -4763,21 +4754,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
-```
-
-> GET ./api/api.php/message/whiteboard/{whiteboard id}
-
-Delete whiteboard.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {whiteboard id} | path parameter | required | int id |
-
-Sample response
-```
-{"render":{"content":[[{"type":"text","attributes":{"name":"Name","value":"test"}}],[[{"type":"textarea","attributes":{"name":"Content","value":"by error on line 1 on 2026-03-14 21:46","rows":40}}],[{"type":"doodle","attributes":{"name":"Doodle"},"content":"..."}]],[{"type":"deletebutton","attributes":{"value":"Delete","onclick":"new _client.Dialog({type: 'confirm', header: 'Permanently delete Whiteboard?', options:{'No, I am not done yet': false,'Ok': {value: true, class: 'reducedCTA'}}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', 1); this.disabled = true;}})"}}],[{"type":"checkbox","attributes":{"name":"Concerns only"},"content":{"Common":[],"Orthotics I":[],"Orthotics II":[],"Prosthetics I":[],"Prosthetics II":{"checked":true},"CAD":[],"Polymer Tech":[],"Silicone Lab":[],"Office/Purchase":[],"Administration":[]}}]],"form":{"data-usecase":"message","action":"javascript:api.message('put', 'whiteboard', 1)"}}}
+{"title":"Personnel register","render":{"content":[[[{"type":"links","description":"Organizational units Prosthetics II","content":{"Message to all":{"href":"javascript:void(0)","data-type":"input","class":"messageto","style":"--icon: url('')","onclick":"_client.message.newMessage('Message to error on line 1', 'error on line 1', '', {}, [])"},"error on line 1":{"href":"javascript:void(0)","data-type":"input","class":"messageto","style":"--icon: url('./api/api.php/file/stream/./fileserver/users/profilepic_error on line 1_dev.png')","onclick":"_client.message.newMessage('Message to error on line 1', 'error on line 1', '', {}, [])"}}}],....
 ```
 
 > DELETE ./api/api.php/message/whiteboard/{whiteboard id}
@@ -4791,7 +4768,21 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Whiteboard deleted.","type":"success"}}
+{"toast":{"msg":"Whiteboard deleted.","type":"success"}}
+```
+
+> GET ./api/api.php/message/whiteboard/{whiteboard id}
+
+Delete whiteboard.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {whiteboard id} | path parameter | required | int id |
+
+Sample response
+```
+{"title":"Whiteboard","render":{"content":[[{"type":"text","attributes":{"name":"Name","value":"dgdfghdfhgdg"}}],[[{"type":"textarea","attributes":{"name":"Content","value":"s\r\ndf\r\ns\r\ndfg\r\nsd\r\nfg\r\ns\r\ndf\r\ng\r\nsdfg\nby error on line 1 on 2026-03-27 23:10","rows":40}}],[{"type":"doodle","attributes":{"name":"Doodle"},"content":"[{\"penColor\":\"rgb(46, 52, 64)\",\"dotSize\":0,\"minWidth\":0.5,\"maxWidth\":2.5,\"velocityFilterWeight\":0.7,\"compositeOperation\":\"source-over\",\"points\":[{\"time\":1773519013556,\"x\":156.5,....
 ```
 
 > POST/PUT ./api/api.php/message/whiteboard/{whiteboard id}
@@ -4806,7 +4797,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Whiteboard saved.","type":"success"},"links":{"test_Doodle(7).png":{"href":"./api/api.php/file/stream/./fileserver/tmp/test_Doodle(7).png","download":"test_Doodle(7).png"}}}
+{"toast":{"msg":"Whiteboard saved.","type":"success"},"dialog":{"render":[{"type":"links","content":{"dgdfghdfhgdg_Doodle(2).png":{"href":"./api/api.php/file/stream/./fileserver/tmp/dgdfghdfhgdg_Doodle(2).png","download":"dgdfghdfhgdg_Doodle(2).png"}}}]}}
 ```
 
 > GET ./api/api.php/message/whiteboards
@@ -4820,7 +4811,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"button","attributes":{"value":"New whiteboard","onclick":"api.message('get', 'whiteboard')"}}],[{"type":"links","description":"All whiteboards","content":{"testboard created by error on line 1, last edit on 2025-10-18 02:30:36":{"href":"javascript: void(0);","onclick":"api.message('get', 'whiteboard', 3)"}}}]]}}
+{"title":"Whiteboard","render":{"content":[[{"type":"button","attributes":{"value":"New whiteboard","onclick":"api.message('get', null, 'whiteboard')"}}],[{"type":"links","description":"All whiteboards","content":{"dgdfghdfhgdg created by error on line 1, last edit on 2026-03-27 23:10:57":{"href":"javascript: void(0);","onclick":"api.message('get', null, 'whiteboard', 1)"}}}]]}}
 ```
 
 [Content](#content)
@@ -4856,7 +4847,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+{"toast": {"msg": "This order has been permanently deleted","type": "success"},"notif":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
 > GET ./api/api.php/order/approved/{null}/{orderstate}?{payload}
@@ -4872,7 +4863,7 @@ Parameters
 
 Sample response
 ```
-{"data":{"filter":{"term":[],"timespan":[],"unit":"prosthetics2"},"state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Stock item\n \nOrganizational unit: Prosthetics II\nApproved: 2025-11-22 23:18:55 ","quantity":"1","unit":"Packung","barcode":"4,03E+12","name":"Schlauch-Strumpf","vendor":"Otto Bock Healthcare GmbH","ordernumber":"99B25","commission":"rth","approval":0,"addinformation":true,"orderer":{"name":"error on line 1","image":"./api/api.php/file/stream/fileserver/users/profilepic_error on line 1_dev.png","units":"prosthetics2,cad,silicone,admin"},"organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"delivered_partially":{"data-delivered_partially":"false"},"delivered_full":{"data-delivered_full":"false"},"issued_partially":{"data-issued_partially":"false"},"issued_full":{"data-issued_full":"false"},"archived":{"data-archived":"false"}},"disapprove":true,"delete":true,"samplecheck":{"item":4084},"productid":4084}],"approval":["data:image/png;base64,iVBORw0KGgoAAAANSUhE....
+{"title":"Approved orders","data":{"filter":{"term":null,"timespan":null,"unit":["common","prosthetics2","cad","silicone","admin"],"etc":null},"state":"unprocessed","order":[{"id":2072,"ordertype":"order","ordertext":"Stock item\n \nOrganizational unit: Prosthetics II\nApproved: 2026-04-17 19:51:45 \nverified by token through error on line 1","quantity":"1","unit":"Packung","name":"Schlauch-Strumpf","vendor":"Otto Bock Healthcare GmbH","ordernumber":"99B25","commission":"sdfgsdfg","addinformation":true,"lastorder":"Last ordered and delivered on 2026-04-24","orderer":{"name":"error on line 1","image":"./api/api.php/file/stream/./fileserver/users/profilepic_error on line 1_dev.png","units":"prosthetics2,cad,silicone,admin"},"organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"....
 ```
 
 > PATCH ./api/api.php/order/approved/{ids}/{orderstate}/{state}
@@ -4894,7 +4885,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+{"toast": {"msg": "Information has been added set","type": "info"},"notif":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
 > GET ./api/api.php/order/export/{null}/{orderstate}?{payload}
@@ -4906,7 +4897,7 @@ see GET ./api/api.php/order/approved/{null}/{orderstate}?{payload}
 
 Sample response
 ```
-{"render": [[{"type": "links", "description": "Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.", "content": {"Export to print": {"href": "./api/api.php/file/stream/./fileserver/tmp/New order - Unprocessed_2025-05-15 1329.pdf"}}}]]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.","content":{"Export filtered view":{"href":"./api/api.php/file/stream/./fileserver/tmp/Unprocessed_2026-05-17 0051.pdf","download":"Unprocessed_2026-05-17 0051.pdf"}}}]}}
 ```
 
 > DELETE ./api/api.php/order/order/{id}
@@ -4920,7 +4911,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+{"toast": {"msg": "This order has been permanently deleted","type": "success"}}
 ```
 
 > GET ./api/api.php/order/order/{id}
@@ -4934,7 +4925,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "purchase","action": "javascript:api.purchase('post', 'order')"},"content": [[{"type": "scanner","destination": "productsearch"},{"type": "select","content": {"... all vendors": {"value": "21_4_5_15_16_17_6_7_31_30_33_22_8_32_23_34_9_18_2_3_10_12_11_29_19_13_14_20_24_1_25_26_27_28"},"Basko": {"value": "21"},"Caroli": {"value": "4"},"Feet Control": {"value": "5"},....
+{"title":"New order","render":{"form":{"data-usecase":"order","action":"javascript:api.order('post', '[data-usecase=order]', 'order')"},"content":[[[{"type":"scanner","destination":"productsearch"},{"type":"text","attributes":{"id":"productsearchvendor","data-type":"filtered","name":"Filter vendors","value":""},"datalist":["Achim Ruthner GmbH","AET-GmbH","AIDAMED","Albrecht GmbH",....
 ```
 
 > POST/PUT ./api/api.php/order/order/{id}
@@ -4949,7 +4940,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}}
+{"toast":{"msg":"Order has been saved to prepared orders but has still to be approved.","type":"info"},"redirect":["order"],"notif":{"order_prepared":4,"order_unprocessed":0,"consumables_pendingincorporation":0}}
 ```
 
 > GET ./api/api.php/order/prepared/{unit}
@@ -4963,7 +4954,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "radio","attributes": {"name": "Organizational unit"},"content": {"Administration": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'admin')"},"Office/Purchase": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'office')"},....
+{"title":"Prepared orders","render":{"content":[[{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"name":"Organizational unit","onchange":"api.order('get', null, 'prepared')","checked":true},"Common":{"name":"Organizational unit","onchange":"api.order('get', null, 'prepared', 'common')"},"Orthotics I":{"name":"Organizational unit","onchange":"api.order('get', null, 'prepared', 'orthotics1')"},"Orthotics II":{"name":"Organizational unit","onchange":"api.order('get', null, 'prepared', 'orthotics2')"},....
 ```
 
 > PUT ./api/api.php/order/prepared
@@ -4977,7 +4968,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": false,"msg": "Approved order can now be processed by the purchase department.","type": "success"}}
+{"toast":{"msg":"Approved order can now be processed by the purchase department.","type":"success"},"notif":{"order_prepared":3,"order_unprocessed":0,"consumables_pendingincorporation":0}}
 ```
 
 [Content](#content)
@@ -4998,7 +4989,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Reimbursement granted set","type":"success"}}
+{"toast":{"msg":"Reimbursement granted set","type":"success"}}
 ```
 
 > POST ./api/api.php/record/casestatealert/
@@ -5012,7 +5003,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Message successfully sent","type":"success"}}
+{"toas":{"msg":"Message successfully sent","type":"success"}}
 ```
 
 > PATCH ./api/api.php/record/close/{identifier}
@@ -5027,10 +5018,10 @@ Parameters
 
 Sample response
 ```
-{"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
+{"toast": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/document/{name}/{identifier}
+> GET ./api/api.php/record/document/{name}/{identifier}/{asModal}
 
 Returns latest available approved document by {name}. Prefills identifier field if passed.
 
@@ -5039,10 +5030,11 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {name} | path parameter | required | form name |
 | {identifier} | path parameter | optional | identifier for records |
+| {asModal} | path parameter | optional | returns a document content as modal instead of render content |
 
 Sample response
 ```
-{"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
+{"title":"Basic data","render":{"content":[[{"type":"identify","attributes":{"name":"Case","value":"Jane Doe *01.02.2003 DAFO #tebvz0"}},{"type":"hidden","attributes":{"name":"_context","value":"casedocumentation"}},{"type":"hidden","attributes":{"name":"_document_name","value":"Basic data"}},{"type":"hidden","attributes":{"name":"_document_id","value":186}}],[{"type":"text","attributes":{"name":"Name","required":true,"data-loss":"prevent"}},{"type":"date","attributes":{"name":"Date of birth","data-loss":"prevent"}},....
 ```
 
 > GET ./api/api.php/record/documentexport/{identifier}/{name}
@@ -5057,21 +5049,7 @@ Parameters
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
-```
-
-> GET ./api/api.php/record/documentexport/{identifier}/{name}
-
-Returns a dialog table view of ERP interface case positions.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for ERP cases |
-
-Sample response
-```
-[{"type": "table","attributes": {"name": "1776368"},"content": [[{"c": "Amount"},{"c": "Position"},{"c": "Position text"}],[{"c": "1.0"},{"c": "1"},{"c": "Myoelektrische Unterarmprothese als Definitivversorgung  in Sandwichbauweise, Silikonhaftkontaktschaft mit Taska Hand nach erfolgter Testversorgung links\nAufstellung siehe Anlage"}],[{"c": ""},{"c": ""},{"c": "Zwischensumme"}]]}]
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2311.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2311.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/fullexport/{identifier}
@@ -5085,7 +5063,7 @@ Parameters
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/identifier
@@ -5099,7 +5077,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'identifier')"},"content": [[{"type": "textsection","attributes":{"name": "Create an identifier that will connect database entries. A current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."}},{"type": "scanner","hint": "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes": {"name": "Identifying data","maxlength": 128}}]]}}
+{"title":"Create identifier label sheet","render":{"content":[[{"type":"textsection","attributes":{"name":"Create an identifier that will connect database entries. An encoded current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."}},{"type":"scanner","hint":"e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes":{"name":"Identifying data","maxlength":128,"id":"_identifier"}}],....
 ```
 
 > POST ./api/api.php/record/identifier/{appendDate}
@@ -5110,11 +5088,11 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {appendDate} | path parameter | optional | if provided a passed identifier will be checked for a timestamp at the end and appended one if not found |
-| payload | form data | required | identifier to be converted to a qr-code |
+| payload | form data | required | identifier to be converted to a qr-code, label selection |
 
 Sample response
 ```
-{"render": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
+{"dialog":{"options":{"Ok":false},"render":[{"type":"links","description":"Open the link, print the identifiers and use them where applicable.","content":{"Identifying data":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tf5f7v.pdf","download":"Jane Doe 01022003 DAFO tf5f7v.pdf"}}}]}}
 ```
 
 > POST ./api/api.php/record/import
@@ -5128,7 +5106,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
+{"data":{"Name":"Jane Doe","Date of birth":"2003-02-01","Address":"somewhere over the rainbow 5","Phone number":"012345678","Insurance":"\"YouMatter Insurances\"","Info":"all fine","Service, aid or recipe":"DAFO","Prescriber":"Dr. Important","Patient number":"08642","DEFAULT_Record type":"rework"},"toast":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting! Files and photos are not part of the import.","type":"success"}}
 ```
 
 > GET ./api/api.php/record/matchbundles/{bundle}/{identifier}
@@ -5143,7 +5121,7 @@ Parameters
 
 Sample response
 ```
-{"render": [{"type": "links","description": "Some documents seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'document', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'document', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+{"dialog":{"options":{"No, I am not done yet":false,"OK":{"value":true,"class":"reducedCTA"}},"render":[{"type":"links","description":"Some documents of the bundle Konfektionsversorgung seem not be be taken into account. Append missing data now:","content":{"Konfektionsversorgung":{"href":"javascript:api.record('get', null, 'document', 'Konfektionsversorgung', 'Jane Doe *01.02.2003 DAFO #tebvz0')"},"Empfangsbestätigung":{"href":"javascript:api.record('get', null, 'document', 'Empfangsbestätigung', 'Jane Doe *01.02.2003 DAFO #tebvz0')"}}}]}}
 ```
 
 > GET ./api/api.php/record/record/{identifier}
@@ -5157,7 +5135,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"textsection","attributes":{"name":"Identifying data","content":"testpatient2"}}],[{"type":"textsection","attributes":{"name":"Form identify yourself version 2024-06-13 21:54:47"}},{"type":"textsection","attributes":{"name":"text "},"content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this document only","onpointerup":"api.record('get', 'documentexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
+{"title":"Record summaries - Jane Doe *01.02.2003 DAFO #tebvz0","render":{"content":[[{"type":"textsection","attributes":{"name":"Identifying data"},"content":"Jane Doe *01.02.2003 DAFO #tebvz0"},{"type":"button","attributes":{"onclick":"_client.application.postLabelSheet('Jane Doe *01.02.2003 DAFO #tebvz0', null, {_type:'sheet'});","value":"Label(s) in format A4"}},{"type":"button","attributes":{"onclick":"_client.application.postLabelSheet('Jane Doe *01.02.2003 DAFO #tebvz0', null, {_type:'label'});","value":"Label(s) in format 85 x 35 Dymo"}},{"type":"button","attributes":{"onclick":"_client.application.postLabelSheet('Jane Doe *01.02.2003 DAFO #tebvz0', null, {_type:'label2'});","value":"Label(s) in format 55 x 30 Zebra"}}],....
 ```
 
 > POST ./api/api.php/record/record
@@ -5171,7 +5149,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"msg": "The record has been saved.","type": "success"}}
+{"toast": {"msg": "The record has been saved.","type": "success"}}
 ```
 
 > GET ./api/api.php/record/records?{payload}
@@ -5185,7 +5163,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","onkeydown":"if (event.key === 'Enter') {api.record('get', 'records');}","value":""},"datalist":[]},{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"value":"null","name":"Organizational unit","onchange":"api.record('get', 'records');","checked":true},"Administration":{"value":"admin","name":"Organizational unit","onchange":"api.record('get', 'records');"},"CAD":....},"data":[]}
+{"title":"Record summaries","render":{"content":[[{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","onkeydown":"if (event.key === 'Enter') {api.record('get', null, 'records');}","value":""},"datalist":["Erika Musterfrau ","Jane Doe ","asdfasdfasdfasdf kein "]},{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"name":"Organizational unit","onchange":"api.record('get', null, 'records');","checked":true},....
 ```
 
 > POST ./api/api.php/record/reidentify/
@@ -5199,7 +5177,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Record successfully merged","type":"success"}}
+{"toast":{"msg":"Record successfully merged","type":"success"}}
 ```
 
 > POST ./api/api.php/record/retype/
@@ -5213,26 +5191,26 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"The record has been saved.","type":"success"}}
+{"toast":{"msg":"The record has been saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/record/simplifiedexport/{identifier}
 
-Returns a download link to a temporary file with the most recent records as a pdf.
+Returns a download link to a temporary file with most recent records as a pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id for document |
+| {identifier} | path parameter | required | identifier for records |
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/simplifieddocumentexport/{identifier}/{name}
 
-Returns a download link to a temporary file with the most recent records for a given document as a pdf.
+Returns a download link to a temporary file with all records for a given document as a pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -5242,7 +5220,7 @@ Parameters
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
+{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2312.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2312.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/verify/{identifier}
@@ -5256,26 +5234,12 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"No irregularities within the record detected. Attached files and data are fine!","type":"success"}}
+{"toast":{"msg":"No irregularities within the record detected. Attached files and data are fine!","type":"success"}}
 ```
 
 [Content](#content)
 
 ### Responsibility endpoints
-
-> PATCH ./api/api.php/responsibility/responsibilities/{id}
-
-Updates acceptance by submitting user for the given responsibility
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-
-Sample response
-```
-{"response":{"msg":"Acceptance confirmed. Thank you for shouldering responsibility!","type":"success"}}
-```
 
 > GET ./api/api.php/responsibility/responsibilities/null/{unit}
 
@@ -5289,7 +5253,49 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"radio","content":{"My responsibilities":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', '_my')"},"My units":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null')","checked":true},"Prosthetics II":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', 'prosthetics2')"}},....
+{"title":"Responsibilities","render":{"content":[[{"type":"radio","content":{"My responsibilities":{"name":"Organizational unit","onchange":"api.responsibility('get', null, 'responsibilities', 'null', '_my')"},"My units":{"name":"Organizational unit","onchange":"api.responsibility('get', null, 'responsibilities', 'null')","checked":true},"Administration":{"name":"Organizational unit","onchange":"api.responsibility('get', null, 'responsibilities', 'null', 'admin')"},"Common":{"name":"Organizational unit","onchange":"api.responsibility('get', null, 'responsibilities', 'null', 'common')"}},"attributes":{"name":"Organizational unit","onchange":"api.responsibility('get', null, 'responsibilities', this.value)"}}],[{"type":"textsection","attributes":{"name":"Get CARO running","class":""}....
+```
+
+> PATCH ./api/api.php/responsibility/responsibilities/{id}
+
+Updates acceptance by submitting user for the given responsibility
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"toast":{"msg":"Acceptance confirmed. Thank you for shouldering responsibility!","type":"success"}}
+```
+
+> DELETE ./api/api.php/responsibility/responsibility/{id|type}
+
+Deleted a responsibility.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"toast":{"msg":"Responsibility deleted","type":"success"}}
+```
+
+> GET ./api/api.php/responsibility/responsibility/{id}
+
+Display a form to add a new responsibility or prefilled with data from the requested database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id |
+
+Sample response
+```
+{"title":"Responsibilities","render":{"form":{"data-usecase":"responsibility","action":"javascript:api.responsibility('put', '[data-usecase=responsibility]', 'responsibility', 2)"},"content":[[{"type":"textarea","attributes":{"name":"Task","value":"Get CARO running","required":true,"data-loss":"prevent"}},{"type":"textarea","attributes":{"name":"Context, description","value":"","data-loss":"prevent"}},{"type":"checkbox","attributes":{"name":"Units"},"content":{"Common":{"checked":false},"Orthotics I":{"checked":false},....
 ```
 
 > POST/PUT ./api/api.php/responsibility/responsibility/{id}
@@ -5304,36 +5310,11 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Responsibility saved","type":"success"}}
+{"toast":{"msg":"Responsibility saved","type":"success"}}
 ```
 
-> GET ./api/api.php/responsibility/responsibility/{id}
 
-Display a form to add a new responsibility or prefilled with data from the requested database entry.
 
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database id |
-
-Sample response
-```
-{"render":{"form":{"data-usecase":"responsibility","action":"javascript:api.responsibility('put', 'responsibility', 5)"},"content":[[{"type":"textarea","attributes":{"name":"Task","value":"test","required":true}},{"type":"textarea","attributes":{"name":"Context, description","value":""}},{"type":"checkbox","attributes":{"name":"Units"},"content":{"Common":{"checked":false},"Orthotics I":{"checked":false},"Orthotics II":{"checked":false},....
-```
-
-> DELETE ./api/api.php/responsibility/responsibility/{id|type}
-
-Deleted a responsibility.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-
-Sample response
-```
-{"response":{"msg":"Responsibility deleted","type":"success"}}
-```
 
 [Content](#content)
 
@@ -5350,7 +5331,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"search","attributes":{"name":"Search","onkeydown":"if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}"}}],[{"type":"hr"}],[[{"type":"textsection","attributes":{"name":"Risk"}},{"type":"button","attributes":{"value":"New","onpointerup":"api.risk('get', 'risk', 'risk')"}},{"type":"select","attributes":{"name":"CAD","onchange":"api.risk('get', 'risk', this.value)"},"content":{"...":[],"Scanspray nicht f\u00fcr Hautkontakt geeignet: Reizung der Haut nach Anwendung in z.B. Prothesenschaft":{"value":"526"},"unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilit\u00e4t und Funktionsverlust des Verschlussystems":{"value":"528"},"unzureichende Passgenauigkeit nach digitaler\/additiver Modellerstellung: Druckstellen":{"value":"527"}}},....
+{"render":{"content":[[[{"type":"search","attributes":{"name":"Search","onkeydown":"if (event.key === 'Enter') {api.risk('get', null, 'search', encodeURIComponent(this.value)); return false;}","value":""}}]],[[{"type":"collapsible","attributes":{"class":"em16"},"content":[{"type":"textsection","attributes":{"name":"Risk"}},{"type":"button","attributes":{"value":"New","onclick":"api.risk('get', null, 'risk', 'risk')"}},{"type":"select","numeration":"prevent","attributes":{"name":"CAD","onchange":"if (this.value && this.value !== '...') api.risk('get', null, 'risk', this.value)"},"content":{"...":[],"Scanspray nicht für Hautkontakt geeignet: Reizung der Haut nach Anwendung in z.B. Prothesenschaft":{"value":"1"},....
 ```
 
 > POST/PATCH ./api/api.php/risk/risk/{id}
@@ -5365,7 +5346,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
+{"toast":{"msg":"The edited risk has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/risk/search/{search}
@@ -5379,7 +5360,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"search","attributes":{"name":"Search","onkeydown":"if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}","value":"unzureichend"}}],[{"type":"textsection","attributes":{"name":"Matches for this search for \"unzureichend\""}},[{"type":"tile","attributes":{"onclick":"api.risk('get', 'risk', 528)"},"content":[{"type":"textsection","attributes":{"name":"Risk","class":"green"},"content":"CAD: unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilität und Funktionsverlust des Verschlussystems"}]},{"type":"tile","attributes":{"onclick":"api.risk('get', 'risk', 527)"},"content":[{"type":"textsection","attributes":{"name":"Risk","class":"green"},"content":"CAD: unzureichende Passgenauigkeit nach digitaler/additiver Modellerstellung: Druckstellen"}]},....
+{"insert":{"content":[[[{"type":"search","attributes":{"name":"Search","onkeydown":"if (event.key === 'Enter') {api.risk('get', null, 'search', encodeURIComponent(this.value)); return false;}","value":"layer"}}],[{"type":"textsection","attributes":{"name":"Matches for this search for \"layer\""}},[{"type":"tile","attributes":{"onclick":"api.risk('get', null, 'risk', 2)","onkeydown":"if (event.key==='Enter') api.risk('get', null, 'risk', 2)","role":"link","tabindex":"0","title":"display Risk"},"content":[{"type":"textsection","attributes":{"name":"Risk","class":"green"},"content":"CAD: unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilität und Funktionsverlust des Verschlussystems"}]}]]]]}}
 ```
 
 [Content](#content)
@@ -5397,7 +5378,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"select","attributes":{"name":"Edit latest chunk for Common","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New template":{"value":"0","selected":true},"Replacement BEST\u00c4TIGT":{"value":19},"Replacement DER_PATIENTIN_AKKUSATIV":{"value":2},"Replacement DER_PATIENTIN_DATIV":{"value":3},"Replacement DER_PATIENTIN_GENITIV":{"value":4},"Replacement DIE_PATIENTIN_NOMINATIV":{"value":1},"Replacement ERH\u00c4LT":{"value":18},"Replacement FRAU_AKKUSATIV":{"value":17},"Replacement FRAU_NOMINATIV":{"value":16},"Replacement HAT_":{"value":25},"Replacement IHREM_GENITIV":{"value":10},"Replacement IHREN_GENITIV":{"value":9},"Replacement IHRER_GENITIV":{"value":8},....
+{"title":"Manage text chunks","render":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', '[data-usecase=texttemplate]', 'chunk')"},"content":[[[{"type":"collapsible","attributes":{"class":"em16"},"content":[{"type":"search","numeration":"prevent","attributes":{"name":"Search name","onkeydown":"if (event.key === 'Enter') {api.texttemplate('get', null, 'chunk', this.value); return false;}"},"datalist":["BESTÄTIGT","Besuchsbestätigung","DER_PATIENTIN_AKKUSATIV","DER_PATIENTIN_DATIV","DER_PATIENTIN_GENITIV"....
 ```
 
 > POST ./api/api.php/texttemplate/chunk
@@ -5411,7 +5392,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
+{"toast":{"msg":"The chunk named eins has been saved.","type":"success"}}
 ```
 
 > DELETE ./api/api.php/texttemplate/chunk/{id}
@@ -5425,7 +5406,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
+{"toast":{"msg":"The chunk named eins has been saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/texttemplate/template/{id}
@@ -5459,7 +5440,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"select","attributes":{"name":"Select text recommendation for Administration","onchange":"api.texttemplate('get', 'text', this.value)"},"content":{"...":{"value":"0"},"text (de)":{"value":4,"selected":true}}}]],[{"type":"radio","attributes":{"name":"Adressee \/ subject","id":"genus"},"content":{"Child female":{"value":0,"data-loss":"prevent"},"Child male":{"value":1,"data-loss":"prevent"},"Child genderless":{"value":2,"data-loss":"prevent"},"Adult female":{"value":3,"data-loss":"prevent"},"Adult male":{"value":4,"data-loss":"prevent"},"Adult genderless":{"value":5,"data-loss":"prevent"},"Informal you":{"value":6,"data-loss":"prevent"},"Formal you":{"value":7,"data-loss":"prevent"}}},....
+{"render":{"content":[[[{"type":"select","attributes":{"name":"Select text recommendation for Administration","onchange":"api.texttemplate('get', null, 'text', this.value)"},"content":{"...":{"value":"0"},"text (de)":{"value":4,"selected":true}}}]],[{"type":"radio","attributes":{"name":"Adressee \/ subject","id":"genus"},"content":{"Child female":{"value":0,"data-loss":"prevent"},"Child male":{"value":1,"data-loss":"prevent"},"Child genderless":{"value":2,"data-loss":"prevent"},"Adult female":{"value":3,"data-loss":"prevent"},"Adult male":{"value":4,"data-loss":"prevent"},"Adult genderless":{"value":5,"data-loss":"prevent"},"Informal you":{"value":6,"data-loss":"prevent"},"Formal you":{"value":7,"data-loss":"prevent"}}},....
 ```
 
 [Content](#content)
@@ -5473,11 +5454,11 @@ Returns a form with selection of calculating options.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | optional | supported calculator type (pow, poa, cd) |
+| {type} | path parameter | optional | supported calculator type (pow, poa, cd, ma, price, thread) |
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', 'calculator', 'pow')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow"},"Parts of attribute":{"value":"poa"},"Circular distance":{"value":"cd"}}},[{"type":"text","attributes":{"name":"Parts","value":""},"hint":"e.g. resin mixing 70\/20, decimal point is allowed"},{"type":"text","attributes":{"name":"Target weight","value":""}}]]]}}
+{"title":"Calculator","render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', '[data-usecase=tool_calculator]', 'calculator', 'pow')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', null, 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow"},"Parts of attribute":{"value":"poa"},"Core Hole":{"value":"thread"},"Measure adjustment":{"value":"ma"},"Circular distance":{"value":"cd"},"Price calculation":{"value":"price"}}},[{"type":"text","attributes":{"name":"Parts","value":""},"hint":"e.g. resin mixing 70/30, decimal point is allowed"},{"type":"text","attributes":{"name":"Target weight","value":""}}]]]}}
 ```
 
 > POST ./api/api.php/tool/calculator/{type}
@@ -5487,12 +5468,12 @@ Returns a prefilled form and a calculated result.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | required | supported code type (pow, poa, cd) |
+| {type} | path parameter | required | supported code type (pow, poa, cd, ma, price, thread) |
 | payload | form data | required | defined fields from previous GET fetch |
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', 'calculator', 'poa')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow"},"Parts of attribute":{"value":"poa","selected":true},"Circular distance":{"value":"cd"}}},[{"type":"text","attributes":{"name":"Parts","value":"20,65"},"hint":"e.g. silicone shore mixing 20,35,65, no decimals"},{"type":"number","attributes":{"name":"Target attribute","value":"35"}}]],[{"type":"text","attributes":{"name":"Result","value":"1 x 65 (33.33 %) \/ 2 x 20 (66.67 %)","readonly":true}}]]}}
+{"title":"Calculator","render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', '[data-usecase=tool_calculator]', 'calculator', 'pow')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', null, 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow","selected":true},"Parts of attribute":{"value":"poa"},"Core Hole":{"value":"thread"},"Measure adjustment":{"value":"ma"},"Circular distance":{"value":"cd"},"Price calculation":{"value":"price"}}},[{"type":"text","attributes":{"name":"Parts","value":"60/40"},"hint":"e.g. resin mixing 70/30, decimal point is allowed"},{"type":"text","attributes":{"name":"Target weight","value":"1000"}}]],[{"type":"textsection","attributes":{"name":"Result"},"content":"600 / 400"}]]}}
 ```
 
 > GET ./api/api.php/tool/code/{type}
@@ -5506,7 +5487,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
+{"title":"Create 2D-codes","render":{"form":{"data-usecase":"tool_create_code","action":"javascript:api.tool('post', '[data-usecase=tool_create_code]', 'code', 'qrcode_text')"},"content":[[{"type":"select","attributes":{"name":"Create a","onchange":"api.tool('get', null, 'code', this.value)"},"content":{"QR text / URL":{"value":"qrcode_text"},"Barcode CODE128":{"value":"barcode_code128"},"Barcode EAN13":{"value":"barcode_ean13"}}},[{"type":"textarea","attributes":{"name":"QR text / URL","value":""}}]]]}}
 ```
 
 > POST ./api/api.php/tool/code/{type}
@@ -5521,7 +5502,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+{"title":"Create 2D-codes","render":{"form":{"data-usecase":"tool_create_code","action":"javascript:api.tool('post', '[data-usecase=tool_create_code]', 'code', 'qrcode_text')"},"content":[[{"type":"select","attributes":{"name":"Create a","onchange":"api.tool('get', null, 'code', this.value)"},"content":{"QR text / URL":{"value":"qrcode_text","selected":true},"Barcode CODE128":{"value":"barcode_code128"},"Barcode EAN13":{"value":"barcode_ean13"}}},[{"type":"textarea","attributes":{"name":"QR text / URL","value":"hello world"}}]],[{"type":"image","description":"Download created code","attributes":{"name":"QR text / URL","qrcode":"hello world"}}]]}}
 ```
 
 > GET ./api/api.php/tool/code_qr/{label}/{code}/{text}
@@ -5537,7 +5518,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
+{"dialog":{"options":{"Ok":false},"render":[{"type":"links","description":"Open the link, print the identifiers and use them where applicable.","content":{"Identifying data":{"href":"./api/api.php/file/stream/./fileserver/tmp/99B25 Schlauch-Strumpf trallala Otto Bock Healthcare GmbH.pdf","download":"99B25 Schlauch-Strumpf trallala Otto Bock Healthcare GmbH.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/tool/image
@@ -5551,7 +5532,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":[]}},{"type":"text","attributes":{"name":"Beschriftung","value":""}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":{"selected":true},"800 x 600":[],"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}]]}}
+{"title":"Image resizing and watermark","render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', '[data-usecase=tool_image]', 'image')"},"content":[[{"type":"file","attributes":{"name":"Image","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Options"},"content":{"Watermark":[]}},{"type":"text","attributes":{"name":"Label","value":""}},{"type":"select","attributes":{"name":"Maximum size"},"content":{"...":{"selected":true},"800 x 600":[],"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}]]}}
 ```
 
 > POST ./api/api.php/tool/image
@@ -5565,7 +5546,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":{"checked":true}}},{"type":"text","attributes":{"name":"Beschriftung","value":"UKHD"}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":[],"800 x 600":{"selected":true},"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}],[{"type":"image","description":"800 x 600_IMG_20231012_0001.jpg","attributes":{"name":"800 x 600_IMG_20231012_0001.jpg","url":"fileserver\/tmp\/800 x 600_IMG_20231012_0001.jpg"}}]]}}
+{"title":"Image resizing and watermark","render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', '[data-usecase=tool_image]', 'image')"},"content":[[{"type":"file","attributes":{"name":"Image","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Options"},"content":{"Watermark":[]}},{"type":"text","attributes":{"name":"Label","value":""}},{"type":"select","attributes":{"name":"Maximum size"},"content":{"...":[],"800 x 600":[],"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}],[{"type":"image","description":"_image.jpg","attributes":{"name":"_image.jpg","url":"./api/api.php/file/stream/./fileserver/tmp/_image.jpg"},"dimensions":{"width":2840,"height":2874}}]]}}
 ```
 
 > GET ./api/api.php/tool/markdown/{table}
@@ -5579,12 +5560,12 @@ Parameters
 
 Sample response without "table"
 ```
-{"render": {"content": [[{"type": "textsection","attributes": {"name": "Quick reference"},"content": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information"},{"type": "textarea","attributes": {"name": "Markdown editor","rows": 24,"value": ""}},{"type": "button","attributes": {"value": "Convert CSV to Markdown and vice versa","onclick": "api.tool('get', 'markdown', 'table')","class": "inlinebutton"}}]]}}
+{"dialog":{"options":{"Cancel":false,"Show preview":{"value":true,"class":"reducedCTA"}},"render":[[{"type":"textsection","attributes":{"name":"Quick reference"},"mdcontent":"#### #### Header\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, ^\\^sup\\^^, ~\\~sub\\~~\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n\n> \\> Quote\n\nStyling will be processed by server after saving.  \nSee manual for more information."},{"type":"textarea","attributes":{"name":"Markdown editor","rows":16,"value":""}},{"type":"button","attributes":{"value":"Convert a CSV-table to Markdown and vice versa","onclick":"api.tool('get', null, 'markdown', 'table')","class":"inlinebutton"}}]]}}
 ```
 
 Sample response with "table"
 ```
-{"content": [{"type": "file","attributes": {"name": "Select CSV-file for conversion","accept": ".csv"}},{"type": "textarea","attributes": {"name": "Markdown editor","value": ""}}]}
+{"dialog":{"options":{"Cancel":false,"Show preview":{"value":true,"class":"reducedCTA"}},"render":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Markdown editor","value":""}}]}}
 ```
 
 > POST ./api/api.php/tool/markdown/{table}
@@ -5599,12 +5580,12 @@ Parameters
 
 Sample response without "table"
 ```
-{"render":{"content":[[{"type":"textsection","attributes":{"name":"Quick reference"},"mdcontent":"#### #### Header\n> \\> Quote\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, ~\\~sub\\~~, ^\\^sup\\^^\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n \nStyling will be processed by server after saving.  \nSee manual for more information."},{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}},{"type":"button","attributes":{"value":"Convert a CSV-table to Markdown and vice versa","onclick":"api.tool('get', 'markdown', 'table')","class":"inlinebutton"}}],[{"type":"textsection","attributes":{"name":"Preview"},"mdcontent":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}]]}}
+{"dialog":{"options":{"Cancel":false,"Show preview":{"value":true,"class":"reducedCTA"}},"render":[[{"type":"textsection","attributes":{"name":"Quick reference"},"mdcontent":"#### #### Header\n\n* \\**italic*\\*, \\*\\***bold**\\*\\*, \\~\\~~~strikethrough~~\\~\\~, ^\\^sup\\^^, ~\\~sub\\~~\n* Linebreaks within paragraphs end with two or more spaces\n* Ordered lists start with numbers and a period, unordered lists with asterisk or dash\n* Nested lists are indented with four spaces\n\n> \\> Quote\n\nStyling will be processed by server after saving.  \nSee manual for more information."},{"type":"textarea","attributes":{"name":"Markdown editor","rows":16,"value":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}},{"type":"button","attributes":{"value":"Convert a CSV-table to Markdown and vice versa","onclick":"api.tool('get', null, 'markdown', 'table')","class":"inlinebutton"}}],[{"type":"textsection","attributes":{"name":"Preview"},"mdcontent":"# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}]]}}
 ```
 
 Sample response with "table"
 ```
-{"content": [{"type": "file","attributes": {"name": "Select CSV-file for conversion","accept": ".csv"}},{"type": "textarea","attributes": {"name": "Markdown editor","value": "| Table header 1 | Table header 2 | Table header 3 | and 4 |\r\n|  -----  |  -----  |  -----  |  -----  |\r\n| *emphasis* | **is** | ***possible*** | `too` |\r\n| linebreaks | are | not | though |"}},{"type": "links","description": "Download CSV-file","content": {"2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv": {"href": "./api/api.php/file/stream/./fileserver/tmp/2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv","download": "2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv"}}}]}
+{"dialog":{"options":{"Cancel":false,"Show preview":{"value":true,"class":"reducedCTA"}},"render":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Markdown editor","value":"| Table header 1 | Table header 2 | Table header 3 | and 4 |\r\n|  -----  |  -----  |  -----  |  -----  |\r\n| *emphasis* | **is** | ***possible*** | `too` |\r\n| linebreaks | are | not | though |"}},{"type":"links","description":"Download CSV-file","content":{"2026-05-16 18-27-27 Table header 1_Table header 2_Table header 3_and 4.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/2026-05-16 18-27-27 Table header 1_Table header 2_Table header 3_and 4.csv","download":"2026-05-16 18-27-27 Table header 1_Table header 2_Table header 3_and 4.csv"}}}]}}
 ```
 
 > GET ./api/api.php/tool/scanner
@@ -5618,7 +5599,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
+{"title":"2D-scanner","render":{"content":[[{"type":"scanner","description":"2D-scanner","destination":"tool_scanner"},{"type":"textarea","attributes":{"name":"Result","rows":8,"readonly":true,"id":"tool_scanner"}}]]}}
 ```
 
 > GET ./api/api.php/tool/zip
@@ -5632,10 +5613,10 @@ Parameters
 
 Sample response
 ```
-{"form": {"data-usecase": "tool_zip", "action": "javascript:api.tool('post', 'zip')"}, "content": [ [ {"type": "textsection", "attributes": {"name": "Select files to add to a ZIP-archive"}, "content": "This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!"}, {"type": "file", "attributes": {"name": "Files to add to archive", "multiple": true}} ], [ {"type": "textsection", "attributes": {"name": Choose an archive to extract files from."}, "content": "You can then download the files separately. Adhere to data safety!"}, {"type": "file", "attributes": {"name": "Archive to unpack"}} ] ]}
+{"title":"Create or unpack a ZIP-archive","render":{"form":{"data-usecase":"tool_zip","action":"javascript:api.tool('post', '[data-usecase=tool_zip]', 'zip')"},"content":[[{"type":"textsection","attributes":{"name":"Select files to add to a ZIP-archive."},"content":"This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!"},{"type":"file","attributes":{"name":"Files to add to archive","multiple":true}}],[{"type":"textsection","attributes":{"name":"Choose an archive to extract files from."},"content":"You can then download the files separately. Adhere to data safety!"},{"type":"file","attributes":{"name":"Archive to unpack"}}]]}}
 ```
 
-> POST ./api/api.php/tool/image
+> POST ./api/api.php/tool/zip
 
 Returns files to download. these can contain a zip file from previously selected other types or extracted files from a provided archive
 
@@ -5646,12 +5627,40 @@ Parameters
 
 Sample response
 ```
-{"render": [ [ {"type": "links", "description": "Download file(s). You may rename archives at your convenience. On exporting sensitive data you are responsible for their safety.", "content": {"app installation.png": {"href": "./api/api.php/file/stream/fileserver/tmp/app installation.png", "download": "app installation.png"}, "testuser_token.png": {"href": "./api/api.php/file/stream/fileserver/tmp/testuser_token.png", "download": "testuser_token.png"}, "app installation.pngtestuser_token.png.zip": {"href": "./api/api.php/file/stream/fileserver/tmp/app installation.pngtestuser_token.png.zip", "download": "app installation.pngtestuser_token.png.zip"}}} ] ]}
+{"dialog":{"options":{"Ok":false},"render":[{"type":"links","description":"Download file(s). You may rename archives at your convenience. On exporting sensitive data you are responsible for their safety.","content":{"erroronline1_token.png.zip":{"href":"./api/api.php/file/stream/./fileserver/tmp/erroronline1_token.png.zip","download":"erroronline1_token.png.zip"}}}]}}
 ```
 
 [Content](#content)
 
 ### User endpoints
+
+> GET ./api/api.php/user/profile
+
+Returns the logged in users system information and custom settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"title":"My profile","render":{"content":[[[{"type":"collapsible","attributes":{"class":"em16"},"content":[{"type":"textsection","attributes":{"name":"Your data within CARO"},"content":"Name: error on line 1\nAuthorized: User, Medical device consultant, Supervisor, Quality management officer, Application admin\nOrganizational units: Prosthetics II, CAD, Silicone Lab, Administration\n \nYou have an order authorization pin. Ask administration for details. \nAverage weekly hours: 2025-11-01 38,5 \n-928.85 hours of overtime as of end of this month \n \nAnnual vacation days: ....
+```
+
+> PATCH ./api/api.php/user/profile
+
+Stores custom settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | user image, application settings |
+
+Sample response
+```
+{redirect: "2","toast": {"msg": "User error on line 1 has been saved","type": "success"}}
+```
 
 > DELETE ./api/api.php/user/user/{id}
 
@@ -5664,7 +5673,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
+{"toast": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
 ```
 
 > GET ./api/api.php/user/user/{id|name}
@@ -5678,7 +5687,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing user","onchange":"api.user('get', 'user', this.value)"},"content":{"...New user":{"selected":true},"CARO App":[],"error on line 1":[],"user":[]}},{"type":"search","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"},"datalist":["CARO App","error on line 1","user"]}],[{"type":"text","attributes":{"name":"Name","required":true,"value":""}},{"type":"checkbox","attributes":{"name":"Authorize"},"content":{"User":[],"Group":[],"Medical device consultant":[],"Supervisor":[],"Office":[],"Human ressources":[],"Purchase":[],"Purchase assistant":[],"Quality management officer":[],"Person responsible for regulatory compliance":[],"CEO":[],"Application admin":[]},....
+{"title":"Manage users","render":{"content":[[{"type":"select","attributes":{"name":"Edit existing user","onchange":"api.user('get', null, 'user', this.value)"},"content":{"...New user":{"selected":true},"CARO App":[],"error on line 1":[],"test":[],"testuser":[]}},{"type":"search","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.user('get', null, 'user', this.value); return false;}"},"datalist":["CARO App","error on line 1","test","testuser"]}],[{"type":"text","attributes":{"name":"Name","required":true,"value":""}},{"type":"checkbox","attributes":{"name":"Authorize"},"content":{"Patient":[],"User":[],"Group":[],"Medical device consultant":[],"Supervisor":[],"Office":[],"Human ressources":[],"Purchase":[],"Purchase assistant":[]....
 ```
 
 > POST/PUT ./api/api.php/user/user/{id}
@@ -5693,35 +5702,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
-```
-
-> GET ./api/api.php/user/profile
-
-Returns the logged in users system information and custom settings.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"content": [[{"type": "textsection","attributes":{"name": "Your data within CARO"},"content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
-```
-
-> PATCH ./api/api.php/user/profile
-
-Stores custom settings.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | user image, application settings |
-
-Sample response
-```
-{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+{"redirect: "2","toast": {"msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
 > DELETE ./api/api.php/user/training/{id}
@@ -5735,7 +5716,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Training deleted","type":"deleted"}}
+{"toast": {"msg": "Training deleted","type": "deleted"}}
 ```
 
 > GET ./api/api.php/user/training/{training_id}/{user_id}
@@ -5750,7 +5731,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"text","attributes":{"name":"Trainee","value":"error on line 1","readonly":true},"datalist":["error on line 1","user"]},{"type":"text","attributes":{"name":"Add training","value":""}},{"type":"text","attributes":{"name":"Time of scheduled training","value":""},"hint":"e.g. a date, month or calendar quarter"},{"type":"hr"},{"type":"date","attributes":{"name":"Date of training"}},{"type":"date","attributes":{"name":"Date of expiry"}},{"type":"number","attributes":{"name":"Experience points"}},{"type":"checkbox","attributes":{"name":"Evaluation"},"content":{"Evaluation is unreasonable, this is a mandatory training.":[]}},{"type":"file","attributes":{"name":"Add document"},"hint":"Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional."}]]}}
+{"dialog":{"options":{"Ok":{"value":true,"class":"reducedCTA"},"No, I am not done yet":false},"render":[[{"type":"text","attributes":{"name":"Trainee","value":"error on line 1","readonly":true},"datalist":["error on line 1","test","testuser"]},{"type":"text","attributes":{"name":"Add training","value":""},"datalist":[]},{"type":"text","attributes":{"name":"Time of scheduled training","value":""},"hint":"e.g. a date, month or calendar quarter"},{"type":"hr"},{"type":"date","attributes":{"name":"Date of training"}},{"type":"date","attributes":{"name":"Date of expiry"}},{"type":"number","attributes":{"name":"Experience points"}},{"type":"checkbox","attributes":{"name":"Evaluation"},"content":{"Evaluation is unreasonable, this training has no impact on product safety.":[]}},{"type":"file","attributes":{"name":"Add document"},"hint":"Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional."}]]}}
 ```
 
 > POST/PUT ./api/api.php/user/training/{id}
@@ -5765,7 +5746,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"undefined language","type":"success"}}
+{"toast":{"msg":"Training has been saved.","type":"success"}}
 ```
 
 [Content](#content)

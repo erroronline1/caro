@@ -244,7 +244,7 @@
 						"type": "documentbutton",
 						"attributes": {
 							"value": "VA Entwicklung anzeigen",
-							"onclick": "api.record('get','displayonly', 'VA Entwicklung')"
+							"onclick": "api.record('get', null, 'document', 'VA Entwicklung', '', 'asModal')"
 						}
 					},
 					{

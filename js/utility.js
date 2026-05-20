@@ -232,9 +232,9 @@ export const _serviceWorker = {
 					});
 				});
 			} catch (e) {
-				api.notification("get", "notifs");
+				api.notification("get", null, "notifs");
 				_serviceWorker.notif.interval = setInterval(() => {
-					api.notification("get", "notifs");
+					api.notification("get", null, "notifs");
 				}, _serviceWorker.notif.interval_duration * 2);
 				document.querySelector("header>div:nth-of-type(2)").style.display = "block";
 				return;
@@ -363,7 +363,7 @@ export const _client = {
 			const formdata = new FormData();
 			if (typeof inputElement === "string") inputElement = document.getElementById(inputElement);
 			if (inputElement) formdata.append(api._lang.GET("tool.markdown.editor"), inputElement.value);
-			api.tool("post", "markdown", null, formdata);
+			api.tool("post", formdata, "markdown", null);
 		},
 
 		/**
@@ -380,7 +380,7 @@ export const _client = {
 			for (const [key, val] of Object.entries(othervalues)) {
 				formdata.append(key, val);
 			}
-			api.record("post", "identifier", appendDate, formdata);
+			api.record("post", formdata, "identifier", appendDate);
 		},
 
 		/**
@@ -538,7 +538,7 @@ export const _client = {
 			if (limits.length && amount > limits.pop()) {
 				const options = {};
 				options[api._lang.GET("general.cancel_button")] = false;
-				options[api._lang.GET("message.navigation.conversations")] = { value: true, class: "reducedCTA", onclick: 'api.message("get", "conversation")' };
+				options[api._lang.GET("message.navigation.conversations")] = { value: true, class: "reducedCTA", onclick: 'api.message("get", null, "conversation")' };
 				new Dialog({
 					type: "confirm",
 					header: api._lang.GET("message.navigation.conversations"),
@@ -621,7 +621,7 @@ export const _client = {
 				"FormData"
 			).then((response) => {
 				if (response) {
-					api.message("post", "message", response);
+					api.message("post", response, "message");
 				}
 			});
 		},
@@ -764,13 +764,13 @@ export const _client = {
 				groupby = {};
 
 			// construct filter checkboxes with events
-			orderstate[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", null, "unprocessed")', value: "unprocessed" };
-			orderstate[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", null, "ordered")', value: "ordered" };
-			orderstate[api._lang.GET("order.order.delivered_partially")] = { onchange: 'api.purchase("get", "approved",null, "delivered_partially")', value: "delivered_partially" };
-			orderstate[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.purchase("get", "approved", null, "delivered_full")', value: "delivered_full" };
-			orderstate[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.purchase("get", "approved", null,"issued_partially")', value: "issued_partially" };
-			orderstate[api._lang.GET("order.order.issued_full")] = { onchange: 'api.purchase("get", "approved", null, "issued_full")', value: "issued_full" };
-			orderstate[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", null, "archived")', value: "archived" };
+			orderstate[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.order("get", null, "approved", null, "unprocessed")', value: "unprocessed" };
+			orderstate[api._lang.GET("order.order.ordered")] = { onchange: 'api.order("get", null, "approved", null, "ordered")', value: "ordered" };
+			orderstate[api._lang.GET("order.order.delivered_partially")] = { onchange: 'api.order("get", null, "approved",null, "delivered_partially")', value: "delivered_partially" };
+			orderstate[api._lang.GET("order.order.delivered_full")] = { onchange: 'api.order("get", null, "approved", null, "delivered_full")', value: "delivered_full" };
+			orderstate[api._lang.GET("order.order.issued_partially")] = { onchange: 'api.order("get", null, "approved", null,"issued_partially")', value: "issued_partially" };
+			orderstate[api._lang.GET("order.order.issued_full")] = { onchange: 'api.order("get", null, "approved", null, "issued_full")', value: "issued_full" };
+			orderstate[api._lang.GET("order.order.archived")] = { onchange: 'api.order("get", null, "approved", null, "archived")', value: "archived" };
 			orderstate[api._lang.GET("order.order." + data.state)].checked = true;
 
 			content.push([
@@ -844,7 +844,7 @@ export const _client = {
 						attributes: {
 							value: api._lang.GET("order.export"),
 							class: "inlinebutton",
-							onclick: 'api.purchase("get", "export", "null", "' + data.state + '")',
+							onclick: 'api.order("get", null, "export", "null", "' + data.state + '")',
 						},
 					}
 				);
@@ -854,7 +854,7 @@ export const _client = {
 				attributes: {
 					value: api._lang.GET("order.refresh"),
 					class: "inlinebutton",
-					onclick: 'api.purchase("get", "approved", null, "' + data.state + '")',
+					onclick: 'api.order("get", null, "approved", null, "' + data.state + '")',
 				},
 			});
 
@@ -926,7 +926,7 @@ export const _client = {
 			for (const input of inputs) {
 				if (input.value === stateinput.value) input.checked = stateinput.checked;
 			}
-			api.purchase("patch", "approved", orders.join("_"), stateinput.value, stateinput.checked);
+			api.order("patch", null, "approved", orders.join("_"), stateinput.value, stateinput.checked);
 		},
 		full: (data, preventcollapsible = undefined) => {
 			// displays full fledged information of every item as article
@@ -1342,7 +1342,7 @@ export const _client = {
 									},
 									"FormData"
 								).then((response) => {
-									if (response) api.purchase("patch", "approved", "element.id", "addinformation", response);
+									if (response) api.order("patch", response, "approved", "element.id", "addinformation");
 								});
 							}
 								.toString()
@@ -1439,7 +1439,7 @@ export const _client = {
 					for (const [attribute, value] of Object.entries(attributes)) states[api._lang.GET("order.order." + state)][attribute] = value;
 					if (attributes["data-" + state] === "true") states[api._lang.GET("order.order." + state)].checked = true;
 					if (!attributes.disabled && !states[api._lang.GET("order.order." + state)].onchange)
-						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('patch', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+						states[api._lang.GET("order.order." + state)].onchange = "api.order('patch', null, 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				// conditional customizing
 				if (states[api._lang.GET("order.order.delivered_partially")] && !states[api._lang.GET("order.order.delivered_partially")].disabled) {
@@ -1448,7 +1448,7 @@ export const _client = {
 					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 					states[api._lang.GET("order.order.delivered_partially")].onchange = function () {
-						api.purchase("patch", "approved", "element.id", "delivered_partially", this.checked);
+						api.order("patch", null, "approved", "element.id", "delivered_partially", this.checked);
 						this.setAttribute("data-delivered_partially", this.checked.toString());
 						if (this.checked)
 							new _client.Dialog(
@@ -1468,7 +1468,7 @@ export const _client = {
 								},
 								"FormData"
 							).then((response) => {
-								if (response) api.purchase("patch", "approved", "element.id", "addinformation", response);
+								if (response) api.order("patch", response, "approved", "element.id", "addinformation");
 							});
 					}
 						.toString()
@@ -1501,7 +1501,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("patch", "approved", "element.id", "disapproved", response);
+									api.order("patch", response, "approved", "element.id", "disapproved");
 									this.disabled = true;
 									this.setAttribute("data-disapproved", "true");
 								} else this.checked = false;
@@ -1538,7 +1538,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("patch", "approved", "element.id", "cancellation", response);
+									api.order("patch", response, "approved", "element.id", "cancellation");
 									this.disabled = true;
 									this.setAttribute("data-cancellation", "true");
 								} else this.checked = false;
@@ -1595,7 +1595,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("patch", "approved", "element.id", "return", response);
+									api.order("patch", response, "approved", "element.id", "return");
 									this.disabled = true;
 									this.setAttribute("data-return", "true");
 								} else this.checked = false;
@@ -1641,7 +1641,7 @@ export const _client = {
 								).then((response) => {
 									if (response) {
 										response[api._lang.GET("order.additional_info")] = api._lang.GET("order.orderstate_description") + " - " + this.value + ": " + response[api._lang.GET("order.additional_info")];
-										api.purchase("patch", "approved", "element.id", "addinformation", response);
+										api.order("patch", response, "approved", "element.id", "addinformation");
 									}
 								});
 							}
@@ -1676,7 +1676,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({ type: "confirm", header: api._lang.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
-									if (confirmation) api.purchase("delete", "approved", "element.id");
+									if (confirmation) api.order("delete", null, "approved", "element.id");
 								});
 							}
 								.toString()
@@ -1695,14 +1695,12 @@ export const _client = {
 						attributes: {
 							value: api._lang.GET("consumables.product.add_new"),
 							onclick:
-								"api.purchase('get', 'product', '" +
-								JSON.stringify({
+								"api.consumables('get', " + JSON.stringify({
 									article_no: element.ordernumber ? element.ordernumber : "",
 									article_name: element.name ? element.name : "",
 									article_unit: element.unit ? element.unit : "",
 									vendor_name: element.vendor ? element.vendor : "",
-								}) +
-								"'); _client.application.closeParentDialog(this);",
+								}) + ", 'product'); _client.application.closeParentDialog(this);",
 						},
 					});
 				}
@@ -1751,7 +1749,7 @@ export const _client = {
 						attributes: {
 							class: "inlinebutton",
 							value: api._lang.GET("order.productlink"),
-							onclick: "api.purchase('get', 'product', " + element.productid + "); _client.application.closeParentDialog(this);",
+							onclick: "api.consumables('get', null, 'product', " + element.productid + "); _client.application.closeParentDialog(this);",
 						},
 					});
 				}
@@ -1768,9 +1766,9 @@ export const _client = {
 									"if (!this.disabled) {" +
 									"formdata = new FormData();" +
 									`formdata.append(api._lang.GET("order.sample_check.checked_order"), "${element.ordertext ? element.ordertext.replaceAll(/\n/g, " ") : ""}");` +
-									"api.purchase('post', 'incorporation', " +
+									"api.consumables('post', formdata, 'incorporation', " +
 									element.incorporation.item +
-									", formdata);}" +
+									");}" +
 									" this.disabled = true",
 							},
 						});
@@ -1793,9 +1791,9 @@ export const _client = {
 									"if (!this.disabled) {" +
 									"formdata = new FormData();" +
 									`formdata.append(api._lang.GET("order.sample_check.checked_order"), "${element.ordertext ? element.ordertext.replaceAll(/\n/g, " ") : ""}");` +
-									"api.purchase('post', 'mdrsamplecheck', " +
+									"api.consumables('post', formdata, 'mdrsamplecheck', " +
 									element.samplecheck.item +
-									", formdata);}" +
+									");}" +
 									" this.disabled = true",
 							},
 						});
@@ -2173,8 +2171,8 @@ export const _client = {
 								":user": record.last_user,
 							}),
 							a: {
-								onclick: "api.record('get', 'record', '" + record.identifier + "')",
-								onkeydown: "if (event.key==='Enter') api.record('get', 'record', '" + record.identifier + "')",
+								onclick: "api.record('get', null, 'record', '" + record.identifier + "')",
+								onkeydown: "if (event.key==='Enter') api.record('get', null, 'record', '" + record.identifier + "')",
 								style: "cursor:pointer",
 								role: "link",
 								tabindex: "0",
@@ -2204,8 +2202,8 @@ export const _client = {
 					context.push({
 						type: "tile",
 						attributes: {
-							onclick: "api.record('get', 'record', '" + record.identifier + "')",
-							onkeydown: "if (event.key==='Enter') api.record('get', 'record', '" + record.identifier + "')",
+							onclick: "api.record('get', null, 'record', '" + record.identifier + "')",
+							onkeydown: "if (event.key==='Enter') api.record('get', null, 'record', '" + record.identifier + "')",
 							role: "link",
 							tabindex: "0",
 						},

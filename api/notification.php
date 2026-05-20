@@ -19,8 +19,8 @@ class NOTIFICATION extends API {
 	 * handle all notification within one call
 	 */
 
-	public $_requestedMethod = REQUEST[1];
-	public $_cronOverride = REQUEST[2] ?? false;
+	public ?string $_requestedMethod = REQUEST[1];
+	public mixed $_cronOverride = REQUEST[2] ?? false;
 	public $_users = [];
 	public $_unit_members = [];
 
@@ -437,7 +437,7 @@ class NOTIFICATION extends API {
 													':days' => $last->diff($this->_date['servertime'])->days,
 													':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 													':document' => $row['last_document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),			
-													':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+													':identifier' => "<a href=\"javascript:javascript:api.record('get', null, 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 												], true);
 											}
 										}
@@ -473,7 +473,7 @@ class NOTIFICATION extends API {
 
 												if (!isset($missingretention_notif[$unit_member])) $missingretention_notif[$unit_member] = [];
 												$missingretention_notif[$unit_member][] = $this->_lang->GET('record.lifespan.reminder_message', [
-													':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+													':identifier' => "<a href=\"javascript:javascript:api.record('get', null, 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 												], true);
 											}
 										}
@@ -634,7 +634,7 @@ class NOTIFICATION extends API {
 											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
 												':days' => $delivered_full->diff($this->_date['servertime'])->days,
 												':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
-												':ordertext' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'' . rawurlencode($decoded_order_data['commission']) . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
+												':ordertext' => '<a href="javascript:void(0);" onclick="api.order(\'get\', null, \'approved\', \'' . rawurlencode($decoded_order_data['commission']) . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
 												':vendor' => strip_tags($decoded_order_data['vendor_label'] ?? ''),
 												':commission' => preg_replace('/\*/', '\\*', addslashes(strip_tags($decoded_order_data['commission']))), // add asterisk masking to avoid dob resulting in wrong formatting
 												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
