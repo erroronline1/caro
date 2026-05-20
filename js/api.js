@@ -737,7 +737,7 @@ export const api = {
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
 
-						if (request[2])
+						if (request[1] === 'start' && request[2])
 							//search
 							document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
 				}
