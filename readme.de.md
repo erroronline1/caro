@@ -1,4 +1,4 @@
-![CARO logo](media/favicon/icon72.png)
+![CARO logo](https://github.com/erroronline1/caro/blob/master/media/favicon/icon72.png?raw=true)
 # CARO - Cloud Assisted Records and Operations
 Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lokale Apache- oder IIS-Server-Umgebungen.
 
@@ -285,7 +285,7 @@ Eine solche Ersetzung könnte beispielsweise *Adressat* genannt werden. Sobald e
 Bei der Erstellung eines Textes können die jeweils passenden grammatikalische Fälle vorbereitet verden (z.B. *:AdressatNominativ, *:AdressatAkkusativ, :AdressatDativ, etc.). Undefinierte Platzhalter erzeugen im Formular ein Eingabefeld, welches im weiteren Verlauf wiederverwendet wird:
 
 *"Der Doktor ist ein außerirdischer Zeitreisender der zuletzt von :actor gespielt wurde. In Staffel :season wird :pronoun von :companion begleitet."*  
-*"Der Doktor ist ein außerirdischer Zeitreisender der zuletzt von **Ncuti Gatwa** gespielt wurde. In Staffel **15** wird **er** von **Belinda Chandra** begleitet."*
+wird zu *"Der Doktor ist ein außerirdischer Zeitreisender der zuletzt von __Ncuti Gatwa__ gespielt wurde. In Staffel __15__ wird __er__ von __Belinda Chandra__ begleitet."*
 
 Die [Lieferantenverwaltung](#lieferanten--und-artikelverwaltung) nutzt systemseitig vordefinierte Platzhalter. Textvorschläge die beispielsweise :CUSTOMERID, :PRODUCTS oder :EXPIREDDOCUMENTS nutzen können für diese vorbereitete Werte importieren.
  
@@ -796,7 +796,7 @@ Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
-Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX` für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll, muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
+Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX` für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll, muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe etwa folgendermaßen aus:
 ```
 2023-07-01; 15
 2024-01-01; 30
@@ -804,7 +804,7 @@ Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahre
 ```
 Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar. Bitte weise den Nutzer darauf hin etwaige Überzeit zu Beginn der Erfassung als Korrekturwert anzugeben.
 
-Es ist auch ein Jahresüberblick verfügbar, der dienstfreie Tage, Resturlaub und Überstunden für das laufende Jahr darstellt, was beispielsweise praktisch ist um Mitarbeiter daran zu erinnern den Urlaub rechtzeitig zu planen. Die Inhalte dieser Übersicht entsprechen denen der Arbeitszeitübersichten (betroffener Nutzer, Bereichtmitarbeiter für Bereichsleiter oder alle für berechtige Nutzer).
+Es ist auch ein Jahresüberblick verfügbar, der dienstfreie Tage, Resturlaub und Überstunden für das laufende Jahr darstellt, was beispielsweise praktisch ist um Mitarbeiter daran zu erinnern den Urlaub rechtzeitig zu planen. Die Inhalte dieser Übersicht entsprechen denen der Arbeitszeitübersichten (betroffener Nutzer, Bereichsmitarbeiter für Bereichsleiter oder alle für berechtige Nutzer).
 
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
@@ -1342,7 +1342,7 @@ Verschachtelte geordnete Listen rotieren durch arabische Nummern, große römisc
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
 | --- | --- | --- | --- |
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
-| Zeilenumbrüche | sind es | **^^jedoch^^** | nicht<br />ohne den<br />HTML-Befehl `<br />` |
+| Zeilenumbrüche | sind es | **++jedoch++** | nicht<br />ohne den<br />HTML-Befehl `<br />` |
 | aber | eine | spaltenweise | Ausrichtung |
 
 # Zitate, Code und Definitionen
@@ -1700,7 +1700,8 @@ Sofern die Ausgabe eines verarbeiteten Filters (z.B. für einen CSV-Filter) in e
     }
 }
 ```
-Für weitere Optionen wird auf die Dokumentation der [OpenSpout-Bibliothek]https://github.com/openspout/openspout/blob/5.x/docs/documentation.md) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
+
+Für weitere Optionen wird auf die Dokumentation der [OpenSpout-Bibliothek](https://github.com/openspout/openspout/blob/5.x/docs/documentation.md) verwiesen. Etwaige Formeln müssen der englischen Schreibweise entsprechen.
 
 Auch die Ausgabe als PDF ist möglich, hier kann die Spaltenbreite bestimmt werden.
 
@@ -1834,11 +1835,11 @@ Dokumente können ein digitales Unterschriftenfeld beinhalten. Gemäß eIDAS
 > Eine fortgeschrittene elektronische Signatur erfüllt alle folgenden Anforderungen:  
 > (a) Sie ist eindeutig dem Unterzeichner zugeordnet.  
 > (b) Sie ermöglicht die Identifizierung des Unterzeichners.  
-> (c) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
+> (c\) Sie wird unter Verwendung elektronischer Signaturerstellungsdaten erstellt, die der Unterzeichner mit einem hohen Maß an Vertrauen unter seiner alleinigen Kontrolle verwenden kann.  
 > (d) Sie ist so mit den auf diese Weise unterzeichneten Daten verbunden, dass eine nachträgliche Veränderung der Daten erkannt werden kann.
 
 bezüglich (a) und (b): Unterschriften werden händisch gezeichnet und als Bilddatei anstelle unkenntlicher Datensätze gespeichert. Das Bild ist mit offiziellen Ausweisdokumenten abgleichbar. Die Identität des Unterzeichners ist sichergestellt, da die Unterschrift persönlich und vor Ort stattfindet.  
-bezüglich (c): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.  
+bezüglich (c\): handschriftliche Unterschriften liegen gänzlich in der Kontrolle des Unterzeichnenden. Die visuelle Einbindung kann eindeutig vor der Absendung gebilligt werden. Die unterzeichneten Daten sind stets in der selben Ansicht wie das Unterschriftenfeld.  
 bezüglich (d): Der Dateien-Hash der Bilddatei ist Teil der Aufzeichnungen und über eine Blockchain gesichert. Eine nachträgliche Veränderung der Unterschrift oder der Daten macht die gesamte Aufzeichnung ungültig.
 
 Es wird die Absprache mit dem Datenschutzbeauftragten empfohlen ob das als elektronische Unterschrift anerkannt wird.
@@ -1862,7 +1863,7 @@ Anwendungsunterstützung Legende:
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 Allgemeine Anforderungen an das Qualitäts-managementsystem | teilweise, strukturell | &bull; Die Erfüllung regulatorischer Anforderungen kann gegengeprüft werden, sofern Dokumenten die regulatorischen Zusammenhänge zugeordnet wurden.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Dokumente](#dokumente), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse für Medizinprodukte gemäß ISO 14971 um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben. Die entsprechende Eingabemaske dürfte auch geeignet sein um Risiken im Allgemeinen zu erfassen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
-| ISO 13485 4.1.3 Prozessüberwachung | teilweise, strukturell | &bull; Nutzerrollen und Schulungen<br/>&bull; Verantwortlichkeiten<br/>&bull; Verbesserungsvorschläge<br/>&bull; Aufzeichnungen<br/>&bull; Dokumentenlenkung<br/>&bull; Interne Audits<br/>&bull; Managementbewertung<br/>&bull; Beschaffung<br/>&bull; Lieferantenbewertung<br/>&bull; Checkliste über regulatorische Erfüllung<br/>&bull; Bestellstatistiken&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | [Nutzer](#nutzer), [Verantwortlichkeiten](#verantwortlichkeiten), [Verbesserungsvorschläge](#verbesserungsvorschläge), [Aufzeichnungen](#aufzeichnungen-1), [Dokumente](#dokumente), [Audit](#audit), [Managementbericht](#managementbericht), [Bestellung](#bestellung), [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) | 
+| ISO 13485 4.1.3 Prozessüberwachung | teilweise, strukturell | &bull; Nutzerrollen und Schulungen<br/>&bull; Verantwortlichkeiten<br/>&bull; Verbesserungsvorschläge<br/>&bull; Aufzeichnungen<br/>&bull; Dokumentenlenkung<br/>&bull; Interne Audits<br/>&bull; Managementbewertung<br/>&bull; Beschaffung<br/>&bull; Lieferantenbewertung<br/>&bull; Checkliste über regulatorische Erfüllung<br/>&bull; Bestellstatistiken&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | [Nutzer](#nutzer), [Verantwortlichkeiten](#verantwortlichkeiten), [Verbesserungsvorschläge](#verbesserungsvorschläge), [Aufzeichnungen](#aufzeichnungen-1), [Dokumente](#dokumente), [Audit](#audit), [Managementbericht](#managementbericht), [Bestellung](#bestellung), [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 13485 4.1.4 Prozesslenkung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.1.5 Ausgegliederte Prozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.1.6 Validierung der Anwendung von Computersoftware | strukturell | &bull; Entsprechende Dokumente erfordern ein Kennzeichen, ähnlich Versorgungsdokumentationen. Software kann ebenfalls ein individuelles Kennzeichen zugeteilt bekommen.<br/>&bull; Computersoftware und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel (7.6) betrachtet werden.<br/>&bull; *Aufzeichnung über Dokumente mit "Überwachung von Arbeitsmitteln"-Kontext* | |
