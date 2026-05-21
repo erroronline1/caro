@@ -742,6 +742,15 @@ export const api = {
 							document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
 				}
 			}
+			if (data.dialog) {
+				const options = {};
+				options[api._lang.GET("general.ok_button")] = false;
+				new Dialog({
+					type: "input",
+					render: data.dialog.render,
+					options: options,
+				});
+			}
 			if (data.notif) _serviceWorker.notif.calendar(data.notif);
 			if (data.redirect) api.application("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
