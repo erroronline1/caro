@@ -66,8 +66,8 @@ Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will 
     | --- | ----- |
     | course | tables|
     
-        1. and lists
-        2. if additionally indented
+    1. and lists
+    3. with the next type though
 
 [referencelink]: http://valid.reference.match
 
@@ -114,7 +114,7 @@ Nested ordered lists cycle through arabic numerals, roman numerals uppercase, ro
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | ---: | :---: | :--- |
 | *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | **^^not^^** | though without<br /> HTML `<br />` |
+| linebreaks | are | **++not++** | though without<br /> HTML `<br />` |
 | and | aligning | text | columnwise |
 
 # Blockquotes, code and definition lists

@@ -6654,7 +6654,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v3.0.0
+    * v3.0.2
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)

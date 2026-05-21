@@ -7,29 +7,29 @@ require_once('./src/Markdown.php');
 $defaultSample = file_get_contents('./sample.md');
 
 $methods = [
-	//"safeMode", // safeMode must come first to disable unsupported tags; can not render inline events and scripts to avoid malicious inserts
-	"emphasis", // should come second to avoid to avoid modifying custom class insertions having unserscore in their name
-	"footnote", // should come third to avoid mishandling indentation and reutilizing list and superscript
-	"blockquote", // should come fourth to enable nesting
-	"reference", // before a and footnote to not mess up with similar patterns
-	"headings", // before hr avoiding conversion of ----
-	"horizontal_rule", // before emphasis avoiding matching *** as emphasis
-	"definition",
-	"task", // before list otherwise only the first occasionally nested item is converted
-	"list",
-	"anchor", // safeMode can not render anchors to avoid malicious scripts
-	"code", // after list to avoid erroneous indentation matching, after anchor to enable anchor code escaping
-	"mailto", // safeMode can not render anchors to avoid malicious scripts
-	"image",
-	"mark",
-	"strikethrough",
-	"subscript",
-	"superscript",
-	"table",
-	"fontsize", // after tables for handling -- characters; THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
-	"typographer",
-	"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-	"linebreak",
+		"code", // must come first to enable escaping to avoid unintended conversion
+		//"safeMode", // prior to tasks, definition and reference avoiding invalidation of allowed input and anchors
+		"footnote", // should come prior to indentation-, list- and superscript-handling
+		"blockquote", // should come prior to other blocks to enable nesting
+		"reference", // before a and footnote to not mess up with similar patterns
+		"definition",
+		"headings", // before hr avoiding conversion of ----
+		"horizontal_rule", // prior to list avoiding conversion of - - -
+		"list",
+		"table",
+		"anchor", // prior to emphasis to escape underscore; safeMode can not render anchors to avoid malicious scripts
+		"mailto", // prior to emphasis to escape underscore; safeMode can not render anchors to avoid malicious scripts
+		"image", // prior to emphasis to escape underscore;
+		"task", 
+		"mark",
+		"strikethrough",
+		"subscript",
+		"superscript",
+		"emphasis",
+		"fontsize", // after tables for handling -- characters; THIS IS A CUSTOM MARKDOWN PROPERTY TO THIS FLAVOUR
+		"typographer",
+		"paragraph", // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		"linebreak",
 ];
 
 class md extends \erroronline1\Markdown\Markdown{
@@ -78,6 +78,7 @@ $end = microtime(true);
 	}
 	th:not([class]), td:not([class]) {
 		width:33vw;
+		max-width:33vw;
 		vertical-align: top;
 		padding: 1em 2em;
 	}
@@ -204,7 +205,9 @@ td:not([class]):nth-of-type(2){
 <body>
 	<table>
 		<tr>
-			<th>Input</th>
+			<th>
+				Input
+			</th>
 			<th>
 				PHP (<?= round(($end - $start) * 1000, 2); ?> ms)
 			</th>
