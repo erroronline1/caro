@@ -84,6 +84,43 @@ class APPLICATION extends API {
 	 * display application info 
 	 */
 	public function about(){
+		if ($this->_requestedManual){
+			if (!in_array($this->_requestedManual, ['readme.md', 'readme.de.md'])) $this->response([], 404);
+			$content = file_get_contents('../' . $this->_requestedManual);
+			/*$summary = [
+				'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', str_replace('.', '_', $this->_requestedManual) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+				'identifier' => null,
+				'content' => $content,
+				'files' => [],
+				'images' => [],
+				'title' => $this->_requestedManual,
+				'date' => $this->_date['usertime']->format('Y-m-d H:i')
+			];
+
+			$downloadfiles = [];
+			require_once('./_tcpdfinterface.php');
+			$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
+			$file = $PDF->auditPDF($summary);
+			$downloadfiles[$this->_requestedManual] = [
+				'href' => $this->_filehandler->getFileLink($file),
+				'download' => pathinfo($file)['basename']
+			];
+			*/
+			$this->response([
+				'dialog' => [
+					'render' => [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_requestedManual
+							],
+							'mdcontent' => $content
+						]					
+					]
+				]
+			]);
+		}
+
 		$lines = ['frontend' => 0, 'backend' => 0, 'code' => 0, 'documentation' => 0, 'configuration' => 0];
 		foreach (['../', '../js', '../api'] as $dir){
 			foreach (scandir($dir) as $file){
@@ -166,15 +203,25 @@ class APPLICATION extends API {
 					'name' => $this->_lang->GET('application.about.license_header')
 				],
 				'content' => $this->_lang->GET('_LICENSE')
-			],
-			[
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'value' => 'readme.md',
+					'onclick' => 'api.application("get", null, "about", "readme.md")'
+				]
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'value' => 'readme.de.md',
+					'onclick' => 'api.application("get", null, "about", "readme.de.md")'
+				]
+			], [
 				'type' => 'links',
 				'description' => $this->_lang->GET('application.about.source_header'),
 				'content' => [
 					$this->_lang->GET('application.about.source') => ['target' => '_blank']
 				]
-			],
-			[
+			], [
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => $this->_lang->GET('application.about.lines_header')
