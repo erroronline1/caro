@@ -56,17 +56,23 @@ class RESPONSIBILITY extends API {
 						':id' => intval($this->_requestedID),
 						':assigned_users' => UTILITY::json_encode(($responsibility['assigned_users'])),
 						':proxy_users' => $responsibility['proxy_users']
-				])) $this->response([
-					'toast' => [
-						'msg' => $this->_lang->GET('responsibility.accepted_success'),
-						'type' => 'success'
-					]]);
+				])) {
+					require_once('./notification.php');
+					$notifications = new NOTIFICATION(get_class_vars(get_class($this)));
+					$this->response([
+						'toast' => [
+							'msg' => $this->_lang->GET('responsibility.accepted_success'),
+							'type' => 'success'
+						],
+						'notif' => ['responsibilities' => $notifications->responsibilities()]
+					]);
+				}
 				else $this->response([
 					'toast' => [
 						'msg' => $this->_lang->GET('responsibility.accepted_error'),
 						'type' => 'error'
-					]]);
-				
+					]
+				]);
 				break;
 			case 'GET':
 				$response = [

@@ -1,4 +1,4 @@
-![CARO logo](media/favicon/icon72.png)
+![CARO logo](https://github.com/erroronline1/caro/blob/master/media/favicon/icon72.png?raw=true)
 # CARO - Cloud Assisted Records and Operations
 A quality management software as device agnostic web-app for local Apache- or IIS-server environments.
 
@@ -381,7 +381,7 @@ Such a replacement may be named *addressee*. If a generic text chunk contains :a
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNominative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
 
 *"The Doctor is an alien timetraveller recently portrayed by :actor. In season :season :pronoun is accompanied by :companion."*  
-rendered to *"The Doctor is an alien timetraveller recently portrayed by **Ncuti Gatwa**. In season **15** **he** is accompanied by **Belinda Chandra**."*
+rendered to *"The Doctor is an alien timetraveller recently portrayed by __Ncuti Gatwa__. In season __15__ __he__ is accompanied by __Belinda Chandra__."*
 
 The [vendor management](#vendor-and-product-management) makes use of system preset placeholders. Text recommendations making use of :CUSTOMERID, :PRODUCTS or :EXPIREDDOCUMENTS for example can import prepared values for these.
 
@@ -1443,7 +1443,7 @@ Nested ordered lists cycle through arabic numerals, roman numerals uppercase, ro
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | ---: | :---: | :--- |
 | *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | **^^not^^** | though without<br /> HTML `<br />` |
+| linebreaks | are | **++not++** | though without<br /> HTML `<br />` |
 | and | aligning | text | columnwise |
 
 # Blockquotes, code and definition lists
@@ -1935,11 +1935,11 @@ Documents can contain a digital signature pad. According to eIDAS
 > An advanced electronic signature shall meet the following requirements:  
 > (a) it is uniquely linked to the signatory;  
 > (b) it is capable of identifying the signatory;  
-> (c) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
+> (c\) it is created using electronic signature creation data that the signatory can, with a high level of confidence, use under his sole control; and  
 > (d) it is linked to the data signed therewith in such a way that any subsequent change in the data is detectable.
 
 regarding (a) and (b): signatures are done manually and are stored as an image instead of obscure data-strings. The image is compareable to official IDs or passports. The signatories identity is ensured because the signature takes place in person at the working site.  
-regarding (c): handwritten signatures are solely under the signatories control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
+regarding (c\): handwritten signatures are solely under the signatories control. The visual integration can be clearly approveable before submission. Signed data is always in the same viewport as the signature pad.  
 regarding (d): the signatures image file hash is part of the record and secured via blockchain. Subsequent changes of the signature or the data invalidate the whole record.
 
 Consult your data protection supervisor if this is sufficient for an electronic signature.
@@ -5267,7 +5267,7 @@ Parameters
 
 Sample response
 ```
-{"toast":{"msg":"Acceptance confirmed. Thank you for shouldering responsibility!","type":"success"}}
+{"toast":{"msg":"Acceptance confirmed. Thank you for shouldering responsibility!","type":"success"},"notif":{"responsibilities":0}}
 ```
 
 > DELETE ./api/api.php/responsibility/responsibility/{id|type}
