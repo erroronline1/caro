@@ -87,10 +87,12 @@ class APPLICATION extends API {
 		if ($this->_requestedManual){
 			if (!in_array($this->_requestedManual, ['readme.md', 'readme.de.md'])) $this->response([], 404);
 			$content = file_get_contents('../' . $this->_requestedManual);
-			/*$summary = [
+			/*
+			// this works in theory but page breaking is not an easy tasg with long images and within table cells, so this option is postponed
+			$summary = [
 				'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', str_replace('.', '_', $this->_requestedManual) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 				'identifier' => null,
-				'content' => $content,
+				'content' => [$content],
 				'files' => [],
 				'images' => [],
 				'title' => $this->_requestedManual,
@@ -99,12 +101,24 @@ class APPLICATION extends API {
 
 			$downloadfiles = [];
 			require_once('./_tcpdfinterface.php');
-			$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
+			$settings = CONFIG['pdf']['record'];
+			$settings['fontsize'] = 8;
+			$PDF = new PDF($settings, $this->_sqlinterface);
 			$file = $PDF->auditPDF($summary);
 			$downloadfiles[$this->_requestedManual] = [
 				'href' => $this->_filehandler->getFileLink($file),
 				'download' => pathinfo($file)['basename']
 			];
+			$this->response([
+				'dialog' => [
+					'render' => [
+						[
+							'type' => 'links',
+							'content' => $downloadfiles
+						]					
+					]
+				]
+			]);
 			*/
 			$this->response([
 				'dialog' => [
