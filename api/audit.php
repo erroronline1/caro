@@ -639,7 +639,7 @@ class AUDIT extends API {
 		$audits = $this->_sqlinterface->EXECUTE('audit_get');
 		foreach ($audits as $audit){
 			if (!$audit['closed']) continue;
-			if ($from > substr($audit['last_touch'], 0 , 10) || $until < substr($audit['last_touch'], 0, 10)) continue;
+			if ($from > substr($audit['last_touch'], 0 ,10) || $until < substr($audit['last_touch'], 0, 10)) continue;
 			$audit['content'] = json_decode($audit['content'], true);
 			$current = [
 				[
@@ -2058,7 +2058,7 @@ class AUDIT extends API {
 		$managementreviews = $this->_sqlinterface->EXECUTE('management_get');
 		foreach ($managementreviews as $managementreview){
 			if (!$managementreview['closed']) continue;
-			if ($from > $managementreview['last_touch'] || $until < $managementreview['last_touch']) continue;
+			if ($from > substr($managementreview['last_touch'], 0 ,10) || $until < substr($managementreview['last_touch'], 0, 10)) continue;
 			$managementreview['content'] = json_decode($managementreview['content'], true);
 			$current = [
 				[
