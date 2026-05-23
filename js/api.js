@@ -262,7 +262,7 @@ export const api = {
 			top: 0,
 			behavior: "smooth",
 		});
-		document.querySelector("#menustart").focus();
+		if (document.querySelector("#menustart")) document.querySelector("#menustart").focus();
 	},
 
 	/**
@@ -1108,7 +1108,7 @@ export const api = {
 				render.processAfterInsertion();
 				api.preventDataloss.start();
 			}
-			if (data.redirect) api.order("get", null, ...data.redirect);
+			if (data.redirect) api.file("get", null, ...data.redirect);
 			if (data.data) {
 				if (request[4] === "filereference") {
 					// this is no real api endpoint but used for routing the behaviour of the successFn
