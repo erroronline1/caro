@@ -81,26 +81,29 @@ class FILE extends API {
 							':path' => $file['path']
 						];
 					}
+				}
 
-					// process provided linked ressources from a wrapped link input
-					foreach ($this->_payload as $key => $value){
-						if (preg_match("/^" . $this->_lang->PROPERTY('file.external_file.link') . "/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
-							$insertions[] = [
-								':author' => $_SESSION['user']['name'],
-								':path' => $link[1]
-							];
-						}
+				// process provided linked ressources from a wrapped link input
+				foreach ($this->_payload as $key => $value){
+					if (preg_match("/^" . $this->_lang->PROPERTY('file.external_file.link') . "/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
+						$insertions[] = [
+							':author' => $_SESSION['user']['name'],
+							':path' => $link[1]
+						];
 					}
+				}
 
-					// insert files and ressources to database
-					$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('file_external_documents_post'), $insertions);
-					$success = boolval(array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)));
-					if ($success){		
-						$this->response(['toast' => [
+				// insert files and ressources to database
+				$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('file_external_documents_post'), $insertions);
+				$success = boolval(array_sum($this->_sqlinterface->EXECUTE($sqlQueryStack)));
+				if ($success){		
+					$this->response([
+						'toast' => [
 							'msg' => $this->_lang->GET('file.manager.new_file_created'),
 							'type' => 'success'
-						]]);
-					}
+						],
+						'redirect' => ['externalfilemanager']
+					]);
 				}
 				$this->response(['toast' => [
 					'msg' => $this->_lang->GET('file.manager.error'),
@@ -267,7 +270,7 @@ class FILE extends API {
 					[
 						'type' => 'link',
 						'attributes' => [
-							'name' => $this->_lang->GET('file.external_file.link'),
+							'name' => $this->_lang->GET('file.external_file.link'), 
 							'multiple' => true
 						]
 					],
