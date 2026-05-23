@@ -84,6 +84,9 @@ class PDF{
 			textarea {
 				width: 100%;
 			}
+			img {
+				display: block;
+			}
 		</style>
 		END;
 	}
@@ -119,7 +122,7 @@ class PDF{
 
 		$page = $this->_pdf->page->getPage();
 		$this->_markdown_css = str_replace('width: 100%', 'width: '. $page['region'][0]['RW'] - 20 . 'mm', $this->_markdown_css);
-		}
+	}
 
 	/**
 	 * writes the prepared content chunks as name:content to the pages and sets bookmarks
@@ -133,7 +136,36 @@ class PDF{
 		for($i = 0; $i < count(array_keys($chunks)); $i++){
 			$name = array_keys($chunks)[$i];
 			$content = $chunks[$name];
-			
+			/*
+			// this works in theory but page breaking is not an easy tasg with long images and within table cells, so this option is postponed
+
+			// set image sizes if not already done so
+			// maxheight is set to region height in this case. main appliance would be readme export
+			// other contents from within the application are supposed to set the dimensions in advance to calling this function
+			preg_match_all('/<img.+?src="(.+?)".+?(width)*.*?>/m', $content, $images);
+			if ($images){ // not null
+				foreach($images[1] as $index => $image){
+					if ($images[2][$index]) continue; // dimensions have been set already
+					// sizing
+					$getimagesize = @getimagesize($image); // suppress warning
+					if (!$getimagesize) continue; // ressource likely not reachable
+					list($img_width, $img_height, $img_type, $img_attr) = $getimagesize;
+					$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+					// scale to max settings if exceeding these 
+					$maxHeight = 30;//$this->_pdf->_contentCoordinates['bottom'] -  $this->_pdf->_contentCoordinates['top'] - 20;
+					$out_height = $img_height > $maxHeight ? $maxHeight : $img_height;
+					$out_width = $out_height * $ratio;
+					$out_width = $out_width > $this->_pageSetup['exportimage_maxwidth'] ? $this->_pageSetup['exportimage_maxwidth'] : $out_width;
+					$out_height = $out_width / $ratio;
+					// approximately convert pixel to mm; weird factor by trial and error
+					$out_width *= (72 / 25.4) * 1.35;
+					$out_height *= (72 / 25.4) * 1.35;
+
+					$img_tag = str_replace($image, $image . '" width="' . $out_width . '" height="' . $out_height, $images[0][$index]);
+					$content = str_replace($images[0][$index], $img_tag, $content);
+				}
+			}
+			*/
 			$page = $this->_pdf->page->getPage();
 			$bbox = $init ? ['y' =>  $this->_pdf->_contentCoordinates['top'], 'h' => 0] : $this->_pdf->getLastBBox();
 			$init = false;
@@ -239,15 +271,6 @@ class PDF{
 				$value = '<pre style="font-size:small">' . substr($value, 8) . '</pre>';
 			}
 			else {
-				// mask filenames that otherwise my end up formatted with emphasis
-				if (!empty($fileContent['files'])){
-					foreach($fileContent['files'] as $file){
-						$value = preg_replace_callback('/' . preg_quote($file, '/') . '/', function($match){
-							return preg_replace('/_/', "\_", $match[0]);
-						},
-						$value);
-					}
-				}
 				$value = $this->_markdown_css . $this->_markdown->md2html($value);
 			}
 		}
@@ -430,11 +453,10 @@ class PDF{
 	 */
 	public function recordsPDF($fileContent){
 		$this->init($fileContent);
-		$_lang = new LANG();
 		$init = true;
 		if ($fileContent['erp_case_number']){
 			$init = $this->writeStandardHTML([
-				$_lang->GET('record.erp_case_number', [], true) => $fileContent['erp_case_number']
+				$this->_pdf->_lang->GET('record.erp_case_number', [], true) => $fileContent['erp_case_number']
 			]);
 		}
 		
@@ -492,7 +514,7 @@ class PDF{
 			if (!empty($fileContent['attachments'][$document])) $this->attachments($fileContent['attachments'][$document]);
 		}
 
-		if (isset($fileContent['recenthash'])) $this->writeStandardHTML([$_lang->GET('record.verify.verify', [], true) => $fileContent['recenthash']], 0, $init);
+		if (isset($fileContent['recenthash'])) $this->writeStandardHTML([$this->_pdf->_lang->GET('record.verify.verify', [], true) => $fileContent['recenthash']], 0, $init);
 
 		return $this->return();
 	}
@@ -831,7 +853,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 				halign: 'R',
 			);
 			$bbox = $this->getLastBBox();
-			$heights['footer'][] = $bbox['h'];
+			$heights['footer'][] = $bbox['h'] * 2;
 		}
 
 		$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // add default font
