@@ -63,6 +63,7 @@ class FILE extends API {
 		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$insertions = [];
 				// $_FILES is submitted always even if empty
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name']) {
 					// process provided files 
@@ -74,7 +75,6 @@ class FILE extends API {
 							'path' => 'external_documents'
 						]
 					);
-					$insertions = [];
 					foreach ($files as $file){
 						$insertions[] = [
 							':author' => $_SESSION['user']['name'],
@@ -92,6 +92,12 @@ class FILE extends API {
 						];
 					}
 				}
+				if (!$insertions) $this->response([
+						'toast' => [
+							'msg' => $this->_lang->GET('file.manager.error'),
+							'type' => 'error'
+						]
+					]);
 
 				// insert files and ressources to database
 				$sqlQueryStack = $this->_sqlinterface->PACK_INSERT($this->_sqlinterface->PREPARE('file_external_documents_post'), $insertions);
@@ -105,10 +111,12 @@ class FILE extends API {
 						'redirect' => ['externalfilemanager']
 					]);
 				}
-				$this->response(['toast' => [
-					'msg' => $this->_lang->GET('file.manager.error'),
-					'type' => 'error'
-				]]);
+				$this->response([
+					'toast' => [
+						'msg' => $this->_lang->GET('file.manager.error'),
+						'type' => 'error'
+					]
+				]);
 				break;
 			case 'PUT':
 				// update availability or regulatory context
