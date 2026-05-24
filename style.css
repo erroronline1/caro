@@ -1007,7 +1007,7 @@ td {
 }
 
 img.eol1_md {
-	float: left;
+	display : block;
 	max-width: 100%;
 }
 
