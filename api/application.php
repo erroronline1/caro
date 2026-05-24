@@ -136,7 +136,7 @@ class APPLICATION extends API {
 		}
 
 		$lines = ['frontend' => 0, 'backend' => 0, 'code' => 0, 'documentation' => 0, 'configuration' => 0];
-		foreach (['../', '../js', '../api'] as $dir){
+		foreach (['../', '../js', '../api', '../vendor/erroronline1/markdown/src'] as $dir){
 			foreach (scandir($dir) as $file){
 				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
 				if (in_array(pathinfo($file)['extension'], ['md'])){
@@ -149,7 +149,7 @@ class APPLICATION extends API {
 		}
 		foreach (['../templates'] as $dir){
 			foreach (scandir($dir) as $file){
-				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
+				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json', 'csv'])) continue;
 				if (in_array(pathinfo($file)['extension'], ['md'])){
 					$lines['documentation']+= count(file($dir . '/' . $file));			
 				}
