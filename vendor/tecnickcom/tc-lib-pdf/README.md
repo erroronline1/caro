@@ -1,4 +1,4 @@
-# tc-lib-pdf
+# tc-lib-pdf (TCPDF)
 
 > **The next generation of [TCPDF](https://tcpdf.org)** - a modern, modular PHP library for programmatically generating PDF documents.
 
@@ -144,7 +144,7 @@ The fastest way to evaluate the library is to follow the installation and font s
 
 ## Requirements
 
-- **PHP 8.1** or later
+- **PHP 8.2** or later
 - Required PHP extensions: `date`, `pcre` (enforced by Composer)
 - Composer
 
@@ -235,6 +235,26 @@ make -C vendor/tecnickcom/tc-lib-pdf-font deps fonts
 Once fonts are generated, they are cached in `vendor/tecnickcom/tc-lib-pdf-font/target/fonts/` and will not be regenerated unless explicitly rebuilt.
 
 You can also add your own fonts and generate their PHP font data with `tc-lib-pdf-font`. For shared or immutable environments, generate them once into a persistent directory you control (outside `vendor/`) and point `K_PATH_FONTS` to that location.
+
+For a runnable end-to-end custom font workflow, see [examples/E072_import_new_font.php](examples/E072_import_new_font.php).
+
+Example import commands (from the project root):
+
+```bash
+mkdir -p target/fonts/source target/fonts/custom
+
+curl -fL --retry 3 -o target/fonts/source/NotoSans-Regular.ttf \
+    https://github.com/notofonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf
+
+php vendor/tecnickcom/tc-lib-pdf-font/util/convert.php \
+    --outpath=target/fonts/custom \
+    --type=TrueTypeUnicode \
+    --flags=32 \
+    --encoding_id=1 \
+    --fonts=target/fonts/source/NotoSans-Regular.ttf
+```
+
+Then point `K_PATH_FONTS` to `target/fonts/custom` (or an absolute path to that directory) before creating the `Tcpdf` instance.
 
 ```php
 \define('K_PATH_FONTS', '/opt/app/fonts/tc-lib-pdf');
@@ -582,12 +602,28 @@ When a PDF/UA mode is active the library automatically:
 - Tags text content with MCIDs and wraps each run in the appropriate structure element (`P`, `H1`–`H6`, `Link`, etc.)
 - Tags `<img>` elements as `Figure` with their `alt` attribute written as `/Alt` in the structure element
 - Emits `ActualText` entries for ligatures and special glyphs so text extraction and screen readers work correctly
+- Provides Artifact marked-content helpers for non-semantic content (`beginArtifact()`, `endArtifact()`, `addArtifactContent()`)
 
 To provide the document language explicitly:
 
 ```php
 $pdf->setDocInfo(['a_meta_language' => 'de-DE']);
 ```
+
+To tag decorative or repeated content as Artifact (for example headers, footers, and page numbers):
+
+```php
+$pid = $pdf->addPage()['pid'];
+
+$headerOperators = $pdf->graph->getLine(10, 10, 200, 10);
+$pdf->addArtifactContent($headerOperators, $pid, 'Pagination', 'Header');
+
+$footerText = $pdf->getTextCell('Page 1', 180, 280, 20, 5);
+$pdf->addArtifactContent($footerText, $pid, 'Pagination', 'Footer');
+```
+
+In PDF/UA mode, the built-in `defaultPageContent()` page-number footer is emitted as `Artifact` with
+`/Type /Pagination /Subtype /Footer`.
 
 Runnable examples: [examples/E015_pdfua.php](examples/E015_pdfua.php) through [examples/E017_pdfua2.php](examples/E017_pdfua2.php).
 
@@ -664,8 +700,3 @@ Original source files are renamed for compatibility and compressed with PHP `gzc
 
 The bundled `sRGB.icc` profile is sourced from the Debian [`icc-profiles-free`](https://packages.debian.org/source/stable/icc-profiles-free) package.
 
----
-
-## Contact
-
-Nicola Asuni — <info@tecnick.com>

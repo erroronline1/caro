@@ -46,7 +46,7 @@ It is intended for both generation and parsing workflows where PDF streams must 
 
 ## Requirements
 
-- PHP 8.1 or later
+- PHP 8.2 or later
 - Extensions: `zlib`, `pcre`
 - Composer
 
@@ -102,8 +102,3 @@ require_once '/usr/share/php/Com/Tecnick/Pdf/Filter/autoload.php';
 
 Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md).
 
----
-
-## Contact
-
-Nicola Asuni - <info@tecnick.com>

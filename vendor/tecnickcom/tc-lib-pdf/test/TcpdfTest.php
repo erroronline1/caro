@@ -31,30 +31,39 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 class TcpdfTest extends TestUtil
 {
+    /** @throws \Throwable */
     protected function getTestObject(): \Com\Tecnick\Pdf\Tcpdf
     {
         return new \Com\Tecnick\Pdf\Tcpdf();
     }
 
-    /** @return array{pid: int} */
+    /**
+     * @return array{pid: int}
+     * @throws \Throwable
+     */
     private function initFontAndAddRawPage(\Com\Tecnick\Pdf\Tcpdf $obj): array
     {
         /** @var \Com\Tecnick\Pdf\Font\Stack $font */
         $font = $this->getObjectProperty($obj, 'font');
         /** @var int $pon */
         $pon = $this->getObjectProperty($obj, 'pon');
-        $fontfile = (string) \realpath(
-            __DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts/core/helvetica.json'
-        );
+        $fontfile = (string) \realpath(__DIR__
+        . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts/core/helvetica.json');
         $font->insert($pon, 'helvetica', '', 10, null, null, $fontfile);
 
         /** @var \Com\Tecnick\Pdf\Page\Page $page */
         $page = $this->getObjectProperty($obj, 'page');
-        /** @var array{pid: int} $rawPage */
+        /** @var array<string, mixed> $rawPage */
         $rawPage = $page->add([]);
-        return $rawPage;
+        if (!isset($rawPage['pid']) || !\is_int($rawPage['pid'])) {
+            $this->fail('Unexpected page id type from add([]).');
+        }
+        $pid = $rawPage['pid'];
+
+        return ['pid' => $pid];
     }
 
+    /** @throws \Throwable */
     public function testSetPDFFilenameAcceptsValidPdfName(): void
     {
         $obj = $this->getTestObject();
@@ -64,16 +73,18 @@ class TcpdfTest extends TestUtil
         $this->assertSame('my_test_file.pdf', $this->getObjectProperty($obj, 'encpdffilename'));
     }
 
+    /** @throws \Throwable */
     public function testSetPDFFilenameRejectsInvalidExtension(): void
     {
         $obj = $this->getTestObject();
-        $before = $this->getObjectProperty($obj, 'pdffilename');
+        $before = (string) $this->getObjectProperty($obj, 'pdffilename');
 
         $obj->setPDFFilename('bad-name.txt');
 
         $this->assertSame($before, $this->getObjectProperty($obj, 'pdffilename'));
     }
 
+    /** @throws \Throwable */
     public function testSetSpaceRegexpParsesPatternAndModifiers(): void
     {
         $obj = $this->getTestObject();
@@ -86,23 +97,18 @@ class TcpdfTest extends TestUtil
         $this->assertSame('i', $regexp['m']);
     }
 
+    /** @throws \Throwable */
     public function testConstructorAlignsFileIdWithInjectedEncryptionObject(): void
     {
         $fileid = \md5('tcpdf-encryption-fileid');
-        $enc = new \Com\Tecnick\Pdf\Encrypt\Encrypt(
-            true,
-            $fileid,
-            2,
-            ['modify', 'copy'],
-            'demo-user',
-            'demo-owner'
-        );
+        $enc = new \Com\Tecnick\Pdf\Encrypt\Encrypt(true, $fileid, 2, ['modify', 'copy'], 'demo-user', 'demo-owner');
 
         $obj = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, '', $enc);
 
         $this->assertSame($fileid, $this->getObjectProperty($obj, 'fileid'));
     }
 
+    /** @throws \Throwable */
     public function testConstructorPassesFileOptionsToSharedFileHelper(): void
     {
         $defaultCurlOpts = [
@@ -115,19 +121,11 @@ class TcpdfTest extends TestUtil
         ];
         $allowedHosts = ['localhost', 'example.test'];
 
-        $obj = new \Com\Tecnick\Pdf\Tcpdf(
-            'mm',
-            true,
-            false,
-            true,
-            '',
-            null,
-            [
-                'defaultCurlOpts' => $defaultCurlOpts,
-                'fixedCurlOpts' => $fixedCurlOpts,
-                'allowedHosts' => $allowedHosts,
-            ]
-        );
+        $obj = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, '', null, [
+            'defaultCurlOpts' => $defaultCurlOpts,
+            'fixedCurlOpts' => $fixedCurlOpts,
+            'allowedHosts' => $allowedHosts,
+        ]);
 
         /** @var \Com\Tecnick\File\File $file */
         $file = $this->getObjectProperty($obj, 'file');
@@ -144,6 +142,7 @@ class TcpdfTest extends TestUtil
         $this->assertSame($fixedCurlOpts, $this->getObjectProperty($imageFile, 'fixedCurlOpts'));
     }
 
+    /** @throws \Throwable */
     #[DataProvider('displayModeFixtureProvider')]
     public function testSetDisplayModeStoresExpectedZoom(string|int $inputZoom, string|int $expectedZoom): void
     {
@@ -156,6 +155,7 @@ class TcpdfTest extends TestUtil
         $this->assertSame($expectedZoom, $display['zoom']);
     }
 
+    /** @throws \Throwable */
     public function testSetUserRightsMergesValues(): void
     {
         $obj = $this->getTestObject();
@@ -184,6 +184,7 @@ class TcpdfTest extends TestUtil
         ];
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsWhenEnabledWithoutHost(): void
     {
         $obj = $this->getTestObject();
@@ -203,6 +204,7 @@ class TcpdfTest extends TestUtil
         ]);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampStoresDataWhenHostProvided(): void
     {
         $obj = $this->getTestObject();
@@ -228,6 +230,7 @@ class TcpdfTest extends TestUtil
         $this->assertFalse($timeStamp['verify_peer']);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsOnInvalidHashAlgorithm(): void
     {
         $obj = $this->getTestObject();
@@ -247,6 +250,7 @@ class TcpdfTest extends TestUtil
         ]);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureStoresLtvOptions(): void
     {
         $obj = $this->getTestObject();
@@ -277,6 +281,7 @@ class TcpdfTest extends TestUtil
         $this->assertFalse($signature['ltv']['embed_crl']);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureThrowsOnMissingSigningCertificate(): void
     {
         $obj = $this->getTestObject();
@@ -294,6 +299,7 @@ class TcpdfTest extends TestUtil
         ]);
     }
 
+    /** @throws \Throwable */
     public function testGetBarcodeReturnsDrawingCommands(): void
     {
         $obj = $this->getTestObject();
@@ -303,6 +309,7 @@ class TcpdfTest extends TestUtil
         $this->bcAssertMatchesRegularExpression('/\bre\b/', $out);
     }
 
+    /** @throws \Throwable */
     public function testGetBarcodeThrowsOnInvalidType(): void
     {
         $obj = $this->getTestObject();
@@ -311,6 +318,7 @@ class TcpdfTest extends TestUtil
         $obj->getBarcode('INVALID_TYPE', 'ABC123');
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureAppearanceStoresPageNameAndRect(): void
     {
         $obj = $this->getTestObject();
@@ -326,6 +334,7 @@ class TcpdfTest extends TestUtil
         $this->bcAssertMatchesRegularExpression('/^[-0-9.]+\s+[-0-9.]+\s+[-0-9.]+\s+[-0-9.]+$/', $appearance['rect']);
     }
 
+    /** @throws \Throwable */
     public function testAddEmptySignatureAppearanceAddsEntry(): void
     {
         $obj = $this->getTestObject();
@@ -335,12 +344,14 @@ class TcpdfTest extends TestUtil
         /** @var array{appearance: array{empty: array<int, array{name: string, page: int, objid: int}>}} $signature */
         $signature = $this->getObjectProperty($obj, 'signature');
         $this->assertNotEmpty($signature['appearance']['empty']);
+        assert(isset($signature['appearance']['empty'][0]), "\$signature['appearance']['empty'][0] must be set");
         $entry = $signature['appearance']['empty'][0];
         $this->assertSame('EmptySig', $entry['name']);
         $this->assertSame($page['pid'], $entry['page']);
         $this->assertIsInt($entry['objid']);
     }
 
+    /** @throws \Throwable */
     public function testAddTOCHandlesEmptyOutlineList(): void
     {
         $obj = $this->getTestObject();
@@ -352,6 +363,7 @@ class TcpdfTest extends TestUtil
         $this->assertCount(0, $outlines);
     }
 
+    /** @throws \Throwable */
     public function testAddTOCProcessesBookmarks(): void
     {
         $obj = $this->getTestObject();
@@ -362,10 +374,12 @@ class TcpdfTest extends TestUtil
         /** @var array<int, array{t: string, p: int}> $outlines */
         $outlines = $this->getObjectProperty($obj, 'outlines');
         $this->assertCount(1, $outlines);
+        assert(isset($outlines[0]), "\$outlines[0] must be set");
         $this->assertSame('Section 1', $outlines[0]['t']);
         $this->assertSame($page['pid'], $outlines[0]['p']);
     }
 
+    /** @throws \Throwable */
     public function testNewLayerReturnsBeginLayerOperatorAndStoresLayer(): void
     {
         $obj = $this->getTestObject();
@@ -375,16 +389,19 @@ class TcpdfTest extends TestUtil
         $layers = $this->getObjectProperty($obj, 'pdflayer');
         $this->assertSame(" /OC /LYR001 BDC\n", $out);
         $this->assertCount(1, $layers);
+        assert(isset($layers[0]), "\$layers[0] must be set");
         $this->assertSame('Layer1', $layers[0]['name']);
         $this->assertSame('/View', $layers[0]['intent']);
     }
 
+    /** @throws \Throwable */
     public function testCloseLayerReturnsEmcOperator(): void
     {
         $obj = $this->getTestObject();
         $this->assertSame("EMC\n", $obj->closeLayer());
     }
 
+    /** @throws \Throwable */
     public function testNewLayerFallsBackToAutoNameAndAddsDesignIntent(): void
     {
         $obj = $this->getTestObject();
@@ -394,10 +411,12 @@ class TcpdfTest extends TestUtil
         $layers = $this->getObjectProperty($obj, 'pdflayer');
         $this->assertSame(" /OC /LYR001 BDC\n", $out);
         $this->assertCount(1, $layers);
+        assert(isset($layers[0]), "\$layers[0] must be set");
         $this->assertSame('LYR001', $layers[0]['name']);
         $this->assertSame('/Design', $layers[0]['intent']);
     }
 
+    /** @throws \Throwable */
     public function testConstructorPdfaModesSetExpectedFlags(): void
     {
         $pdfa1u = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, true, 'pdfa1u');
@@ -429,6 +448,7 @@ class TcpdfTest extends TestUtil
         $this->assertSame(0, $this->getObjectProperty($unknown, 'pdfa'));
     }
 
+    /** @throws \Throwable */
     public function testConstructorWithUnicodeDisabledSetsAsciiWhitespacePattern(): void
     {
         $obj = new \Com\Tecnick\Pdf\Tcpdf('mm', false, false, true);
@@ -438,6 +458,7 @@ class TcpdfTest extends TestUtil
         $this->assertSame('/[^\S\xa0]/', $regexp['r']);
     }
 
+    /** @throws \Throwable */
     public function testPdfxRestrictiveModesForceDeviceCmykProcessColors(): void
     {
         foreach (['pdfx', 'pdfx1a', 'pdfx3'] as $mode) {
@@ -458,6 +479,7 @@ class TcpdfTest extends TestUtil
         }
     }
 
+    /** @throws \Throwable */
     public function testDefaultAndPdfx4KeepRgbProcessColors(): void
     {
         $default = new \Com\Tecnick\Pdf\Tcpdf();
@@ -467,6 +489,36 @@ class TcpdfTest extends TestUtil
         $this->assertStringContainsString(" rg\n", $pdfx4->color->getPdfColor('#336699'));
     }
 
+    /** @throws \Throwable */
+    public function testCssColorModelsEmitExpectedPdfOperators(): void
+    {
+        $obj = new \Com\Tecnick\Pdf\Tcpdf();
+
+        $cases = [
+            'named navy' => ['navy', " rg\n"],
+            'gray g()' => ['g(50%)', " g\n"],
+            'hex short' => ['#0f0', " rg\n"],
+            'hex long' => ['#1e90ff', " rg\n"],
+            'rgb' => ['rgb(255, 99, 71)', " rg\n"],
+            'rgba' => ['rgba(30, 144, 255, 0.25)', " rg\n"],
+            'hsl' => ['hsl(120, 100%, 25%)', " rg\n"],
+            'hsla' => ['hsla(300, 100%, 50%, 0.20)', " rg\n"],
+            'lab' => ['lab(54.29% -19.04 38.25)', " scn\n"],
+            'lab alpha' => ['lab(54.29% -19.04 38.25 / 0.35)', " scn\n"],
+            'cmyk' => ['cmyk(67, 33, 0, 25)', " k\n"],
+        ];
+
+        foreach ($cases as $label => [$color, $operator]) {
+            $pdfColor = $obj->color->getPdfColor($color);
+            $this->assertTrue($pdfColor !== '', 'Expected non-empty PDF color output for case: ' . $label);
+            $this->assertStringContainsString($operator, $pdfColor, 'Unexpected PDF operator for case: ' . $label);
+            if ($label === 'lab' || $label === 'lab alpha') {
+                $this->assertStringContainsString('/CS', $pdfColor);
+            }
+        }
+    }
+
+    /** @throws \Throwable */
     public function testSetSignatureSetsDefaultPrivkeyAndSignFlag(): void
     {
         $obj = $this->getTestObject();
@@ -501,6 +553,7 @@ class TcpdfTest extends TestUtil
         $this->assertTrue($this->getObjectProperty($obj, 'sign'));
     }
 
+    /** @throws \Throwable */
     public function testSetSignAnnotRefsReturnsWhenNoEmptySignaturesAreDefined(): void
     {
         $obj = new TestableTcpdf();
@@ -529,8 +582,13 @@ class TcpdfTest extends TestUtil
         $signature = $this->getObjectProperty($obj, 'signature');
         $this->assertSame([], $signature['appearance']['empty']);
         $this->assertSame($page['pid'], $signature['appearance']['page']);
+
+        /** @var array{annotrefs: array<int>} $pageData */
+        $pageData = $obj->page->getPage($page['pid']);
+        $this->assertContains(123, $pageData['annotrefs']);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureAppearanceAddsMainSignatureAnnotationReference(): void
     {
         $obj = new TestableTcpdf();
@@ -546,6 +604,60 @@ class TcpdfTest extends TestUtil
         $this->assertSame('MainSig', $signature['appearance']['name']);
     }
 
+    /** @throws \Throwable */
+    public function testGetSignatureObjectIDReturnsReservedObjectId(): void
+    {
+        $obj = $this->getTestObject();
+        $page = $this->initFontAndAddRawPage($obj);
+        $certPath = __DIR__ . '/../examples/data/cert/tcpdf.crt';
+        $certPem = (string) \file_get_contents($certPath);
+
+        $obj->setSignature([
+            'appearance' => [
+                'empty' => [],
+                'name' => 'MainSig',
+                'page' => $page['pid'],
+                'rect' => '0 0 10 5',
+            ],
+            'approval' => '',
+            'cert_type' => 2,
+            'extracerts' => null,
+            'info' => ['ContactInfo' => '', 'Location' => '', 'Name' => '', 'Reason' => ''],
+            'password' => '',
+            'privkey' => $certPem,
+            'signcert' => $certPem,
+        ]);
+
+        $this->assertGreaterThan(0, $obj->getSignatureObjectID());
+    }
+
+    /** @throws \Throwable */
+    public function testSetSignatureAppearanceStreamStoresModeAndState(): void
+    {
+        $obj = $this->getTestObject();
+        $obj->setSignatureAppearanceStream('q 0 g Q', 'N', 'On');
+
+        /** @var array{appearance: array{ap: array<string, array<string, string>>, as: string}} $signature */
+        $signature = $this->getObjectProperty($obj, 'signature');
+        $appearance = $signature['appearance'];
+        $ap = $appearance['ap'];
+        $normal = $ap['n'] ?? [];
+        $this->assertSame('q 0 g Q', $normal['On'] ?? null);
+        $this->assertSame('On', $signature['appearance']['as']);
+    }
+
+    /** @throws \Throwable */
+    public function testSetSignatureAppearanceXObjectStoresXObjectId(): void
+    {
+        $obj = $this->getTestObject();
+        $obj->setSignatureAppearanceXObject('IMP1');
+
+        /** @var array{appearance: array{xobj: string}} $signature */
+        $signature = $this->getObjectProperty($obj, 'signature');
+        $this->assertSame('IMP1', $signature['appearance']['xobj']);
+    }
+
+    /** @throws \Throwable */
     public function testEnableSignatureApprovalTogglesFlag(): void
     {
         $obj = new TestableTcpdf();
@@ -558,6 +670,7 @@ class TcpdfTest extends TestUtil
         $this->assertFalse($this->getObjectProperty($obj, 'sigapp'));
     }
 
+    /** @throws \Throwable */
     public function testAddTOCSupportsRtlPositioningAndBookmarkColor(): void
     {
         $obj = $this->getTestObject();
@@ -569,9 +682,11 @@ class TcpdfTest extends TestUtil
         /** @var array<int, array{t: string}> $outlines */
         $outlines = $this->getObjectProperty($obj, 'outlines');
         $this->assertCount(1, $outlines);
+        assert(isset($outlines[0]), "\$outlines[0] must be set");
         $this->assertSame('RTL entry', $outlines[0]['t']);
     }
 
+    /** @throws \Throwable */
     public function testAddTOCHandlesRegionOverflowAndPageTransitions(): void
     {
         $obj = $this->getTestObject();
@@ -583,9 +698,11 @@ class TcpdfTest extends TestUtil
         /** @var array<int, array{t: string}> $outlines */
         $outlines = $this->getObjectProperty($obj, 'outlines');
         $this->assertCount(1, $outlines);
+        assert(isset($outlines[0]), "\$outlines[0] must be set");
         $this->assertStringStartsWith('Long TOC line', $outlines[0]['t']);
     }
 
+    /** @throws \Throwable */
     public function testLanguageSettersUpdateLanguageMetadata(): void
     {
         $obj = $this->getTestObject();
@@ -593,15 +710,16 @@ class TcpdfTest extends TestUtil
         $obj->setLanguageArray(['a_meta_language' => 'it-IT', 'custom' => 'x']);
         /** @var array<string, string> $lang */
         $lang = $this->getObjectProperty($obj, 'lang');
-        $this->assertSame('it-IT', $lang['a_meta_language']);
-        $this->assertSame('x', $lang['custom']);
+        $this->assertSame('it-IT', $lang['a_meta_language'] ?? null);
+        $this->assertSame('x', $lang['custom'] ?? null);
 
         $obj->setLanguage('en-US');
         /** @var array<string, string> $updated */
         $updated = $this->getObjectProperty($obj, 'lang');
-        $this->assertSame('en-US', $updated['a_meta_language']);
+        $this->assertSame('en-US', $updated['a_meta_language'] ?? null);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureAddsDefaultLtvOptionsWhenMissing(): void
     {
         $obj = $this->getTestObject();
@@ -632,6 +750,7 @@ class TcpdfTest extends TestUtil
         $this->assertTrue($signature['ltv']['include_vri']);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureThrowsWhenLtvIsNotArray(): void
     {
         $obj = $this->getTestObject();
@@ -649,9 +768,11 @@ class TcpdfTest extends TestUtil
             'ltv' => 'invalid',
         ];
 
-        (new \ReflectionMethod($obj, 'setSignature'))->invoke($obj, $data);
+        $setSignatureObj = new \ReflectionMethod($obj, 'setSignature');
+        $setSignatureObj->invoke($obj, $data);
     }
 
+    /** @throws \Throwable */
     public function testSetSignatureThrowsWhenLtvKeyIsInvalidType(): void
     {
         $obj = $this->getTestObject();
@@ -676,9 +797,11 @@ class TcpdfTest extends TestUtil
             ],
         ];
 
-        (new \ReflectionMethod($obj, 'setSignature'))->invoke($obj, $data);
+        $setSignatureObj = new \ReflectionMethod($obj, 'setSignature');
+        $setSignatureObj->invoke($obj, $data);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsOnInvalidPolicyOid(): void
     {
         $obj = $this->getTestObject();
@@ -698,6 +821,7 @@ class TcpdfTest extends TestUtil
         ]);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsOnInvalidNonceType(): void
     {
         $obj = $this->getTestObject();
@@ -716,9 +840,11 @@ class TcpdfTest extends TestUtil
             'verify_peer' => true,
         ];
 
-        (new \ReflectionMethod($obj, 'setSignTimeStamp'))->invoke($obj, $data);
+        $setSignTimeStampObj = new \ReflectionMethod($obj, 'setSignTimeStamp');
+        $setSignTimeStampObj->invoke($obj, $data);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsOnInvalidTimeout(): void
     {
         $obj = $this->getTestObject();
@@ -738,6 +864,7 @@ class TcpdfTest extends TestUtil
         ]);
     }
 
+    /** @throws \Throwable */
     public function testSetSignTimeStampThrowsOnInvalidVerifyPeerType(): void
     {
         $obj = $this->getTestObject();
@@ -756,9 +883,11 @@ class TcpdfTest extends TestUtil
             'verify_peer' => 1,
         ];
 
-        (new \ReflectionMethod($obj, 'setSignTimeStamp'))->invoke($obj, $data);
+        $setSignTimeStampObj = new \ReflectionMethod($obj, 'setSignTimeStamp');
+        $setSignTimeStampObj->invoke($obj, $data);
     }
 
+    /** @throws \Throwable */
     public function testPdfColorGetterAndInvalidColorFallback(): void
     {
         $default = $this->getTestObject();

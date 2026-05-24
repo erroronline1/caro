@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Gray.php
  *
@@ -43,7 +45,7 @@ class Gray extends \Com\Tecnick\Color\Model
      *
      * @var float
      */
-    protected $cmp_gray = 0.0;
+    protected float $cmp_gray = 0.0;
 
     /**
      * Get an array with all color components.
@@ -93,18 +95,25 @@ class Gray extends \Com\Tecnick\Color\Model
     }
 
     /**
-     * Get the CSS representation of the color: rgba(R, G, B, A)
-     * NOTE: Supported since CSS3 and above.
-     *       Use getHexadecimalColor() for CSS1 and CSS2
+     * Get the CSS representation of the color: g(G) or rgba(R, G, B, A).
      */
     public function getCssColor(): string
     {
-        return 'rgba('
-            . $this->getNormalizedValue($this->cmp_gray, 100) . '%,'
-            . $this->getNormalizedValue($this->cmp_gray, 100) . '%,'
-            . $this->getNormalizedValue($this->cmp_gray, 100) . '%,'
+        if ($this->cmp_alpha === 1.0) {
+            return 'g(' . $this->getNormalizedValue($this->cmp_gray, 100) . '%)';
+        }
+
+        return (
+            'rgba('
+            . $this->getNormalizedValue($this->cmp_gray, 100)
+            . '%,'
+            . $this->getNormalizedValue($this->cmp_gray, 100)
+            . '%,'
+            . $this->getNormalizedValue($this->cmp_gray, 100)
+            . '%,'
             . $this->cmp_alpha
-            . ')';
+            . ')'
+        );
     }
 
     /**
@@ -113,7 +122,7 @@ class Gray extends \Com\Tecnick\Color\Model
      */
     public function getJsPdfColor(): string
     {
-        if ($this->cmp_alpha == 0) {
+        if ($this->cmp_alpha === 0.0) {
             return '["T"]'; // transparent color
         }
 
@@ -219,7 +228,7 @@ class Gray extends \Com\Tecnick\Color\Model
      */
     public function invertColor(): self
     {
-        $this->cmp_gray = (1 - $this->cmp_gray);
+        $this->cmp_gray = 1 - $this->cmp_gray;
         return $this;
     }
 }

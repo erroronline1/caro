@@ -17,7 +17,6 @@
 namespace Test\Import;
 
 use Com\Tecnick\Pdf\Import\ImportCorruptedSourceException;
-use Com\Tecnick\Pdf\Import\ImportUnsupportedFeatureException;
 use Com\Tecnick\Pdf\Import\SourceDocument;
 use PHPUnit\Framework\TestCase;
 
@@ -28,15 +27,17 @@ class SourceDocumentTest extends TestCase
         $path = __DIR__ . '/../fixtures/simple_import.pdf';
         $data = file_get_contents($path);
         $this->assertNotFalse($data);
-        return (string) $data;
+        return $data;
     }
 
+    /** @throws \Throwable */
     public function testConstructSucceedsWithValidPdf(): void
     {
         $doc = new SourceDocument($this->loadFixture());
         $this->assertNotEmpty($doc->getId());
     }
 
+    /** @throws \Throwable */
     public function testIdIsSha256OfData(): void
     {
         $data = $this->loadFixture();
@@ -44,6 +45,7 @@ class SourceDocumentTest extends TestCase
         $this->assertSame(hash('sha256', $data), $doc->getId());
     }
 
+    /** @throws \Throwable */
     public function testGetTrailerContainsRoot(): void
     {
         $doc = new SourceDocument($this->loadFixture());
@@ -51,6 +53,7 @@ class SourceDocumentTest extends TestCase
         $this->assertArrayHasKey('root', $trailer);
     }
 
+    /** @throws \Throwable */
     public function testGetXrefReturnsNonEmptyArray(): void
     {
         $doc = new SourceDocument($this->loadFixture());
@@ -58,6 +61,7 @@ class SourceDocumentTest extends TestCase
         $this->assertNotEmpty($xref);
     }
 
+    /** @throws \Throwable */
     public function testGetObjectReturnsDataForKnownRef(): void
     {
         $doc = new SourceDocument($this->loadFixture());
@@ -66,6 +70,7 @@ class SourceDocumentTest extends TestCase
         $this->assertNotEmpty($obj);
     }
 
+    /** @throws \Throwable */
     public function testGetObjectThrowsForUnknownRef(): void
     {
         $doc = new SourceDocument($this->loadFixture());
@@ -73,40 +78,47 @@ class SourceDocumentTest extends TestCase
         $doc->getObject('999_0');
     }
 
+    /** @throws \Throwable */
     public function testFindObjectReturnsNullForUnknownRef(): void
     {
         $doc = new SourceDocument($this->loadFixture());
         $this->assertNull($doc->findObject('999_0'));
     }
 
+    /** @throws \Throwable */
     public function testConstructThrowsOnEmptyData(): void
     {
         $this->expectException(ImportCorruptedSourceException::class);
         new SourceDocument('');
     }
 
+    /** @throws \Throwable */
     public function testConstructThrowsOnGarbage(): void
     {
         $this->expectException(ImportCorruptedSourceException::class);
         new SourceDocument('this is not a pdf');
     }
 
+    /** @throws \Throwable */
     public function testRefToKeyConvertsNormalRef(): void
     {
         $this->assertSame('3_0', SourceDocument::refToKey('3 0 R'));
     }
 
+    /** @throws \Throwable */
     public function testRefToKeyPassesThroughKeyForm(): void
     {
         $this->assertSame('3_0', SourceDocument::refToKey('3_0'));
     }
 
+    /** @throws \Throwable */
     public function testRefToKeyThrowsOnInvalidRef(): void
     {
         $this->expectException(ImportCorruptedSourceException::class);
         SourceDocument::refToKey('not a ref');
     }
 
+    /** @throws \Throwable */
     public function testObjectCountReturnsPositiveInteger(): void
     {
         $doc = new SourceDocument($this->loadFixture());

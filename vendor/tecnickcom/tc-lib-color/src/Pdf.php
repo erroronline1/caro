@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Pdf.php
  *
@@ -58,7 +60,7 @@ class Pdf extends \Com\Tecnick\Color\Spot
      */
     public function getJsColorString(string $color): string
     {
-        if (\in_array($color, self::JSCOLOR)) {
+        if (\in_array($color, self::JSCOLOR, strict: true)) {
             return 'color.' . $color;
         }
 
@@ -67,7 +69,7 @@ class Pdf extends \Com\Tecnick\Color\Spot
                 return $colobj->getJsPdfColor();
             }
         } catch (ColorException $colorException) {
-            // \assert(true); // noop
+            unset($colorException);
         }
 
         // default transparent color
@@ -84,13 +86,13 @@ class Pdf extends \Com\Tecnick\Color\Spot
         try {
             return $this->getSpotColorObj($color);
         } catch (ColorException $colorException) {
-            // \assert(true); // noop
+            unset($colorException);
         }
 
         try {
             return $this->getColorObj($color);
         } catch (ColorException $colorException) {
-            // \assert(true); // noop
+            unset($colorException);
         }
 
         return null;
@@ -108,14 +110,14 @@ class Pdf extends \Com\Tecnick\Color\Spot
     {
         try {
             $col = $this->getSpotColor($color);
-            $tint = \sprintf('cs %F scn', (\max(0, \min(1, $tint))));
+            $tint = \sprintf('cs %F scn', \max(0, \min(1, $tint)));
             if ($stroke) {
                 $tint = \strtoupper($tint);
             }
 
             return \sprintf('/CS%d %s' . "\n", $col['i'], $tint);
         } catch (ColorException $colorException) {
-            // \assert(true); // noop
+            unset($colorException);
         }
 
         try {
@@ -124,10 +126,32 @@ class Pdf extends \Com\Tecnick\Color\Spot
                 return $col->getPdfColor($stroke);
             }
         } catch (ColorException $colorException) {
-            // \assert(true); // noop
+            unset($colorException);
         }
 
         return '';
+    }
+
+    /**
+     * Get the stroked color components format used in PDF documents.
+     *
+     * @param string $color HTML, CSS or Spot color to parse
+     * @param float  $tint  Intensity of the color (from 0 to 1; 1 = full intensity).
+     */
+    public function getPdfStrokeColor(string $color, float $tint = 1): string
+    {
+        return $this->getPdfColor($color, true, $tint);
+    }
+
+    /**
+     * Get the fill color components format used in PDF documents.
+     *
+     * @param string $color HTML, CSS or Spot color to parse
+     * @param float  $tint  Intensity of the color (from 0 to 1; 1 = full intensity).
+     */
+    public function getPdfFillColor(string $color, float $tint = 1): string
+    {
+        return $this->getPdfColor($color, false, $tint);
     }
 
     /**
@@ -138,11 +162,33 @@ class Pdf extends \Com\Tecnick\Color\Spot
     public function getPdfRgbComponents(string $color): string
     {
         $model = $this->getColorObject($color);
-        if (! $model instanceof \Com\Tecnick\Color\Model) {
+        if (!$model instanceof \Com\Tecnick\Color\Model) {
             return '';
         }
 
         $cmp = $model->toRgbArray();
-        return \sprintf('%F %F %F', $cmp['red'], $cmp['green'], $cmp['blue']);
+        return \sprintf('%F %F %F', $cmp['red'] ?? 0.0, $cmp['green'] ?? 0.0, $cmp['blue'] ?? 0.0);
+    }
+
+    /**
+     * Get the CMYK color components format used in PDF documents.
+     *
+     * @param string $color HTML, CSS or Spot color to parse
+     */
+    public function getPdfCmykComponents(string $color): string
+    {
+        $model = $this->getColorObject($color);
+        if (!$model instanceof \Com\Tecnick\Color\Model) {
+            return '';
+        }
+
+        $cmp = $model->toCmykArray();
+        return \sprintf(
+            '%F %F %F %F',
+            $cmp['cyan'] ?? 0.0,
+            $cmp['magenta'] ?? 0.0,
+            $cmp['yellow'] ?? 0.0,
+            $cmp['key'] ?? 0.0,
+        );
     }
 }

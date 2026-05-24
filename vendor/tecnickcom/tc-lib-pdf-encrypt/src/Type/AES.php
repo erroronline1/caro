@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * AES.php
  *
@@ -41,12 +43,11 @@ class AES
      * @param string $mode Cipher
      *
      * @return string encrypted text
+     *
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
      */
-    public function encrypt(
-        string $data,
-        string $key,
-        string $mode = '',
-    ): string {
+    public function encrypt(string $data, string $key, string $mode = ''): string
+    {
         if ($mode === '') {
             $mode = \strlen($key) > 16 ? 'aes-256-cbc' : 'aes-128-cbc';
         }
@@ -55,11 +56,17 @@ class AES
         $aesnopad->checkCipher($mode);
 
         $len = \openssl_cipher_iv_length($mode);
-        if ($len === false) {
+        if ($len === false || $len <= 0) {
             throw new EncException('openssl_cipher_iv_length failed');
         }
 
         $ivect = \openssl_random_pseudo_bytes($len);
-        return $ivect . $aesnopad->encrypt($data, $key, $ivect, $mode);
+        $enc = \openssl_encrypt($data, $mode, $key, OPENSSL_RAW_DATA, $ivect);
+
+        if ($enc === false) {
+            throw new EncException('encryption error: ' . (string) \openssl_error_string());
+        }
+
+        return $ivect . $enc;
     }
 }

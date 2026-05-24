@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script. -->
+
 # Markdown
 * [Text formatting](#text-formatting-atx-h1-header)
 * [Substitutions](#substitutions-setx-h1-header)
@@ -44,7 +47,7 @@ some@mail.address converted to mailto: and an escaped\@mail.address
 
 ### Internal references (h3 header)
 
-[this is a reference link with a match somwhere][referencelink]
+[this is a reference link with a match somewhere][referencelink]
 [and an attempt where the actual reference has been forgotten][noreferencelink]
 
 Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
@@ -60,7 +63,7 @@ Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will 
     
     > as well as
     >> blockquotes
-    >
+    > `with inline code`
     
     | and | of |
     | --- | ----- |
@@ -130,11 +133,13 @@ Nested ordered lists cycle through arabic numerals, roman numerals uppercase, ro
 
 ~~~
 or being surrounded by
-three \` or ~
+three ` or ~
+<!-- html comments are not
+rendered as such here -->
 ~~~
 
-Inline `code with two ore more characters between the symbols`, also ``code with ` escaped by double backticks``  
-and some `code with <brackets>` and `code with an escaped \`-character` render inline.
+Inline `code with two ore more characters between the symbols` and some `code with <brackets>`,  
+also ``code with ` escaped by double backticks``  and `code with an escaped \`-character` render inline.
 
 Definition list containing
 : definition lines that
@@ -154,8 +159,8 @@ Definition list containing
     multiple lines
     ~~~
 8. and  
-[x] accomplished and  
-[ ] unaccomplished tasks
+    [x] accomplished and  
+    [ ] unaccomplished tasks
 
 - - -
 
@@ -179,9 +184,9 @@ Definition list containing
 ## Safety related content that should pose lesser threat with safeMode
 <a href="http://some.shady.website">totally legit website link</a>  
 <a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
-<a href="javascript:alert('click event')">a href with click event</a>  
-[markdown link with js protocol href](javascript:alert('js href'))  
-<div onclick="alert('you clicked!')">clickable div</div>
+<a href="javascript:alert('a with js href')">a href with click event</a>  
+[markdown link with js protocol href](javascript:alert('md with js href'))  
+<div onclick="alert('you clicked!')">>>clickable div<<</div>
 
 ### safeMode restricted tags
 e.g. <label>is this input really part of your ui? <input type="text" /></label>  

@@ -33,14 +33,12 @@ class LabTest extends TestUtil
 {
     protected function getTestObject(): \Com\Tecnick\Color\Model\Lab
     {
-        return new \Com\Tecnick\Color\Model\Lab(
-            [
-                'lstar' => 52,
-                'astar' => 0,
-                'bstar' => -39,
-                'alpha' => 0.85,
-            ]
-        );
+        return new \Com\Tecnick\Color\Model\Lab([
+            'lstar' => 52,
+            'astar' => 0,
+            'bstar' => -39,
+            'alpha' => 0.85,
+        ]);
     }
 
     public function testGetType(): void
@@ -59,7 +57,7 @@ class LabTest extends TestUtil
                 'b' => -39,
                 'A' => 0.85,
             ],
-            $lab->getArray()
+            $lab->getArray(),
         );
     }
 
@@ -73,20 +71,18 @@ class LabTest extends TestUtil
                 0.75,
             ],
             $lab->getPDFacArray(),
-            0.03
+            0.03,
         );
     }
 
     public function testGetNormalizedArray(): void
     {
-        $lab = new \Com\Tecnick\Color\Model\Lab(
-            [
-                'lstar' => 51.6,
-                'astar' => 0.4,
-                'bstar' => -38.7,
-                'alpha' => 0.85,
-            ]
-        );
+        $lab = new \Com\Tecnick\Color\Model\Lab([
+            'lstar' => 51.6,
+            'astar' => 0.4,
+            'bstar' => -38.7,
+            'alpha' => 0.85,
+        ]);
 
         $this->assertEquals(
             [
@@ -95,14 +91,22 @@ class LabTest extends TestUtil
                 'b' => -39.0,
                 'A' => 0.85,
             ],
-            $lab->getNormalizedArray(255)
+            $lab->getNormalizedArray(255),
         );
     }
 
     public function testGetCssColor(): void
     {
         $lab = $this->getTestObject();
-        $this->assertSame('rgba(25%, 50%, 75%, 0.85)', $lab->getCssColor());
+        $this->assertSame('lab(52% 0 -39 / 0.85)', $lab->getCssColor());
+
+        $opaque = new \Com\Tecnick\Color\Model\Lab([
+            'lstar' => 52,
+            'astar' => 0,
+            'bstar' => -39,
+            'alpha' => 1,
+        ]);
+        $this->assertSame('lab(52% 0 -39)', $opaque->getCssColor());
     }
 
     public function testGetJsPdfColor(): void
@@ -113,14 +117,12 @@ class LabTest extends TestUtil
 
     public function testGetJsPdfTransparentColor(): void
     {
-        $transparent = new \Com\Tecnick\Color\Model\Lab(
-            [
-                'lstar' => 52,
-                'astar' => 0,
-                'bstar' => -39,
-                'alpha' => 0,
-            ]
-        );
+        $transparent = new \Com\Tecnick\Color\Model\Lab([
+            'lstar' => 52,
+            'astar' => 0,
+            'bstar' => -39,
+            'alpha' => 0,
+        ]);
 
         $this->assertSame('["T"]', $transparent->getJsPdfColor());
     }
@@ -147,7 +149,7 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toGrayArray(),
-            0.02
+            0.02,
         );
     }
 
@@ -162,7 +164,7 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toRgbArray(),
-            0.03
+            0.03,
         );
     }
 
@@ -177,7 +179,7 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toLabArray(),
-            0.01
+            0.01,
         );
     }
 
@@ -193,7 +195,7 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toCmykArray(),
-            0.05
+            0.05,
         );
     }
 
@@ -208,27 +210,25 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toHslArray(),
-            0.05
+            0.05,
         );
     }
 
     public function testToRgbArrayLowLightnessBranch(): void
     {
-        $lab = new \Com\Tecnick\Color\Model\Lab(
-            [
-                'lstar' => 2,
-                'astar' => 0,
-                'bstar' => 0,
-                'alpha' => 1,
-            ]
-        );
+        $lab = new \Com\Tecnick\Color\Model\Lab([
+            'lstar' => 2,
+            'astar' => 0,
+            'bstar' => 0,
+            'alpha' => 1,
+        ]);
 
         $rgb = $lab->toRgbArray();
-        $this->assertGreaterThan(0.0, $rgb['red']);
-        $this->assertLessThan(0.03, $rgb['red']);
-        $this->assertEqualsWithDelta($rgb['red'], $rgb['green'], 0.0001);
-        $this->assertEqualsWithDelta($rgb['green'], $rgb['blue'], 0.0001);
-        $this->assertSame(1.0, $rgb['alpha']);
+        $this->assertGreaterThan(0.0, $rgb['red'] ?? 0.0);
+        $this->assertLessThan(0.03, $rgb['red'] ?? 0.0);
+        $this->assertEqualsWithDelta($rgb['red'] ?? 0.0, $rgb['green'] ?? 0.0, 0.0001);
+        $this->assertEqualsWithDelta($rgb['green'] ?? 0.0, $rgb['blue'] ?? 0.0, 0.0001);
+        $this->assertSame(1.0, $rgb['alpha'] ?? 0.0);
     }
 
     public function testInvertColor(): void
@@ -243,7 +243,99 @@ class LabTest extends TestUtil
                 'alpha' => 0.85,
             ],
             $lab->toRgbArray(),
-            0.05
+            0.05,
+        );
+    }
+
+    public function testSetComponentValueForLabSpecificComponents(): void
+    {
+        $model = new class(['lstar' => 0.425, 'astar' => -0.1225, 'bstar' => 0.3375, 'alpha' => 1]) extends
+            \Com\Tecnick\Color\Model {
+            protected $type = 'TEST';
+            protected float $cmp_lstar = 0.0;
+            protected float $cmp_astar = 0.0;
+            protected float $cmp_bstar = 0.0;
+
+            public function getArray(): array
+            {
+                return [];
+            }
+
+            public function getPDFacArray(): array
+            {
+                return [];
+            }
+
+            public function getNormalizedArray(int $max): array
+            {
+                return [];
+            }
+
+            public function getCssColor(): string
+            {
+                return '';
+            }
+
+            public function getJsPdfColor(): string
+            {
+                return '';
+            }
+
+            public function getComponentsString(): string
+            {
+                return '';
+            }
+
+            public function getPdfColor(bool $stroke = false): string
+            {
+                return '';
+            }
+
+            public function toGrayArray(): array
+            {
+                return [];
+            }
+
+            public function toRgbArray(): array
+            {
+                return [];
+            }
+
+            public function toHslArray(): array
+            {
+                return [];
+            }
+
+            public function toCmykArray(): array
+            {
+                return [];
+            }
+
+            public function toLabArray(): array
+            {
+                return [
+                    'lstar' => $this->cmp_lstar,
+                    'astar' => $this->cmp_astar,
+                    'bstar' => $this->cmp_bstar,
+                    'alpha' => $this->cmp_alpha,
+                ];
+            }
+
+            public function invertColor(): self
+            {
+                return $this;
+            }
+        };
+
+        $this->assertEqualsWithDelta(
+            [
+                'lstar' => 0.425,
+                'astar' => 0.0,
+                'bstar' => 0.3375,
+                'alpha' => 1.0,
+            ],
+            $model->toLabArray(),
+            0.0001,
         );
     }
 }

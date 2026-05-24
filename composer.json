@@ -2,6 +2,6 @@
     "require": {
         "openspout/openspout": "^5.2",
         "erroronline1/markdown": "*",
-        "tecnickcom/tc-lib-pdf": "^8.11"
+        "tecnickcom/tc-lib-pdf": "^8.27"
     }
 }

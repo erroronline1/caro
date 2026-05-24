@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["8.1", "8.2", "8.3", "8.4", "8.5"]
+        php-version: ["8.2", "8.3", "8.4", "8.5"]
     steps:
       - uses: actions/checkout@v6
       #- name: Install pdfinfo
@@ -48,6 +48,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
       - name: Install dependencies
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: make deps
       - name: Install qpdf
         if: matrix.php-version == '8.4'
@@ -57,6 +59,32 @@ jobs:
         run: make preflight
       - name: Run all tests
         run: make qa
+      #- name: Generate CSS renderability reports
+      #  if: matrix.php-version == '8.4'
+      #  run: |
+      #    php resources/css/renderability_score.php \
+      #      --corpus=test/fixtures/html/real_pages/corpus.json \
+      #      --json=target/report/renderability-score.json \
+      #      --markdown=target/report/renderability-score.md
+      #    php resources/css/renderability_trend.php \
+      #      --score=target/report/renderability-score.json \
+      #      --history=target/report/renderability-trend.json \
+      #      --markdown=target/report/renderability-trend.md \
+      #      --sha=${{ github.sha }} \
+      #      --ref=${{ github.ref_name }} \
+      #      --run-id=${{ github.run_id }}
+      #    cat target/report/renderability-score.md >> "$GITHUB_STEP_SUMMARY"
+      #    cat target/report/renderability-trend.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload CSS renderability reports
+        if: matrix.php-version == '8.4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: css-renderability-reports-${{ github.run_id }}
+          path: |
+            target/report/renderability-score.json
+            target/report/renderability-score.md
+            target/report/renderability-trend.json
+            target/report/renderability-trend.md
       - name: Send coverage
         if: matrix.php-version == '8.4'
         uses: codecov/codecov-action@v6

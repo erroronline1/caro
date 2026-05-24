@@ -23,21 +23,25 @@ class SVGTest extends TestUtil
         self::setUpFontsPath();
     }
 
+    /** @throws \Throwable */
     protected function getTestObject(): \Com\Tecnick\Pdf\Tcpdf
     {
         return new \Com\Tecnick\Pdf\Tcpdf();
     }
 
+    /** @throws \Throwable */
     protected function getInternalTestObject(): TestableSVG
     {
         return new TestableSVG();
     }
 
+    /** @throws \Throwable */
     public function testAddSVGStoresInlineSvgObject(): void
     {
         $obj = $this->getTestObject();
         $page = $this->initFontAndPage($obj);
-        $svg = '@<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50">'
+        $svg =
+            '@<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50">'
             . '<rect x="0" y="0" width="100" height="50" fill="#ff0000"/>'
             . '</svg>';
 
@@ -47,9 +51,12 @@ class SVGTest extends TestUtil
         /** @var array<int, array<string, mixed>> $svgobjs */
         $svgobjs = $this->getObjectProperty($obj, 'svgobjs');
         $this->assertArrayHasKey($soid, $svgobjs);
-        $this->assertNotSame('', $svgobjs[$soid]['out']);
+        $svgObj = $svgobjs[$soid] ?? null;
+        $this->assertIsArray($svgObj);
+        $this->assertNotSame('', $svgObj['out'] ?? '');
     }
 
+    /** @throws \Throwable */
     public function testAddSVGRejectsInvalidSvg(): void
     {
         $obj = $this->getTestObject();
@@ -59,11 +66,13 @@ class SVGTest extends TestUtil
         $obj->addSVG('@<svg xmlns="http://www.w3.org/2000/svg"></svg>');
     }
 
+    /** @throws \Throwable */
     public function testGetSetSVGReturnsRenderableOutput(): void
     {
         $obj = $this->getTestObject();
         $page = $this->initFontAndPage($obj);
-        $svg = '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
+        $svg =
+            '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
             . '<circle cx="10" cy="10" r="8" fill="#00ff00"/>'
             . '</svg>';
 
@@ -76,11 +85,13 @@ class SVGTest extends TestUtil
         $this->assertStringEndsWith("Q\nQ\n", $out);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternFillEmitsPdfPatternResources(): void
     {
         $obj = new \Com\Tecnick\Pdf\Tcpdf('mm', true, false, false);
         $page = $this->initFontAndPage($obj);
-        $svg = '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
+        $svg =
+            '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
             . '<defs>'
             . '<pattern id="p1" patternUnits="userSpaceOnUse" x="0" y="0" width="4" height="4">'
             . '<rect x="0" y="0" width="4" height="4" fill="none" stroke="#000000" stroke-width="1"/>'
@@ -102,6 +113,7 @@ class SVGTest extends TestUtil
         $this->assertMatchesRegularExpression('/\/PTN_[A-F0-9]{16}\s+\d+\s+0\s+R/', $pdf);
     }
 
+    /** @throws \Throwable */
     public function testGetSetSVGThrowsForUnknownId(): void
     {
         $obj = $this->getTestObject();
@@ -110,6 +122,7 @@ class SVGTest extends TestUtil
         $obj->getSetSVG(999);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMtranslateWithTwoValues(): void
     {
         $obj = $this->getInternalTestObject();
@@ -119,6 +132,7 @@ class SVGTest extends TestUtil
         $this->assertSame([1.0, 0.0, 0.0, 1.0, 10.5, 20.3], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMtranslateWithOneValue(): void
     {
         $obj = $this->getInternalTestObject();
@@ -128,6 +142,7 @@ class SVGTest extends TestUtil
         $this->assertSame([1.0, 0.0, 0.0, 1.0, 5.5, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMscaleWithTwoValues(): void
     {
         $obj = $this->getInternalTestObject();
@@ -137,6 +152,7 @@ class SVGTest extends TestUtil
         $this->assertSame([2.0, 0.0, 0.0, 3.0, 0.0, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMscaleWithOneValue(): void
     {
         $obj = $this->getInternalTestObject();
@@ -146,6 +162,7 @@ class SVGTest extends TestUtil
         $this->assertSame([1.5, 0.0, 0.0, 1.5, 0.0, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMrotateWithDegrees(): void
     {
         $obj = $this->getInternalTestObject();
@@ -157,6 +174,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame([1.0, 0.0, 0.0, 1.0, 0.0, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMskewXWithDegrees(): void
     {
         $obj = $this->getInternalTestObject();
@@ -167,6 +185,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame([1.0, 0.0, 0.0, 1.0, 0.0, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMskewYWithDegrees(): void
     {
         $obj = $this->getInternalTestObject();
@@ -177,6 +196,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame([1.0, 0.0, 0.0, 1.0, 0.0, 0.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMmatrixWithSixValues(): void
     {
         $obj = $this->getInternalTestObject();
@@ -186,6 +206,7 @@ class SVGTest extends TestUtil
         $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], $result);
     }
 
+    /** @throws \Throwable */
     public function testParseSVGTMmatrixWithCSVFormat(): void
     {
         $obj = $this->getInternalTestObject();
@@ -195,6 +216,7 @@ class SVGTest extends TestUtil
         $this->assertSame([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], $result);
     }
 
+    /** @throws \Throwable */
     public function testSvgUnitConvertersAndTransformHelpers(): void
     {
         $obj = $this->getInternalTestObject();
@@ -215,6 +237,7 @@ class SVGTest extends TestUtil
         $this->assertStringContainsString(' cm', $out);
     }
 
+    /** @throws \Throwable */
     public function testSvgTagPathAndCssAttributeHelpers(): void
     {
         $obj = $this->getInternalTestObject();
@@ -233,6 +256,7 @@ class SVGTest extends TestUtil
         $this->assertSame('fallback', $obj->exposeParseCSSAttrib($tag, 'line-height', 'fallback'));
     }
 
+    /** @throws \Throwable */
     public function testSvgTextAttributeAndBlendAlphaHelpers(): void
     {
         $obj = $this->getInternalTestObject();
@@ -272,6 +296,7 @@ class SVGTest extends TestUtil
         $this->assertStringContainsString('gs', $pdfx4->exposeGetSVGExtGState(0.8, 0.5, 'Multiply'));
     }
 
+    /** @throws \Throwable */
     public function testSvgPathCommandHelpersProducePathOperations(): void
     {
         $obj = $this->getInternalTestObject();
@@ -304,13 +329,15 @@ class SVGTest extends TestUtil
         $this->assertStringContainsString('c', $tout);
 
         $arcPaths = [['0', 'A'], ['1', 'z']];
-        [$aout, $coord] = $obj->exposeSvgPathCmdA(
-            [5, 5, 0, 0, 1, 30, 35],
-            $coord,
-            $arcPaths,
-            0,
-            ['5', '5', '0', '0', '1', '30', '35']
-        );
+        [$aout, $coord] = $obj->exposeSvgPathCmdA([5, 5, 0, 0, 1, 30, 35], $coord, $arcPaths, 0, [
+            '5',
+            '5',
+            '0',
+            '0',
+            '1',
+            '30',
+            '35',
+        ]);
         $this->assertNotSame('', $aout);
 
         [$zout, $coord] = $obj->exposeSvgPathCmdZ($coord);
@@ -319,6 +346,7 @@ class SVGTest extends TestUtil
         $this->assertSame($coord['yinit'], $coord['y']);
     }
 
+    /** @throws \Throwable */
     public function testSvgStyleHelperMethodsCoverCorePaths(): void
     {
         $obj = $this->getInternalTestObject();
@@ -417,21 +445,17 @@ class SVGTest extends TestUtil
         $fillPattern['opacity'] = 1.0;
         $fillPattern['fill-opacity'] = 1.0;
         $obj->patchSvgObj(3, ['out' => 'BASE']);
-        [$fillPatternOut] = $obj->exposeParseSVGStyleFill(
-            3,
-            $fillPattern,
-            [],
-            0,
-            0,
-            10,
-            10,
-            'getClippingRect',
-            [0.0, 0.0, 10.0, 10.0, 0.0],
-        );
+        [$fillPatternOut] = $obj->exposeParseSVGStyleFill(3, $fillPattern, [], 0, 0, 10, 10, 'getClippingRect', [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+        ]);
         $this->assertSame('BASE', $obj->getSvgObj(3)['out']);
         $this->assertIsString($fillPatternOut);
 
-        $parser = \xml_parser_create();
+        $parser = \xml_parser_create('UTF-8');
         $obj->exposeParseSVGStyleClipPath($parser, 3, []);
 
         $earlyStyle = $base;
@@ -441,6 +465,7 @@ class SVGTest extends TestUtil
         $this->assertSame('', $objstyle);
     }
 
+    /** @throws \Throwable */
     public function testSvgRawSizeAndPrescanHelpers(): void
     {
         $obj = $this->getInternalTestObject();
@@ -456,17 +481,21 @@ class SVGTest extends TestUtil
         try {
             $this->assertSame($inline, $obj->exposeGetRawSVGData($tmp));
         } finally {
-            @\unlink($tmp);
+            if (\file_exists($tmp)) {
+                \unlink($tmp);
+            }
         }
 
         $size = $obj->exposeGetSVGSize(
-            '<svg x="1" y="2" width="100" height="50" viewBox="0 0 100 50" preserveAspectRatio="xMinYMin meet"></svg>'
+            '<svg x="1" y="2" width="100" height="50" viewBox="0 0 100 50" preserveAspectRatio="xMinYMin meet"></svg>',
         );
         $this->assertGreaterThan(0, $size['width']);
         $this->assertGreaterThan(0, $size['height']);
         $this->assertSame('xMinYMin', $size['ar_align']);
 
-        $attr = $obj->exposeGetSVGPrescanAttributes(['id' => 'g1', 'stop-color' => '#fff', 'junk' => 'x']);
+        $getPrescanAttributes = new \ReflectionMethod($obj, 'exposeGetSVGPrescanAttributes');
+        /** @var array<string, string> $attr */
+        $attr = $getPrescanAttributes->invokeArgs($obj, [['id' => 'g1', 'stop-color' => '#fff', 'junk' => 'x']]);
         $this->assertArrayHasKey('id', $attr);
         $this->assertArrayHasKey('stop-color', $attr);
         $this->assertArrayNotHasKey('junk', $attr);
@@ -484,9 +513,14 @@ class SVGTest extends TestUtil
         );
         $svgobj = $obj->getSvgObj(40);
         $this->assertArrayHasKey('lg', $svgobj['gradients']);
-        $this->assertGreaterThanOrEqual(1, \count($svgobj['gradients']['lg']['stops']));
+        $lg = $svgobj['gradients']['lg'] ?? null;
+        $this->assertIsArray($lg);
+        $stops = $lg['stops'];
+        $this->assertIsArray($stops);
+        $this->assertGreaterThanOrEqual(1, \count($stops));
     }
 
+    /** @throws \Throwable */
     public function testSvgGetSVGSizeCoversMissingViewboxAndThreeTokenAspectRatio(): void
     {
         $obj = $this->getInternalTestObject();
@@ -499,12 +533,13 @@ class SVGTest extends TestUtil
         $this->assertSame([0.0, 0.0, 0.0, 0.0], $noViewBox['viewBox']);
 
         $threeTokens = $obj->exposeGetSVGSize(
-            '<svg width="10" height="10" viewBox="0 0 10 10" preserveAspectRatio="defer xMaxYMax slice"></svg>'
+            '<svg width="10" height="10" viewBox="0 0 10 10" preserveAspectRatio="defer xMaxYMax slice"></svg>',
         );
         $this->assertSame('xMaxYMax', $threeTokens['ar_align']);
         $this->assertSame('slice', $threeTokens['ar_ms']);
     }
 
+    /** @throws \Throwable */
     public function testSvgPrescanRadialGradientWithDirectStopAttributes(): void
     {
         $obj = $this->getInternalTestObject();
@@ -519,9 +554,14 @@ class SVGTest extends TestUtil
 
         $svgobj = $obj->getSvgObj(44);
         $this->assertArrayHasKey('rg', $svgobj['gradients']);
-        $this->assertGreaterThanOrEqual(1, \count($svgobj['gradients']['rg']['stops']));
+        $rg = $svgobj['gradients']['rg'] ?? null;
+        $this->assertIsArray($rg);
+        $stops = $rg['stops'];
+        $this->assertIsArray($stops);
+        $this->assertGreaterThanOrEqual(1, \count($stops));
     }
 
+    /** @throws \Throwable */
     public function testSvgTagHandlersAndEndStartHelpers(): void
     {
         $obj = $this->getInternalTestObject();
@@ -563,6 +603,7 @@ class SVGTest extends TestUtil
         $this->assertFalse($obj->getSvgObj(41)['defsmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgRemainingStartTagMethodsCoveredViaGuardBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -584,7 +625,8 @@ class SVGTest extends TestUtil
         $this->assertSame('', $obj->exposeParseSVGTagSTARTradialGradient(42, ['id' => 'rg2']));
         $obj->patchSvgObj(42, ['gradientid' => 'lg2']);
         $this->assertSame('', $obj->exposeParseSVGTagSTARTstop(42, ['offset' => '50%'], $base));
-        $this->assertNotEmpty($obj->getSvgObj(42)['gradients']['lg2']['stops']);
+        $svg42 = $obj->getSvgObj(42);
+        $this->assertNotEmpty($svg42['gradients']['lg2']['stops'] ?? []);
 
         // Invisibility/clip guards for shape and text tags.
         $obj->patchSvgObj(42, ['textmode' => ['invisible' => true], 'clipmode' => false]);
@@ -594,7 +636,7 @@ class SVGTest extends TestUtil
             42,
             ['width' => '1', 'height' => '1'],
             $base,
-            $base
+            $base,
         ));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTcircle($parser, 42, ['r' => '1'], $base, $base));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTellipse(
@@ -602,14 +644,14 @@ class SVGTest extends TestUtil
             42,
             ['rx' => '1', 'ry' => '1'],
             $base,
-            $base
+            $base,
         ));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTline(
             $parser,
             42,
             ['x1' => '0', 'y1' => '0', 'x2' => '1', 'y2' => '1'],
             $base,
-            $base
+            $base,
         ));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTpolygon($parser, 42, ['points' => '0,0 1,1'], $base, $base));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTimage($parser, 42, ['xlink:href' => 'x.png'], $base, $base));
@@ -621,6 +663,7 @@ class SVGTest extends TestUtil
         $this->assertSame('', $obj->exposeParseSVGTagSTARTuse($parser, 42, ['xlink:href' => '#missing']));
     }
 
+    /** @throws \Throwable */
     public function testSvgUseTagResolvesDefinitionAndAppendsOutput(): void
     {
         $obj = $this->getInternalTestObject();
@@ -644,29 +687,33 @@ class SVGTest extends TestUtil
         ]);
 
         $parser = \xml_parser_create('UTF-8');
-        $this->assertSame('', $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            45,
-            ['xlink:href' => '#shape1', 'x' => '5', 'y' => '7']
-        ));
+        $this->assertSame('', $obj->exposeParseSVGTagSTARTuse($parser, 45, [
+            'xlink:href' => '#shape1',
+            'x' => '5',
+            'y' => '7',
+        ]));
 
         $svgobj = $obj->getSvgObj(45);
         $this->assertNotSame('', $svgobj['out']);
     }
 
+    /** @throws \Throwable */
     public function testSvgTransformRotateCenterAndEmptyTransformMatrix(): void
     {
         $obj = $this->getInternalTestObject();
 
         $rot = $obj->exposeParseSVGTMrotate('45 10 20');
         $this->assertCount(6, $rot);
+        assert(isset($rot[4]), "\$rot[4] must be set");
         $this->assertNotSame(0.0, $rot[4]);
+        assert(isset($rot[5]), "\$rot[5] must be set");
         $this->assertNotSame(0.0, $rot[5]);
 
         $tmx = $obj->exposeGetSVGTransformMatrix('');
         $this->assertSame([1.0, 0.0, 0.0, 1.0, 0.0, 0.0], $tmx);
     }
 
+    /** @throws \Throwable */
     public function testSvgPathCmdAHandlesIdenticalEndpointsAndSweepAdjustments(): void
     {
         $obj = $this->getInternalTestObject();
@@ -699,6 +746,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $arcOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgParseStyleGradientHandlesXrefMeasureAndPercentageModes(): void
     {
         $obj = $this->getInternalTestObject();
@@ -741,23 +789,20 @@ class SVGTest extends TestUtil
             ],
         ];
 
-        $refOut = $obj->exposeParseSVGStyleGradient(
-            46,
-            $gradients,
-            'ref',
+        $refOut = $obj->exposeParseSVGStyleGradient(46, $gradients, 'ref', 5.0, 6.0, 20.0, 10.0, 'getClippingRect', [
             5.0,
             6.0,
             20.0,
             10.0,
-            'getClippingRect',
-            [5.0, 6.0, 20.0, 10.0, 0.0],
-        );
+            0.0,
+        ]);
         $this->assertNotSame('', $refOut);
 
         $pctOut = $obj->exposeParseSVGStyleGradient(46, $gradients, 'pct', 0.0, 0.0, 10.0, 10.0);
         $this->assertNotSame('', $pctOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgDefsModeStartEndAndInnerSvgStartBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -786,17 +831,17 @@ class SVGTest extends TestUtil
         $obj->exposeHandleSVGTagEnd($parser, 'path');
         $defs = $obj->getSvgObj(47)['defs'];
         /** @var array<string, mixed> $def1 */
-        $def1 = $defs['def1'];
+        $def1 = $defs['def1'] ?? [];
         /** @var array<string, mixed> $child */
-        $child = (isset($def1['child']) && \is_array($def1['child'])) ? $def1['child'] : [];
+        $child = isset($def1['child']) && \is_array($def1['child']) ? $def1['child'] : [];
         $this->assertArrayHasKey('child1_CLOSE', $child);
 
         $obj->exposeHandleSVGTagStart($parser, 'line', [], 47);
         $defs = $obj->getSvgObj(47)['defs'];
         /** @var array<string, mixed> $def1 */
-        $def1 = $defs['def1'];
+        $def1 = $defs['def1'] ?? [];
         /** @var array<string, mixed> $child */
-        $child = (isset($def1['child']) && \is_array($def1['child'])) ? $def1['child'] : [];
+        $child = isset($def1['child']) && \is_array($def1['child']) ? $def1['child'] : [];
         $this->assertArrayHasKey('DF_3', $child);
 
         $obj->exposeHandleSVGTagStart($parser, 'circle', ['id' => 'newdef'], 47);
@@ -815,6 +860,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThan(1, \count($obj->getSvgObj(47)['styles']));
     }
 
+    /** @throws \Throwable */
     public function testSvgPathCommandsCoverRelativeAndFallbackBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -859,6 +905,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThan(0.0, $coord['yoffset']);
     }
 
+    /** @throws \Throwable */
     public function testSvgStyleFontAndStrokeExtraBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -885,6 +932,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $strokeOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgHandleStartAndEndAdditionalBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -918,6 +966,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $textOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgStartSvgViewboxFallbackAndAspectBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -954,6 +1003,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $aspectOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgVisibleStartTagHandlersProduceOutput(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1022,13 +1072,7 @@ class SVGTest extends TestUtil
         );
         $this->assertNotSame('', $lineOut);
 
-        $polyOut = $obj->exposeParseSVGTagSTARTpolygon(
-            $parser,
-            51,
-            ['points' => '1,1 5,1 5,5 1,5'],
-            $base,
-            $base,
-        );
+        $polyOut = $obj->exposeParseSVGTagSTARTpolygon($parser, 51, ['points' => '1,1 5,1 5,5 1,5'], $base, $base);
         $this->assertNotSame('', $polyOut);
 
         $imgPath = (string) \realpath(__DIR__ . '/../examples/images/tcpdf_signature.png');
@@ -1050,16 +1094,11 @@ class SVGTest extends TestUtil
         );
         $this->assertNotSame('', $textOut);
 
-        $tspanOut = $obj->exposeParseSVGTagSTARTtspan(
-            $parser,
-            51,
-            ['dx' => '1', 'dy' => '1'],
-            $base,
-            $base,
-        );
+        $tspanOut = $obj->exposeParseSVGTagSTARTtspan($parser, 51, ['dx' => '1', 'dy' => '1'], $base, $base);
         $this->assertNotSame('', $tspanOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgHandleEndDefsAddsParentCloseWhenNameMatches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1087,12 +1126,13 @@ class SVGTest extends TestUtil
 
         $defs = $obj->getSvgObj(52)['defs'];
         /** @var array<string, mixed> $grp */
-        $grp = $defs['grp1'];
+        $grp = $defs['grp1'] ?? [];
         /** @var array<string, mixed> $child */
-        $child = (isset($grp['child']) && \is_array($grp['child'])) ? $grp['child'] : [];
+        $child = isset($grp['child']) && \is_array($grp['child']) ? $grp['child'] : [];
         $this->assertArrayHasKey('grp1_CLOSE', $child);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerDefsCaptureAndLifecycle(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1126,15 +1166,16 @@ class SVGTest extends TestUtil
         $this->assertArrayHasKey('mk1', $svgobj['defs']);
 
         /** @var array<string, mixed> $marker */
-        $marker = $svgobj['defs']['mk1'];
-        $this->assertSame('marker', $marker['name']);
+        $marker = $svgobj['defs']['mk1'] ?? [];
+        $this->assertSame('marker', $marker['name'] ?? null);
 
         /** @var array<string, mixed> $child */
-        $child = (isset($marker['child']) && \is_array($marker['child'])) ? $marker['child'] : [];
+        $child = isset($marker['child']) && \is_array($marker['child']) ? $marker['child'] : [];
         $this->assertArrayHasKey('DF_1', $child);
         $this->assertArrayHasKey('DF_1_CLOSE', $child);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerStartWithoutIdOnlyEnablesDefsMode(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1150,6 +1191,7 @@ class SVGTest extends TestUtil
         $this->assertFalse($obj->getSvgObj(522)['defsmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternDefsCaptureAndLifecycle(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1186,15 +1228,16 @@ class SVGTest extends TestUtil
         $this->assertArrayHasKey('pat1', $svgobj['defs']);
 
         /** @var array<string, mixed> $pattern */
-        $pattern = $svgobj['defs']['pat1'];
-        $this->assertSame('pattern', $pattern['name']);
+        $pattern = $svgobj['defs']['pat1'] ?? [];
+        $this->assertSame('pattern', $pattern['name'] ?? null);
 
         /** @var array<string, mixed> $child */
-        $child = (isset($pattern['child']) && \is_array($pattern['child'])) ? $pattern['child'] : [];
+        $child = isset($pattern['child']) && \is_array($pattern['child']) ? $pattern['child'] : [];
         $this->assertArrayHasKey('DF_1', $child);
         $this->assertArrayHasKey('DF_1_CLOSE', $child);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternStartWithoutIdOnlyEnablesDefsMode(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1210,6 +1253,7 @@ class SVGTest extends TestUtil
         $this->assertFalse($obj->getSvgObj(539)['defsmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgMaskDefsCaptureAndLifecycle(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1245,15 +1289,16 @@ class SVGTest extends TestUtil
         $this->assertArrayHasKey('msk1', $svgobj['defs']);
 
         /** @var array<string, mixed> $mask */
-        $mask = $svgobj['defs']['msk1'];
-        $this->assertSame('mask', $mask['name']);
+        $mask = $svgobj['defs']['msk1'] ?? [];
+        $this->assertSame('mask', $mask['name'] ?? null);
 
         /** @var array<string, mixed> $child */
-        $child = (isset($mask['child']) && \is_array($mask['child'])) ? $mask['child'] : [];
+        $child = isset($mask['child']) && \is_array($mask['child']) ? $mask['child'] : [];
         $this->assertArrayHasKey('DF_1', $child);
         $this->assertArrayHasKey('DF_1_CLOSE', $child);
     }
 
+    /** @throws \Throwable */
     public function testSvgMaskStartWithoutIdOnlyEnablesDefsMode(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1269,6 +1314,7 @@ class SVGTest extends TestUtil
         $this->assertFalse($obj->getSvgObj(550)['defsmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefInheritanceIsResolvedByFill(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1326,23 +1372,20 @@ class SVGTest extends TestUtil
             'out' => 'BASE',
         ]);
 
-        [$out] = $obj->exposeParseSVGStyleFill(
-            540,
-            $base,
-            [],
-            0,
-            0,
-            10,
-            10,
-            'getClippingRect',
-            [0.0, 0.0, 10.0, 10.0, 0.0],
-        );
+        [$out] = $obj->exposeParseSVGStyleFill(540, $base, [], 0, 0, 10, 10, 'getClippingRect', [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $out);
         $this->assertSame('BASE', $obj->getSvgObj(540)['out']);
         $this->assertSame(0, $obj->getSvgObj(540)['patternmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefInheritanceUsesChildAttrAndParentFallback(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1390,8 +1433,8 @@ class SVGTest extends TestUtil
         $resolved = $obj->exposeResolveSVGPatternDef(544, 'patRef');
 
         $this->assertNotNull($resolved);
-        $resolvedAttr = (isset($resolved['attr']) && \is_array($resolved['attr'])) ? $resolved['attr'] : [];
-        $resolvedChild = (isset($resolved['child']) && \is_array($resolved['child'])) ? $resolved['child'] : [];
+        $resolvedAttr = $resolved['attr'];
+        $resolvedChild = isset($resolved['child']) ? $resolved['child'] : [];
 
         $this->assertSame('9', $resolvedAttr['width'] ?? '');
         $this->assertSame('6', $resolvedAttr['height'] ?? '');
@@ -1401,6 +1444,7 @@ class SVGTest extends TestUtil
         $this->assertArrayHasKey('PARENT_RECT', $resolvedChild);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefInheritanceKeepsChildContentWhenPresent(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1457,11 +1501,12 @@ class SVGTest extends TestUtil
         $resolved = $obj->exposeResolveSVGPatternDef(545, 'patRef');
 
         $this->assertNotNull($resolved);
-        $resolvedChild = (isset($resolved['child']) && \is_array($resolved['child'])) ? $resolved['child'] : [];
+        $resolvedChild = isset($resolved['child']) ? $resolved['child'] : [];
         $this->assertArrayHasKey('CHILD_RECT', $resolvedChild);
         $this->assertArrayNotHasKey('PARENT_RECT', $resolvedChild);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefMissingParentFallsBackToChildDefinition(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1508,8 +1553,8 @@ class SVGTest extends TestUtil
         $resolved = $obj->exposeResolveSVGPatternDef(546, 'patRef');
 
         $this->assertNotNull($resolved);
-        $resolvedAttr = (isset($resolved['attr']) && \is_array($resolved['attr'])) ? $resolved['attr'] : [];
-        $resolvedChild = (isset($resolved['child']) && \is_array($resolved['child'])) ? $resolved['child'] : [];
+        $resolvedAttr = $resolved['attr'];
+        $resolvedChild = isset($resolved['child']) ? $resolved['child'] : [];
         $this->assertSame('5', $resolvedAttr['width'] ?? '');
         $this->assertSame('5', $resolvedAttr['height'] ?? '');
         $this->assertArrayNotHasKey('patternUnits', $resolvedAttr);
@@ -1520,21 +1565,18 @@ class SVGTest extends TestUtil
         $style['opacity'] = 1.0;
         $style['fill-opacity'] = 1.0;
 
-        [$out] = $obj->exposeParseSVGStyleFill(
-            546,
-            $style,
-            [],
-            0,
-            0,
-            10,
-            10,
-            'getClippingRect',
-            [0.0, 0.0, 10.0, 10.0, 0.0],
-        );
+        [$out] = $obj->exposeParseSVGStyleFill(546, $style, [], 0, 0, 10, 10, 'getClippingRect', [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $out);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefNonFragmentKeepsLocalPatternDefinition(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1604,8 +1646,8 @@ class SVGTest extends TestUtil
         $resolved = $obj->exposeResolveSVGPatternDef(547, 'patRef');
 
         $this->assertNotNull($resolved);
-        $resolvedAttr = (isset($resolved['attr']) && \is_array($resolved['attr'])) ? $resolved['attr'] : [];
-        $resolvedChild = (isset($resolved['child']) && \is_array($resolved['child'])) ? $resolved['child'] : [];
+        $resolvedAttr = $resolved['attr'];
+        $resolvedChild = isset($resolved['child']) ? $resolved['child'] : [];
         $this->assertSame('5', $resolvedAttr['width'] ?? '');
         $this->assertSame('5', $resolvedAttr['height'] ?? '');
         $this->assertArrayNotHasKey('patternUnits', $resolvedAttr);
@@ -1617,21 +1659,18 @@ class SVGTest extends TestUtil
         $style['opacity'] = 1.0;
         $style['fill-opacity'] = 1.0;
 
-        [$out] = $obj->exposeParseSVGStyleFill(
-            547,
-            $style,
-            [],
-            0,
-            0,
-            10,
-            10,
-            'getClippingRect',
-            [0.0, 0.0, 10.0, 10.0, 0.0],
-        );
+        [$out] = $obj->exposeParseSVGStyleFill(547, $style, [], 0, 0, 10, 10, 'getClippingRect', [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $out);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefInheritsViewBoxAndPatternTransformInteraction(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1702,14 +1741,8 @@ class SVGTest extends TestUtil
         $this->assertNotNull($resolvedInherit);
         $this->assertNotNull($resolvedOverride);
 
-        $attrInherit = (
-            isset($resolvedInherit['attr'])
-            && \is_array($resolvedInherit['attr'])
-        ) ? $resolvedInherit['attr'] : [];
-        $attrOverride = (
-            isset($resolvedOverride['attr'])
-            && \is_array($resolvedOverride['attr'])
-        ) ? $resolvedOverride['attr'] : [];
+        $attrInherit = $resolvedInherit['attr'];
+        $attrOverride = $resolvedOverride['attr'];
         $this->assertSame('0 0 10 20', $attrInherit['viewBox'] ?? '');
         $this->assertSame('translate(1,2) scale(0.5)', $attrInherit['patternTransform'] ?? '');
         $this->assertSame('0 0 10 20', $attrOverride['viewBox'] ?? '');
@@ -1720,49 +1753,38 @@ class SVGTest extends TestUtil
         $style['fill-opacity'] = 1.0;
 
         $style['fill'] = 'url(#patBase)';
-        [$outBase] = $obj->exposeParseSVGStyleFill(
-            548,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outBase] = $obj->exposeParseSVGStyleFill(548, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $style['fill'] = 'url(#patRefInherit)';
-        [$outInherit] = $obj->exposeParseSVGStyleFill(
-            548,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outInherit] = $obj->exposeParseSVGStyleFill(548, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $style['fill'] = 'url(#patRefOverride)';
-        [$outOverride] = $obj->exposeParseSVGStyleFill(
-            548,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outOverride] = $obj->exposeParseSVGStyleFill(548, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $outBase);
         $this->assertNotSame('', $outInherit);
         $this->assertNotSame('', $outOverride);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternPreserveAspectRatioChangesViewBoxTransform(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1849,36 +1871,29 @@ class SVGTest extends TestUtil
         ]);
 
         $style['fill'] = 'url(#patNone)';
-        [$outNone] = $obj->exposeParseSVGStyleFill(
-            541,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outNone] = $obj->exposeParseSVGStyleFill(541, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $style['fill'] = 'url(#patMeet)';
-        [$outMeet] = $obj->exposeParseSVGStyleFill(
-            541,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outMeet] = $obj->exposeParseSVGStyleFill(541, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $outNone);
         $this->assertNotSame('', $outMeet);
         $this->assertNotSame($outNone, $outMeet);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternHrefCycleIsHandledSafely(): void
     {
         $obj = $this->getInternalTestObject();
@@ -1937,23 +1952,20 @@ class SVGTest extends TestUtil
             'out' => 'BASE',
         ]);
 
-        [$out] = $obj->exposeParseSVGStyleFill(
-            542,
-            $style,
-            [],
-            0,
-            0,
-            10,
-            10,
-            'getClippingRect',
-            [0.0, 0.0, 10.0, 10.0, 0.0],
-        );
+        [$out] = $obj->exposeParseSVGStyleFill(542, $style, [], 0, 0, 10, 10, 'getClippingRect', [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $out);
         $this->assertSame('BASE', $obj->getSvgObj(542)['out']);
         $this->assertSame(0, $obj->getSvgObj(542)['patternmode']);
     }
 
+    /** @throws \Throwable */
     public function testSvgPatternViewBoxIgnoresPatternContentUnits(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2022,30 +2034,22 @@ class SVGTest extends TestUtil
         ]);
 
         $style['fill'] = 'url(#patUser)';
-        [$outUser] = $obj->exposeParseSVGStyleFill(
-            543,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outUser] = $obj->exposeParseSVGStyleFill(543, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $style['fill'] = 'url(#patObj)';
-        [$outObj] = $obj->exposeParseSVGStyleFill(
-            543,
-            $style,
-            [],
-            0,
-            0,
-            6,
-            6,
-            'getClippingRect',
-            [0.0, 0.0, 6.0, 6.0, 0.0],
-        );
+        [$outObj] = $obj->exposeParseSVGStyleFill(543, $style, [], 0, 0, 6, 6, 'getClippingRect', [
+            0.0,
+            0.0,
+            6.0,
+            6.0,
+            0.0,
+        ]);
 
         $this->assertNotSame('', $outUser);
         $this->assertNotSame('', $outObj);
@@ -2054,6 +2058,7 @@ class SVGTest extends TestUtil
         $this->assertSame($normUser, $normObj);
     }
 
+    /** @throws \Throwable */
     public function testSvgLineRendersStartEndMarkersWhenDefined(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2115,6 +2120,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThanOrEqual(3, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgLineIgnoresMissingMarkerRefsGracefully(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2140,6 +2146,7 @@ class SVGTest extends TestUtil
         $this->assertSame(1, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgPathRendersStartMidEndMarkersWhenDefined(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2190,18 +2197,13 @@ class SVGTest extends TestUtil
         ]);
 
         $parser = \xml_parser_create('UTF-8');
-        $out = $obj->exposeParseSVGTagSTARTpath(
-            $parser,
-            525,
-            ['d' => 'M 1 1 L 9 1 L 9 7'],
-            $base,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTpath($parser, 525, ['d' => 'M 1 1 L 9 1 L 9 7'], $base, $base);
 
         $this->assertNotSame('', $out);
         $this->assertGreaterThanOrEqual(4, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgPolylineRendersMidMarkerWhenDefined(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2252,19 +2254,13 @@ class SVGTest extends TestUtil
         ]);
 
         $parser = \xml_parser_create('UTF-8');
-        $out = $obj->exposeParseSVGTagSTARTpolygon(
-            $parser,
-            526,
-            ['points' => '1,1 8,1 8,6'],
-            $base,
-            $base,
-            true,
-        );
+        $out = $obj->exposeParseSVGTagSTARTpolygon($parser, 526, ['points' => '1,1 8,1 8,6'], $base, $base, true);
 
         $this->assertNotSame('', $out);
         $this->assertGreaterThanOrEqual(4, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgCurvedPathRendersMarkersWithoutErrors(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2315,18 +2311,13 @@ class SVGTest extends TestUtil
         ]);
 
         $parser = \xml_parser_create('UTF-8');
-        $out = $obj->exposeParseSVGTagSTARTpath(
-            $parser,
-            527,
-            ['d' => 'M 1 1 C 3 9 7 -1 9 7 L 12 9'],
-            $base,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTpath($parser, 527, ['d' => 'M 1 1 C 3 9 7 -1 9 7 L 12 9'], $base, $base);
 
         $this->assertNotSame('', $out);
         $this->assertGreaterThanOrEqual(4, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgClosedPathAddsMidMarkerAtClosureJoin(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2377,19 +2368,14 @@ class SVGTest extends TestUtil
         ]);
 
         $parser = \xml_parser_create('UTF-8');
-        $out = $obj->exposeParseSVGTagSTARTpath(
-            $parser,
-            528,
-            ['d' => 'M 1 1 L 8 1 L 8 6 Z'],
-            $base,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTpath($parser, 528, ['d' => 'M 1 1 L 8 1 L 8 6 Z'], $base, $base);
 
         $this->assertNotSame('', $out);
         // Closed triangle has 3 vertices, each should receive marker-mid.
         $this->assertGreaterThanOrEqual(4, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerShorthandAppliesToLineAnchors(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2453,6 +2439,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThanOrEqual(3, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerOrientDegSuffixIsAccepted(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2514,6 +2501,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThanOrEqual(3, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerPercentRefMatchesAbsoluteRefInViewBox(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2614,6 +2602,7 @@ class SVGTest extends TestUtil
         $this->assertSame($outAbs, $outPct);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerPreserveAspectRatioChangesOutputTransform(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2717,6 +2706,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame($outNone, $outMeet);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerSpecificAnchorsOverrideShorthand(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2781,6 +2771,7 @@ class SVGTest extends TestUtil
         $this->assertSame(2, \substr_count($out, "q\n"));
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerPreserveAspectRatioDeferMatchesEquivalentValue(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2883,6 +2874,7 @@ class SVGTest extends TestUtil
         $this->assertSame($outEq, $outDefer);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerUnitsUserSpaceOnUseIgnoresStrokeWidthScale(): void
     {
         $obj = $this->getInternalTestObject();
@@ -2954,6 +2946,7 @@ class SVGTest extends TestUtil
         $this->assertSame($outThin, $outThick);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerUnitsStrokeWidthScalesWithStrokeWidth(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3025,6 +3018,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame($outThin, $outThick);
     }
 
+    /** @throws \Throwable */
     public function testSvgMarkerAutoStartReverseDiffersFromAutoAtStart(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3126,6 +3120,7 @@ class SVGTest extends TestUtil
         $this->assertNotSame($outAuto, $outRev);
     }
 
+    /** @throws \Throwable */
     public function testSvgHandleStartInheritAndUnknownTagBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3156,6 +3151,7 @@ class SVGTest extends TestUtil
         $this->assertTrue($svgobj['textmode']['invisible']);
     }
 
+    /** @throws \Throwable */
     public function testSvgClipPathInvisibleAndShapeImageGuardBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3199,26 +3195,30 @@ class SVGTest extends TestUtil
         $this->assertSame('', $imgClip);
     }
 
+    /** @throws \Throwable */
     public function testSvgAddSVGAlignmentAndScalingBranches(): void
     {
         $obj = $this->getTestObject();
         $page = $this->initFontAndPage($obj);
 
-        $svgSlice = '@<svg xmlns="http://www.w3.org/2000/svg"'
+        $svgSlice =
+            '@<svg xmlns="http://www.w3.org/2000/svg"'
             . ' width="20" height="10" viewBox="0 0 20 10" preserveAspectRatio="xMaxYMax slice">'
             . '<rect x="0" y="0" width="20" height="10" fill="#ffcc00"/>'
             . '</svg>';
         $idSlice = $obj->addSVG($svgSlice, 10, 12, 30, 10, $page['height']);
         $this->assertGreaterThan(0, $idSlice);
 
-        $svgMeet = '@<svg xmlns="http://www.w3.org/2000/svg"'
+        $svgMeet =
+            '@<svg xmlns="http://www.w3.org/2000/svg"'
             . ' width="10" height="20" viewBox="0 0 10 20" preserveAspectRatio="xMidYMid meet">'
             . '<circle cx="5" cy="10" r="4" fill="#00ccff"/>'
             . '</svg>';
         $idMeet = $obj->addSVG($svgMeet, 15, 18, 0, 25, $page['height']);
         $this->assertGreaterThan($idSlice, $idMeet);
 
-        $svgNone = '@<svg xmlns="http://www.w3.org/2000/svg"'
+        $svgNone =
+            '@<svg xmlns="http://www.w3.org/2000/svg"'
             . ' width="12" height="12" viewBox="0 0 12 12" preserveAspectRatio="none">'
             . '<line x1="0" y1="0" x2="12" y2="12" stroke="#000"/>'
             . '</svg>';
@@ -3226,6 +3226,7 @@ class SVGTest extends TestUtil
         $this->assertGreaterThan($idMeet, $idNone);
     }
 
+    /** @throws \Throwable */
     public function testSvgRemainingHelperGradientAndFillBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3266,16 +3267,16 @@ class SVGTest extends TestUtil
         ]);
         $this->assertNotSame('', $obj->getSvgObj(55)['out']);
 
-        $this->assertSame('', $obj->exposeParseSVGTagSTARTlinearGradient(
-            55,
-            ['gradientTransform' => 'matrix(1 0 0 1 1 2)']
-        ));
+        $this->assertSame('', $obj->exposeParseSVGTagSTARTlinearGradient(55, [
+            'gradientTransform' => 'matrix(1 0 0 1 1 2)',
+        ]));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTradialGradient(55, ['r' => '0.5']));
         $svgobj = $obj->getSvgObj(55);
         $this->assertNotSame('', $svgobj['gradientid']);
         $this->assertNotEmpty($svgobj['gradients']);
     }
 
+    /** @throws \Throwable */
     public function testSvgAdditionalEdgeBranchesForCoverage(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3313,7 +3314,7 @@ class SVGTest extends TestUtil
             56,
             ['x' => '4', 'y' => '5', 'r' => '2'],
             $base,
-            $base
+            $base,
         );
         $this->assertNotSame('', $circleClip);
         $ellipseClip = $obj->exposeParseSVGTagSTARTellipse(
@@ -3321,7 +3322,7 @@ class SVGTest extends TestUtil
             56,
             ['x' => '4', 'y' => '5', 'rx' => '2', 'ry' => '1'],
             $base,
-            $base
+            $base,
         );
         $this->assertNotSame('', $ellipseClip);
 
@@ -3342,7 +3343,7 @@ class SVGTest extends TestUtil
         \file_put_contents(
             $svgPath,
             '<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2">'
-            . '<rect x="0" y="0" width="2" height="2" fill="#000"/></svg>'
+            . '<rect x="0" y="0" width="2" height="2" fill="#000"/></svg>',
         );
         try {
             $svgImgOut = $obj->exposeParseSVGTagSTARTimage(
@@ -3354,7 +3355,9 @@ class SVGTest extends TestUtil
             );
             $this->assertNotSame('', $svgImgOut);
         } finally {
-            @\unlink($svgPath);
+            if (\file_exists($svgPath)) {
+                \unlink($svgPath);
+            }
         }
 
         // text defaults without explicit anchor/direction/stroke
@@ -3374,11 +3377,12 @@ class SVGTest extends TestUtil
                 ],
             ],
         ]);
-        $this->assertSame('', $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            56,
-            ['xlink:href' => '#u1', 'id' => 'tmp', 'x' => '2', 'y' => '3']
-        ));
+        $this->assertSame('', $obj->exposeParseSVGTagSTARTuse($parser, 56, [
+            'xlink:href' => '#u1',
+            'id' => 'tmp',
+            'x' => '2',
+            'y' => '3',
+        ]));
 
         // raw svg + size fallback branches
         $emptyFile = \tempnam(\sys_get_temp_dir(), 'tc-svg-empty-');
@@ -3387,7 +3391,9 @@ class SVGTest extends TestUtil
             \file_put_contents($emptyFile, '');
             $this->assertSame('', $obj->exposeGetRawSVGData($emptyFile));
         } finally {
-            @\unlink($emptyFile);
+            if (\file_exists($emptyFile)) {
+                \unlink($emptyFile);
+            }
         }
         $this->assertSame(0.0, $obj->exposeGetSVGSize('not svg data')['width']);
         $this->assertSame('xMidYMid', $obj->exposeGetSVGSize('<svg viewBox="0 0 10 10"></svg>')['ar_align']);
@@ -3402,14 +3408,18 @@ class SVGTest extends TestUtil
         $this->assertSame('', $obj->exposeParseSVGTagSTARTlinearGradient(58, []));
         $this->assertSame('', $obj->exposeParseSVGTagSTARTradialGradient(58, []));
         $this->setObjectProperty($obj, 'pdfa', 0);
-        $obj->exposeParseSVGTagSTARTlinearGradient(
-            58,
-            ['x1' => '1', 'y1' => '2', 'x2' => '3', 'y2' => '4', 'xlink:href' => '#gref']
-        );
-        $obj->exposeParseSVGTagSTARTradialGradient(
-            58,
-            ['r' => '0.5', 'gradientTransform' => 'matrix(1 0 0 1 1 1)', 'xlink:href' => '#gref2']
-        );
+        $obj->exposeParseSVGTagSTARTlinearGradient(58, [
+            'x1' => '1',
+            'y1' => '2',
+            'x2' => '3',
+            'y2' => '4',
+            'xlink:href' => '#gref',
+        ]);
+        $obj->exposeParseSVGTagSTARTradialGradient(58, [
+            'r' => '0.5',
+            'gradientTransform' => 'matrix(1 0 0 1 1 1)',
+            'xlink:href' => '#gref2',
+        ]);
 
         // addSVG parser error + width/height branch variants
         $objMain = $this->getTestObject();
@@ -3418,6 +3428,7 @@ class SVGTest extends TestUtil
         $objMain->addSVG('@<svg><g></svg>', 1, 1, 2, 2, $page['height']);
     }
 
+    /** @throws \Throwable */
     public function testSvgHandlersCoverAdditionalDispatchAndEarlyReturns(): void
     {
         $parser = \xml_parser_create('UTF-8');
@@ -3444,13 +3455,13 @@ class SVGTest extends TestUtil
             $parser,
             'linearGradient',
             ['id' => 'lg1', 'x1' => '0', 'y1' => '0', 'x2' => '100%', 'y2' => '0%'],
-            59
+            59,
         );
         $obj->exposeHandleSVGTagStart(
             $parser,
             'radialGradient',
             ['id' => 'rg1', 'cx' => '50%', 'cy' => '50%', 'r' => '0.5'],
-            59
+            59,
         );
         $obj->exposeHandleSVGTagStart($parser, 'stop', ['offset' => '0%'], 59);
         $obj->exposeHandleSVGTagStart($parser, 'polygon', ['points' => '0,0 1,0 1,1'], 59);
@@ -3470,6 +3481,7 @@ class SVGTest extends TestUtil
         $this->assertArrayHasKey('out', $obj->getSvgObj(59));
     }
 
+    /** @throws \Throwable */
     public function testSvgAddSvgCoversParseErrorAndInvalidInputBranches(): void
     {
         $obj = $this->getTestObject();
@@ -3479,19 +3491,22 @@ class SVGTest extends TestUtil
         \file_put_contents(
             $tmpRel,
             '<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2">'
-            . '<rect x="0" y="0" width="2" height="2"/></svg>'
+            . '<rect x="0" y="0" width="2" height="2"/></svg>',
         );
         try {
             $svgId = $obj->addSVG('tmp-svg-rel.svg', 1, 1, 2, 2, $page['height']);
             $this->assertGreaterThan(0, $svgId);
         } finally {
-            @\unlink($tmpRel);
+            if (\file_exists($tmpRel)) {
+                \unlink($tmpRel);
+            }
         }
 
         $this->bcExpectException(\Com\Tecnick\Pdf\Exception::class);
         $obj->addSVG('/path/does-not-exist.svg', 1, 1, 2, 2, $page['height']);
     }
 
+    /** @throws \Throwable */
     public function testSvgAddSvgThrowsOnXmlParseErrorAfterSizeParsing(): void
     {
         $obj = $this->getTestObject();
@@ -3508,6 +3523,7 @@ class SVGTest extends TestUtil
         );
     }
 
+    /** @throws \Throwable */
     public function testSvgImageTagCoversNestedSvgFailureAndBase64Path(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3517,24 +3533,26 @@ class SVGTest extends TestUtil
 
         $obj->initSvgObjForHandlers(60);
         $obj->patchSvgObj(60, [
-            'clipmode' => false, 'dir' => __DIR__, 'styles' => [$base], 'textmode' => ['invisible' => false]
+            'clipmode' => false,
+            'dir' => __DIR__,
+            'styles' => [$base],
+            'textmode' => ['invisible' => false],
         ]);
 
         $badSvg = __DIR__ . '/fixtures/invalid-child.svg';
         \file_put_contents($badSvg, '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><g></svg>');
         try {
-            $this->assertSame(
-                '',
-                $obj->exposeParseSVGTagSTARTimage(
-                    $parser,
-                    60,
-                    ['xlink:href' => $badSvg, 'x' => '0', 'y' => '0', 'width' => '1', 'height' => '1'],
-                    $base,
-                    $base,
-                ),
-            );
+            $this->assertSame('', $obj->exposeParseSVGTagSTARTimage(
+                $parser,
+                60,
+                ['xlink:href' => $badSvg, 'x' => '0', 'y' => '0', 'width' => '1', 'height' => '1'],
+                $base,
+                $base,
+            ));
         } finally {
-            @\unlink($badSvg);
+            if (\file_exists($badSvg)) {
+                \unlink($badSvg);
+            }
         }
 
         $onePx = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7ZkQAAAABJRU5ErkJggg==';
@@ -3544,7 +3562,10 @@ class SVGTest extends TestUtil
                 60,
                 [
                     'xlink:href' => 'data:image/png;base64,' . $onePx,
-                    'x' => '0', 'y' => '0', 'width' => '1', 'height' => '1'
+                    'x' => '0',
+                    'y' => '0',
+                    'width' => '1',
+                    'height' => '1',
                 ],
                 $base,
                 $base,
@@ -3555,6 +3576,7 @@ class SVGTest extends TestUtil
         }
     }
 
+    /** @throws \Throwable */
     public function testSvgAdditionalTransformAndDispatchBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3609,13 +3631,13 @@ class SVGTest extends TestUtil
             $parser,
             'linearGradient',
             ['id' => 'lgx', 'gradientUnits' => 'userSpaceOnUse'],
-            64
+            64,
         );
         $obj->exposeHandleSVGTagStart(
             $parser,
             'radialGradient',
             ['id' => 'rgx', 'gradientUnits' => 'userSpaceOnUse', 'r' => '0.5', 'cx' => '2', 'cy' => '3'],
-            64
+            64,
         );
         $obj->exposeHandleSVGTagStart($parser, 'stop', ['offset' => '50%'], 64);
         $obj->exposeHandleSVGTagStart($parser, 'ellipse', ['cx' => '3', 'cy' => '4', 'rx' => '2', 'ry' => '1'], 64);
@@ -3633,6 +3655,7 @@ class SVGTest extends TestUtil
         $this->assertIsString($svgOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgGradientAndFillRemainingBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3656,15 +3679,7 @@ class SVGTest extends TestUtil
             ],
         ];
 
-        $grOut = $obj->exposeParseSVGStyleGradient(
-            65,
-            $gradients,
-            'eq',
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        );
+        $grOut = $obj->exposeParseSVGStyleGradient(65, $gradients, 'eq', 0.0, 0.0, 0.0, 0.0);
         $this->assertNotSame('', $grOut);
 
         $fillStyle = $base;
@@ -3676,26 +3691,30 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $fillOut);
     }
 
+    /** @throws \Throwable */
     public function testSvgAddSvgScalingAndRecursiveChildBranches(): void
     {
         $obj = $this->getTestObject();
         $page = $this->initFontAndPage($obj);
 
-        $svgSlice = '@<svg xmlns="http://www.w3.org/2000/svg"'
+        $svgSlice =
+            '@<svg xmlns="http://www.w3.org/2000/svg"'
             . ' width="100" height="10" viewBox="0 0 100 10" preserveAspectRatio="xMinYMin slice">'
             . '<rect x="0" y="0" width="100" height="10" fill="#cccccc"/>'
             . '</svg>';
         $idSlice = $obj->addSVG($svgSlice, 2, 2, 100, 100, $page['height']);
         $this->assertGreaterThan(0, $idSlice);
 
-        $svgMeet = '@<svg xmlns="http://www.w3.org/2000/svg"'
+        $svgMeet =
+            '@<svg xmlns="http://www.w3.org/2000/svg"'
             . ' width="10" height="100" viewBox="0 0 10 100" preserveAspectRatio="xMinYMin meet">'
             . '<rect x="0" y="0" width="10" height="100" fill="#999999"/>'
             . '</svg>';
         $idMeet = $obj->addSVG($svgMeet, 3, 3, 100, 100, $page['height']);
         $this->assertGreaterThan($idSlice, $idMeet);
 
-        $svgAutoHeight = '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10">'
+        $svgAutoHeight =
+            '@<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10">'
             . '<rect x="0" y="0" width="20" height="10"/></svg>';
         $idAutoHeight = $obj->addSVG($svgAutoHeight, 4, 4, 30, 0, $page['height']);
         $this->assertGreaterThan($idMeet, $idAutoHeight);
@@ -3720,11 +3739,16 @@ class SVGTest extends TestUtil
             $setOut = $obj->getSetSVG($parentId);
             $this->assertNotSame('', $setOut);
         } finally {
-            @\unlink($childPath);
-            @\unlink($parentPath);
+            if (\file_exists($childPath)) {
+                \unlink($childPath);
+            }
+            if (\file_exists($parentPath)) {
+                \unlink($parentPath);
+            }
         }
     }
 
+    /** @throws \Throwable */
     public function testSvgFinalFeasibleBranchCoverageBatch(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3736,19 +3760,24 @@ class SVGTest extends TestUtil
         $coord['relcoord'] = true;
         $coord['xoffset'] = 1.0;
         $coord['yoffset'] = 1.0;
-        [, $coord] = $obj->exposeSvgPathCmdA(
-            [4.0, 3.0, 0.0, 0.0, 0.0, 8.0, 9.0],
-            $coord,
-            [['0', 'A'], ['1', 'z']],
-            0,
-            ['4', '3', '0', '0', '0', '8', '9'],
-        );
+        [, $coord] = $obj->exposeSvgPathCmdA([4.0, 3.0, 0.0, 0.0, 0.0, 8.0, 9.0], $coord, [['0', 'A'], ['1', 'z']], 0, [
+            '4',
+            '3',
+            '0',
+            '0',
+            '0',
+            '8',
+            '9',
+        ]);
         $this->assertGreaterThan(0.0, $coord['xoffset']);
         $this->assertGreaterThan(0.0, $coord['yoffset']);
 
         $obj->initSvgObjForHandlers(70);
         $obj->patchSvgObj(70, [
-            'defsmode' => true, 'defs' => [], 'styles' => [$base], 'textmode' => ['invisible' => false]
+            'defsmode' => true,
+            'defs' => [],
+            'styles' => [$base],
+            'textmode' => ['invisible' => false],
         ]);
         /** @var array<int, array<string, mixed>> $svgobjs */
         $svgobjs = $this->getObjectProperty($obj, 'svgobjs');
@@ -3764,8 +3793,12 @@ class SVGTest extends TestUtil
             $parser,
             70,
             [
-                'x' => '0', 'y' => '0', 'width' => '40', 'height' => '10',
-                'viewBox' => '0 0 100 50', 'preserveAspectRatio' => 'none'
+                'x' => '0',
+                'y' => '0',
+                'width' => '40',
+                'height' => '10',
+                'viewBox' => '0 0 100 50',
+                'preserveAspectRatio' => 'none',
             ],
             $base,
             $base,
@@ -3777,8 +3810,12 @@ class SVGTest extends TestUtil
             $parser,
             70,
             [
-                'x' => '0', 'y' => '0', 'width' => '40', 'height' => '10',
-                'viewBox' => '0 0 100 50', 'preserveAspectRatio' => 'xMaxYMid meet'
+                'x' => '0',
+                'y' => '0',
+                'width' => '40',
+                'height' => '10',
+                'viewBox' => '0 0 100 50',
+                'preserveAspectRatio' => 'xMaxYMid meet',
             ],
             $base,
             $base,
@@ -3790,8 +3827,12 @@ class SVGTest extends TestUtil
             $parser,
             70,
             [
-                'x' => '0', 'y' => '0', 'width' => '10', 'height' => '40',
-                'viewBox' => '0 0 50 100', 'preserveAspectRatio' => 'xMidYMax meet'
+                'x' => '0',
+                'y' => '0',
+                'width' => '10',
+                'height' => '40',
+                'viewBox' => '0 0 50 100',
+                'preserveAspectRatio' => 'xMidYMax meet',
             ],
             $base,
             $base,
@@ -3799,18 +3840,20 @@ class SVGTest extends TestUtil
         $this->assertNotSame('', $svgMeetYMax);
 
         $obj->initSvgObjForHandlers(71);
-        $obj->exposeParseSVGTagSTARTradialGradient(
-            71,
-            ['id' => 'rgm', 'gradientUnits' => 'userSpaceOnUse', 'cx' => '2', 'cy' => '3', 'r' => '2']
-        );
+        $obj->exposeParseSVGTagSTARTradialGradient(71, [
+            'id' => 'rgm',
+            'gradientUnits' => 'userSpaceOnUse',
+            'cx' => '2',
+            'cy' => '3',
+            'r' => '2',
+        ]);
         $svgobj71 = $obj->getSvgObj(71);
-        $this->assertSame('measure', $svgobj71['gradients']['rgm']['mode']);
+        $this->assertSame('measure', $svgobj71['gradients']['rgm']['mode'] ?? null);
 
         $obj->initSvgObjForHandlers(72);
         $styleNoAnchor = $base;
-        unset($styleNoAnchor['text-anchor']);
-        unset($styleNoAnchor['direction']);
-        // @phpstan-ignore argument.type
+        $styleNoAnchor['text-anchor'] = '';
+        $styleNoAnchor['direction'] = '';
         $txtOut = $obj->exposeParseSVGTagSTARTtext($parser, 72, ['x' => '1', 'y' => '1'], $styleNoAnchor, $base);
         $this->assertNotSame('', $txtOut);
 
@@ -3821,6 +3864,7 @@ class SVGTest extends TestUtil
         $this->assertSame('AB', $obj->getSetSVG(73));
     }
 
+    /** @throws \Throwable */
     public function testSvgRemainingFeasibleHotspotBranches(): void
     {
         $obj = $this->getInternalTestObject();
@@ -3830,8 +3874,8 @@ class SVGTest extends TestUtil
         $coord = $obj->getPathCoordDefaults();
         $paths = [['0', 'A'], ['1', 'z']];
         $rawSets = [
-            ['4', '2', '0', '1', '0', '10', '20'],
-            ['4', '2', '0', '0', '1', '10', '20'],
+            ['4', '2', '0',  '1', '0', '10', '20'],
+            ['4', '2', '0',  '0', '1', '10', '20'],
             ['6', '3', '45', '1', '0', '14', '16'],
             ['6', '3', '45', '0', '1', '14', '16'],
         ];
@@ -3883,8 +3927,12 @@ class SVGTest extends TestUtil
             $parser,
             76,
             [
-                'x' => '0', 'y' => '0', 'width' => '40', 'height' => '10',
-                'viewBox' => '0 0 100 50', 'preserveAspectRatio' => 'xMidYMid meet'
+                'x' => '0',
+                'y' => '0',
+                'width' => '40',
+                'height' => '10',
+                'viewBox' => '0 0 100 50',
+                'preserveAspectRatio' => 'xMidYMid meet',
             ],
             $base,
             $base,
@@ -3896,8 +3944,12 @@ class SVGTest extends TestUtil
             $parser,
             76,
             [
-                'x' => '0', 'y' => '0', 'width' => '10', 'height' => '40',
-                'viewBox' => '0 0 50 100', 'preserveAspectRatio' => 'xMinYMid meet'
+                'x' => '0',
+                'y' => '0',
+                'width' => '10',
+                'height' => '40',
+                'viewBox' => '0 0 50 100',
+                'preserveAspectRatio' => 'xMinYMid meet',
             ],
             $base,
             $base,
@@ -3911,6 +3963,7 @@ class SVGTest extends TestUtil
 
     /**
      * T-1: visibility:hidden text must still advance the layout cursor.
+     * @throws \Throwable
      */
     public function testSvgInvisibleTextAdvancesCursor(): void
     {
@@ -3945,6 +3998,7 @@ class SVGTest extends TestUtil
 
     /**
      * T-1: empty invisible text does not change the cursor.
+     * @throws \Throwable
      */
     public function testSvgInvisibleEmptyTextDoesNotChangeCursor(): void
     {
@@ -3973,6 +4027,7 @@ class SVGTest extends TestUtil
 
     /**
      * Metadata text like <desc> must not leak into renderable SVG text buffer.
+     * @throws \Throwable
      */
     public function testSvgDescCharacterDataIsNotRenderedAsText(): void
     {
@@ -3990,6 +4045,7 @@ class SVGTest extends TestUtil
 
     /**
      * T-2: starting a new text/tspan while buffered text exists flushes the run.
+     * @throws \Throwable
      */
     public function testSvgStartTextFlushesBufferedRun(): void
     {
@@ -4001,7 +4057,7 @@ class SVGTest extends TestUtil
 
         // Simulate state after an outer <text> started and accumulated content.
         $obj->patchSvgObj(82, [
-            'styles' => [$base, $base],  // outer-text style already on stack
+            'styles' => [$base, $base], // outer-text style already on stack
             'defsmode' => false,
             'textmode' => [
                 'invisible' => false,
@@ -4015,13 +4071,7 @@ class SVGTest extends TestUtil
         ]);
 
         // Starting a tspan should flush 'Outer' and produce non-empty output.
-        $tspanOut = $obj->exposeParseSVGTagSTARTtspan(
-            $parser,
-            82,
-            ['x' => '5', 'y' => '10'],
-            $base,
-            $base,
-        );
+        $tspanOut = $obj->exposeParseSVGTagSTARTtspan($parser, 82, ['x' => '5', 'y' => '10'], $base, $base);
         // After flush the text buffer must be empty (new run started fresh).
         $this->assertSame('', $obj->getSvgObj(82)['text']);
         // Output contains both the flushed run and the new transform.
@@ -4030,6 +4080,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: parseSVGTagSTARTuse resolves an element via plain href (SVG 2).
+     * @throws \Throwable
      */
     public function testSvgUseTagResolvesViaPlainHref(): void
     {
@@ -4062,6 +4113,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: parseSVGTagSTARTimage falls back to plain href when xlink:href absent.
+     * @throws \Throwable
      */
     public function testSvgImageTagAcceptsPlainHref(): void
     {
@@ -4072,16 +4124,7 @@ class SVGTest extends TestUtil
         $base = $obj->exposeDefaultSVGStyle();
 
         // Missing both href attributes → empty.
-        $this->assertSame(
-            '',
-            $obj->exposeParseSVGTagSTARTimage(
-                $parser,
-                84,
-                [],
-                $base,
-                $base,
-            )
-        );
+        $this->assertSame('', $obj->exposeParseSVGTagSTARTimage($parser, 84, [], $base, $base));
 
         // Plain href pointing to an image that will cause a load exception;
         // what matters is that the early-return guard no longer rejects the call
@@ -4104,6 +4147,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: linearGradient and radialGradient store xref from plain href.
+     * @throws \Throwable
      */
     public function testSvgGradientXrefFromPlainHref(): void
     {
@@ -4115,12 +4159,13 @@ class SVGTest extends TestUtil
         $obj->exposeParseSVGTagSTARTradialGradient(85, ['id' => 'rg85', 'href' => '#rgBase']);
 
         $svgobj = $obj->getSvgObj(85);
-        $this->assertSame('lgBase', $svgobj['gradients']['lg85']['xref']);
-        $this->assertSame('rgBase', $svgobj['gradients']['rg85']['xref']);
+        $this->assertSame('lgBase', $svgobj['gradients']['lg85']['xref'] ?? null);
+        $this->assertSame('rgBase', $svgobj['gradients']['rg85']['xref'] ?? null);
     }
 
     /**
      * S-5: gradient prescan preserves plain href so xref inheritance works.
+     * @throws \Throwable
      */
     public function testSvgPrescanGradientsKeepsPlainHrefXref(): void
     {
@@ -4139,12 +4184,13 @@ class SVGTest extends TestUtil
         );
 
         $svgobj = $obj->getSvgObj(851);
-        $this->assertSame('baseLg', (string) ($svgobj['gradients']['refLg']['xref'] ?? ''));
-        $this->assertSame('baseRg', (string) ($svgobj['gradients']['refRg']['xref'] ?? ''));
+        $this->assertSame('baseLg', $svgobj['gradients']['refLg']['xref'] ?? '');
+        $this->assertSame('baseRg', $svgobj['gradients']['refRg']['xref'] ?? '');
     }
 
     /**
      * R-4: stroke-dasharray values with unit suffixes are normalised to user units.
+     * @throws \Throwable
      */
     public function testSvgDasharrayWithUnitSuffixIsNormalised(): void
     {
@@ -4173,6 +4219,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: <symbol id="sym"> enters defs-capture mode and stores the id in defs.
+     * @throws \Throwable
      */
     public function testSvgSymbolEnterDefsMode(): void
     {
@@ -4185,11 +4232,12 @@ class SVGTest extends TestUtil
         $svgobj = $obj->getSvgObj(90);
         $this->assertTrue($svgobj['defsmode']);
         $this->assertArrayHasKey('mySymbol', $svgobj['defs']);
-        $this->assertSame('symbol', $svgobj['defs']['mySymbol']['name']);
+        $this->assertSame('symbol', $svgobj['defs']['mySymbol']['name'] ?? null);
     }
 
     /**
      * E-1: </symbol> exits defs-capture mode.
+     * @throws \Throwable
      */
     public function testSvgSymbolEndExitsDefsMode(): void
     {
@@ -4206,6 +4254,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: symbol without id does not crash and defsmode is still entered.
+     * @throws \Throwable
      */
     public function testSvgSymbolWithoutIdStillEntersDefsMode(): void
     {
@@ -4221,6 +4270,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: first non-id child inside symbol is captured in defs child list.
+     * @throws \Throwable
      */
     public function testSvgSymbolCapturesFirstAnonymousChild(): void
     {
@@ -4230,27 +4280,23 @@ class SVGTest extends TestUtil
         $obj->initSvgObjForHandlers(92);
 
         $obj->exposeParseSVGTagSTARTsymbol(92, ['id' => 'symChild']);
-        $obj->exposeHandleSVGTagStart(
-            $parser,
-            'rect',
-            ['width' => '10', 'height' => '5'],
-            92,
-        );
+        $obj->exposeHandleSVGTagStart($parser, 'rect', ['width' => '10', 'height' => '5'], 92);
 
         $svgobj = $obj->getSvgObj(92);
         $this->assertArrayHasKey('symChild', $svgobj['defs']);
-        $symbolDef = $svgobj['defs']['symChild'];
+        $symbolDef = $svgobj['defs']['symChild'] ?? [];
         $children = $symbolDef['child'] ?? [];
         $this->assertIsArray($children);
         $this->assertNotSame([], $children);
 
         $first = \reset($children);
         $this->assertIsArray($first);
-        $this->assertSame('rect', $first['name'] ?? '');
+        $this->assertSame('rect', $first['name']);
     }
 
     /**
      * E-1/R-3: <use> on symbol falls back to symbol viewBox size when width/height missing.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolFallsBackToViewBoxDimensions(): void
     {
@@ -4285,6 +4331,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1/R-3: explicit width/height on use still override symbol defaults.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolRespectsExplicitUseDimensions(): void
     {
@@ -4314,11 +4361,13 @@ class SVGTest extends TestUtil
             ],
         ]);
 
-        $out = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            922,
-            ['href' => '#symovr', 'x' => '0', 'y' => '0', 'width' => '10', 'height' => '5'],
-        );
+        $out = $obj->exposeParseSVGTagSTARTuse($parser, 922, [
+            'href' => '#symovr',
+            'x' => '0',
+            'y' => '0',
+            'width' => '10',
+            'height' => '5',
+        ]);
         $this->assertNotSame('', $out);
         // Rendering with explicit dimensions should still produce content and transforms.
         $this->assertStringContainsString(' cm', $out);
@@ -4326,6 +4375,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: use-level transform is preserved when expanding <symbol>.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolPreservesUseLevelTransformAttribute(): void
     {
@@ -4351,26 +4401,24 @@ class SVGTest extends TestUtil
 
         $obj->initSvgObjForHandlers(923);
         $obj->patchSvgObj(923, ['styles' => [$base], 'defs' => $defs]);
-        $outDefault = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            923,
-            ['href' => '#symstyle', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outDefault = $obj->exposeParseSVGTagSTARTuse($parser, 923, [
+            'href' => '#symstyle',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $obj->initSvgObjForHandlers(924);
         $obj->patchSvgObj(924, ['styles' => [$base], 'defs' => $defs]);
-        $outTransformed = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            924,
-            [
-                'href' => '#symstyle',
-                'x' => '0',
-                'y' => '0',
-                'width' => '20',
-                'height' => '10',
-                'transform' => 'translate(5,7)',
-            ],
-        );
+        $outTransformed = $obj->exposeParseSVGTagSTARTuse($parser, 924, [
+            'href' => '#symstyle',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+            'transform' => 'translate(5,7)',
+        ]);
 
         $this->assertNotSame('', $outDefault);
         $this->assertNotSame('', $outTransformed);
@@ -4379,6 +4427,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: use-level style is preserved when expanding <symbol>.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolPreservesUseLevelStyleAttribute(): void
     {
@@ -4404,26 +4453,24 @@ class SVGTest extends TestUtil
 
         $obj->initSvgObjForHandlers(925);
         $obj->patchSvgObj(925, ['styles' => [$base], 'defs' => $defs]);
-        $outDefault = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            925,
-            ['href' => '#symstyle2', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outDefault = $obj->exposeParseSVGTagSTARTuse($parser, 925, [
+            'href' => '#symstyle2',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $obj->initSvgObjForHandlers(926);
         $obj->patchSvgObj(926, ['styles' => [$base], 'defs' => $defs]);
-        $outStyled = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            926,
-            [
-                'href' => '#symstyle2',
-                'x' => '0',
-                'y' => '0',
-                'width' => '20',
-                'height' => '10',
-                'style' => 'fill:#ff0000;stroke:none;',
-            ],
-        );
+        $outStyled = $obj->exposeParseSVGTagSTARTuse($parser, 926, [
+            'href' => '#symstyle2',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+            'style' => 'fill:#ff0000;stroke:none;',
+        ]);
 
         $this->assertNotSame('', $outDefault);
         $this->assertNotSame('', $outStyled);
@@ -4432,6 +4479,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: symbol-level style is preserved when expanding <symbol>.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolPreservesSymbolLevelStyleAttribute(): void
     {
@@ -4458,11 +4506,13 @@ class SVGTest extends TestUtil
                 ],
             ],
         ]);
-        $outDefault = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            927,
-            ['href' => '#symstyle3', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outDefault = $obj->exposeParseSVGTagSTARTuse($parser, 927, [
+            'href' => '#symstyle3',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $obj->initSvgObjForHandlers(928);
         $obj->patchSvgObj(928, [
@@ -4483,11 +4533,13 @@ class SVGTest extends TestUtil
                 ],
             ],
         ]);
-        $outStyled = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            928,
-            ['href' => '#symstyle3', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outStyled = $obj->exposeParseSVGTagSTARTuse($parser, 928, [
+            'href' => '#symstyle3',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $this->assertNotSame('', $outDefault);
         $this->assertNotSame('', $outStyled);
@@ -4496,6 +4548,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-1: symbol-level transform is preserved when expanding <symbol>.
+     * @throws \Throwable
      */
     public function testSvgUseSymbolPreservesSymbolLevelTransformAttribute(): void
     {
@@ -4522,11 +4575,13 @@ class SVGTest extends TestUtil
                 ],
             ],
         ]);
-        $outDefault = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            929,
-            ['href' => '#symstyle4', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outDefault = $obj->exposeParseSVGTagSTARTuse($parser, 929, [
+            'href' => '#symstyle4',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $obj->initSvgObjForHandlers(930);
         $obj->patchSvgObj(930, [
@@ -4547,11 +4602,13 @@ class SVGTest extends TestUtil
                 ],
             ],
         ]);
-        $outTransformed = $obj->exposeParseSVGTagSTARTuse(
-            $parser,
-            930,
-            ['href' => '#symstyle4', 'x' => '0', 'y' => '0', 'width' => '20', 'height' => '10'],
-        );
+        $outTransformed = $obj->exposeParseSVGTagSTARTuse($parser, 930, [
+            'href' => '#symstyle4',
+            'x' => '0',
+            'y' => '0',
+            'width' => '20',
+            'height' => '10',
+        ]);
 
         $this->assertNotSame('', $outDefault);
         $this->assertNotSame('', $outTransformed);
@@ -4560,6 +4617,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-7: <a> start stores link metadata and </a> emits an annotation ref.
+     * @throws \Throwable
      */
     public function testSvgATagCreatesAnnotationReference(): void
     {
@@ -4568,7 +4626,10 @@ class SVGTest extends TestUtil
         $obj->initSvgObjForHandlers(93);
 
         $pageBefore = $obj->exposeGetCurrentPageData();
-        $annotRefsBefore = $pageBefore['annotrefs'] ?? [];
+        $annotRefsBefore = [];
+        if (isset($pageBefore['annotrefs']) && \is_array($pageBefore['annotrefs'])) {
+            $annotRefsBefore = $pageBefore['annotrefs'];
+        }
         $this->assertIsArray($annotRefsBefore);
         $countBefore = \count($annotRefsBefore);
 
@@ -4582,15 +4643,19 @@ class SVGTest extends TestUtil
         $this->assertSame('', $end);
 
         $pageAfter = $obj->exposeGetCurrentPageData();
-        $annotRefsAfter = $pageAfter['annotrefs'] ?? [];
+        $annotRefsAfter = [];
+        if (isset($pageAfter['annotrefs']) && \is_array($pageAfter['annotrefs'])) {
+            $annotRefsAfter = $pageAfter['annotrefs'];
+        }
         $this->assertIsArray($annotRefsAfter);
         $countAfter = \count($annotRefsAfter);
         $this->assertSame($countBefore + 1, $countAfter);
-        $this->assertSame('', (string) ($obj->getSvgObj(93)['textmode']['linkhref'] ?? ''));
+        $this->assertSame('', $obj->getSvgObj(93)['textmode']['linkhref'] ?? '');
     }
 
     /**
      * E-7: missing href on <a> should degrade gracefully with no annotation.
+     * @throws \Throwable
      */
     public function testSvgATagWithoutHrefProducesNoAnnotation(): void
     {
@@ -4599,7 +4664,10 @@ class SVGTest extends TestUtil
         $obj->initSvgObjForHandlers(94);
 
         $pageBefore = $obj->exposeGetCurrentPageData();
-        $annotRefsBefore = $pageBefore['annotrefs'] ?? [];
+        $annotRefsBefore = [];
+        if (isset($pageBefore['annotrefs']) && \is_array($pageBefore['annotrefs'])) {
+            $annotRefsBefore = $pageBefore['annotrefs'];
+        }
         $this->assertIsArray($annotRefsBefore);
         $countBefore = \count($annotRefsBefore);
 
@@ -4609,7 +4677,10 @@ class SVGTest extends TestUtil
         $this->assertSame('', $end);
 
         $pageAfter = $obj->exposeGetCurrentPageData();
-        $annotRefsAfter = $pageAfter['annotrefs'] ?? [];
+        $annotRefsAfter = [];
+        if (isset($pageAfter['annotrefs']) && \is_array($pageAfter['annotrefs'])) {
+            $annotRefsAfter = $pageAfter['annotrefs'];
+        }
         $this->assertIsArray($annotRefsAfter);
         $countAfter = \count($annotRefsAfter);
         $this->assertSame($countBefore, $countAfter);
@@ -4617,6 +4688,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-8 stub: <switch> start returns empty string.
+     * @throws \Throwable
      */
     public function testSvgSwitchTagStartReturnsEmpty(): void
     {
@@ -4630,6 +4702,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-8 stub: </switch> end returns empty string.
+     * @throws \Throwable
      */
     public function testSvgSwitchTagEndReturnsEmpty(): void
     {
@@ -4643,6 +4716,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-8: only first direct child of switch is rendered.
+     * @throws \Throwable
      */
     public function testSvgSwitchRendersOnlyFirstChild(): void
     {
@@ -4660,7 +4734,7 @@ class SVGTest extends TestUtil
             960,
         );
         $obj->exposeHandleSVGTagEnd($parser, 'rect');
-        $outAfterFirst = (string) $obj->getSvgObj(960)['out'];
+        $outAfterFirst = $obj->getSvgObj(960)['out'];
         $this->assertNotSame('', $outAfterFirst);
 
         // Second sibling should be skipped by switch selection logic.
@@ -4671,16 +4745,17 @@ class SVGTest extends TestUtil
             960,
         );
         $obj->exposeHandleSVGTagEnd($parser, 'circle');
-        $outAfterSecond = (string) $obj->getSvgObj(960)['out'];
+        $outAfterSecond = $obj->getSvgObj(960)['out'];
         $this->assertSame($outAfterFirst, $outAfterSecond);
 
         $obj->exposeHandleSVGTagEnd($parser, 'switch');
-        $this->assertEmpty($obj->getSvgObj(960)['switchstack']);
+        $this->assertEmpty($obj->getSvgObj(960)['switchstack'] ?? []);
     }
 
     /**
      * S-1: dominant-baseline='hanging' shifts renderY by -ascent.
      * We verify that the output changes when baseline keyword differs.
+     * @throws \Throwable
      */
     public function testSvgDominantBaselineHangingChangesOutput(): void
     {
@@ -4743,6 +4818,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: textLength with spacingAndGlyphs wraps output in an extra transform.
+     * @throws \Throwable
      */
     public function testSvgTextLengthGlyphsAddsScaleTransform(): void
     {
@@ -4804,6 +4880,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: rotate adds extra transform operators around the text output.
+     * @throws \Throwable
      */
     public function testSvgTextRotateAddsTransformOperators(): void
     {
@@ -4865,6 +4942,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: multi-value rotate is parsed and applied per glyph.
+     * @throws \Throwable
      */
     public function testSvgTextRotateListAppliesPerGlyph(): void
     {
@@ -4878,13 +4956,7 @@ class SVGTest extends TestUtil
         $obj->patchSvgObj(1001, [
             'styles' => [$base],
         ]);
-        $obj->exposeParseSVGTagSTARTtext(
-            $parser,
-            1001,
-            ['x' => '5', 'y' => '10', 'rotate' => '0'],
-            $base,
-            $base,
-        );
+        $obj->exposeParseSVGTagSTARTtext($parser, 1001, ['x' => '5', 'y' => '10', 'rotate' => '0'], $base, $base);
         $obj->exposeHandleSVGCharacter($parser, 'AB');
         $outSingle = $obj->exposeParseSVGTagENDtext(1001);
 
@@ -4893,26 +4965,23 @@ class SVGTest extends TestUtil
         $obj->patchSvgObj(1002, [
             'styles' => [$base],
         ]);
-        $obj->exposeParseSVGTagSTARTtext(
-            $parser,
-            1002,
-            ['x' => '5', 'y' => '10', 'rotate' => '0 45'],
-            $base,
-            $base,
-        );
+        $obj->exposeParseSVGTagSTARTtext($parser, 1002, ['x' => '5', 'y' => '10', 'rotate' => '0 45'], $base, $base);
         $obj->exposeHandleSVGCharacter($parser, 'AB');
         $outList = $obj->exposeParseSVGTagENDtext(1002);
         $svgobj = $obj->getSvgObj(1002);
         $rotlist = $svgobj['textmode']['rotlist'] ?? [];
 
         $this->assertGreaterThanOrEqual(2, \count($rotlist));
-        $this->assertEqualsWithDelta(0.0, (float) $rotlist[0], 0.001);
-        $this->assertEqualsWithDelta(45.0, (float) $rotlist[1], 0.001);
+        assert(isset($rotlist[0]), "\$rotlist[0] must be set");
+        $this->assertEqualsWithDelta(0.0, $rotlist[0], 0.001);
+        assert(isset($rotlist[1]), "\$rotlist[1] must be set");
+        $this->assertEqualsWithDelta(45.0, $rotlist[1], 0.001);
         $this->assertGreaterThan(\strlen($outSingle), \strlen($outList));
     }
 
     /**
      * R-1: multi-value x list triggers per-character rendering (more operators).
+     * @throws \Throwable
      */
     public function testSvgMultiValueXListRendersPerCharacter(): void
     {
@@ -4974,6 +5043,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-6: textPath startOffset maps text origin along referenced path.
+     * @throws \Throwable
      */
     public function testSvgTextPathStartOffsetUpdatesPosition(): void
     {
@@ -5008,7 +5078,7 @@ class SVGTest extends TestUtil
 
         $this->assertNotSame('', $out);
         $svgobj = $obj->getSvgObj(103);
-        $pos25 = (float) $svgobj['x'];
+        $pos25 = $svgobj['x'];
 
         $obj->initSvgObjForHandlers(106);
         $obj->patchSvgObj(106, [
@@ -5033,7 +5103,7 @@ class SVGTest extends TestUtil
             $base,
             $base,
         );
-        $pos50 = (float) $obj->getSvgObj(106)['x'];
+        $pos50 = $obj->getSvgObj(106)['x'];
 
         $this->assertGreaterThan(0.0, $pos25);
         $this->assertGreaterThan($pos25, $pos50);
@@ -5042,6 +5112,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-6: textPath on vertical segment sets rotate to path angle.
+     * @throws \Throwable
      */
     public function testSvgTextPathVerticalSegmentSetsRotate(): void
     {
@@ -5075,11 +5146,12 @@ class SVGTest extends TestUtil
         );
 
         $svgobj = $obj->getSvgObj(104);
-        $this->assertEqualsWithDelta(90.0, (float) ($svgobj['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertEqualsWithDelta(90.0, $svgobj['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * E-6: offset on bent path uses cumulative segment length and local tangent.
+     * @throws \Throwable
      */
     public function testSvgTextPathOffsetUsesBendSegmentTangent(): void
     {
@@ -5112,16 +5184,17 @@ class SVGTest extends TestUtil
         );
 
         $svgobj = $obj->getSvgObj(1041);
-        $textX = (float) $svgobj['x'];
-        $textY = (float) $svgobj['y'];
+        $textX = $svgobj['x'];
+        $textY = $svgobj['y'];
         $this->assertGreaterThan(0.0, $textY);
         $this->assertGreaterThan($textY, $textX);
         $this->assertNotEqualsWithDelta($textX, $textY, 0.001);
-        $this->assertEqualsWithDelta(90.0, (float) ($svgobj['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertEqualsWithDelta(90.0, $svgobj['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * E-6: per-glyph textPath layout updates rotation as glyphs pass a bend.
+     * @throws \Throwable
      */
     public function testSvgTextPathPerGlyphRotationFollowsBend(): void
     {
@@ -5159,12 +5232,15 @@ class SVGTest extends TestUtil
         $svgobj = $obj->getSvgObj(1042);
         $rotlist = $svgobj['textmode']['rotlist'] ?? [];
         $this->assertGreaterThanOrEqual(2, \count($rotlist));
-        $this->assertLessThan(45.0, (float) $rotlist[0]);
-        $this->assertGreaterThan(45.0, (float) $rotlist[1]);
+        assert(isset($rotlist[0]), "\$rotlist[0] must be set");
+        $this->assertLessThan(45.0, $rotlist[0]);
+        assert(isset($rotlist[1]), "\$rotlist[1] must be set");
+        $this->assertGreaterThan(45.0, $rotlist[1]);
     }
 
     /**
      * E-6: path-command decomposition handles H/V bends for tangent angle.
+     * @throws \Throwable
      */
     public function testSvgTextPathPathHVCommandsUseLocalVerticalTangent(): void
     {
@@ -5188,21 +5264,16 @@ class SVGTest extends TestUtil
             ],
         ]);
 
-        $obj->exposeParseSVGTagSTARTtextPath(
-            $parser,
-            1047,
-            ['href' => '#tp_hv', 'startOffset' => '75%'],
-            $base,
-            $base,
-        );
+        $obj->exposeParseSVGTagSTARTtextPath($parser, 1047, ['href' => '#tp_hv', 'startOffset' => '75%'], $base, $base);
 
         $svgobj = $obj->getSvgObj(1047);
-        $this->assertEqualsWithDelta(90.0, (float) ($svgobj['textmode']['rotate'] ?? 0.0), 0.001);
-        $this->assertGreaterThan(0.0, (float) $svgobj['y']);
+        $this->assertEqualsWithDelta(90.0, $svgobj['textmode']['rotate'] ?? 0.0, 0.001);
+        $this->assertGreaterThan(0.0, $svgobj['y']);
     }
 
     /**
      * E-6: cubic path sampling uses local start tangent instead of endpoint chord.
+     * @throws \Throwable
      */
     public function testSvgTextPathCubicUsesLocalStartTangentAtSmallOffset(): void
     {
@@ -5235,13 +5306,14 @@ class SVGTest extends TestUtil
         );
 
         $svgobj = $obj->getSvgObj(1048);
-        $angle = (float) ($svgobj['textmode']['rotate'] ?? 0.0);
+        $angle = $svgobj['textmode']['rotate'] ?? 0.0;
         $this->assertGreaterThan(-45.0, $angle);
         $this->assertLessThan(45.0, $angle);
     }
 
     /**
      * E-6: arc path sampling uses local arc tangent at small offsets.
+     * @throws \Throwable
      */
     public function testSvgTextPathArcUsesLocalStartTangentAtSmallOffset(): void
     {
@@ -5265,21 +5337,16 @@ class SVGTest extends TestUtil
             ],
         ]);
 
-        $obj->exposeParseSVGTagSTARTtextPath(
-            $parser,
-            1049,
-            ['href' => '#tp_arc', 'startOffset' => '5%'],
-            $base,
-            $base,
-        );
+        $obj->exposeParseSVGTagSTARTtextPath($parser, 1049, ['href' => '#tp_arc', 'startOffset' => '5%'], $base, $base);
 
         $svgobj = $obj->getSvgObj(1049);
-        $angle = (float) ($svgobj['textmode']['rotate'] ?? 0.0);
+        $angle = $svgobj['textmode']['rotate'] ?? 0.0;
         $this->assertGreaterThan(45.0, \abs($angle));
     }
 
     /**
      * E-6: arc sweep flag influences initial tangent direction.
+     * @throws \Throwable
      */
     public function testSvgTextPathArcSweepDirectionAffectsInitialTangentSign(): void
     {
@@ -5308,7 +5375,7 @@ class SVGTest extends TestUtil
             $base,
             $base,
         );
-        $angleUp = (float) ($obj->getSvgObj(1050)['textmode']['rotate'] ?? 0.0);
+        $angleUp = $obj->getSvgObj(1050)['textmode']['rotate'] ?? 0.0;
 
         // sweep=0 should mirror direction, yielding a negative initial tangent.
         $obj->initSvgObjForHandlers(1051);
@@ -5330,7 +5397,7 @@ class SVGTest extends TestUtil
             $base,
             $base,
         );
-        $angleDown = (float) ($obj->getSvgObj(1051)['textmode']['rotate'] ?? 0.0);
+        $angleDown = $obj->getSvgObj(1051)['textmode']['rotate'] ?? 0.0;
 
         $this->assertGreaterThan(45.0, \abs($angleUp));
         $this->assertGreaterThan(45.0, \abs($angleDown));
@@ -5339,6 +5406,7 @@ class SVGTest extends TestUtil
 
     /**
      * E-6: zero-radius arc falls back to a straight segment endpoint behavior.
+     * @throws \Throwable
      */
     public function testSvgTextPathZeroRadiusArcFallsBackToLine(): void
     {
@@ -5369,13 +5437,14 @@ class SVGTest extends TestUtil
         );
 
         $svgobj = $obj->getSvgObj(1052);
-        $this->assertGreaterThan(0.0, (float) $svgobj['x']);
-        $this->assertEqualsWithDelta(0.0, (float) $svgobj['y'], 0.001);
-        $this->assertEqualsWithDelta(0.0, (float) ($svgobj['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertGreaterThan(0.0, $svgobj['x']);
+        $this->assertEqualsWithDelta(0.0, $svgobj['y'], 0.001);
+        $this->assertEqualsWithDelta(0.0, $svgobj['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * E-6: spacing="auto" expands inter-glyph distance to fill path.
+     * @throws \Throwable
      */
     public function testSvgTextPathSpacingAutoExpandsGlyphGap(): void
     {
@@ -5413,26 +5482,25 @@ class SVGTest extends TestUtil
 
         $obj->initSvgObjForHandlers(1044);
         $obj->patchSvgObj(1044, ['styles' => [$base], 'defs' => $defs]);
-        $obj->exposeParseSVGTagSTARTtextPath(
-            $parser,
-            1044,
-            ['href' => '#tp_space', 'spacing' => 'auto'],
-            $base,
-            $base,
-        );
+        $obj->exposeParseSVGTagSTARTtextPath($parser, 1044, ['href' => '#tp_space', 'spacing' => 'auto'], $base, $base);
         $obj->exposeHandleSVGCharacter($parser, 'ab');
         $obj->exposeParseSVGTagENDtextPath(1044);
         $auto = $obj->getSvgObj(1044);
         $xAuto = $auto['textmode']['xlist'] ?? [];
         $this->assertGreaterThanOrEqual(2, \count($xAuto));
 
-        $gapExact = (float) $xExact[1] - (float) $xExact[0];
-        $gapAuto = (float) $xAuto[1] - (float) $xAuto[0];
+        assert(isset($xExact[1]), "\$xExact[1] must be set");
+        assert(isset($xExact[0]), "\$xExact[0] must be set");
+        $gapExact = $xExact[1] - $xExact[0];
+        assert(isset($xAuto[1]), "\$xAuto[1] must be set");
+        assert(isset($xAuto[0]), "\$xAuto[0] must be set");
+        $gapAuto = $xAuto[1] - $xAuto[0];
         $this->assertGreaterThan($gapExact, $gapAuto);
     }
 
     /**
      * E-6: method="stretch" scales glyph advances to consume path length.
+     * @throws \Throwable
      */
     public function testSvgTextPathMethodStretchExpandsGlyphGap(): void
     {
@@ -5483,13 +5551,18 @@ class SVGTest extends TestUtil
         $xStretch = $stretch['textmode']['xlist'] ?? [];
         $this->assertGreaterThanOrEqual(2, \count($xStretch));
 
-        $gapAlign = (float) $xAlign[1] - (float) $xAlign[0];
-        $gapStretch = (float) $xStretch[1] - (float) $xStretch[0];
+        assert(isset($xAlign[1]), "\$xAlign[1] must be set");
+        assert(isset($xAlign[0]), "\$xAlign[0] must be set");
+        $gapAlign = $xAlign[1] - $xAlign[0];
+        assert(isset($xStretch[1]), "\$xStretch[1] must be set");
+        assert(isset($xStretch[0]), "\$xStretch[0] must be set");
+        $gapStretch = $xStretch[1] - $xStretch[0];
         $this->assertGreaterThan($gapAlign, $gapStretch);
     }
 
     /**
      * E-6: spacing="auto" distributes extra length as equal inter-glyph gaps.
+     * @throws \Throwable
      */
     public function testSvgTextPathSpacingAutoPreservesMixedWidthGapDelta(): void
     {
@@ -5524,8 +5597,11 @@ class SVGTest extends TestUtil
         $exact = $obj->getSvgObj(1053);
         $xExact = $exact['textmode']['xlist'] ?? [];
         $this->assertGreaterThanOrEqual(3, \count($xExact));
-        $gapExactOne = (float) $xExact[1] - (float) $xExact[0];
-        $gapExactTwo = (float) $xExact[2] - (float) $xExact[1];
+        assert(isset($xExact[1]), "\$xExact[1] must be set");
+        assert(isset($xExact[0]), "\$xExact[0] must be set");
+        $gapExactOne = $xExact[1] - $xExact[0];
+        assert(isset($xExact[2]), "\$xExact[2] must be set");
+        $gapExactTwo = $xExact[2] - $xExact[1];
 
         $obj->initSvgObjForHandlers(1054);
         $obj->patchSvgObj(1054, ['styles' => [$base], 'defs' => $defs]);
@@ -5541,20 +5617,20 @@ class SVGTest extends TestUtil
         $auto = $obj->getSvgObj(1054);
         $xAuto = $auto['textmode']['xlist'] ?? [];
         $this->assertGreaterThanOrEqual(3, \count($xAuto));
-        $gapAutoOne = (float) $xAuto[1] - (float) $xAuto[0];
-        $gapAutoTwo = (float) $xAuto[2] - (float) $xAuto[1];
+        assert(isset($xAuto[1]), "\$xAuto[1] must be set");
+        assert(isset($xAuto[0]), "\$xAuto[0] must be set");
+        $gapAutoOne = $xAuto[1] - $xAuto[0];
+        assert(isset($xAuto[2]), "\$xAuto[2] must be set");
+        $gapAutoTwo = $xAuto[2] - $xAuto[1];
 
         $this->assertGreaterThan($gapExactOne, $gapAutoOne);
         $this->assertGreaterThan($gapExactTwo, $gapAutoTwo);
-        $this->assertEqualsWithDelta(
-            $gapExactOne - $gapExactTwo,
-            $gapAutoOne - $gapAutoTwo,
-            0.5,
-        );
+        $this->assertEqualsWithDelta($gapExactOne - $gapExactTwo, $gapAutoOne - $gapAutoTwo, 0.5);
     }
 
     /**
      * E-6: textPath with unresolved href still behaves like a nested text run.
+     * @throws \Throwable
      */
     public function testSvgTextPathMissingReferenceStillRendersText(): void
     {
@@ -5582,6 +5658,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-2: writing-mode vertical is stored in textmode by STARTtext.
+     * @throws \Throwable
      */
     public function testSvgWritingModeVerticalSetsTextModeFlag(): void
     {
@@ -5593,21 +5670,16 @@ class SVGTest extends TestUtil
         $vertical = $base;
         $vertical['writing-mode'] = 'vertical-rl';
 
-        $out = $obj->exposeParseSVGTagSTARTtext(
-            $parser,
-            107,
-            ['x' => '10', 'y' => '20'],
-            $vertical,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTtext($parser, 107, ['x' => '10', 'y' => '20'], $vertical, $base);
 
         $this->assertNotSame('', $out);
-        $this->assertTrue((bool) ($obj->getSvgObj(107)['textmode']['vertical'] ?? false));
-        $this->assertEqualsWithDelta(90.0, (float) ($obj->getSvgObj(107)['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertTrue($obj->getSvgObj(107)['textmode']['vertical'] ?? false);
+        $this->assertEqualsWithDelta(90.0, $obj->getSvgObj(107)['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * S-2: glyph-orientation-vertical overrides default 90deg vertical rotation.
+     * @throws \Throwable
      */
     public function testSvgWritingModeVerticalGlyphOrientationOverride(): void
     {
@@ -5620,21 +5692,16 @@ class SVGTest extends TestUtil
         $vertical['writing-mode'] = 'tb-rl';
         $vertical['glyph-orientation-vertical'] = '0deg';
 
-        $out = $obj->exposeParseSVGTagSTARTtext(
-            $parser,
-            109,
-            ['x' => '10', 'y' => '20'],
-            $vertical,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTtext($parser, 109, ['x' => '10', 'y' => '20'], $vertical, $base);
 
         $this->assertNotSame('', $out);
-        $this->assertTrue((bool) ($obj->getSvgObj(109)['textmode']['vertical'] ?? false));
-        $this->assertEqualsWithDelta(0.0, (float) ($obj->getSvgObj(109)['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertTrue($obj->getSvgObj(109)['textmode']['vertical'] ?? false);
+        $this->assertEqualsWithDelta(0.0, $obj->getSvgObj(109)['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * S-2: glyph-orientation-horizontal is applied in horizontal writing mode.
+     * @throws \Throwable
      */
     public function testSvgHorizontalGlyphOrientationSetsRotation(): void
     {
@@ -5647,21 +5714,16 @@ class SVGTest extends TestUtil
         $hstyle['writing-mode'] = 'lr-tb';
         $hstyle['glyph-orientation-horizontal'] = '180deg';
 
-        $out = $obj->exposeParseSVGTagSTARTtext(
-            $parser,
-            110,
-            ['x' => '10', 'y' => '20'],
-            $hstyle,
-            $base,
-        );
+        $out = $obj->exposeParseSVGTagSTARTtext($parser, 110, ['x' => '10', 'y' => '20'], $hstyle, $base);
 
         $this->assertNotSame('', $out);
-        $this->assertFalse((bool) ($obj->getSvgObj(110)['textmode']['vertical'] ?? false));
-        $this->assertEqualsWithDelta(180.0, (float) ($obj->getSvgObj(110)['textmode']['rotate'] ?? 0.0), 0.001);
+        $this->assertFalse($obj->getSvgObj(110)['textmode']['vertical'] ?? false);
+        $this->assertEqualsWithDelta(180.0, $obj->getSvgObj(110)['textmode']['rotate'] ?? 0.0, 0.001);
     }
 
     /**
      * S-2: invisible vertical text advances Y instead of X.
+     * @throws \Throwable
      */
     public function testSvgInvisibleVerticalTextAdvancesYCursor(): void
     {
@@ -5684,13 +5746,13 @@ class SVGTest extends TestUtil
             'y' => 9.0,
         ]);
 
-        $xBefore = (float) $obj->getSvgObj(108)['x'];
-        $yBefore = (float) $obj->getSvgObj(108)['y'];
+        $xBefore = $obj->getSvgObj(108)['x'];
+        $yBefore = $obj->getSvgObj(108)['y'];
         $out = $obj->exposeParseSVGTagENDtext(108);
 
         $this->assertSame('', $out);
-        $this->assertSame($xBefore, (float) $obj->getSvgObj(108)['x']);
-        $this->assertGreaterThan($yBefore, (float) $obj->getSvgObj(108)['y']);
+        $this->assertSame($xBefore, $obj->getSvgObj(108)['x']);
+        $this->assertGreaterThan($yBefore, $obj->getSvgObj(108)['y']);
     }
 
     // -------------------------------------------------------------------------
@@ -5700,6 +5762,7 @@ class SVGTest extends TestUtil
     /**
      * parseSVGStyleMask with a valid url(#id) registers the mask stream and
      * returns a PDF ExtGState activation command containing the mask key.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleResolvesUrlAndRegistersMaskStream(): void
     {
@@ -5740,20 +5803,27 @@ class SVGTest extends TestUtil
         $this->assertNotEmpty($masks, 'svgmasks must contain the registered mask');
 
         $maskKey = \array_key_first($masks);
-        $this->assertIsString($maskKey);
+        if (!\is_string($maskKey)) {
+            $this->fail('Expected non-empty svgmasks key to be a string');
+        }
+
         $this->assertStringContainsString($maskKey, $out);
         $this->assertStringStartsWith('MSK_', $maskKey);
 
-        $maskData = $masks[$maskKey];
+        $maskData = [];
+        if (isset($masks[$maskKey]) && \is_array($masks[$maskKey])) {
+            $maskData = $masks[$maskKey];
+        }
         $this->assertIsArray($maskData);
         $this->assertArrayHasKey('stream', $maskData);
         $this->assertArrayHasKey('bbox', $maskData);
-        $this->assertSame(0, $maskData['gs_n'], 'gs_n is 0 until PDF output phase');
+        $this->assertSame(0, $maskData['gs_n'] ?? null, 'gs_n is 0 until PDF output phase');
     }
 
     /**
      * Calling parseSVGStyleMask with mask="none" returns empty string and does
      * not register anything.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleNoneIsNoOp(): void
     {
@@ -5772,6 +5842,7 @@ class SVGTest extends TestUtil
 
     /**
      * A mask url that references a missing def returns empty string.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleMissingDefIsNoOp(): void
     {
@@ -5791,6 +5862,7 @@ class SVGTest extends TestUtil
     /**
      * Calling parseSVGStyleMask while patternmode > 0 returns empty string
      * (guard against recursion during mask/pattern child replay).
+     * @throws \Throwable
      */
     public function testSvgMaskStyleSkippedInsidePatternMode(): void
     {
@@ -5821,6 +5893,7 @@ class SVGTest extends TestUtil
     /**
      * Calling parseSVGStyleMask twice with the same mask id re-uses the
      * already-registered mask entry without duplicating it.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleSameMaskIsRegisteredOnce(): void
     {
@@ -5855,6 +5928,7 @@ class SVGTest extends TestUtil
     /**
      * parseSVGTagSTARTfilter with an id registers a placeholder in defs and
      * enables defsmode so fe* children are swallowed.
+     * @throws \Throwable
      */
     public function testSvgFilterStartRegistersPlaceholderAndEnablesDefsMode(): void
     {
@@ -5867,12 +5941,13 @@ class SVGTest extends TestUtil
         $svgobj = $obj->getSvgObj(570);
         $this->assertTrue($svgobj['defsmode']);
         $this->assertArrayHasKey('f1', $svgobj['defs']);
-        $this->assertSame('filter', $svgobj['defs']['f1']['name']);
+        $this->assertSame('filter', $svgobj['defs']['f1']['name'] ?? null);
     }
 
     /**
      * parseSVGTagSTARTfilter without an id still enables defsmode but does not
      * add a defs entry.
+     * @throws \Throwable
      */
     public function testSvgFilterStartWithoutIdOnlyEnablesDefsMode(): void
     {
@@ -5889,6 +5964,7 @@ class SVGTest extends TestUtil
 
     /**
      * parseSVGTagENDfilter clears defsmode.
+     * @throws \Throwable
      */
     public function testSvgFilterEndClearsDefsMode(): void
     {
@@ -5909,6 +5985,7 @@ class SVGTest extends TestUtil
 
     /**
      * 'auto' hints for all properties emit no ri operator (use PDF default).
+     * @throws \Throwable
      */
     public function testSvgRenderingHintsAllAutoEmitsNothing(): void
     {
@@ -5922,6 +5999,7 @@ class SVGTest extends TestUtil
 
     /**
      * 'optimizeQuality' on any property emits /RelativeColorimetric ri.
+     * @throws \Throwable
      */
     public function testSvgRenderingHintsOptimizeQualityEmitsRelativeColorimetric(): void
     {
@@ -5937,6 +6015,7 @@ class SVGTest extends TestUtil
 
     /**
      * 'optimizeSpeed' on any property emits /AbsoluteColorimetric ri.
+     * @throws \Throwable
      */
     public function testSvgRenderingHintsOptimizeSpeedEmitsAbsoluteColorimetric(): void
     {
@@ -5952,6 +6031,7 @@ class SVGTest extends TestUtil
 
     /**
      * 'crispEdges' and 'geometricPrecision' map to RelativeColorimetric.
+     * @throws \Throwable
      */
     public function testSvgRenderingHintsCrispEdgesAndGeometricPrecision(): void
     {
@@ -5969,6 +6049,7 @@ class SVGTest extends TestUtil
     /**
      * When both optimizeQuality and optimizeSpeed hints are present,
      * optimizeSpeed wins (last in priority order).
+     * @throws \Throwable
      */
     public function testSvgRenderingHintsSpeedBeatsQualityWhenBothPresent(): void
     {
@@ -5976,17 +6057,19 @@ class SVGTest extends TestUtil
         $this->initFontAndPage($obj);
 
         $style = $obj->exposeDefaultSVGStyle();
-        $style['image-rendering']  = 'optimizeQuality';
+        $style['image-rendering'] = 'optimizeQuality';
         $style['color-rendering'] = 'optimizeSpeed';
 
         $out = $obj->exposeParseSVGStyleRenderingHints($style);
         $this->assertSame("/AbsoluteColorimetric ri\n", $out);
     }
+
     /**
      * <filter> is in SVGCHARDATASKIPTAGS so the entire filter+fe* subtree is
      * silently skipped via the charskip counter: charskip is balanced (back to
      * zero) after the subtree, defsmode is correctly restored by </defs>, and
      * no output is written.
+     * @throws \Throwable
      */
     public function testSvgFilterRoundTripViaHandlersProducesNoOutput(): void
     {
@@ -6014,7 +6097,7 @@ class SVGTest extends TestUtil
         $svgobj = $obj->getSvgObj(573);
 
         // charskip counter must be balanced back to zero after the subtree.
-        $this->assertSame(0, (int)($svgobj['charskip'] ?? 0), 'charskip balanced');
+        $this->assertSame(0, (int) $svgobj['charskip'], 'charskip balanced');
 
         // defsmode off after </defs>
         $this->assertFalse($svgobj['defsmode'], 'defsmode false after </defs>');
@@ -6025,6 +6108,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getSVGPath returns empty when paint operator is empty (line 1111).
+     * @throws \Throwable
      */
     public function testGetSVGPathReturnEmptyOnEmptyPaintOp(): void
     {
@@ -6038,6 +6122,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getSVGPath covers default branch in match (unknown cmd → line 1184).
+     * @throws \Throwable
      */
     public function testGetSVGPathUnknownCommandProducesEmptyOutput(): void
     {
@@ -6051,6 +6136,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: parseSVGGlyphOrientationAngle with rad unit (lines 2156-2160).
+     * @throws \Throwable
      */
     public function testParseSVGGlyphOrientationAngleRadians(): void
     {
@@ -6061,6 +6147,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: parseSVGGlyphOrientationAngle with grad unit (line 2167-2168).
+     * @throws \Throwable
      */
     public function testParseSVGGlyphOrientationAngleGradians(): void
     {
@@ -6071,6 +6158,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: parseSVGGlyphOrientationAngle with empty string returns default (line 2156).
+     * @throws \Throwable
      */
     public function testParseSVGGlyphOrientationAngleEmptyStringReturnsDefault(): void
     {
@@ -6081,6 +6169,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: parseSVGGlyphOrientationAngle non-matching string returns default (line 2160).
+     * @throws \Throwable
      */
     public function testParseSVGGlyphOrientationAngleInvalidReturnsDefault(): void
     {
@@ -6091,6 +6180,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getSVGGlyphOrientationRotation horizontal 'auto' returns 0.0 (line 2197).
+     * @throws \Throwable
      */
     public function testGetSVGGlyphOrientationRotationHorizontalAutoReturnsZero(): void
     {
@@ -6104,6 +6194,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: resolveSVGPatternLength with percentage value (lines 2525, 2529-2530).
+     * @throws \Throwable
      */
     public function testResolveSVGPatternLengthPercentage(): void
     {
@@ -6115,6 +6206,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: resolveSVGPatternLength empty string returns 0 (line 2525).
+     * @throws \Throwable
      */
     public function testResolveSVGPatternLengthEmptyReturnsZero(): void
     {
@@ -6126,6 +6218,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with horizontal H command (lines 6136-6187 range).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithHCommand(): void
     {
@@ -6138,6 +6231,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with V command (lines 6235-6240).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithVCommand(): void
     {
@@ -6150,6 +6244,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with cubic bezier C command (lines 6267-6298).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithCCommand(): void
     {
@@ -6162,6 +6257,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with smooth S command (lines 6300-6334).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithSCommand(): void
     {
@@ -6174,6 +6270,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with quadratic Q command (lines 6311-6322).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithQCommand(): void
     {
@@ -6186,6 +6283,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with T (smooth quadratic) command (lines 6324-6343).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithTCommand(): void
     {
@@ -6198,6 +6296,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with arc A command (lines 6348-6388).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithACommand(): void
     {
@@ -6210,6 +6309,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData returns null for empty path (line 6112).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataEmptyReturnsNull(): void
     {
@@ -6221,48 +6321,44 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromDef with 'line' defName (lines 6077-6087).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromDefLine(): void
     {
         $obj = $this->getInternalTestObject();
         $obj->initSvgObjForHandlers(586);
-        $points = $obj->exposeGetTextPathPointsFromDef(
-            586,
-            'line',
-            ['x1' => '0', 'y1' => '0', 'x2' => '100', 'y2' => '0'],
-        );
+        $points = $obj->exposeGetTextPathPointsFromDef(586, 'line', [
+            'x1' => '0',
+            'y1' => '0',
+            'x2' => '100',
+            'y2' => '0',
+        ]);
         $this->assertIsArray($points);
         $this->assertCount(2, $points);
     }
 
     /**
      * S-3: getTextPathPointsFromDef with 'polyline' defName (lines 6077-6087).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromDefPolyline(): void
     {
         $obj = $this->getInternalTestObject();
         $obj->initSvgObjForHandlers(587);
-        $points = $obj->exposeGetTextPathPointsFromDef(
-            587,
-            'polyline',
-            ['points' => '0,0 50,50 100,0'],
-        );
+        $points = $obj->exposeGetTextPathPointsFromDef(587, 'polyline', ['points' => '0,0 50,50 100,0']);
         $this->assertIsArray($points);
         $this->assertCount(3, $points);
     }
 
     /**
      * S-3: getTextPathPointsFromDef with 'polygon' closes the path (line 6096).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromDefPolygonClosesPath(): void
     {
         $obj = $this->getInternalTestObject();
         $obj->initSvgObjForHandlers(588);
-        $points = $obj->exposeGetTextPathPointsFromDef(
-            588,
-            'polygon',
-            ['points' => '0,0 50,50 100,0'],
-        );
+        $points = $obj->exposeGetTextPathPointsFromDef(588, 'polygon', ['points' => '0,0 50,50 100,0']);
         $this->assertIsArray($points);
         // polygon adds closing point so 4 points total
         $this->assertCount(4, $points);
@@ -6270,6 +6366,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromDef with unknown defName returns null (line 6112).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromDefUnknownReturnsNull(): void
     {
@@ -6281,6 +6378,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with Z close command (covers Z → ptlist append).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataWithZCommand(): void
     {
@@ -6293,6 +6391,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-3: getTextPathPointsFromPathData with relative commands (lowercase m l h v).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataRelativeCommands(): void
     {
@@ -6307,6 +6406,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: sampleTextPathArc returns [] when start == end (same point).
+     * @throws \Throwable
      */
     public function testSampleTextPathArcSameStartEndReturnsEmpty(): void
     {
@@ -6317,6 +6417,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: sampleTextPathArc scales radii (lambda > 1) and returns sampled points.
+     * @throws \Throwable
      */
     public function testSampleTextPathArcScaledRadiusReturnsPoints(): void
     {
@@ -6328,6 +6429,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: sampleTextPathArc with a normal semicircle returns multiple points.
+     * @throws \Throwable
      */
     public function testSampleTextPathArcNormalArcReturnsPoints(): void
     {
@@ -6343,6 +6445,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: sampleTextPathArc with large-arc flag covers alternate path.
+     * @throws \Throwable
      */
     public function testSampleTextPathArcLargeArcFlagReturnsPoints(): void
     {
@@ -6355,6 +6458,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getArcVectorAngle returns 90° between (1,0) and (0,1).
+     * @throws \Throwable
      */
     public function testGetArcVectorAngleReturnsExpectedAngle(): void
     {
@@ -6365,6 +6469,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getArcVectorAngle returns 0 for parallel same-direction vectors.
+     * @throws \Throwable
      */
     public function testGetArcVectorAngleParallelVectorsReturnsZero(): void
     {
@@ -6377,6 +6482,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathLength of a horizontal segment returns correct length.
+     * @throws \Throwable
      */
     public function testGetTextPathLengthHorizontalSegment(): void
     {
@@ -6387,6 +6493,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathLength of empty / single-point list returns 0.
+     * @throws \Throwable
      */
     public function testGetTextPathLengthEmptyReturnsZero(): void
     {
@@ -6399,6 +6506,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset returns null for fewer than 2 points.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetTooFewPointsReturnsNull(): void
     {
@@ -6409,6 +6517,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset returns null for zero-length path.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetZeroLengthReturnsNull(): void
     {
@@ -6420,6 +6529,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset skips zero-length (duplicate) segment via continue.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetZeroLengthSegmentIsContinued(): void
     {
@@ -6434,6 +6544,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset skips past a segment (covers remaining -= segLength branch).
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetMultiSegmentSkipsFirst(): void
     {
@@ -6448,6 +6559,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset at offset 0 returns near the start point.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetZeroReturnsStartPoint(): void
     {
@@ -6462,6 +6574,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset past the end returns the last point.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetPastEndReturnsLastPoint(): void
     {
@@ -6475,6 +6588,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getTextPathPointAtOffset at midpoint returns interpolated point.
+     * @throws \Throwable
      */
     public function testGetTextPathPointAtOffsetMidpointInterpolates(): void
     {
@@ -6490,6 +6604,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getSVGResolvedMarker returns specific when it is set and not 'none'.
+     * @throws \Throwable
      */
     public function testGetSVGResolvedMarkerSpecificReturned(): void
     {
@@ -6500,6 +6615,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getSVGResolvedMarker returns 'none' when specific='none' and fallback=false.
+     * @throws \Throwable
      */
     public function testGetSVGResolvedMarkerSpecificNoneNoFallbackReturnsNone(): void
     {
@@ -6510,6 +6626,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getSVGResolvedMarker falls back to markerAll when specific='none' and markerAll valid.
+     * @throws \Throwable
      */
     public function testGetSVGResolvedMarkerFallsBackToMarkerAll(): void
     {
@@ -6520,6 +6637,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getSVGResolvedMarker returns specific when specific='none', fallback=true but markerAll empty.
+     * @throws \Throwable
      */
     public function testGetSVGResolvedMarkerNoneWithEmptyMarkerAllReturnsSpecific(): void
     {
@@ -6530,6 +6648,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: getSVGResolvedMarker returns empty when both specific and markerAll are empty.
+     * @throws \Throwable
      */
     public function testGetSVGResolvedMarkerBothEmptyReturnsEmpty(): void
     {
@@ -6542,6 +6661,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGTagENDa returns '' and resets linkhref when href is set (horizontal).
+     * @throws \Throwable
      */
     public function testParseSVGTagENDaWithLinkHrefReturnsEmpty(): void
     {
@@ -6566,11 +6686,12 @@ class SVGTest extends TestUtil
         // linkhref is cleared, returns ''
         $this->assertSame('', $out);
         $svgobj = $obj->getSvgObj(592);
-        $this->assertSame('', (string) ($svgobj['textmode']['linkhref'] ?? ''));
+        $this->assertSame('', $svgobj['textmode']['linkhref'] ?? '');
     }
 
     /**
      * S-4: parseSVGTagENDa with vertical text mode covers the vertical width/height branch.
+     * @throws \Throwable
      */
     public function testParseSVGTagENDaVerticalModeCoversVerticalBranch(): void
     {
@@ -6594,13 +6715,14 @@ class SVGTest extends TestUtil
         $out = $obj->exposeParseSVGTagENDa(593);
         $this->assertSame('', $out);
         $svgobj = $obj->getSvgObj(593);
-        $this->assertSame('', (string) ($svgobj['textmode']['linkhref'] ?? ''));
+        $this->assertSame('', $svgobj['textmode']['linkhref'] ?? '');
     }
 
     // ── getSetSVG ────────────────────────────────────────────────────────────
 
     /**
      * S-4: getSetSVG throws PdfException for an unknown soid.
+     * @throws \Throwable
      */
     public function testGetSetSVGInvalidSoidThrows(): void
     {
@@ -6613,6 +6735,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: path with no leading letter hits the empty-command handler (lines 6148-6149).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataNoLeadingLetterReturnsNull(): void
     {
@@ -6624,6 +6747,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: 'M 0' has too few coords → break in m/l/t block (line 6157).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataTooFewMLTCoordsBreaks(): void
     {
@@ -6635,6 +6759,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: lowercase 'c' covers the relative C adjustment block (lines 6235-6240).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataRelativeCCommand(): void
     {
@@ -6647,6 +6772,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: incomplete 'C' with too few params hits break (line 6226).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataIncompleteCBreaks(): void
     {
@@ -6658,6 +6784,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: lowercase 's' covers the relative S adjustment block (lines 6281-6284).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataRelativeSCommand(): void
     {
@@ -6670,6 +6797,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: incomplete 'S' hits break (line 6268).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataIncompleteSBreaks(): void
     {
@@ -6681,6 +6809,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: lowercase 'q' covers the relative Q adjustment block (lines 6319-6322).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataRelativeQCommand(): void
     {
@@ -6693,6 +6822,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: incomplete 'Q' hits break (line 6312).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataIncompleteQBreaks(): void
     {
@@ -6704,6 +6834,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: lowercase 'a' covers the relative A end-point adjustment (lines 6358-6359).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataRelativeACommand(): void
     {
@@ -6716,6 +6847,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-5: incomplete 'A' hits break (line 6348).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataIncompleteABreaks(): void
     {
@@ -6728,6 +6860,7 @@ class SVGTest extends TestUtil
     /**
      * S-5: arc with same start/end → sampleTextPathArc returns [] → fallback ptlist
      * entry is appended (line 6378).
+     * @throws \Throwable
      */
     public function testGetTextPathPointsFromPathDataSameStartEndArcAddsPoint(): void
     {
@@ -6743,6 +6876,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGStyleMask returns '' when transparency is not allowed (PDF/X-1a mode).
+     * @throws \Throwable
      */
     public function testSvgMaskStyleNoTransparencyReturnsEmpty(): void
     {
@@ -6767,6 +6901,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGStyleMask with non-url mask value returns '' (regex mismatch branch).
+     * @throws \Throwable
      */
     public function testSvgMaskStyleNonUrlValueReturnsEmpty(): void
     {
@@ -6784,6 +6919,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGStyleMask where def exists but has wrong type returns ''.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleWrongDefTypeReturnsEmpty(): void
     {
@@ -6806,6 +6942,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGStyleMask skips non-array child elements (continue branch).
+     * @throws \Throwable
      */
     public function testSvgMaskStyleNonArrayChildIsContinued(): void
     {
@@ -6833,6 +6970,7 @@ class SVGTest extends TestUtil
 
     /**
      * S-4: parseSVGStyleMask closing_tag child with content appends to text.
+     * @throws \Throwable
      */
     public function testSvgMaskStyleClosingTagWithContentAppendsText(): void
     {

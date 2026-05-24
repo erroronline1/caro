@@ -16,6 +16,7 @@
 
 namespace Test\Import;
 
+use Com\Tecnick\Pdf\Import\ImportCorruptedSourceException;
 use Com\Tecnick\Pdf\Import\ImportPageOutOfRangeException;
 use Com\Tecnick\Pdf\Import\PageResolver;
 use Com\Tecnick\Pdf\Import\SourceDocument;
@@ -23,14 +24,52 @@ use PHPUnit\Framework\TestCase;
 
 class PageResolverTest extends TestCase
 {
+    private function invokeResolverMethod(PageResolver $resolver, string $method, mixed ...$args): mixed
+    {
+        $ref = new \ReflectionClass($resolver);
+        return $ref->getMethod($method)->invokeArgs($resolver, $args);
+    }
+
+    /** @throws \Throwable */
     private function loadDoc(): SourceDocument
     {
         $path = __DIR__ . '/../fixtures/simple_import.pdf';
         $data = file_get_contents($path);
         $this->assertNotFalse($data);
-        return new SourceDocument((string) $data);
+        return new SourceDocument($data);
     }
 
+    /**
+     * @param array<int, mixed> $pairs
+     * @return array<int, mixed>
+     */
+    private function dictObject(array $pairs): array
+    {
+        return [['<<', $pairs]];
+    }
+
+    /**
+     * @param array<string, array<int, mixed>> $objects
+     * @throws \Throwable
+     */
+    private function mockDoc(array $objects): SourceDocument
+    {
+        $doc = $this->createStub(SourceDocument::class);
+        $doc->method('getTrailer')->willReturn(['root' => '1 0 R']);
+        $doc->method('getObject')->willReturnCallback(static function (string $ref) use ($objects): array {
+            $object = $objects[$ref] ?? null;
+            if ($object === null) {
+                throw new ImportCorruptedSourceException('Missing object in test map: ' . $ref);
+            }
+
+            return $object;
+        });
+        $doc->method('findObject')->willReturnCallback(static fn(string $ref): ?array => $objects[$ref] ?? null);
+
+        return $doc;
+    }
+
+    /** @throws \Throwable */
     public function testResolvePage1ReturnsExpectedMediaBox(): void
     {
         $resolver = new PageResolver();
@@ -41,6 +80,7 @@ class PageResolverTest extends TestCase
         $this->assertEqualsWithDelta(792.0, $resolved['mediaBox'][3], 0.001);
     }
 
+    /** @throws \Throwable */
     public function testResolvePage1HasResources(): void
     {
         $resolver = new PageResolver();
@@ -48,6 +88,7 @@ class PageResolverTest extends TestCase
         $this->assertArrayHasKey('resources', $resolved);
     }
 
+    /** @throws \Throwable */
     public function testResolvePage1RotateIsZero(): void
     {
         $resolver = new PageResolver();
@@ -55,6 +96,7 @@ class PageResolverTest extends TestCase
         $this->assertSame(0, $resolved['rotate']);
     }
 
+    /** @throws \Throwable */
     public function testResolveThrowsForPageZero(): void
     {
         $resolver = new PageResolver();
@@ -62,10 +104,286 @@ class PageResolverTest extends TestCase
         $resolver->resolve($this->loadDoc(), 0);
     }
 
+    /** @throws \Throwable */
     public function testResolveThrowsForPageOutOfRange(): void
     {
         $resolver = new PageResolver();
         $this->expectException(ImportPageOutOfRangeException::class);
         $resolver->resolve($this->loadDoc(), 999);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveThrowsWhenRootPagesEntryIsMissing(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Catalog'],
+            ]),
+        ]);
+
+        $this->expectException(ImportCorruptedSourceException::class);
+        $this->expectExceptionMessage('missing /Pages entry');
+        $resolver->resolve($doc, 1);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveParsesInheritedRotateAndIndirectResources(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Pages'],
+                ['objref', '2 0 R'],
+            ]),
+            '2_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Pages'],
+                ['/', 'Kids'],
+                [
+                    '[',
+                    [
+                        ['objref', '3 0 R'],
+                    ],
+                ],
+                ['/', 'MediaBox'],
+                [
+                    '[',
+                    [
+                        ['numeric', 0],
+                        ['numeric', 0],
+                        ['numeric', 612],
+                        ['numeric', 792],
+                    ],
+                ],
+                ['/', 'Rotate'],
+                ['numeric', '180'],
+                ['/', 'Resources'],
+                ['objref', '4 0 R'],
+            ]),
+            '3_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Page'],
+            ]),
+            '4_0' => $this->dictObject([
+                ['/', 'Font'],
+                [
+                    '<<',
+                    [
+                        ['/', 'F1'],
+                        ['objref', '5 0 R'],
+                    ],
+                ],
+            ]),
+            '5_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Font'],
+            ]),
+        ]);
+
+        $resolved = $resolver->resolve($doc, 1);
+
+        $this->assertSame(180, $resolved['rotate']);
+        $this->assertArrayHasKey('Font', $resolved['resources']);
+        if (!isset($resolved['resources']['Font']) || !\is_array($resolved['resources']['Font'])) {
+            $this->fail('Expected Font resources array.');
+        }
+
+        $this->assertArrayHasKey('F1', $resolved['resources']['Font']);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveSkipsInvalidKidsAndUsesInlineResourcesAndBoxFallbacks(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Pages'],
+                ['objref', '2 0 R'],
+            ]),
+            '2_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Pages'],
+                ['/', 'Kids'],
+                [
+                    '[',
+                    [
+                        ['numeric', 7],
+                        ['objref', '3 0 R'],
+                    ],
+                ],
+                ['/', 'MediaBox'],
+                [
+                    '[',
+                    [
+                        ['numeric', 0],
+                        ['numeric', 0],
+                        ['numeric', 400],
+                        ['numeric', 600],
+                    ],
+                ],
+            ]),
+            '3_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Page'],
+                ['/', 'CropBox'],
+                ['string', 'invalid'],
+                ['/', 'Rotate'],
+                ['numeric', 90],
+                ['/', 'Resources'],
+                [
+                    '<<',
+                    [
+                        ['/', 'ProcSet'],
+                        [
+                            '[',
+                            [
+                                ['/', '/PDF'],
+                                ['/', '/Text'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $resolved = $resolver->resolve($doc, 1);
+
+        $this->assertSame(90, $resolved['rotate']);
+        $this->assertSame([0.0, 0.0, 400.0, 600.0], $resolved['mediaBox']);
+        $this->assertSame($resolved['mediaBox'], $resolved['cropBox']);
+        $this->assertSame($resolved['cropBox'], $resolved['bleedBox']);
+        $this->assertSame($resolved['cropBox'], $resolved['trimBox']);
+        $this->assertSame($resolved['cropBox'], $resolved['artBox']);
+        $this->assertSame(['/PDF', '/Text'], $resolved['resources']['ProcSet'] ?? null);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveThrowsWhenResolvedPageIsMissingMediaBox(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Pages'],
+                ['objref', '2 0 R'],
+            ]),
+            '2_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Pages'],
+                ['/', 'Kids'],
+                [
+                    '[',
+                    [
+                        ['objref', '3 0 R'],
+                    ],
+                ],
+            ]),
+            '3_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Page'],
+            ]),
+        ]);
+
+        $this->expectException(ImportCorruptedSourceException::class);
+        $this->expectExceptionMessage('missing /MediaBox');
+        $resolver->resolve($doc, 1);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveThrowsForPagesNodeWithoutKidsArray(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Pages'],
+                ['objref', '2 0 R'],
+            ]),
+            '2_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Pages'],
+            ]),
+        ]);
+
+        $this->expectException(ImportCorruptedSourceException::class);
+        $this->expectExceptionMessage('/Kids');
+        $resolver->resolve($doc, 1);
+    }
+
+    /** @throws \Throwable */
+    public function testResolveThrowsForUnexpectedPageTreeNodeType(): void
+    {
+        $resolver = new PageResolver();
+        $doc = $this->mockDoc([
+            '1_0' => $this->dictObject([
+                ['/', 'Pages'],
+                ['objref', '2 0 R'],
+            ]),
+            '2_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Catalog'],
+                ['/', 'Kids'],
+                [
+                    '[',
+                    [
+                        ['objref', '3 0 R'],
+                    ],
+                ],
+            ]),
+            '3_0' => $this->dictObject([
+                ['/', 'Type'],
+                ['/', 'Page'],
+            ]),
+        ]);
+
+        $this->expectException(ImportCorruptedSourceException::class);
+        $this->expectExceptionMessage('Unexpected page tree node type');
+        $resolver->resolve($doc, 1);
+    }
+
+    public function testObjectToDictThrowsWhenDictionaryElementIsMissing(): void
+    {
+        $resolver = new PageResolver();
+
+        $this->expectException(ImportCorruptedSourceException::class);
+        $this->expectExceptionMessage('Expected dictionary object');
+        $this->invokeResolverMethod($resolver, 'objectToDict', ['not-an-array-element']);
+    }
+
+    public function testParseDictArraySkipsMalformedKeysAndParsesFallbackValueTypes(): void
+    {
+        $resolver = new PageResolver();
+
+        /** @var array<string, mixed> $parsed */
+        $parsed = $this->invokeResolverMethod($resolver, 'parseDictArray', [
+            ['numeric', 1],
+            ['string', 'ignored-non-name-key'],
+            ['/', 123],
+            ['string', 'ignored-non-string-name'],
+            ['/', '/Literal'],
+            'plain-text',
+            ['/', '/Ref'],
+            ['objref'],
+            ['/', '/Unknown'],
+            ['keyword', 'fallback-value'],
+            ['/', '/Empty'],
+            [],
+        ]);
+
+        $this->assertSame(
+            [
+                'Literal' => 'plain-text',
+                'Ref' => '',
+                'Unknown' => 'fallback-value',
+                'Empty' => null,
+            ],
+            \array_intersect_key($parsed, [
+                'Literal' => true,
+                'Ref' => true,
+                'Unknown' => true,
+                'Empty' => true,
+            ]),
+        );
+        $this->assertArrayNotHasKey('123', $parsed);
     }
 }

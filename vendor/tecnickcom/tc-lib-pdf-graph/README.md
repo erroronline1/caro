@@ -46,7 +46,7 @@ It exposes the primitives needed to compose paths and painting operations while 
 
 ## Requirements
 
-- PHP 8.1 or later
+- PHP 8.2 or later
 - Extension: `zlib`
 - Composer
 
@@ -110,8 +110,3 @@ require_once '/usr/share/php/Com/Tecnick/Pdf/Graph/autoload.php';
 
 Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md).
 
----
-
-## Contact
-
-Nicola Asuni - <info@tecnick.com>

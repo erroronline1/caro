@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script. -->
+
 # Markdown
 
 My markdown parser from scratch  
@@ -13,15 +16,14 @@ There are about 1000 PHP packages on [Packagist](https://packagist.org/search/?q
 * this project not only has a PHP-library but also an ECMAScript. You can decide if you want to render the content on the server, or let the users machine do the work, while the payload is a bit less bloated (the provided Markdown sample has about 60% of the bytes compared to the output). While using both in your project in general you can expect the same result.
 * I can easily implement features I consider helpful for my projects as inspired by https://parsedown.org/demo, https://markdown-it.github.io/
 
-It matches common Markdown behaviour as far as I could tell after testing with several examples. See [issues](https://github.com/erroronline1/markdown/issues) for deviations.  
-Also half the lines for double the features of Parsedown at almost the same speed, or double the speed using the same features (give or take server caching), if that is of any importance.
+It matches common Markdown behaviour as far as I could tell after testing with several examples, also a [rather big one](https://github.com/erroronline1/caro/blob/master/readme.md). See [paragraph below](#current-limitations-and-things-feeling-off) or [issues](https://github.com/erroronline1/markdown/issues) for deviations.  
 
 Releases follow [Semantic Versioning](https://semver.org):
 * MAJOR - breaking changes
 * MINOR - backwards-compatible new features
 * PATCH - backwards-compatible bug fixes
 
-## Features
+## Extended Features
 * Link auto-detection, as well as tel- and ftp-protocol
 * Markdown link titles
 * Auto-mailto
@@ -33,8 +35,8 @@ Releases follow [Semantic Versioning](https://semver.org):
 * A custom Markdown for `++larger++` and `--smaller--` text
 
 ### safeMode
-safeMode does not convert external links and aims to convert relevant characters for script execution and insertions to HTML-escaped characters to avoid malicious code from untrusted user input. Internal links like `#heading` are not affected though.  
-The brackets of the following tags is escaped: (a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video) to not trick users into unintended elements, HTML is otherwise considered uncritical and is therefore unaltered.
+safeMode does not convert external links and aims to convert relevant characters for script execution and insertions to HTML-escaped characters to avoid malicious code from untrusted user input. Internal links like `#heading` are not affected though. By escaping relevant characters the output becomes safe to render, but may result in invalid HTML the dev-tools keep nagging about. Still better than malicious code, imho.  
+The brackets of the following tags are escaped: (a|applet|audio|body|dialog|form|html|iframe|input|keygen|main|noscript|object|param|script|style|title|textarea|video) to not trick users into unintended elements, HTML is otherwise considered uncritical and is therefore unaltered.
 
 > References are converted to internal links pointing to the place of the stated address that will be written in plain text
 
@@ -128,222 +130,14 @@ class md extends \erroronline1\Markdown\Markdown{
     }
 }
 ```
-
-## Output
-Use the following sample to check against other Markdown-parsers and decide for yourself which one is more suitable for your needs.
-
-```
-# Markdown
-* [Text formatting](#text-formatting-atx-h1-header)
-* [Substitutions](#substitutions-setx-h1-header)
-* [Links](#links-atx-h2-header)
-* [Lists](#lists-setx-h2-header)
-* [Tables](#withcustomid)
-* [Blockquotes, code and definition lists](#blockquotes-code-and-definition-lists)
-* [Nesting](#nesting)
-
-# Text formatting (ATX h1 header)
-
-This is a flavored markdown processor for basic text styling.  
-Lines should end with two or more spaces  
-to have an intentional linebreak
-and not just continuing.
-
-Text can be *italic*, **bold with asterisks** and __underscores__, ***italic and bold***, ~~striked through~~.  
-By adding decorators in the right place you achieve mid*word*emphasis and *also __mixed__ up* emphasis.  
-Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk** or ~~striked \~~ through~~.  
-Subscript like H~2~O, superscript like X^2^ and ==marked text== are available.  
-A custom markdown for this processor can make ++font larger++ or --smaller--
-
-Substitutions (SETX h1 header)
-======================
-
-Task lists can be created a well  
-[ ] where \[ ] and \[x]  
-[x] are converted to html checkboxes
-
-(c) (C) (r) (R) (tm) (TM) (p) (P) +- -> will be replaced by their symbol  
-unless escaped: \(c) (C\) \(r\) \(R) (tm\) \(TM\) \(p) (P\) +\- \->
-
-## Links (ATX h2 header)
-Links will be replaced if not in safeMode, unless they are internal references
-
-http://some.url, not particularly styled, just a detected protocol  
-a phone number: tel:012345678  
-[Styled link to markdown information](https://www.markdownguide.org)  
-<http://some.other.url> with brackets  
-[urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
-some@mail.address converted to mailto: and an escaped\@mail.address  
-![an image](https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png) if loadable  
-
-### Internal references (h3 header)
-
-[this is a reference link with a match somwhere][referencelink]
-[and an attempt where the actual reference has been forgotten][noreferencelink]
-
-Here's a simple footnote[^1], and here's a longer one[^bignote]. Footnotes will appear at the bottom later.
-
-[^1]: This is the first footnote.
-[^bignote]: Here's one with multiple lines and other elements.
-    Indent the content to include it in the current footnote.  
-    Add as many lines as you like.
-    ~~~
-    code blocks
-    are supported
-    ~~~
-    
-    > as well as
-    >> blockquotes
-    >
-    
-    | and | of |
-    | --- | ----- |
-    | course | tables|
-    
-    1. and lists
-    3. with the next type though
-
-[referencelink]: http://valid.reference.match
-
-#### Other internal navigation (h4 header)
-[top header](#text-formatting-atx-h1-header)  
-[second header](#substitutions-setx-h1-header)  
-[fifth header](#withcustomid)  
-
---------
-
-Lists (SETX h2 header)
-----
-
-1. Ordered list items start with a number and a period
-    * Unordered list items start with asterisk or dash
-    * Sublist nesting
-    * is possible
-    * by indentating with four spaces
-        1. and list types
-        2. are interchangeable
-        1. and
-            2. can
-                3. be
-                    4. nested
-                        5. until
-                            6. you're
-                                8. tired
-2. Ordered list item
-with  
-multiple lines
-    1. the numbers
-    1. of ordered lists
-    2. actually don't
-    3. matter at all
-        12. unless the start number is other than 1
-        25. then you'll have an offset
-
-123\. with an escaped period avoids a list
-
-Nested ordered lists cycle through arabic numerals, roman numerals uppercase, roman numerals lowercase, latin alphabet uppercase and latin alphabet lowercase as numeration. 
-
-# Tables {#withcustomid}
-
-| Table header 1 | Table header 2 | Table header 3 | and 4 |
-| --- | ---: | :---: | :--- |
-| *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | **++not++** | though without<br /> HTML `<br />` |
-| and | aligning | text | columnwise |
-
-# Blockquotes, code and definition lists
-
-> Blockquote  
-> with *multiple*
-> lines  
-> as seen in many email programs  
-> start with a >
-
-    preformatted text/code can
-    start with 4 spaces <code>
-
-~~~
-or being surrounded by
-three \` or ~
-~~~
-
-Inline `code with two ore more characters between the symbols`, also ``code with ` escaped by double backticks``  
-and some `code with <brackets>` and `code with an escaped \`-character` render inline.
-
-Definition list containing
-: definition lines that
-: start with a :
-
-# Nesting
-
-1. List items can contain
-    > Blockquotes
-2. or 
-    |Tables|Column2|
-    |---|---|
-    |R1C1|R1C2|
-4. also
-    ~~~
-    code with
-    multiple lines
-    ~~~
-8. and  
-[x] accomplished and  
-[ ] unaccomplished tasks
-
-- - -
-
-> ~~~
-> Same goes for
-> ~~~
-> > blockquotes
->
-> 1. with
-> 2. nested
->     * lists
-> 
-> definition lists
-> : with multiple
-> : lines
->
-> | Tables nested | within | blockquotes |
-> | :---------- | :-----: | ---: |
-> | are | possible | as well |
-
-## Safety related content that should pose lesser threat with safeMode
-<a href="http://some.shady.website">totally legit website link</a>  
-<a href="javascript:void(0)" onclick="alert('click event')">a with click event</a>  
-<a href="javascript:alert('click event')">a href with click event</a>  
-[markdown link with js protocol href](javascript:alert('js href'))  
-<div onclick="alert('you clicked!')">clickable div</div>
-
-### safeMode restricted tags
-e.g. <label>is this input really part of your ui? <input type="text" /></label>  
-<script>alert('this script injection had been presented by disabled safeMode')</script>
-```
-
-[renders to](https://raw.githubusercontent.com/erroronline1/markdown/refs/heads/main/readme.md) (look at the sourcecode, since not all features may be available in this preview...)
-
-<!-- Markdown parsing by error on line 1, https://github.com/erroronline1/markdown -->
- <h1 id="markdown">Markdown</h1> <ul class="eol1_md"><li><a href="#text-formatting-atx-h1-header" class="eol1_md">Text formatting</a></li><li><a href="#substitutions-setx-h1-header" class="eol1_md">Substitutions</a></li><li><a href="#links-atx-h2-header" class="eol1_md">Links</a></li><li><a href="#lists-setx-h2-header" class="eol1_md">Lists</a></li><li><a href="#withcustomid" class="eol1_md">Tables</a></li><li><a href="#blockquotes-code-and-definition-lists" class="eol1_md">Blockquotes, code and definition lists</a></li><li><a href="#nesting" class="eol1_md">Nesting</a></li></ul> <h1 id="text-formatting-atx-h1-header">Text formatting (ATX h1 header)</h1> <p>This is a flavored markdown processor for basic text styling.<br />Lines should end with two or more spaces<br />to have an intentional linebreak
-and not just continuing.</p> Text can be <em>italic</em>, <strong>bold with asterisks</strong> and <strong>underscores</strong>, <em><strong>italic and bold</strong></em>, <s>striked through</s>.<br />By adding decorators in the right place you achieve mid<em>word</em>emphasis and <em>also <strong>mixed</strong> up</em> emphasis.<br />Some escaping of formatting characters is possible with a leading \ as in <strong>bold * asterisk</strong> or <s>striked ~~ through</s>.<br />Subscript like H<sub>2</sub>O, superscript like X<sup>2</sup> and <mark class="eol1_md">marked text</mark> are available.<br />A custom markdown for this processor can make <span class="eol1_md" style="font-size:larger;">font larger</span> or <span class="eol1_md" style="font-size:smaller;">smaller</span> <h1 id="substitutions-setx-h1-header">Substitutions (SETX h1 header)</h1> <p>Task lists can be created a well<br /><input type="checkbox" disabled class="eol1_md"> where [ ] and [x]<br /><input type="checkbox" disabled checked class="eol1_md"> are converted to html checkboxes</p> &copy; &copy; &reg; &reg; &trade; &trade; &#9413; &#9413; &#177; &rarr; will be replaced by their symbol<br />unless escaped: (c) (C) (r) (R) (tm) (TM) (p) (P) +- -> <h2 id="links-atx-h2-header">Links (ATX h2 header)</h2> Links will be replaced if not in safeMode, unless they are internal references <p><a href="http://some.url" class="eol1_md">http://some.url</a>, not particularly styled, just a detected protocol<br />a phone number: <a href="tel:012345678" class="eol1_md">tel:012345678</a><br /><a href="https://www.markdownguide.org" class="eol1_md">Styled link to markdown information</a><br /><a href="http://some.other.url" class="eol1_md">http://some.other.url</a> with brackets<br /><a href="http://some.url?test2=2&test3=a%3D%28%2Fbcdef" title="some title" class="eol1_md">urlencoded link with title</a> and <a href="javascript: protocol" class="eol1_md">javascript: protocol</a>)<br /><a href="mailto:&#115;&#111;&#109;&#101;&#x40;&#x6d;&#x61;&#105;&#108;&#46;&#x61;&#x64;&#100;&#114;&#x65;&#115;&#115;">&#115;&#111;&#109;&#101;&#x40;&#x6d;&#x61;&#105;&#108;&#46;&#x61;&#x64;&#100;&#114;&#x65;&#115;&#115;</a> converted to mailto: and an escaped@mail.address<br /><img alt="an image" src="https://github.com/erroronline1/caro/raw/master/media/favicon/icon72.png" class="eol1_md" /> if loadable  </p> <h3 id="internal-references-h3-header">Internal references (h3 header)</h3> <a href="http://valid.reference.match">this is a reference link with a match somwhere</a> and an attempt where the actual reference has been forgotten <p>Here's a simple footnote<sup><a id="fnref:1" href="#fn:1" class="eol1_md">[1]</a></sup>, and here's a longer one<sup><a id="fnref:2" href="#fn:2" class="eol1_md">[2]</a></sup>. Footnotes will appear at the bottom later.</p> <p> </p> <h4 id="other-internal-navigation-h4-header">Other internal navigation (h4 header)</h4> <a href="#text-formatting-atx-h1-header" class="eol1_md">top header</a><br /><a href="#substitutions-setx-h1-header" class="eol1_md">second header</a><br /><a href="#withcustomid" class="eol1_md">fifth header</a><br /> <hr> <h2 id="lists-setx-h2-header">Lists (SETX h2 header)</h2> <ol type="1" class="eol1_md"><li>Ordered list items start with a number and a period <ul class="eol1_md"><li>Unordered list items start with asterisk or dash</li><li>Sublist nesting</li><li>is possible</li><li>by indentating with four spaces <ol type="1" class="eol1_md"><li>and list types</li><li>are interchangeable</li><li>and <ol type="I" start="2" class="eol1_md"><li>can <ol type="i" start="3" class="eol1_md"><li>be <ol type="A" start="4" class="eol1_md"><li>nested <ol type="a" start="5" class="eol1_md"><li>until <ol type="1" start="6" class="eol1_md"><li>you're <ol type="I" start="8" class="eol1_md"><li>tired</li></ol></li></ol></li></ol></li></ol></li></ol></li></ol></li></ol></li></ul></li><li>Ordered list item
-with<br />multiple lines <ol type="I" class="eol1_md"><li>the numbers</li><li>of ordered lists</li><li>actually don't</li><li>matter at all <ol type="i" start="12" class="eol1_md"><li>unless the start number is other than 1</li><li>then you'll have an offset</li></ol></li></ol></li></ol> 123. with an escaped period avoids a list <p>Nested ordered lists cycle through arabic numerals, roman numerals uppercase, roman numerals lowercase, latin alphabet uppercase and latin alphabet lowercase as numeration. </p> <h1 id="withcustomid">Tables</h1> <table class="eol1_md"><tr><th>Table header 1</th><th>Table header 2</th><th align="right">Table header 3</th><th align="center">and 4</th></tr><tr><td><em>emphasis</em></td><td><strong>is</strong></td><td align="right"><em><strong>possible</strong></em></td><td align="center"><code class="eol1_md">too</code></td></tr><tr><td>linebreaks</td><td>are</td><td align="right"><strong><span class="eol1_md" style="font-size:larger;">not</span></strong></td><td align="center">though without<br /> HTML <code class="eol1_md">&lt;br /&gt;</code></td></tr><tr><td>and</td><td>aligning</td><td align="right">text</td><td align="center">columnwise</td></tr></table> <h1 id="blockquotes-code-and-definition-lists">Blockquotes, code and definition lists</h1> <p><blockquote class="eol1_md"> Blockquote<br />with <em>multiple</em> lines<br />as seen in many email programs<br />start with a > </blockquote></p>     <code class="eol1_md"><pre class="eol1_md"> preformatted text/code can
-start with 4 spaces &lt;code&gt;</pre></code> <code class="eol1_md"><pre class="eol1_md">or being surrounded by
-three \` or ~</pre></code> <p>Inline <code class="eol1_md">code with two ore more characters between the symbols</code>, also <code class="eol1_md">code with ` escaped by double backticks</code><br />and some <code class="eol1_md">code with &lt;brackets&gt;</code> and <code class="eol1_md">code with an escaped \`-character</code> render inline.</p> <dl class="eol1_md"><dt>Definition list containing </dt><dd>definition lines that</dd><dd>start with a :</dd></dl> <h1 id="nesting">Nesting</h1> <p><ol type="1" class="eol1_md"><li>List items can contain <p><blockquote class="eol1_md">Blockquotes </blockquote></p></li><li>or<br /><table class="eol1_md"><tr><th>Tables</th><th>Column2</th></tr><tr><td>R1C1</td><td>R1C2</td></tr></table></li><li>also</p> <code class="eol1_md"><pre class="eol1_md">code with
-multiple lines</pre></code></li><li>and<br /><input type="checkbox" disabled checked class="eol1_md"> accomplished and<br /><input type="checkbox" disabled class="eol1_md"> unaccomplished tasks</li></ol> <hr> <p><blockquote class="eol1_md"> <code class="eol1_md"><pre class="eol1_md">Same goes for</pre></code> <p><blockquote class="eol1_md">blockquotes </blockquote></p> <ol type="1" class="eol1_md"><li>with</li><li>nested <ul class="eol1_md"><li>lists</li></ul></li></ol> <dl class="eol1_md"><dt>definition lists </dt><dd>with multiple</dd><dd>lines</dd></dl> <table class="eol1_md"><tr><th>Tables nested</th><th align="left">within</th><th align="center">blockquotes</th></tr><tr><td>are</td><td align="left">possible</td><td align="center">as well</td></tr></table> </blockquote></p> <h2 id="safety-related-content-that-should-pose-lesser-threat-with-safemode">Safety related content that should pose lesser threat with safeMode</h2> <a href="http://some.shady.website">totally legit website link</a><br /><a href="javascript:void(0)" onclick="alert('click event')">a with click event</a><br /><a href="javascript:alert('click event')">a href with click event</a><br /><a href="markdown link with js protocol href" class="eol1_md">markdown link with js protocol href</a>)<br /><div onclick="alert('you clicked!')">clickable div</div> <h3 id="safemode-restricted-tags">safeMode restricted tags</h3> e.g. <label>is this input really part of your ui? <input type="text" /></label><br /><script>alert('this script injection had been presented by disabled safeMode')</script> <hr> <ol type="1" class="eol1_md"><li><a id="fn:1" class="eol1_md"></a>    This is the first footnote. <a href="#fnref:1" class="eol1_md">&crarr;</a></li><li><a id="fn:2" class="eol1_md"></a>    Here's one with multiple lines and other elements.
-Indent the content to include it in the current footnote.<br />Add as many lines as you like. <code class="eol1<em>md"><pre class="eol1</em>md">code blocks
-are supported</pre></code> <p><blockquote class="eol1_md">as well as <p><blockquote class="eol1_md">blockquotes </blockquote></p> </blockquote></p> <table class="eol1_md"><tr><th>and</th><th>of</th></tr><tr><td>course</td><td>tables</td></tr></table> <ol type="I" class="eol1_md"><li>and lists</li><li>with the next type though <a href="#fnref:2" class="eol1_md">&crarr;</a></li></ol></li></ol>
-    
-<br>
-
-without safeMode in about 1-2.5 ms in PHP (depending on the server) and 4-15 ms in ECMAScript (depending on the clients calculation power). Is the sourcecode tidy? I tried, but does that matter? It's about visuals anyway, isn't it?  
-[Check for yourself.](http://markdown.erroronline.one)
-
 ## Current limitations and things feeling off
 
 * This flavour currently lacks support of
     * Syntax highlighting
     * Emojis
     * Forgiving indentation handling within lists, here you should be accurate; also lists don't accept blank lines without indentation regarding paragraphs
-    * Block sizes (lists, code, blockquote, etc.) longer than 8k charachters may fail and impact further processing on php. You can split them though if applicable. This may be considered visually uncritical. 
+    * Block sizes (lists, code, blockquote, etc.) longer than 8k characters may fail and impact further processing on php. You can split them though if applicable. This may be considered visually uncritical.
+
+Due to the **intended** capability of turning scripts into links like `[test](javascript:fn())` there may be the need to escape a bit more as in `(this is an example: [test](javascript:fn())\)`
+
+You should avoid a number right beside a HTML-comment. Something like `<!--comment-->2` will likely fail. Whatever symbol i'd choose, chances are never zero. I can as well stick with numbers. 

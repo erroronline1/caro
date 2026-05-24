@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Cmyk.php
  *
@@ -43,28 +45,28 @@ class Cmyk extends \Com\Tecnick\Color\Model
      *
      * @var float
      */
-    protected $cmp_cyan = 0.0;
+    protected float $cmp_cyan = 0.0;
 
     /**
      * Value of the Magenta color component [0..1]
      *
      * @var float
      */
-    protected $cmp_magenta = 0.0;
+    protected float $cmp_magenta = 0.0;
 
     /**
      * Value of the Yellow color component [0..1]
      *
      * @var float
      */
-    protected $cmp_yellow = 0.0;
+    protected float $cmp_yellow = 0.0;
 
     /**
      * Value of the Key (Black) color component [0..1]
      *
      * @var float
      */
-    protected $cmp_key = 0.0;
+    protected float $cmp_key = 0.0;
 
     /**
      * Get an array with all color components.
@@ -123,19 +125,31 @@ class Cmyk extends \Com\Tecnick\Color\Model
     }
 
     /**
-     * Get the CSS representation of the color: rgba(R, G, B, A)
-     * NOTE: Supported since CSS3 and above.
-     *       Use getHexadecimalColor() for CSS1 and CSS2
+     * Get the CSS representation of the color: cmyk(C, M, Y, K) or cmyka(C, M, Y, K, A)
      */
     public function getCssColor(): string
     {
-        $rgb = $this->toRgbArray();
-        return 'rgba('
-            . $this->getNormalizedValue($rgb['red'], 100) . '%,'
-            . $this->getNormalizedValue($rgb['green'], 100) . '%,'
-            . $this->getNormalizedValue($rgb['blue'], 100) . '%,'
-            . $rgb['alpha']
-            . ')';
+        $colorType = 'cmyk';
+        $alpha = '';
+        if ($this->cmp_alpha < 1.0) {
+            $colorType = 'cmyka';
+            $alpha = ',' . $this->cmp_alpha;
+        }
+
+        return (
+            $colorType
+            . '('
+            . $this->getNormalizedValue($this->cmp_cyan, 100)
+            . '%,'
+            . $this->getNormalizedValue($this->cmp_magenta, 100)
+            . '%,'
+            . $this->getNormalizedValue($this->cmp_yellow, 100)
+            . '%,'
+            . $this->getNormalizedValue($this->cmp_key, 100)
+            . '%'
+            . $alpha
+            . ')'
+        );
     }
 
     /**
@@ -144,7 +158,7 @@ class Cmyk extends \Com\Tecnick\Color\Model
      */
     public function getJsPdfColor(): string
     {
-        if ($this->cmp_alpha == 0) {
+        if ($this->cmp_alpha === 0.0) {
             return '["T"]'; // transparent color
         }
 
@@ -194,9 +208,9 @@ class Cmyk extends \Com\Tecnick\Color\Model
     public function toRgbArray(): array
     {
         return [
-            'red' => \max(0, \min(1, (1 - (($this->cmp_cyan * (1 - $this->cmp_key)) + $this->cmp_key)))),
-            'green' => \max(0, \min(1, (1 - (($this->cmp_magenta * (1 - $this->cmp_key)) + $this->cmp_key)))),
-            'blue' => \max(0, \min(1, (1 - (($this->cmp_yellow * (1 - $this->cmp_key)) + $this->cmp_key)))),
+            'red' => \max(0, \min(1, 1 - (($this->cmp_cyan * (1 - $this->cmp_key)) + $this->cmp_key))),
+            'green' => \max(0, \min(1, 1 - (($this->cmp_magenta * (1 - $this->cmp_key)) + $this->cmp_key))),
+            'blue' => \max(0, \min(1, 1 - (($this->cmp_yellow * (1 - $this->cmp_key)) + $this->cmp_key))),
             'alpha' => $this->cmp_alpha,
         ];
     }
@@ -244,10 +258,10 @@ class Cmyk extends \Com\Tecnick\Color\Model
      */
     public function invertColor(): self
     {
-        $this->cmp_cyan = (1 - $this->cmp_cyan);
-        $this->cmp_magenta = (1 - $this->cmp_magenta);
-        $this->cmp_yellow = (1 - $this->cmp_yellow);
-        $this->cmp_key = (1 - $this->cmp_key);
+        $this->cmp_cyan = 1 - $this->cmp_cyan;
+        $this->cmp_magenta = 1 - $this->cmp_magenta;
+        $this->cmp_yellow = 1 - $this->cmp_yellow;
+        $this->cmp_key = 1 - $this->cmp_key;
         return $this;
     }
 }

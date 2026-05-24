@@ -46,6 +46,9 @@ class TcpdfImporterFacadeTest extends TestCase
     /** Path to a fixture with an /Encrypt trailer entry. */
     private string $encryptedPdf;
 
+    /**
+     * @throws \Throwable
+     */
     protected function setUp(): void
     {
         if (!\defined('K_PATH_FONTS')) {
@@ -63,6 +66,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ helpers
 
+    /**
+     * @throws \Throwable
+     */
     private function makePdf(): Tcpdf
     {
         $pdf = new Tcpdf();
@@ -72,6 +78,9 @@ class TcpdfImporterFacadeTest extends TestCase
         return $pdf;
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function makePdfWithMode(string $mode): Tcpdf
     {
         $pdf = new Tcpdf(mode: $mode);
@@ -79,15 +88,16 @@ class TcpdfImporterFacadeTest extends TestCase
         return $pdf;
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function getPdfVersion(Tcpdf $pdf): string
     {
         $ref = new \ReflectionClass($pdf);
         while ($ref !== false) {
             if ($ref->hasProperty('pdfver')) {
                 $prop = $ref->getProperty('pdfver');
-                $prop->setAccessible(true);
-                $val = $prop->getValue($pdf);
-                return \is_string($val) ? $val : '';
+                return $this->stringValue($prop->getValue($pdf));
             }
 
             $ref = $ref->getParentClass();
@@ -96,8 +106,16 @@ class TcpdfImporterFacadeTest extends TestCase
         return '';
     }
 
+    private function stringValue(mixed $value): string
+    {
+        return \is_string($value) ? $value : '';
+    }
+
     // ------------------------------------------------------------------ setImportSourceFile / setImportSourceData
 
+    /**
+     * @throws \Throwable
+     */
     public function testSetImportSourceFileReturnsNonEmptyId(): void
     {
         $pdf = $this->makePdf();
@@ -105,6 +123,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertNotEmpty($srcId);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSetImportSourceDataReturnsNonEmptyId(): void
     {
         $pdf = $this->makePdf();
@@ -113,6 +134,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertNotEmpty($srcId);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSetImportSourceFileThrowsForMissingFile(): void
     {
         $pdf = $this->makePdf();
@@ -120,6 +144,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $pdf->setImportSourceFile('/nonexistent/path.pdf');
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSetImportSourceFileThrowsForEncryptedPdf(): void
     {
         $pdf = $this->makePdf();
@@ -128,6 +155,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $pdf->setImportSourceFile($this->encryptedPdf);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSetImportSourceFileWithPasswordThrowsActionableEncryptedError(): void
     {
         $pdf = $this->makePdf();
@@ -138,6 +168,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ getSourcePageCount
 
+    /**
+     * @throws \Throwable
+     */
     public function testGetSourcePageCountSimple(): void
     {
         $pdf = $this->makePdf();
@@ -145,6 +178,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame(1, $pdf->getSourcePageCount($srcId));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGetSourcePageCountMultipage(): void
     {
         $pdf = $this->makePdf();
@@ -154,6 +190,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ importPage / importPages
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageReturnsPageTemplate(): void
     {
         $pdf = $this->makePdf();
@@ -164,6 +203,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertGreaterThan(0.0, $tpl->getHeight());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageThrowsForOutOfRange(): void
     {
         $pdf = $this->makePdf();
@@ -172,6 +214,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $pdf->importPage($srcId, 99);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageUsesTrimBoxWhenRequested(): void
     {
         $pdf = $this->makePdf();
@@ -181,6 +226,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertEqualsWithDelta(660.0, $tpl->getHeight(), 0.01);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageUsesArtBoxWhenRequested(): void
     {
         $pdf = $this->makePdf();
@@ -190,6 +238,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertEqualsWithDelta(640.0, $tpl->getHeight(), 0.01);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageRespectsRotationByDefault(): void
     {
         $pdf = $this->makePdf();
@@ -198,6 +249,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame(90, $tpl->getRotation());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageCanDisableRotationRespect(): void
     {
         $pdf = $this->makePdf();
@@ -206,6 +260,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame(0, $tpl->getRotation());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageWithGroupXObjectBumpsPdfVersionTo14Minimum(): void
     {
         $pdf = $this->makePdf();
@@ -215,6 +272,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame('1.4', $this->getPdfVersion($pdf));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageWithGroupXObjectDisabledKeepsVersion(): void
     {
         $pdf = $this->makePdf();
@@ -224,6 +284,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame('1.3', $this->getPdfVersion($pdf));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageEmitsTransparencyGroupByDefault(): void
     {
         $pdf = $this->makePdf();
@@ -236,6 +299,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertStringContainsString('/Group << /Type /Group /S /Transparency >>', $raw);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPageSuppressesTransparencyGroupInPdfx3(): void
     {
         $pdf = $this->makePdfWithMode('pdfx3');
@@ -248,6 +314,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertStringNotContainsString('/Group << /Type /Group /S /Transparency >>', $raw);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPagesNullRangeImportsAll(): void
     {
         $pdf = $this->makePdf();
@@ -259,15 +328,22 @@ class TcpdfImporterFacadeTest extends TestCase
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPagesExplicitRange(): void
     {
         $pdf = $this->makePdf();
         $srcId = $pdf->setImportSourceFile($this->multipagePdf);
         $tpls = $pdf->importPages($srcId, [1]);
         $this->assertCount(1, $tpls);
+        assert(isset($tpls[0]), "\$tpls[0] must be set");
         $this->assertInstanceOf(PageTemplate::class, $tpls[0]);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImportPagesThrowsForOutOfRange(): void
     {
         $pdf = $this->makePdf();
@@ -278,6 +354,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ useImportedPage
 
+    /**
+     * @throws \Throwable
+     */
     public function testUseImportedPageReturnsPlacementDimensions(): void
     {
         $pdf = $this->makePdf();
@@ -292,6 +371,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $placed['width'], 0.01);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUseImportedPageAlignCenterCentersInsideRequestedBox(): void
     {
         $pdf = $this->makePdf();
@@ -299,14 +381,7 @@ class TcpdfImporterFacadeTest extends TestCase
         $tpl = $pdf->importPage($srcId, 1);
         $pdf->addPage();
 
-        $placed = $pdf->useImportedPage(
-            $tpl,
-            10.0,
-            20.0,
-            100.0,
-            200.0,
-            ['keepAspectRatio' => true, 'align' => 'CC']
-        );
+        $placed = $pdf->useImportedPage($tpl, 10.0, 20.0, 100.0, 200.0, ['keepAspectRatio' => true, 'align' => 'CC']);
 
         // In a 100x200 box with source ratio 612:792, width is the limiting axis.
         $this->assertEqualsWithDelta(100.0, $placed['width'], 0.01);
@@ -315,6 +390,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertEqualsWithDelta(55.29, $placed['y'], 0.05);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUseImportedPageWithClipAddsClipOperatorToPageContent(): void
     {
         $pdf = $this->makePdf();
@@ -322,14 +400,7 @@ class TcpdfImporterFacadeTest extends TestCase
         $tpl = $pdf->importPage($srcId, 1);
         $pdf->addPage();
 
-        $pdf->useImportedPage(
-            $tpl,
-            15.0,
-            25.0,
-            80.0,
-            60.0,
-            ['clip' => true, 'keepAspectRatio' => false]
-        );
+        $pdf->useImportedPage($tpl, 15.0, 25.0, 80.0, 60.0, ['clip' => true, 'keepAspectRatio' => false]);
 
         $page = $pdf->page->getPage();
         $content = \implode('', $page['content']);
@@ -338,6 +409,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ addPageFromImport
 
+    /**
+     * @throws \Throwable
+     */
     public function testAddPageFromImportCreatesPageAndReturnsTemplate(): void
     {
         $pdf = $this->makePdf();
@@ -350,6 +424,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertGreaterThanOrEqual(0, $pageId);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAddPageFromImportPageDimensionsMatchTemplate(): void
     {
         $pdf = $this->makePdf();
@@ -358,14 +435,17 @@ class TcpdfImporterFacadeTest extends TestCase
 
         $pageId = $pdf->page->getPageID();
         $page = $pdf->page->getPage($pageId);
-        $pageW = (float) $page['width'];
-        $pageH = (float) $page['height'];
+        $pageW = $page['width'];
+        $pageH = $page['height'];
         $this->assertGreaterThan(0.0, $pageW);
         $this->assertGreaterThan(0.0, $pageH);
         // The aspect ratio of the page must match the template.
         $this->assertEqualsWithDelta($tpl->getWidth() / $tpl->getHeight(), $pageW / $pageH, 0.01);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAddPageFromImportPlacesXObject(): void
     {
         $pdf = $this->makePdf();
@@ -381,6 +461,9 @@ class TcpdfImporterFacadeTest extends TestCase
 
     // ------------------------------------------------------------------ appendDocument
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentCreatesOnePagePerSourcePage(): void
     {
         $pdf = $this->makePdf();
@@ -389,21 +472,31 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertCount(2, $tpls);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentWithRangeCreatesOnlyRequestedPages(): void
     {
         $pdf = $this->makePdf();
         $srcId = $pdf->setImportSourceFile($this->multipagePdf);
         $tpls = $pdf->appendDocument($srcId, [2]);
         $this->assertCount(1, $tpls);
+        assert(isset($tpls[0]), "\$tpls[0] must be set");
         $this->assertSame(2, $tpls[0]->getSourcePage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentRestoresCallerPageContext(): void
     {
         $pdf = $this->makePdf();
 
         // Create an initial page.
         $callerPage = $pdf->addPage();
+        if (!isset($callerPage['pid']) || !\is_int($callerPage['pid'])) {
+            $this->fail('Expected integer page id.');
+        }
         $callerPid = $callerPage['pid'];
 
         // Append pages from a multi-page source.
@@ -414,6 +507,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertSame($callerPid, $pdf->page->getPageID());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentWithNoPriorPageLeavesCurrentOnLastAppended(): void
     {
         $pdf = $this->makePdf();
@@ -428,6 +524,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $this->assertCount(2, $tpls);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentThrowsForOutOfRangePage(): void
     {
         $pdf = $this->makePdf();
@@ -436,6 +535,9 @@ class TcpdfImporterFacadeTest extends TestCase
         $pdf->appendDocument($srcId, [5]);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAppendDocumentXObjectsRegistered(): void
     {
         $pdf = $this->makePdf();
@@ -445,7 +547,7 @@ class TcpdfImporterFacadeTest extends TestCase
         $pages = $pdf->page->getPages();
         $pageContent = '';
         foreach ($pages as $page) {
-            $content = $page['content'] ?? [];
+            $content = $page['content'];
             if ($content === []) {
                 continue;
             }

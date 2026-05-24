@@ -52,7 +52,7 @@ It is built to handle multilingual text paths where normalization, code-point ha
 
 ## Requirements
 
-- PHP 8.1 or later
+- PHP 8.2 or later
 - Extensions: `mbstring`, `pcre`
 - Composer
 
@@ -126,7 +126,11 @@ Codepoints belonging to unsupported scripts are passed through unchanged.
 make deps
 make help
 make qa
+make server
 ```
+
+`make server` starts the local PHP development server for the `example/` directory on `http://localhost:8000`.
+Use a custom port with `make server PORT=8080`.
 
 ---
 
@@ -148,9 +152,3 @@ require_once '/usr/share/php/Com/Tecnick/Unicode/autoload.php';
 ## Contributing
 
 Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md).
-
----
-
-## Contact
-
-Nicola Asuni - <info@tecnick.com>

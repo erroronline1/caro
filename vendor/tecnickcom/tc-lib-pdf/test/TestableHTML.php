@@ -32,12 +32,17 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
             'lineoriginx' => 0.0,
             'maxwidth' => 0.0,
             'maxheight' => 0.0,
+            'floatrowleftw' => 0.0,
+            'floatrowrightw' => 0.0,
+            'floatrowtop' => 0.0,
+            'floatrowbottom' => 0.0,
             'lineadvance' => 0.0,
             'linebottom' => 0.0,
             'lineascent' => 0.0,
             'linewordspacing' => 0.0,
             'linewrapped' => false,
             'textindentapplied' => false,
+            'pendingblockmarginb' => 0.0,
             'basefont' => '',
         ],
         'fontcache' => [],
@@ -48,6 +53,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         'linkstack' => [],
         'listack' => [],
         'prelevel' => 0,
+        'quotelevel' => 0,
         'dom' => [],
     ];
 
@@ -56,19 +62,24 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->sanitizeHTML($html);
     }
 
+    /**
+     * Render context defaults are pre-initialized in `$testhrc` for probe-style tests.
+     * @throws \Throwable
+     */
     private function initExposeRenderContextIfNeeded(): void
     {
-        if (isset($this->testhrc['cellctx']) && \is_array($this->testhrc['cellctx'])) {
-            return;
-        }
-
-        $this->initHTMLCellContext($this->testhrc, 0.0, 0.0, 0.0, 0.0);
+        // Intentionally kept as a compatibility hook for existing expose* methods.
     }
 
     /** @phpstan-return THTMLRenderContext */
     public function exposeGetHTMLRenderContext(): array
     {
         return $this->testhrc;
+    }
+
+    private function stringifyInvokeResult(mixed $value): string
+    {
+        return \is_string($value) ? $value : '';
     }
 
     /** @return array<int, string> */
@@ -78,10 +89,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $names = [];
         foreach ($ref->getMethods(\ReflectionMethod::IS_PROTECTED) as $method) {
             $name = $method->getName();
-            if (
-                \str_starts_with($name, 'parseHTMLTagOPEN')
-                || \str_starts_with($name, 'parseHTMLTagCLOSE')
-            ) {
+            if (\str_starts_with($name, 'parseHTMLTagOPEN') || \str_starts_with($name, 'parseHTMLTagCLOSE')) {
                 $names[] = $name;
             }
         }
@@ -90,7 +98,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $names;
     }
 
-    /** @phpstan-param THTMLAttrib $elm */
+    /**
+     * @phpstan-param THTMLAttrib $elm
+     * @throws \Throwable
+     */
     public function exposeInvokeParseHTMLTagMethod(
         string $method,
         array $elm,
@@ -102,12 +113,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $this->initExposeRenderContextIfNeeded();
         $this->testhrc['dom'] = [$elm];
 
-        $out = $this->{$method}($this->testhrc, 0, $tpx, $tpy, $tpw, $tph);
-        if (!\is_string($out)) {
-            return '';
-        }
+        $refm = new \ReflectionMethod($this, $method);
+        $args = [&$this->testhrc, 0, &$tpx, &$tpy, &$tpw, &$tph];
 
-        return $out;
+        return $this->stringifyInvokeResult($refm->invokeArgs($this, $args));
     }
 
     /** @phpstan-return THTMLAttrib */
@@ -116,7 +125,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLRootProperties();
     }
 
-    /** @phpstan-return array<int, THTMLAttrib> */
+    /**
+     * @phpstan-return array<int, THTMLAttrib>
+     * @throws \Throwable
+     */
     public function exposeGetHTMLDOM(string $html): array
     {
         return $this->getHTMLDOM($html);
@@ -127,16 +139,15 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      *
      * @return array<int, float>
      */
-    public function exposeComputeHTMLTableColWidths(
-        array $dom,
-        int $tablekey,
-        int $cols,
-        float $availableWidth,
-    ): array {
+    public function exposeComputeHTMLTableColWidths(array $dom, int $tablekey, int $cols, float $availableWidth): array
+    {
         return $this->computeHTMLTableColWidths($dom, $tablekey, $cols, $availableWidth);
     }
 
-    /** @phpstan-param array<string, mixed> $markerStyles */
+    /**
+     * @phpstan-param array<string, mixed> $markerStyles
+     * @throws \Throwable
+     */
     public function exposeGetHTMLliBullet(
         int $depth,
         int $count,
@@ -148,6 +159,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLliBullet($depth, $count, $posx, $posy, $type, $markerStyles);
     }
 
+    /** @throws \Throwable */
     public function exposePageBreak(): int
     {
         return $this->pageBreak();
@@ -180,9 +192,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
     }
 
     /**
-    * @phpstan-param array<int, THTMLAttrib> $dom
+     * @phpstan-param array<int, THTMLAttrib> $dom
      * @phpstan-param array<string, string> $css
      * @phpstan-param array<int> $level
+     * @throws \Throwable
      */
     public function exposeProcessHTMLDOMOpeningTag(
         array &$dom,
@@ -195,14 +208,12 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $this->processHTMLDOMOpeningTag($dom, $css, $level, $element, $key, $thead);
     }
 
-    /** @phpstan-param THTMLAttrib $elm */
-    public function exposeParseHTMLText(
-        array $elm,
-        float &$tpx,
-        float &$tpy,
-        float &$tpw,
-        float &$tph,
-    ): string {
+    /**
+     * @phpstan-param THTMLAttrib $elm
+     * @throws \Throwable
+     */
+    public function exposeParseHTMLText(array $elm, float &$tpx, float &$tpy, float &$tpw, float &$tph): string
+    {
         $this->initExposeRenderContextIfNeeded();
         $this->testhrc['dom'] = [$elm];
 
@@ -211,6 +222,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
 
     /**
      * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
      */
     public function exposeParseHTMLTextWithDom(
         array $dom,
@@ -226,15 +238,13 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->parseHTMLText($this->testhrc, $key, $tpx, $tpy, $tpw, $tph);
     }
 
-    public function exposeInitHTMLCellContext(
-        float $originx,
-        float $originy,
-        float $maxwidth,
-        float $maxheight,
-    ): void {
+    /** @throws \Throwable */
+    public function exposeInitHTMLCellContext(float $originx, float $originy, float $maxwidth, float $maxheight): void
+    {
         $this->initHTMLCellContext($this->testhrc, $originx, $originy, $maxwidth, $maxheight);
     }
 
+    /** @throws \Throwable */
     public function exposeSetHTMLLineState(
         float $lineadvance,
         float $linebottom,
@@ -249,7 +259,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $this->testhrc['cellctx']['linewrapped'] = $linewrapped;
     }
 
-    /** @phpstan-param THTMLAttrib $elm */
+    /**
+     * @phpstan-param THTMLAttrib $elm
+     * @throws \Throwable
+     */
     public function exposeOpenHTMLBlock(array $elm, float &$tpx, float &$tpy, float &$tpw): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -258,7 +271,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->openHTMLBlock($this->testhrc, 0, $tpx, $tpy, $tpw);
     }
 
-    /** @phpstan-param THTMLAttrib $elm */
+    /**
+     * @phpstan-param THTMLAttrib $elm
+     * @throws \Throwable
+     */
     public function exposeCloseHTMLBlock(array $elm, float &$tpx, float &$tpy, float &$tpw): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -274,6 +290,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
 
     /**
      * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
      */
     public function exposeParseHTMLTagOPENbrWithDom(
         array $dom,
@@ -311,6 +328,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      * @phpstan-param array<int, THTMLAttrib> $dom
      *
      * @return array<int|string, array<string, mixed>>
+     * @throws \Throwable
      */
     public function exposeGetHTMLTableCellBorderStylesWithDom(array $dom, int $key): array
     {
@@ -324,6 +342,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      * @phpstan-param array<int, THTMLAttrib> $dom
      *
      * @return ?array<string, mixed>
+     * @throws \Throwable
      */
     public function exposeGetHTMLTableCellFillStyleWithDom(array $dom, int $key): ?array
     {
@@ -339,7 +358,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLFillStyle($fillcolor);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeHasBlockLvBgAncestorWithDom(array $dom, int $key): bool
     {
         $this->initExposeRenderContextIfNeeded();
@@ -348,7 +370,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->hasBlockLvBgAncestor($this->testhrc, $key);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeFindHTMLAncestorOpeningTagWithDom(array $dom, int $key, string $tagname): int
     {
         $this->initExposeRenderContextIfNeeded();
@@ -362,6 +387,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      * @phpstan-param array<string, string> $attr
      *
      * @return string|array<string, mixed>
+     * @throws \Throwable
      */
     public function exposeGetHTMLInputButtonActionWithDom(array $dom, int $key, string $type, array $attr): string|array
     {
@@ -382,17 +408,21 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->isAllowedHTMLTcpdfMethod($method);
     }
 
+    /** @throws \Throwable */
     public function exposeExecuteHTMLTcpdfPageBreak(string $mode, float &$tpx, float &$tpw): void
     {
         $this->initExposeRenderContextIfNeeded();
         $this->executeHTMLTcpdfPageBreak($this->testhrc, $mode, $tpx, $tpw);
     }
 
-    /** @param array<int, array<string, mixed>> $tablestack */
+    /**
+     * @param array<int, array<string, mixed>> $tablestack
+     * @phpstan-param array<int, THTMLTableState> $tablestack
+     * @throws \Throwable
+     */
     public function exposeSetHTMLTableStack(array $tablestack): void
     {
         $this->initExposeRenderContextIfNeeded();
-        // @phpstan-ignore assign.propertyType
         $this->testhrc['tablestack'] = $tablestack;
     }
 
@@ -402,13 +432,17 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLCollapsedBorderStyleName($style);
     }
 
+    /** @throws \Throwable */
     public function exposeResetHTMLTableStackOnPageBreak(float $tpy): void
     {
         $this->initExposeRenderContextIfNeeded();
         $this->resetHTMLTableStackOnPageBreak($this->testhrc, $tpy);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeGetHTMLListMarkerTypeWithDom(array $dom, int $key, bool $ordered): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -417,7 +451,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLListMarkerType($this->testhrc, $key, $ordered);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposePushHTMLListWithDom(array $dom, int $key, bool $ordered): void
     {
         $this->initExposeRenderContextIfNeeded();
@@ -425,13 +462,17 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         $this->pushHTMLList($this->testhrc, $key, $ordered);
     }
 
+    /** @throws \Throwable */
     public function exposePopHTMLList(): void
     {
         $this->initExposeRenderContextIfNeeded();
         $this->popHTMLList($this->testhrc);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeGetHTMLListItemCounterWithDom(array $dom, int $key): int
     {
         $this->initExposeRenderContextIfNeeded();
@@ -440,6 +481,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLListItemCounter($this->testhrc, $key);
     }
 
+    /** @throws \Throwable */
     public function exposeGetCurrentHTMLListMarkerType(): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -447,6 +489,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getCurrentHTMLListMarkerType($this->testhrc);
     }
 
+    /** @throws \Throwable */
     public function exposeEstimateHTMLTableHeadHeight(string $thead): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -454,7 +497,35 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->estimateHTMLTableHeadHeight($this->testhrc, $thead);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<string, mixed>|null $cell
+     * @phpstan-param array<int|string, array<array-key, array<array-key, int>|float|int|string>|float|string> $styles
+     * @throws \Throwable
+     */
+    public function exposeMeasureHTMLCellRenderedHeight(
+        string $html,
+        float $posx = 0,
+        float $posy = 0,
+        float $width = 0,
+        float $height = 0,
+        ?array $cell = null,
+        array $styles = [],
+    ): float {
+        return $this->measureHTMLCellRenderedHeight($html, $posx, $posy, $width, $height, $cell, $styles);
+    }
+
+    /** @throws \Throwable */
+    public function exposeReplayHTMLTableHead(string $thead, float &$tpx, float &$tpy, float &$tpw, float &$tph): string
+    {
+        $this->initExposeRenderContextIfNeeded();
+
+        return $this->replayHTMLTableHead($this->testhrc, $thead, $tpx, $tpy, $tpw, $tph);
+    }
+
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeEstimateHTMLTableRowHeightWithDom(array $dom, int $trkey): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -469,7 +540,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->findHTMLClosingTagIndex($dom, $startkey);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeEstimateHTMLTextHeightWithDom(array $dom, int $key, string $text, float $width): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -478,7 +552,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->estimateHTMLTextHeight($this->testhrc, $key, $text, $width);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeEstimateHTMLNobrHeightWithDom(array $dom, int $startkey, float $width): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -487,12 +564,31 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->estimateHTMLNobrHeight($this->testhrc, $startkey, $width);
     }
 
+    /** @throws \Throwable */
     public function exposeSetHTMLPrelevel(int $prelevel): void
     {
         $this->initExposeRenderContextIfNeeded();
         $this->testhrc['prelevel'] = $prelevel;
     }
 
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
+    public function exposeSetHTMLDom(array $dom): void
+    {
+        $this->initExposeRenderContextIfNeeded();
+        $this->testhrc['dom'] = $dom;
+    }
+
+    /** @throws \Throwable */
+    public function exposeUpdateHTMLParentBlockBottom(int $openkey, float $bottom): void
+    {
+        $this->initExposeRenderContextIfNeeded();
+        $this->updateHTMLParentBlockBottom($this->testhrc, $openkey, $bottom);
+    }
+
+    /** @throws \Throwable */
     public function exposeGetHTMLBaseFontName(): string
     {
         return $this->getHTMLBaseFontName();
@@ -502,6 +598,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      * @phpstan-param array<int, THTMLAttrib> $dom
      *
      * @return array<string, mixed>
+     * @throws \Throwable
      */
     public function exposeGetHTMLFontMetricWithDom(array $dom, int $key): array
     {
@@ -511,7 +608,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLFontMetric($this->testhrc, $key);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeGetHTMLTextPrefixWithDom(array $dom, int $key): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -520,7 +620,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLTextPrefix($this->testhrc, $key);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeGetHTMLLineAdvanceWithDom(array $dom, int $key): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -529,7 +632,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLLineAdvance($this->testhrc, $key);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeGetCurrentHTMLLineAdvanceWithDom(array $dom, int $key): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -538,6 +644,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getCurrentHTMLLineAdvance($this->testhrc, $key);
     }
 
+    /** @throws \Throwable */
     public function exposeUpdateHTMLLineAdvance(float $lineadvance): void
     {
         $this->initExposeRenderContextIfNeeded();
@@ -548,6 +655,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
      * @phpstan-param array<int, THTMLAttrib> $dom
      *
      * @return array{width: float, spaces: int, wrapped: bool}
+     * @throws \Throwable
      */
     public function exposeMeasureHTMLInlineLineMetricsWithDom(
         array $dom,
@@ -561,11 +669,13 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->measureHTMLInlineLineMetrics($this->testhrc, $startkey, $maxwidth, $wordspacing);
     }
 
+    /** @throws \Throwable */
     public function exposeGetHTMLTextFirstLineSpaces(string $text, string $forcedir, float $maxwidth): int
     {
         return $this->getHTMLTextFirstLineSpaces($text, $forcedir, $maxwidth);
     }
 
+    /** @throws \Throwable */
     public function exposeGetHTMLTextFirstLineSpacesWithMode(
         string $text,
         string $mode,
@@ -581,7 +691,10 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->getHTMLTextFirstLineSpaces($text, $forcedir, $maxwidth);
     }
 
-    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeMeasureHTMLInlineRunMaxAscentWithDom(array $dom, int $startkey): float
     {
         $this->initExposeRenderContextIfNeeded();
@@ -590,12 +703,14 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->measureHTMLInlineRunMaxAscent($this->testhrc, $startkey);
     }
 
+    /** @throws \Throwable */
     public function exposeHasHTMLTextBreakOpportunity(string $text): bool
     {
         $this->initExposeRenderContextIfNeeded();
         return $this->hasHTMLTextBreakOpportunity($this->testhrc, 0, $text);
     }
 
+    /** @throws \Throwable */
     public function exposeHasHTMLTextBreakOpportunityWithMode(string $text, string $mode): bool
     {
         $this->initExposeRenderContextIfNeeded();
@@ -607,6 +722,7 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->hasHTMLTextBreakOpportunity($this->testhrc, 0, $text);
     }
 
+    /** @throws \Throwable */
     public function exposeNormalizeHTMLTextWithMode(string $text, string $mode): string
     {
         $this->initExposeRenderContextIfNeeded();
@@ -619,6 +735,35 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
     }
 
     /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
+    public function exposeApplyHTMLFontVariantWithDom(array $dom, int $key, string $text): string
+    {
+        $this->initExposeRenderContextIfNeeded();
+        $this->testhrc['dom'] = $dom;
+
+        return $this->applyHTMLFontVariant($this->testhrc, $text, $key);
+    }
+
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
+    public function exposeGetHTMLPseudoTextContentWithDom(
+        array $dom,
+        int $key,
+        string $style,
+        int $quotelevel = 0,
+    ): string {
+        $this->initExposeRenderContextIfNeeded();
+        $this->testhrc['dom'] = $dom;
+        $this->testhrc['quotelevel'] = $quotelevel;
+
+        return $this->getHTMLPseudoTextContent($this->testhrc, $key, $style);
+    }
+
+    /**
      * @return array<string, string>
      */
     public function exposeParseHTMLStyleDeclarationMap(string $style): array
@@ -626,9 +771,179 @@ class TestableHTML extends \Com\Tecnick\Pdf\Tcpdf
         return $this->parseHTMLStyleDeclarationMap($style);
     }
 
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @phpstan-param array<int, string> $properties
+     */
+    public function exposeIsLastHTMLStyleDeclarationProperty(
+        array &$dom,
+        int $key,
+        string $property,
+        array $properties,
+    ): bool {
+        return $this->isLastHTMLStyleDeclarationProperty($dom, $key, $property, $properties);
+    }
+
+    /**
+     * @phpstan-param THTMLRenderContext $hrc
+     * @throws \Com\Tecnick\Pdf\Font\Exception
+     * @throws \Com\Tecnick\Unicode\Exception
+     */
+    public function exposeGetCurrentHTMLListIndentWidthWithContext(array &$hrc): float
+    {
+        return $this->getCurrentHTMLListIndentWidth($hrc);
+    }
+
+    /**
+     * @param array<string, mixed> $elm
+     */
+    public function exposeGetPdfUaListNumbering(array $elm): string
+    {
+        return $this->getPdfUaListNumbering($elm);
+    }
+
+    /**
+     * @return array{T: string, R: string, B: string, L: string}|array{}
+     */
+    public function exposeExpandHTMLBorderQuadValues(string $value): array
+    {
+        return $this->expandHTMLBorderQuadValues($value);
+    }
+
+    /**
+     * @phpstan-param THTMLTableState $table
+     * @phpstan-param THTMLAttrib $elm
+     * @param array{buffer: string} $cellctx
+     */
+    public function exposeShouldHideHTMLEmptyTableCell(array $table, array $elm, array $cellctx): bool
+    {
+        $fullCellCtx = [
+            'bstyles' => [],
+            'buffer' => $cellctx['buffer'],
+            'cellw' => 0.0,
+            'cellx' => 0.0,
+            'colindex' => 0,
+            'colspan' => 1,
+            'fillstyle' => null,
+            'lineadvance' => 0.0,
+            'lineascent' => 0.0,
+            'linebottom' => 0.0,
+            'linewordspacing' => 0.0,
+            'linewrapped' => false,
+            'maxheight' => 0.0,
+            'maxwidth' => 0.0,
+            'originx' => 0.0,
+            'originy' => 0.0,
+            'rowspan' => 1,
+            'rowtop' => 0.0,
+            'valign' => 'top',
+        ];
+
+        return $this->shouldHideHTMLEmptyTableCell($table, $elm, $fullCellCtx);
+    }
+
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Com\Tecnick\Pdf\Page\Exception
+     * @throws \Com\Tecnick\Pdf\Exception
+     */
+    public function exposeParseHTMLStyleBorderSpacingProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleBorderSpacingProperty($dom, $key, $parentkey);
+    }
+
     /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStylePageBreakInsideProperty(array &$dom, int $key): void
+    {
+        $this->parseHTMLStylePageBreakInsideProperty($dom, $key);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleBreakInsideAliasProperty(array &$dom, int $key): void
+    {
+        $this->parseHTMLStyleBreakInsideAliasProperty($dom, $key);
+    }
+
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Com\Tecnick\Color\Exception
+     */
+    public function exposeParseHTMLStyleBackgroundProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleBackgroundProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleTableLayoutProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleTableLayoutProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleCaptionSideProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleCaptionSideProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleEmptyCellsProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleEmptyCellsProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleFontShorthandProperty(array &$dom, int $key): void
+    {
+        $this->parseHTMLStyleFontShorthandProperty($dom, $key);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleFontFamilyProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleFontFamilyProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleListStyleShorthandProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleListStyleShorthandProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleListStyleTypeProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleListStyleTypeProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleListStylePositionProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleListStylePositionProperty($dom, $key, $parentkey);
+    }
+
+    /** @phpstan-param array<int, THTMLAttrib> $dom */
+    public function exposeParseHTMLStyleListStyleImageProperty(array &$dom, int $key, int $parentkey): void
+    {
+        $this->parseHTMLStyleListStyleImageProperty($dom, $key, $parentkey);
+    }
+
+    /**
+     * @phpstan-param array<int, THTMLAttrib> $dom
+     * @throws \Throwable
+     */
     public function exposeParseHTMLStyleAttributesWithDom(array &$dom, int $key, int $parentkey): void
     {
         $this->parseHTMLStyleAttributes($dom, $key, $parentkey);
+    }
+
+    /**
+     * @param array<string, mixed> $attr
+     * @param array<string, mixed> $elm
+     *
+     * @return array<string, mixed>
+     */
+    public function exposeGetHTMLFormFieldJSProperties(array $attr, string $fieldkind, array $elm = []): array
+    {
+        return $this->getHTMLFormFieldJSProperties($attr, $fieldkind, $elm);
     }
 }

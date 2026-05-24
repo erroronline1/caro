@@ -31,44 +31,65 @@ namespace Test;
  */
 class BufferTest extends TestUtil
 {
+    public function testSubsetModeDisabledByDefault(): void
+    {
+        $this->setupTest();
+        $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
+        $this->assertFalse($stack->isSubsetMode());
+    }
+
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
+    public function testAddSubsetCharOnMissingFontThrows(): void
+    {
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
+        $this->setupTest();
+        $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
+        $stack->addSubsetChar('missing', 65);
+    }
+
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testStackMissingKey(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $stack->getFont('missing');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testStackMissingFontName(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $objnum = 1;
         $stack->add($objnum, '');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testStackIFileMissing(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $objnum = 1;
         $stack->add($objnum, 'something', '', '/missing/nothere.json');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testStackIFileNotJson(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $objnum = 1;
         $stack->add($objnum, 'something', '', __DIR__ . '/StackTest.php');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testStackIFileWrongFormat(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $objnum = 1;
@@ -76,6 +97,7 @@ class BufferTest extends TestUtil
         $stack->add($objnum, 'something', '', $this->getFontPath() . 'badformat.json');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadDeafultWidthA(): void
     {
         $this->setupTest();
@@ -87,6 +109,7 @@ class BufferTest extends TestUtil
         $this->assertEquals(600, $font['dw']);
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadDeafultWidthB(): void
     {
         $this->setupTest();
@@ -98,6 +121,7 @@ class BufferTest extends TestUtil
         $this->assertEquals(123, $font['dw']);
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadDeafultWidthC(): void
     {
         $this->setupTest();
@@ -105,16 +129,17 @@ class BufferTest extends TestUtil
         $objnum = 1;
         \file_put_contents(
             $this->getFontPath() . 'test.json',
-            '{"type":"Type1","desc":{"MissingWidth":234},"cw":{"0":600}}'
+            '{"type":"Type1","desc":{"MissingWidth":234},"cw":{"0":600}}',
         );
         $stack->add($objnum, 'test', '', $this->getFontPath() . 'test.json');
         $font = $stack->getFont('test');
         $this->assertEquals(234, $font['dw']);
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadWrongType(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1);
         $objnum = 1;
@@ -122,9 +147,10 @@ class BufferTest extends TestUtil
         $stack->add($objnum, 'test', '', $this->getFontPath() . 'test.json');
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadCidOnPdfa(): void
     {
-        $this->bcExpectException('\\' . \Com\Tecnick\Pdf\Font\Exception::class);
+        $this->bcExpectException(\Com\Tecnick\Pdf\Font\Exception::class);
         $this->setupTest();
         $stack = new \Com\Tecnick\Pdf\Font\Stack(1, false, true, true);
         $objnum = 1;
@@ -132,6 +158,7 @@ class BufferTest extends TestUtil
         $stack->add($objnum, 'test', '', $this->getFontPath() . 'test.json', false);
     }
 
+    /** @throws \Com\Tecnick\Pdf\Font\Exception */
     public function testLoadArtificialStyles(): void
     {
         $this->setupTest();
@@ -139,12 +166,17 @@ class BufferTest extends TestUtil
         $objnum = 1;
         \file_put_contents(
             $this->getFontPath() . 'test.json',
-            '{"type":"Core","cw":{"0":600},"mode":{"bold":true,"italic":true}}'
+            '{"type":"Core","cw":{"0":600},"mode":{"bold":true,"italic":true}}',
         );
         $key = $stack->add($objnum, 'symbol', '', $this->getFontPath() . 'test.json');
         $this->assertNotEmpty($key);
     }
 
+    /**
+     * @throws \Com\Tecnick\File\Exception
+     * @throws \Com\Tecnick\Pdf\Font\Exception
+     * @throws \RangeException
+     */
     public function testBuffer(): void
     {
         $this->setupTest();
@@ -198,6 +230,11 @@ class BufferTest extends TestUtil
         $this->assertNotEmpty($font);
     }
 
+    /**
+     * @throws \Com\Tecnick\File\Exception
+     * @throws \Com\Tecnick\Pdf\Font\Exception
+     * @throws \RangeException
+     */
     public function testBufferPdfa(): void
     {
         $this->setupTest();

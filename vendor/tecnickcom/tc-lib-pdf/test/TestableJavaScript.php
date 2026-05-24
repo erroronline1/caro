@@ -21,14 +21,34 @@ class TestableJavaScript extends \Com\Tecnick\Pdf\Tcpdf
     /**
      * @param array<string, mixed> $prp
      * @return array<string, mixed>
+     * @throws \Throwable
      */
     public function exposeGetAnnotOptFromJSProp(array $prp = []): array
     {
         return $this->getAnnotOptFromJSProp($prp);
     }
 
+    /** @throws \Throwable */
     public function exposeGetPDFDefFillColor(): string
     {
         return $this->getPDFDefFillColor();
+    }
+
+    /**
+     * @param array<string, mixed> $opt
+     * @param array<string, mixed> $jsp
+     * @return array<string, mixed>
+     * @throws \Throwable
+     */
+    public function exposeMergeAnnotOptions(
+        array $opt = ['subtype' => 'text'],
+        array $jsp = [],
+        string $color = '',
+    ): array {
+        $opt = \array_merge(['subtype' => 'text'], $opt);
+
+        $method = new \ReflectionMethod($this, 'mergeAnnotOptions');
+        /** @var array<string, mixed> */
+        return $method->invokeArgs($this, [$opt, $jsp, $color]);
     }
 }

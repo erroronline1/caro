@@ -1,4 +1,5 @@
 <?php
+
 /**
  * E008_signature_timestamp.php
  *
@@ -16,7 +17,7 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require(__DIR__ . '/../vendor/autoload.php');
+require __DIR__ . '/../vendor/autoload.php';
 
 // define fonts directory
 \define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
@@ -38,8 +39,32 @@ $page = $pdf->addPage();
 $pdf->page->addContent($bfont['out']);
 
 $text = 'This document requests an RFC 3161 TSA timestamp for the CMS signature.';
-$textCell = $pdf->getTextCell($text, 15, 20, 180, 0, 0, 1, 'T', 'L');
+$textCell = $pdf->getTextCell(
+    txt: $text,
+    posx: 15,
+    posy: 20,
+    width: 180,
+    height: 0,
+    offset: 0,
+    linespace: 1,
+    valign: 'T',
+    halign: 'L',
+);
 $pdf->page->addContent($textCell);
+
+$text2 = 'Timestamping requires outbound HTTPS connectivity to the configured TSA endpoint.';
+$textCell2 = $pdf->getTextCell(
+    txt: $text2,
+    posx: 15,
+    posy: 27,
+    width: 180,
+    height: 0,
+    offset: 0,
+    linespace: 1,
+    valign: 'T',
+    halign: 'L',
+);
+$pdf->page->addContent($textCell2);
 
 $certPath = \realpath(__DIR__ . '/data/cert/tcpdf.crt');
 if ($certPath === false) {
@@ -63,6 +88,7 @@ $pdf->setSignature([
 
 $pdf->setSignTimeStamp([
     'enabled' => true,
+    // Public demo endpoint. For production use your trusted TSA service.
     'host' => 'https://freetsa.org/tsr',
     'username' => '',
     'password' => '',
@@ -74,7 +100,48 @@ $pdf->setSignTimeStamp([
     'verify_peer' => true,
 ]);
 
-$pdf->setSignatureAppearance(15, 35, 90, 20, -1, 'TimestampedSignature');
+$pdf->setSignatureAppearance(posx: 15, posy: 35, width: 90, heigth: 20, page: -1, name: 'TimestampedSignature');
+
+// Optional appearance stream to clearly indicate timestamped signature intent.
+$sigW = 90.0;
+$sigH = 20.0;
+$sigTopY = $page['height'] - $sigH;
+
+$sigAppearance = $bfont['out'];
+$sigAppearance .= $pdf->color->getPdfColor('rgb(20%,20%,20%)');
+$sigAppearance .= $pdf->getTextCell(
+    txt: 'RFC 3161 Timestamped Signature',
+    posx: 0,
+    posy: $sigTopY,
+    width: $sigW,
+    height: $sigH,
+    offset: 3.0,
+    linespace: 0,
+    valign: 'C',
+    halign: 'L',
+    cell: null,
+    styles: [
+        'all' => [
+            'fillColor' => 'rgb(96%,96%,90%)',
+            'lineColor' => 'rgb(35%,35%,10%)',
+            'lineWidth' => 1.0,
+        ],
+    ],
+    strokewidth: 0,
+    wordspacing: 0,
+    leading: 0,
+    rise: 0,
+    jlast: true,
+    fill: true,
+    stroke: false,
+    underline: false,
+    linethrough: false,
+    overline: false,
+    clip: false,
+    drawcell: true,
+);
+
+$pdf->setSignatureAppearanceStream(stream: $sigAppearance);
 
 $rawpdf = $pdf->getOutPDFString();
-$pdf->renderPDF($rawpdf);
+$pdf->renderPDF(rawpdf: $rawpdf);

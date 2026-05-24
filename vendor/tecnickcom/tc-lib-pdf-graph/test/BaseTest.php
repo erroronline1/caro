@@ -36,32 +36,143 @@ class BaseTest extends TestUtil
             80,
             100,
             new \Com\Tecnick\Color\Pdf(),
-            new \Com\Tecnick\Pdf\Encrypt\Encrypt(),
-            false
+            $this->getEncryptObject(),
+            false,
         );
     }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     */
+    public function testGetOutResourcesByKeysSkipInvalidEntries(): void
+    {
+        $draw = $this->getTestObject();
+
+        $draw->getOverprint();
+        $draw->getGradient(
+            2,
+            [0, 0, 1, 0],
+            [
+                ['color' => 'red', 'offset' => 0.0],
+                ['color' => 'blue', 'offset' => 1.0],
+            ],
+            '',
+            false,
+        );
+
+        $this->assertSame(' /ExtGState << >>' . "\n", $draw->getOutExtGStateResourcesByKeys([999]));
+        $this->assertSame('', $draw->getOutGradientResourcesByKeys([999]));
+    }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
+    public function testGradientShadersHandleMalformedStopsAndFloatExponent(): void
+    {
+        $draw = $this->getTestObject();
+        $draw->getGradient(
+            2,
+            [0, 0, 1, 0],
+            [
+                ['color' => 'red', 'offset' => 0.0, 'opacity' => 0.5],
+                ['color' => 'blue', 'offset' => 1.0, 'opacity' => 0.6, 'exponent' => 1.5],
+            ],
+            '',
+            false,
+        );
+
+        $outFloatExponent = $draw->getOutGradientShaders($draw->getObjectNumber());
+        $this->assertStringContainsString('/N 1.5', $outFloatExponent);
+    }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
+    public function testGetOutGradientShadersSkipsMissingOpacityPattern(): void
+    {
+        $draw = new class(0.75, 80, 100, new \Com\Tecnick\Color\Pdf(), $this->getEncryptObject(), false) extends
+            \Com\Tecnick\Pdf\Graph\Draw {
+            /**
+             * @param array<int, array{
+             *     antialias: bool,
+             *     background: ?\Com\Tecnick\Color\Model,
+             *     colors: array<int, array{color: string, exponent?: float, offset?: float, opacity?: float}>,
+             *     colspace: string,
+             *     coords: array<float>,
+             *     id: int,
+             *     pattern: int,
+             *     stream: string,
+             *     transparency: bool,
+             *     type: int,
+             * }> $grads
+             */
+            public function setGradientsForTest(array $grads): void
+            {
+                $this->gradients = $grads;
+            }
+
+            protected function getOutGradientCols(array $grad, string $type): string
+            {
+                if ($type === 'opacity') {
+                    return '';
+                }
+
+                return parent::getOutGradientCols($grad, $type);
+            }
+        };
+
+        $draw->setGradientsForTest([
+            1 => [
+                'antialias' => false,
+                'background' => null,
+                'colors' => [
+                    0 => ['color' => 'red', 'offset' => 0.0, 'opacity' => 0.5, 'exponent' => 1.0],
+                    1 => ['color' => 'blue', 'offset' => 1.0, 'opacity' => 0.6, 'exponent' => 1.0],
+                ],
+                'colspace' => 'DeviceRGB',
+                'coords' => [0.0, 0.0, 1.0, 0.0],
+                'id' => 0,
+                'pattern' => 0,
+                'stream' => '',
+                'transparency' => true,
+                'type' => 2,
+            ],
+        ]);
+
+        $out = $draw->getOutGradientShaders(10);
+        $this->assertNotSame('', $out);
+    }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     */
 
     public function testGetOutExtGState(): void
     {
         $draw = $this->getTestObject();
         $res = $draw->getOutExtGState(10);
-        $this->assertEquals(
-            '',
-            $res
-        );
+        $this->assertEquals('', $res);
 
         $draw->getOverprint();
         $draw->getAlpha();
 
         $res = $draw->getOutExtGState(10);
         $this->assertEquals(
-            '11 0 obj' . "\n"
-            . '<< /Type /ExtGState /OP true /op true /OPM 0.000000 >>' . "\n"
-            . 'endobj' . "\n"
-            . '12 0 obj' . "\n"
-            . '<< /Type /ExtGState /CA 1.000000 /ca 1.000000 /BM /Normal /AIS false >>' . "\n"
-            . 'endobj' . "\n",
-            $res
+            '11 0 obj'
+            . "\n"
+            . '<< /Type /ExtGState /OP true /op true /OPM 0.000000 >>'
+            . "\n"
+            . 'endobj'
+            . "\n"
+            . '12 0 obj'
+            . "\n"
+            . '<< /Type /ExtGState /CA 1.000000 /ca 1.000000 /BM /Normal /AIS false >>'
+            . "\n"
+            . 'endobj'
+            . "\n",
+            $res,
         );
 
         $this->assertEquals(12, $draw->getObjectNumber());
@@ -71,7 +182,9 @@ class BaseTest extends TestUtil
 
     /**
      * @SuppressWarnings("PHPMD.LongVariable")
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
      */
+
     public function testGetOutExtGStateResourcesEmpty(): void
     {
         $draw = $this->getTestObject();
@@ -79,46 +192,46 @@ class BaseTest extends TestUtil
         $this->assertEquals('', $outExtGStateResources);
     }
 
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     */
+
     public function testGetOutGradientResourcesEmpty(): void
     {
         $draw = $this->getTestObject();
         $outGradientResources = $draw->getOutGradientResources();
-        $this->assertEquals(
-            '',
-            $outGradientResources
-        );
+        $this->assertEquals('', $outGradientResources);
     }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
 
     public function testGetOutGradientShaders(): void
     {
         $draw = $this->getTestObject();
         $res = $draw->getOutGradientShaders(10);
-        $this->assertEquals(
-            '',
-            $res
-        );
+        $this->assertEquals('', $res);
 
         $draw->getCoonsPatchMeshWithCoords(3, 5, 7, 11);
         $draw->getOutGradientShaders(11);
         $this->assertEquals(13, $draw->getObjectNumber());
 
         $res = $draw->getOutGradientResources();
-        $this->assertEquals(
-            ' /Pattern << /p1 13 0 R >>' . "\n"
-            . ' /Shading << /Sh1 12 0 R >>' . "\n",
-            $res
-        );
+        $this->assertEquals(' /Pattern << /p1 13 0 R >>' . "\n" . ' /Shading << /Sh1 12 0 R >>' . "\n", $res);
 
         $nres = $draw->getOutGradientResourcesByKeys([]);
         $this->assertEmpty($nres);
 
         $resx = $draw->getOutGradientResourcesByKeys([1]);
-        $this->assertEquals(
-            ' /Pattern << /p1 13 0 R >>' . "\n"
-            . ' /Shading << /Sh1 12 0 R >>' . "\n",
-            $resx
-        );
+        $this->assertEquals(' /Pattern << /p1 13 0 R >>' . "\n" . ' /Shading << /Sh1 12 0 R >>' . "\n", $resx);
     }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
 
     public function testGetOutShaders(): void
     {
@@ -152,11 +265,13 @@ class BaseTest extends TestUtil
                 'opacity' => 0.9,
             ],
         ];
-        $this->assertEquals(
-            '/TGS1 gs' . "\n"
-            . '/Sh1 sh' . "\n",
-            $draw->getGradient(2, [0, 0, 1, 0], $stops, '', false)
-        );
+        $this->assertEquals('/TGS1 gs' . "\n" . '/Sh1 sh' . "\n", $draw->getGradient(
+            2,
+            [0, 0, 1, 0],
+            $stops,
+            '',
+            false,
+        ));
 
         $draw->getOverprint();
         $draw->getAlpha();
@@ -166,20 +281,19 @@ class BaseTest extends TestUtil
         $this->assertEquals(19, $draw->getObjectNumber());
 
         $res = $draw->getOutExtGStateResources();
-        $this->assertEquals(
-            ' /ExtGState << /GS1 1 0 R /GS2 2 0 R /TGS1 19 0 R >>' . "\n",
-            $res
-        );
+        $this->assertEquals(' /ExtGState << /GS1 1 0 R /GS2 2 0 R /TGS1 19 0 R >>' . "\n", $res);
 
         $nres = $draw->getOutExtGStateResourcesByKeys([]);
         $this->assertEmpty($nres);
 
-        $resx = $draw->getOutExtGStateResourcesByKeys([1,2]);
-        $this->assertEquals(
-            ' /ExtGState << /GS1 1 0 R /GS2 2 0 R >>' . "\n",
-            $resx
-        );
+        $resx = $draw->getOutExtGStateResourcesByKeys([1, 2]);
+        $this->assertEquals(' /ExtGState << /GS1 1 0 R /GS2 2 0 R >>' . "\n", $resx);
     }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
 
     public function testGetOutShadersRadial(): void
     {
@@ -200,18 +314,20 @@ class BaseTest extends TestUtil
                 ],
             ],
             'white',
-            true
+            true,
         );
 
-        $this->assertEquals(
-            '/Sh1 sh' . "\n",
-            $out
-        );
+        $this->assertEquals('/Sh1 sh' . "\n", $out);
 
         $this->assertEquals(0, $draw->getObjectNumber());
         $draw->getOutGradientShaders($draw->getObjectNumber());
         $this->assertEquals(4, $draw->getObjectNumber());
     }
+
+    /**
+     * @throws \Com\Tecnick\Pdf\Graph\Exception
+     * @throws \Com\Tecnick\Pdf\Encrypt\Exception
+     */
 
     public function testGetOutGradientShadersInvalidColor(): void
     {

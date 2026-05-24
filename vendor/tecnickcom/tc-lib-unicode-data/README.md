@@ -46,7 +46,7 @@ It externalizes large Unicode datasets into a dedicated package so runtime libra
 
 ## Requirements
 
-- PHP 8.1 or later
+- PHP 8.2 or later
 - Composer
 
 ---
@@ -100,8 +100,3 @@ require_once '/usr/share/php/Com/Tecnick/Unicode/Data/autoload.php';
 
 Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md).
 
----
-
-## Contact
-
-Nicola Asuni - <info@tecnick.com>

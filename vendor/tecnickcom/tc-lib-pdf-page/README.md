@@ -46,7 +46,7 @@ It provides the structural model that document builders use to define media boxe
 
 ## Requirements
 
-- PHP 8.1 or later
+- PHP 8.2 or later
 - Extensions: `date`, `zlib`
 - Composer
 
@@ -110,8 +110,3 @@ require_once '/usr/share/php/Com/Tecnick/Pdf/Page/autoload.php';
 
 Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md).
 
----
-
-## Contact
-
-Nicola Asuni - <info@tecnick.com>

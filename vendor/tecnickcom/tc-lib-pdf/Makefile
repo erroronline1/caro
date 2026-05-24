@@ -98,8 +98,8 @@ COMPOSER=$(PHP) -d "apc.enable_cli=0" $(shell which composer)
 # phpDocumentor executable file
 PHPDOC=$(shell which phpDocumentor)
 
-# phpstan version
-PHPSTANVER=2.1.40
+# veraPDF binary path (can be overridden, e.g. make verapdf-ua VERAPDF_BIN=/opt/verapdf/bin/verapdf)
+VERAPDF_BIN?=$(shell command -v verapdf 2>/dev/null)
 
 # --- MAKE TARGETS ---
 
@@ -126,9 +126,8 @@ x: buildall
 
 ## Test and build everything from scratch
 .PHONY: buildall
-buildall: deps
-	# cd vendor/tecnickcom/tc-lib-pdf-font/ && make deps fonts
-	$(MAKE) codefix qa bz2 rpm deb
+buildall:
+	$(MAKE) deps format qa bz2 rpm deb
 
 ## Package the library in a compressed bz2 archive
 .PHONY: bz2
@@ -141,11 +140,6 @@ bz2:
 .PHONY: clean
 clean:
 	rm -rf ./vendor $(TARGETDIR)
-
-## Fix code style violations
-.PHONY: codefix
-codefix:
-	./vendor/bin/phpcbf --ignore="\./vendor/" --standard=psr12 src test
 
 ## Build a DEB package for Debian-like Linux distributions
 .PHONY: deb
@@ -178,8 +172,7 @@ endif
 deps: ensuretarget
 	rm -rf ./vendor/*
 	($(COMPOSER) install -vvv --no-interaction)
-	curl --silent --show-error --fail --location --output ./vendor/phpstan.phar https://github.com/phpstan/phpstan/releases/download/${PHPSTANVER}/phpstan.phar \
-	&& chmod +x ./vendor/phpstan.phar
+	curl --proto '=https' --tlsv1.2 --silent --show-error --fail --location https://carthage.software/mago.sh | bash -s -- --install-dir=./vendor/bin
 
 ## Generate source code documentation
 .PHONY: doc
@@ -221,14 +214,18 @@ ifneq ($(strip $(CONFIGPATH)),)
 	find $(PATHINSTCFG) -type f -exec chmod 644 {} \;
 endif
 
-## Test source code for coding standard violations
+## Format the source code
+.PHONY: format
+format:
+	./vendor/bin/mago fmt src test examples
+
+## Analyze and Lint the source code
 .PHONY: lint
 lint:
-	#./vendor/bin/phpcbf --config-set ignore_non_auto_fixable_on_exit 1
-	./vendor/bin/phpcs --standard=phpcs.xml --cache=$(TARGETDIR)/phpcs.cache
-	./vendor/bin/phpmd src text unusedcode,naming,design --exclude vendor --cache --cache-file $(TARGETDIR)/phpmd-src.cache
-	./vendor/bin/phpmd test text unusedcode,naming,design --exclude */vendor/* --cache --cache-file $(TARGETDIR)/phpmd-test.cache
-	php -r 'exit((int)version_compare(PHP_MAJOR_VERSION, "7", ">"));' || ./vendor/phpstan.phar analyse
+	./vendor/bin/mago --config ./mago.src.toml analyze src
+	./vendor/bin/mago --config ./mago.test.toml analyze test
+	./vendor/bin/mago --config ./mago.src.toml lint src
+	./vendor/bin/mago --config ./mago.test.toml lint test
 
 ## Run all tests and reports
 .PHONY: qa
@@ -244,6 +241,44 @@ report: ensuretarget
 .PHONY: preflight
 preflight: ensuretarget
 	bash ./resources/preflight/run_preflight_matrix.sh
+
+## Generate renderability score and trend reports for the real-page corpus
+.PHONY: renderability
+renderability: ensuretarget
+	$(PHP) resources/css/renderability_score.php \
+		--corpus=test/fixtures/html/real_pages/corpus.json \
+		--json=$(TARGETDIR)/report/renderability-score.json \
+		--markdown=$(TARGETDIR)/report/renderability-score.md
+	$(PHP) resources/css/renderability_trend.php \
+		--score=$(TARGETDIR)/report/renderability-score.json \
+		--history=$(TARGETDIR)/report/renderability-trend.json \
+		--markdown=$(TARGETDIR)/report/renderability-trend.md
+
+## Generate PDF/UA examples and validate with veraPDF
+.PHONY: verapdf-ua
+verapdf-ua: ensuretarget
+	@if [[ -z "$(VERAPDF_BIN)" ]]; then \
+		echo "veraPDF CLI not found. Set VERAPDF_BIN=/path/to/verapdf or add verapdf to PATH."; \
+		exit 2; \
+	fi
+	$(PHP) examples/E015_pdfua.php > $(TARGETDIR)/report/E015_pdfua.pdf
+	$(PHP) examples/E016_pdfua1.php > $(TARGETDIR)/report/E016_pdfua1.pdf
+	$(PHP) examples/E017_pdfua2.php > $(TARGETDIR)/report/E017_pdfua2.pdf
+	@fail=0; \
+	for spec in "E015_pdfua.pdf:ua1" "E016_pdfua1.pdf:ua1" "E017_pdfua2.pdf:ua2"; do \
+		file="$${spec%%:*}"; \
+		flavour="$${spec##*:}"; \
+		input="$(TARGETDIR)/report/$${file}"; \
+		report="$(TARGETDIR)/report/$${file%.pdf}.verapdf.txt"; \
+		if "$(VERAPDF_BIN)" --format text --verbose --flavour "$${flavour}" "$${input}" > "$${report}" 2>&1; then \
+			echo "[ok] $${file} ($${flavour})"; \
+		else \
+			echo "[fail] $${file} ($${flavour}) - see $${report}"; \
+			fail=1; \
+		fi; \
+	done; \
+	echo "veraPDF reports written to $(TARGETDIR)/report/*.verapdf.txt"; \
+	exit $$fail
 
 ## Build the RPM package for RedHat-like Linux distributions
 .PHONY: rpm

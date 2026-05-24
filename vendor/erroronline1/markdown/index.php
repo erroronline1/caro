@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script. -->
 <?php
 /*
 quick preview and benchmark for markdown libraries in two languages
@@ -17,10 +20,10 @@ $methods = [
 		"horizontal_rule", // prior to list avoiding conversion of - - -
 		"list",
 		"table",
-		"anchor", // prior to emphasis to escape underscore; safeMode can not render anchors to avoid malicious scripts
-		"mailto", // prior to emphasis to escape underscore; safeMode can not render anchors to avoid malicious scripts
-		"image", // prior to emphasis to escape underscore;
-		"task", 
+		"image", // prior to anchor for properly linkable images
+		"anchor", // safeMode can not render anchors to avoid malicious scripts
+		"mailto", // safeMode can not render anchors to avoid malicious scripts
+		"task",
 		"mark",
 		"strikethrough",
 		"subscript",
@@ -69,7 +72,7 @@ else $markdown = new \erroronline1\Markdown\Markdown();
 $PHPMarkdown = $markdown->md2html($sample, boolval($safeMode), $selectedMethods);
 $end = microtime(true);
 ?>
-<html>
+<html lang="de">
 <style>
 	body {
 		background-color: #e5e9f0;
@@ -83,10 +86,10 @@ $end = microtime(true);
 		padding: 1em 2em;
 	}
 
-td:not([class]):nth-of-type(2){
+	td:not([class]):nth-of-type(2){
 		border-left: 1px dashed #5e81ac;
 		border-right: 1px dashed #5e81ac;
-}
+	}
 	textarea {
 		width: 100%;
 		height: 60vh;
@@ -105,7 +108,7 @@ td:not([class]):nth-of-type(2){
 			height:2em;
 		}
 	}
-	input[type="submit"] {
+	input[type="submit"], input[type="button"] {
 		margin:.5em;
 		padding:.75em;
 		width: 10rem;
@@ -169,6 +172,7 @@ td:not([class]):nth-of-type(2){
 		background: #434c5e;
 		color: #a3be8c;
 		line-height:1.8em;
+		overflow: scroll;
 	}
 
 	table.eol1_md {
@@ -227,6 +231,7 @@ td:not([class]):nth-of-type(2){
 					?><br />
 					<label style="width:20rem"><input type="checkbox" name="customClass" <?= $customClass; ?> /> custom PHP class demo</label><br />
 					<label style="width:20rem"><input type="checkbox" name="customStyling" <?= $customStyling; ?> /> add a bit of styling</label><br />
+					<input type="button" onclick="std_settings()" value="standard of others" title="still a bit more but this is not that granulary" /><br />
 					<input type="submit" value="Submit" />
 				</form>
 				Minimal styling on output for comprehension and eye soothing only. Most is default browser behaviour though unless you tick the box above.
@@ -251,6 +256,27 @@ td:not([class]):nth-of-type(2){
 	const content = MARKDOWN.md2html(<?= json_encode($sample, JSON_UNESCAPED_UNICODE); ?>, <?= boolval($safeMode) ? 'true' : 'false'; ?>, [<?= implode(', ', array_map(fn($v) => '"' . $v . '"', $selectedMethods)); ?>]);
 	document.getElementById("scriptheader").innerHTML += " (" + (performance.now() - start).toFixed(2) + " ms)";
 	document.getElementById("scriptcolumn").innerHTML = content;
+</script>
+<script>
+	function std_settings(){
+		[<?= implode(', ', array_map(fn($v) => '"' . $v . '"', $methods)); ?>].forEach(e => {
+			document.getElementsByName(e)[0].checked = [
+				"code",
+				"blockquote",
+				"reference",
+				"headings",
+				"horizontal_rule",
+				"list",
+				"table",
+				"image",
+				"anchor",
+				"strikethrough",
+				"emphasis",
+				"paragraph",
+				"linebreak",
+			].includes(e);
+		});
+	}
 </script>
 
 </html>

@@ -7,7 +7,7 @@ This index lists all runnable examples bundled with tc-lib-pdf, from foundationa
 - [E002_font_dump.php](E002_font_dump.php): Font inspection and glyph dump example.
 - [E003_persian_arabic.php](E003_persian_arabic.php): RTL text rendering example for Persian and Arabic scripts.
 - [E004_page_formats.php](E004_page_formats.php): Page format and orientation samples.
-- [E005_header_footer.php](E005_header_footer.php): Repeating custom page header and footer example.
+- [E005_header_footer.php](E005_header_footer.php): Repeating custom page header and footer example with PDF/UA Artifact tagging (`Pagination/Header` and `Pagination/Footer`).
 - [E006_minimal.php](E006_minimal.php): Minimal "Hello, PDF" setup.
 - [E007_signature_basic.php](E007_signature_basic.php): Basic detached CMS (PKCS#7) digital signature with visible signature fields.
 - [E008_signature_timestamp.php](E008_signature_timestamp.php): Detached CMS digital signature with RFC 3161 timestamp support.
@@ -65,8 +65,15 @@ This index lists all runnable examples bundled with tc-lib-pdf, from foundationa
 - [E060_custom_xmp_metadata.php](E060_custom_xmp_metadata.php): Custom XMP namespace injection (IPTC rights, XMP-MM version history, application metadata) via setCustomXMP.
 - [E061_user_rights_reader_extensions.php](E061_user_rights_reader_extensions.php): Adobe Reader extension rights (UR3 signature) via setUserRights to enable form-filling, commenting, and saving in free Reader.
 - [E062_bidi_mixed_rtl_ltr.php](E062_bidi_mixed_rtl_ltr.php): Mixed bidirectional typography with mid-document setRTL switching and inline Hebrew/Latin runs on the same page.
-- [E063_manual_tag_tree.php](E063_manual_tag_tree.php): Manual PDF/UA structure-element tagging with beginStructElem/endStructElem for H1–H3, P, Caption, Note, and Blockquote roles.
+- [E063_manual_tag_tree.php](E063_manual_tag_tree.php): Manual PDF/UA structure-element tagging with beginStructElem/endStructElem plus Artifact-tagged decorative layout separators.
 - [E064_custom_hyphenation_dictionary.php](E064_custom_hyphenation_dictionary.php): External TeX hyphenation pattern loading via loadTexHyphenPatterns and setTexHyphenPatterns with a side-by-side Dutch column comparison.
 - [E065_import_single_page.php](E065_import_single_page.php): Import one source page as a Form XObject and place it scaled on a destination page.
 - [E066_import_document_append.php](E066_import_document_append.php): Append all pages from an imported source document and preserve destination flow.
 - [E067_import_page_region_nup.php](E067_import_page_region_nup.php): Advanced 2x2 N-up composition from imported pages with clipping and centered placement per region.
+- [E068_font_subset.php](E068_font_subset.php): Font subsetting example showing reduced embedding to only used glyphs.
+- [E069_html_line_height.php](E069_html_line_height.php): HTML line-height behavior showcase across percentages, absolute units, relative units, and unitless values.
+- [E070_default_page_content_import.php](E070_default_page_content_import.php): Use defaultPageContent() to place an imported source page as common content on every new page.
+- [E071_gettextcell_bbox_metrics.php](E071_gettextcell_bbox_metrics.php): Multiline getTextCell block with visible border and printed bbox/textbbox/cellbbox metrics for visual verification.
+- [E072_import_new_font.php](E072_import_new_font.php): Import a custom TTF/OTF font with tc-lib-pdf-font conversion tooling and use it in tc-lib-pdf.
+- [E073_css_supported_categories.php](E073_css_supported_categories.php): Consolidated CSS category showcase covering cascade, selectors, box model, typography, float/clear/position, tables, and paged media.
+- [E074_text_cell_fit_modes.php](E074_text_cell_fit_modes.php): Visual inspection grid for getTextCell() fit modes (T, S, F) including disabled precondition cases.

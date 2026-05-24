@@ -20,16 +20,25 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class BaseTest extends TestUtil
 {
+    private function invokeBaseMethod(object $obj, string $method, mixed ...$args): mixed
+    {
+        $ref = new \ReflectionClass($obj);
+        return $ref->getMethod($method)->invokeArgs($obj, $args);
+    }
+
+    /** @throws \Throwable */
     protected function getTestObject(): \Com\Tecnick\Pdf\Tcpdf
     {
         return new \Com\Tecnick\Pdf\Tcpdf();
     }
 
+    /** @throws \Throwable */
     protected function getInternalTestObject(): TestableBase
     {
         return new TestableBase();
     }
 
+    /** @throws \Throwable */
     public function testToPointsAndToUnitRoundTrip(): void
     {
         $obj = $this->getTestObject();
@@ -40,6 +49,7 @@ class BaseTest extends TestUtil
         $this->bcAssertEqualsWithDelta($usr, $obj->toUnit($pnt), 0.0001);
     }
 
+    /** @throws \Throwable */
     public function testToYPointsAndToYUnitWithExplicitPageHeight(): void
     {
         $obj = $this->getTestObject();
@@ -53,6 +63,7 @@ class BaseTest extends TestUtil
         $this->bcAssertEqualsWithDelta($usr, $yUnit, 0.0001);
     }
 
+    /** @throws \Throwable */
     public function testEnableDefaultPageContentTogglesFlag(): void
     {
         $obj = $this->getTestObject();
@@ -63,6 +74,7 @@ class BaseTest extends TestUtil
         $this->assertTrue($this->getObjectProperty($obj, 'defPageContentEnabled'));
     }
 
+    /** @throws \Throwable */
     public function testSetRTLReturnsSameInstanceAndSetsProperty(): void
     {
         $obj = $this->getTestObject();
@@ -75,6 +87,7 @@ class BaseTest extends TestUtil
         $this->assertFalse($this->getObjectProperty($obj, 'rtl'));
     }
 
+    /** @throws \Throwable */
     #[DataProvider('unitValueConversionProvider')]
     public function testGetUnitValuePointsConvertsCommonUnits(string $input, float $expected, float $delta): void
     {
@@ -85,6 +98,7 @@ class BaseTest extends TestUtil
         $this->bcAssertEqualsWithDelta($expected, $result, $delta);
     }
 
+    /** @throws \Throwable */
     public function testGetUnitValuePointsConvertsRelativeAndViewportUnits(): void
     {
         $obj = $this->getInternalTestObject();
@@ -107,6 +121,7 @@ class BaseTest extends TestUtil
         $this->bcAssertEqualsWithDelta(20.0, $obj->exposeGetUnitValuePoints('10vmin', $ref), 0.0001);
     }
 
+    /** @throws \Throwable */
     public function testGetUnitValuePointsConvertsNumericDefault(): void
     {
         $obj = $this->getInternalTestObject();
@@ -116,6 +131,7 @@ class BaseTest extends TestUtil
         $this->assertGreaterThan(0, $result);
     }
 
+    /** @throws \Throwable */
     public function testGetUnitValuePointsThrowsForInvalidValue(): void
     {
         $obj = $this->getInternalTestObject();
@@ -124,6 +140,7 @@ class BaseTest extends TestUtil
         $obj->exposeGetUnitValuePoints('invalid!!!');
     }
 
+    /** @throws \Throwable */
     public function testGetFontValuePointsConvertsNamedFontSize(): void
     {
         $obj = $this->getInternalTestObject();
@@ -140,6 +157,7 @@ class BaseTest extends TestUtil
         $this->assertGreaterThan($ref['parent'], $result);
     }
 
+    /** @throws \Throwable */
     public function testGetFontValuePointsDelegatesUnknownUnitToGetUnitValuePoints(): void
     {
         $obj = $this->getInternalTestObject();
@@ -150,6 +168,7 @@ class BaseTest extends TestUtil
         $this->bcAssertEqualsWithDelta(28.35, $result, 0.1);
     }
 
+    /** @throws \Throwable */
     #[DataProvider('tmpRtlModeProvider')]
     public function testSetTmpRTLWithMode(string $mode, bool $expectedRtl): void
     {
@@ -160,6 +179,7 @@ class BaseTest extends TestUtil
         $this->assertSame($expectedRtl, $obj->exposeIsRTL());
     }
 
+    /** @throws \Throwable */
     #[DataProvider('isRtlStateProvider')]
     public function testIsRTLReturnsExpectedState(bool $globalRtl, bool $expected): void
     {
@@ -169,6 +189,52 @@ class BaseTest extends TestUtil
         $result = $obj->exposeIsRTL();
 
         $this->assertSame($expected, $result);
+    }
+
+    /** @throws \Throwable */
+    public function testIsTransparencyAllowedReturnsTrueWhenPdfxDisabled(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->setObjectProperty($obj, 'pdfx', false);
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx1a');
+
+        $this->assertTrue($this->invokeBaseMethod($obj, 'isTransparencyAllowed') === true);
+    }
+
+    /** @throws \Throwable */
+    public function testIsTransparencyAllowedDependsOnPdfxMode(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->setObjectProperty($obj, 'pdfx', true);
+
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx4');
+        $this->assertTrue($this->invokeBaseMethod($obj, 'isTransparencyAllowed'));
+
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx3');
+        $this->assertFalse($this->invokeBaseMethod($obj, 'isTransparencyAllowed'));
+    }
+
+    /** @throws \Throwable */
+    public function testRequiresPdfxDeviceCmykReturnsFalseWhenPdfxDisabled(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->setObjectProperty($obj, 'pdfx', false);
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx1a');
+
+        $this->assertFalse($this->invokeBaseMethod($obj, 'requiresPdfxDeviceCmyk'));
+    }
+
+    /** @throws \Throwable */
+    public function testRequiresPdfxDeviceCmykDependsOnPdfxMode(): void
+    {
+        $obj = $this->getInternalTestObject();
+        $this->setObjectProperty($obj, 'pdfx', true);
+
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx3');
+        $this->assertTrue($this->invokeBaseMethod($obj, 'requiresPdfxDeviceCmyk'));
+
+        $this->setObjectProperty($obj, 'pdfxMode', 'pdfx5');
+        $this->assertFalse($this->invokeBaseMethod($obj, 'requiresPdfxDeviceCmyk'));
     }
 
     /** @return array<string, array{0: string, 1: float, 2: float}> */
