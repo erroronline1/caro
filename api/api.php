@@ -337,7 +337,7 @@ class API {
 					'attributes' => [
 						'name' => $description,
 					],
-					'content' => strtr($content, $replacements)
+					'mdcontent' => strtr($content, $replacements)
 				]];
 			}
 			$response['render']['content'][] = $tos;
