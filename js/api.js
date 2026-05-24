@@ -388,7 +388,7 @@ export const api = {
 				}
 				// session has been timed out, display message and clear intervals
 				api.session_timeout.render(0);
-				if (Object.keys(api._settings.user).length) new Toast(api._lang.GET("assemble.render.aria.timeout"), "error", 1800000, "sessionwarning");
+				if ("name" in api._settings.user) new Toast(api._lang.GET("assemble.render.aria.timeout"), "error", 1800000, "sessionwarning");
 				clearInterval(api.session_timeout.interval);
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
