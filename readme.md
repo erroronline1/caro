@@ -6,19 +6,22 @@ A quality management software as device agnostic web-app for local Apache- or II
 
 ## CURRENT PRE-RELEASE STATE
 see also [Usability test plan](#usability-test-plan) and [Usability test](#usability-tests)
-```mermaid
+<!--```mermaid
 graph LR;
-    Prototyping-->test[Test environment];
-    test-->alpha["Alpha testing
+    Prototyping==>test[Test environment];
+    test==>alpha["Alpha testing
     with selected users"];
-    alpha-->datasafety[Data safety approval];
-    datasafety-.->it[IT approval];
+    alpha==>datasafety[Data safety approval];
+    datasafety==>it[IT approval];
     it-.->network{{"Network environment
     and infrastructure"}};
     network-.->beta{{"Beta testing"}};
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNplklFP2zAQx7-Kdc-lommSJplA2kBISNuEgL2s4cE018YisSPnDCtWvvvOaVqQyEPuzvf7X_6x7WFjKoQCdlZ2tfh5_63Ugp87a8jQvlN6d3FxSdjT-pFfAvWrska3qOlpQkOTGdl0tVyX8D3EcZG1B-JNUS16bHBDWAnXo-1LOMpHHesrSbKXW6T9-ppTcciF7DprXmVzxD8w1iha3z5-QRSdzc8uNdKbsS_el_D7kH42P31bV0LprZU9WbchZ7GEYZjGTAPCrGckGQb94Hj6tQ8ytAPmtDLa-z8hnFydqLEbMMs7IXv0_sY1jZiqYYAZH4KqoGAvOIMWbStDCT7oS6AaW_ZXcFrhVrqGSih1kHVS_zWmPSqtcbsaiq1seq5cx1uG10ryCZ8Q6cg87PXmWGOlyNhfh6sw3ohxKhQe_kGxzOfniyjO8uUiy-JVmqQz2EMRRfl8GafJKspWSR6Whxm8j0bO53kSZ_EyitM8S9I8ztkW6grtlXGaoFishv8gYdP6?type=png)](https://mermaid.live/edit#pako:eNplklFP2zAQx7-Kdc-lommSJplA2kBISNuEgL2s4cE018YisSPnDCtWvvvOaVqQyEPuzvf7X_6x7WFjKoQCdlZ2tfh5_63Ugp87a8jQvlN6d3FxSdjT-pFfAvWrska3qOlpQkOTGdl0tVyX8D3EcZG1B-JNUS16bHBDWAnXo-1LOMpHHesrSbKXW6T9-ppTcciF7DprXmVzxD8w1iha3z5-QRSdzc8uNdKbsS_el_D7kH42P31bV0LprZU9WbchZ7GEYZjGTAPCrGckGQb94Hj6tQ8ytAPmtDLa-z8hnFydqLEbMMs7IXv0_sY1jZiqYYAZH4KqoGAvOIMWbStDCT7oS6AaW_ZXcFrhVrqGSih1kHVS_zWmPSqtcbsaiq1seq5cx1uG10ryCZ8Q6cg87PXmWGOlyNhfh6sw3ohxKhQe_kGxzOfniyjO8uUiy-JVmqQz2EMRRfl8GafJKspWSR6Whxm8j0bO53kSZ_EyitM8S9I8ztkW6grtlXGaoFishv8gYdP6)
+
 Things are still in motion. Images may be outdated.
 
 ## nice to have but still lacking reasonable ideas how to implement
@@ -33,12 +36,8 @@ Things are still in motion. Images may be outdated.
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
-* tidy, rephrase readme
-    * graph md, export and embed svg, utilize own pdf library instead of default use of markdownpdf (despite being great)
+* tidy, rephrase readme?
 * check if erpinterface import still works with api.js
-* check external file link in external documents
-
-
 
 ## Content
 * [Introducion](#introducion)
@@ -169,7 +168,7 @@ Things are still in motion. Images may be outdated.
 * [Ressources](#ressources)
 * [License](#license)
 
-The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
+The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro). On viewing this document from within the application, images may be displayed on an unrestricted internet access only.
 
 # Introducion
 
@@ -224,48 +223,31 @@ Information load is influenced by assigned roles and units to ensure the least p
 ![sample application menu](http://toh.erroronline.one/caro/application%20menu%20en.png)
 
 ### Users
-These are what the application has been built for.  
-Please consider describing how you validate the person you are registering as a new user for data safety reasons.
 
-#### On adding a new user select a unique user name, set available permissions, assigned units and the application timeout considering accessibility or usual workplace conditions.
+Please consider describing how you validate the person you are registering as a new user for data safety reasons.  
 
-Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. 
-
-The application provides a dedicated role management for registered users. Users can have different permissions. As the whole content is only accessible on login, set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables), too. The provided example is considered a decent choice, but it is up to you.
-
+On adding a new user select a unique user name, set available permissions, assigned units and the application timeout considering accessibility or usual workplace conditions. Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user.  
+The application provides a dedicated role management for registered users. Users can have different permissions. As the whole content is only accessible on login, set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables), too. The provided example is considered a decent choice, but it is up to you.  
 Users can have multiple assigned organizational units and permissions. Only contents whose assigned permissions or units intersect are displayed and notified of.
 
-#### A profile picture can be set, otherwise a default picture with the initials is used.  
-
+A profile picture can be set, otherwise a default picture with the initials is used.  
 Custom set pictures can be restored to default. The profile picture will always be overwritten with the default image following a name change (since the application is not aware if the profile picture is custom or default).
 
-#### A generated order authorization pin can be used to approve orders.  
+A generated order authorization pin can be used to approve orders.
 
-#### Working time and vacation settings allow the user the use of timetracking.  
+Working time and vacation settings allow the user the use of timetracking. The format is YYYY-MM-DD XX, see [timesheet](#timesheet) for reference.
 
-The format is YYYY-MM-DD XX  
-See [timesheet](#timesheet) for reference.
+Known trainings and skill levels can be set. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)\) can be modified.
 
-#### Known trainings and skill levels can be set.
-
-Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified.
-
-#### Select the creation of a new login token if applicable.
-
-The generated access token can be exported and, for example, used as a laminated card. The two-factor-pin is part of the export and is to be cut off and disposed of prior to laminating.
-
-![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
-
+Select the creation of a new login token if applicable. The generated access token can be exported and, for example, used as a laminated card. The two-factor-pin is part of the export and is to be cut off and disposed of prior to laminating.  
+![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)  
 The token lacks any further identification, like the application name or logo, by intent to obfuscate its use. *On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.*
 
-#### Assign a date of an automated access denial for data safety reasons if applicable.
-
-Once the date is met a new token is generated, invalidating all current sessions. The user is not deleted yet but not able to access the application without further action.
+Assign a date of an automated access denial for data safety reasons if applicable. Once the date is met a new token is generated, invalidating all current sessions. The user is not deleted yet but not able to access the application without further action.
 
 ![user screenshot](http://toh.erroronline.one/caro/user%20en-fullpage.png)
 
-Some permissions/restrictions are default set independent from the applications configuration:
-
+Some permissions/restrictions are default set independent from the applications configuration:  
 Contributing to timesheets is accessible only if weekly hours are defined for the user - even the application admin. Off-duty days are accessible for every personalized user though.
 
 * Patients
@@ -291,13 +273,13 @@ Contributing to timesheets is accessible only if weekly hours are defined for th
     * default user CARO App has this permission. Use it to initially implement new users.
     * assign only to trusted, preferably administative staff members
 
-```mermaid
-graph TD;
-    application((application))-->login[login];
-    login-->scan_code;
-    scan_code{scan code}-->user_db[(user database)];
-    user_db-->|found|permission{permission};
-    user_db-->|not found|login;
+<!--```mermaid
+flowchart TD;
+    application((application))-- >login[login];
+    login-- >scan_code;
+    scan_code{scan code}-- >user_db[(user database)];
+    user_db-- >|found|permission{permission};
+    user_db-- >|not found|login;
 
     permission-..->manage_users((manage users));
     manage_users-..->new_user[new user];
@@ -316,12 +298,14 @@ graph TD;
     renew login token"];
     profile==>user_db;
 
-    permission-->|has pin|orders((approve orders))
-    permission-->|authorized|authorized(("see content based
+    permission-- >|has pin|orders((approve orders))
+    permission-- >|authorized|authorized(("see content based
     on authorization"))
-    permission-->|units|units(("see content based
+    permission-- >|units|units(("see content based
     on units"))
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNp9VE2P2jAQ_SuWT0EKaPkmqZZL99pTeypZIRM7iUViR7YDZYH_3rGdQNil5WC9cd48xvPGPuNUUoZjnJXymBZEGfTrLREIfqSuS54Sw6UIgl4wGAyH61LmXGzc-v7N810An3RKxNaqtvu3-GwRsugKtEYztaW7TWABosSQHdFs0Km1n4F4yWQj6KVmquJaQwHnO7x-ZQtpkM9wBQHBU-5Jw9FouK6IIDnb2kQdBD5yMnowaEX7FJcj2NFFGwCO-_6UOVwzyo1nWvRA7TQszVWtmTFc5HqTYIBIkIqFiDSmkIp_uIaH7RkFNyGqC2lkiKSi0DVLQzUXIdJ7XpY6REYRLqxc2DMFGblnQPKdlmlTMWGAfJRqjwrZKMAH4t0FJ046wV25t5N8qbff-W7vRqK7Z_mUlcz4Nm08fmhN7_Oj0GcDX1_X8ii2tZIZL1kQQIDa4GZejwD0FkGPDxy84yKTquo3VzHradvc3rCj7mgPvF5X7626_9u_K7cDWhBtPbs4C7W7WkoemLcUpu9ZTjcPjPZgENiRYXCjhAFDkb0_tD29eByhBD_XtTOl_fp_NUexKjjEueIUx0Y1LMQVyBEb4rPlJtgUrGIJjgFSlpGmNAlOxBXSaiJ-S1l1mUo2eYHjjJQaoqaGF4C9cZIrcqPAEeTPk0i72A6TVD_8g-XeLaeK4zP-g-NpNHoZT2araDperWbLxXwR4hOOJ5NoNJ0t5svJajmP7PY1xB-ukJdRNJ-tZtPxcgrrEnKgLCbAhu_wgBgcR9e_7vbC3w?type=png)](https://mermaid.live/edit#pako:eNp9VE2P2jAQ_SuWT0EKaPkmqZZL99pTeypZIRM7iUViR7YDZYH_3rGdQNil5WC9cd48xvPGPuNUUoZjnJXymBZEGfTrLREIfqSuS54Sw6UIgl4wGAyH61LmXGzc-v7N810An3RKxNaqtvu3-GwRsugKtEYztaW7TWABosSQHdFs0Km1n4F4yWQj6KVmquJaQwHnO7x-ZQtpkM9wBQHBU-5Jw9FouK6IIDnb2kQdBD5yMnowaEX7FJcj2NFFGwCO-_6UOVwzyo1nWvRA7TQszVWtmTFc5HqTYIBIkIqFiDSmkIp_uIaH7RkFNyGqC2lkiKSi0DVLQzUXIdJ7XpY6REYRLqxc2DMFGblnQPKdlmlTMWGAfJRqjwrZKMAH4t0FJ046wV25t5N8qbff-W7vRqK7Z_mUlcz4Nm08fmhN7_Oj0GcDX1_X8ii2tZIZL1kQQIDa4GZejwD0FkGPDxy84yKTquo3VzHradvc3rCj7mgPvF5X7626_9u_K7cDWhBtPbs4C7W7WkoemLcUpu9ZTjcPjPZgENiRYXCjhAFDkb0_tD29eByhBD_XtTOl_fp_NUexKjjEueIUx0Y1LMQVyBEb4rPlJtgUrGIJjgFSlpGmNAlOxBXSaiJ-S1l1mUo2eYHjjJQaoqaGF4C9cZIrcqPAEeTPk0i72A6TVD_8g-XeLaeK4zP-g-NpNHoZT2araDperWbLxXwR4hOOJ5NoNJ0t5svJajmP7PY1xB-ukJdRNJ-tZtPxcgrrEnKgLCbAhu_wgBgcR9e_7vbC3w)
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture, set individual application settings and renew their token on their own.
 
@@ -330,9 +314,11 @@ Users can see their information in the profile section for transparency reasons.
 [Content](#content)
 
 ### Manual
-The application provides a quick reference manual within the *About CARO App*-section. On installation a default manual will be inserted in the [default language](#runtime-variables).
+The application provides a customizable quick reference manual within the *About CARO App*-section. On installation a default manual will be inserted in the [default language](#runtime-variables).
 
 Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the displayed entries for others.
+
+The full documentation can be accessed here too.
 
 ## Communication
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)
@@ -393,8 +379,8 @@ Output will be copied to clipboad on clicking or tapping the output field.
 
 ![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20en-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     textrecommendation(("text
     recommendation"))==>select[select template];
     select===>chunks[("database containing
@@ -405,15 +391,15 @@ graph TD;
     display==>|input and update|render(rendered text);
 
     managechunks(("manage
-    text chunks"))--->select2["select recent
+    text chunks"))--- >select2["select recent
     by name or new"];
-    managechunks-->select3["select any or new"];
-    select2-->chunks;
-    select3--->chunks;
-    chunks--->editchunk[edit chunk];
-    editchunk-->type{type};
-    type--->|"add replacement"|chunks;
-    type-->|"add text"|chunks;
+    managechunks-- >select3["select any or new"];
+    select2-- >chunks;
+    select3--- >chunks;
+    chunks--- >editchunk[edit chunk];
+    editchunk-- >type{type};
+    type--- >|"add replacement"|chunks;
+    type-- >|"add text"|chunks;
     
     managetemplate(("manage
     text templates"))-..->select4["select recent
@@ -423,7 +409,9 @@ graph TD;
     select5-..->chunks;
     chunks-...->edittemplate[edit template];
     edittemplate-.->|add template|chunks;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqdVE2PmzAQ_SvIp0QKKOEjCVTZS_faU3tq6MELE4IKdmSMdmmS_96xB-drc6iaQ7Bn3rw384w5skKWwDK2a-R7sedKez9ev-TCw5-GD62gkG0LouS6lmIyyZmJUv4-l7PpdLN56aCBQm_pgRTtoeEafo2UFN4grtj34ne3RUIs52-8A6-QQvNa1KIiMEE8LkqPK8VFBSimOxRydIRAtlPOKtBeKztt2kKYG4H0vbfBE7yFnJ3KusPQsEVhWl1AVGLkanHojZDTGZFGyKYsqD9g53BSaACoCT2gtK5NsY4qWy54BdSncY_2V3_HEYx5vu-P7oXY3Gjg7TDjDJ5UnoD3a3e3GheO6MrBxfCpZhRCONXdhSP_Me7I_Rcoa213W7OihCO95BCnhwMczd_ZvU24NgR4VLwscTB0tLAniodyJ0ZIB7Tv2wPidm53ek_ddUkyOAicO_H_OOzI_AtN8i8mxwb_xOXE9vPM5sAkjJlOkbx-vEy3CKNxIrso4AxjM1apumSZVj3MWAuq5WbLjoYEr_MezLXIcFnCjvcNmp2LM5YduPgpZesqleyrPct2vOlwRy__a80rxS8Q3mv5fRCF25sGpfpGHxj7nbGsLDuyD5ZFaTBfhPE6jRbrdbxaJssZG1gWhmkQxctkFa5XSWrC5xn7YxuZB2kSr-NokYZRNE-jELuy1-6r7IVmWXr-C1aXmwE?type=png)](https://mermaid.live/edit#pako:eNqdVE2PmzAQ_SvIp0QKKOEjCVTZS_faU3tq6MELE4IKdmSMdmmS_96xB-drc6iaQ7Bn3rw384w5skKWwDK2a-R7sedKez9ev-TCw5-GD62gkG0LouS6lmIyyZmJUv4-l7PpdLN56aCBQm_pgRTtoeEafo2UFN4grtj34ne3RUIs52-8A6-QQvNa1KIiMEE8LkqPK8VFBSimOxRydIRAtlPOKtBeKztt2kKYG4H0vbfBE7yFnJ3KusPQsEVhWl1AVGLkanHojZDTGZFGyKYsqD9g53BSaACoCT2gtK5NsY4qWy54BdSncY_2V3_HEYx5vu-P7oXY3Gjg7TDjDJ5UnoD3a3e3GheO6MrBxfCpZhRCONXdhSP_Me7I_Rcoa213W7OihCO95BCnhwMczd_ZvU24NgR4VLwscTB0tLAniodyJ0ZIB7Tv2wPidm53ek_ddUkyOAicO_H_OOzI_AtN8i8mxwb_xOXE9vPM5sAkjJlOkbx-vEy3CKNxIrso4AxjM1apumSZVj3MWAuq5WbLjoYEr_MezLXIcFnCjvcNmp2LM5YduPgpZesqleyrPct2vOlwRy__a80rxS8Q3mv5fRCF25sGpfpGHxj7nbGsLDuyD5ZFaTBfhPE6jRbrdbxaJssZG1gWhmkQxctkFa5XSWrC5xn7YxuZB2kSr-NokYZRNE-jELuy1-6r7IVmWXr-C1aXmwE)
 
 Albeit supposed to streamline professional correspondence, text recommendations and their components are not considered critical and can be deleted by authorized users. They can be hidden as well if in doubt or wanting to come back later.
 
@@ -529,8 +517,8 @@ Versioning is achieved by a timestamp.
 
 Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases. Document bundles are not subject to approval and versioning but also can not be deleted, only hidden. Document bundles may contain external documents as well, these are not subject to fulfillment supervision though.
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     manage_components(("manage
     components"))===>select["select recent
     component by name"];
@@ -552,19 +540,19 @@ graph TD;
     message with approval request"|documents_database;
 
     manage_documents(("manage
-    documents"))--->select3["select recent
+    documents"))--- >select3["select recent
     document by name"];
-    select3-->documents_database;
-    manage_documents-->select4["select any
+    select3-- >documents_database;
+    manage_documents-- >select4["select any
     document"];
-    select4-->documents_database;
-    manage_documents-->|new document|edit_document["edit document,
+    select4-- >documents_database;
+    manage_documents-- >|new document|edit_document["edit document,
     add, reorder components"];
-    documents_database-->|"existing
+    documents_database-- >|"existing
     document
     from database"|edit_document;
-    edit_document-->save;
-    save--->|"new version,
+    edit_document-- >save;
+    save--- >|"new version,
     message with approval request"|documents_database;
     
     manage_bundles(("manage
@@ -573,7 +561,7 @@ graph TD;
     select5-.->documents_database;
     manage_bundles-.->select6["select any
     bundle"];
-    select6-->documents_database;
+    select6-- >documents_database;
     manage_bundles-.->|new bundle|edit_bundle["edit bundle,
     add, reorder documents"];
     documents_database-.->|"existing
@@ -586,7 +574,9 @@ graph TD;
     documents_database o----oreturns("returns only latest dataset on request
     if named item is not hidden,
     approved and permissions match")
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqtlU1P4zAQhv-K5RNISQRJ-pGsupfluqfd0xKE3HjaRkrsru0AXeC_rx3HThtSEBI9VJ7xeOad8eP2GZecAs7xpuaP5Y4IhX7ffCsY0p-GMLKF-5I3e86AKXlxUWDrtAHDToEvL1er1XcJNZTqtsB2gQSUensUjdYHxEgDBb7rK9lofZ7ysm1MwntKFFkTCbe6pvci57XHHiu1OxIRWK-PDtC6ZbQGo-7uXE9edDyoJuwwkjyWGk9qfafGS4EZPL7J-gK0UkOklmAcOoIpbfYNEUp1q3QLvkUBXFAQg6q3WmxNeKqkqth2XLgzN4I3w0THWvrMp04zLfIAt-bLT0SvV75F9ABCVpz1ShuQUg_DXhXZ7wV_ILXW_7cFafqfHOLJGH3EmD6_YeALw7C_x2SaPhd9Dr5EJ_joRv2-L5ZOQOOixhXST1Z4MdN0Dns5znKcOHsAJXBsnDzO85iYOmNMfAPnKXEhx5A4nxmORuKIjtBW-SI6zMGTofWvfMzH8PgvwyhyNzabxsMGn4NjFkYf311fL_Sl5hNw2KBx_nn4qfQdGda212HXjgprTTFx9GTeQSKaYKLXfZ4IG3DMg_XY0Y94iKLwy38u3m4hrsELuQDVCiY1Hf0KcVYfUE2Uztn1IUFpny_Tpas2HQkUVQoaVEnEuEK7ilJwWq08HUEYRXsQTSVNJ1JfmCp3Gjsc4K2oKM6VaCHAjQ4hxsTPJkGB1Q4MarleUtiQttYdFuxVH9sT9ofzxp0UvN3ucL4htdRWu9ea4aYiW0F8CGkV_3VgpbPNDXDx0_63d3_xXVacP-MnnCdZdHUdp8ssuV4u08V8Ng_wAedxnEVJOp8t4uVilhn3a4D_dUKuomyWLtPkOsnibDlP5wstC5iG6gdvmcJ59vofuTDZZw?type=png)](https://mermaid.live/edit#pako:eNqtlU1P4zAQhv-K5RNISQRJ-pGsupfluqfd0xKE3HjaRkrsru0AXeC_rx3HThtSEBI9VJ7xeOad8eP2GZecAs7xpuaP5Y4IhX7ffCsY0p-GMLKF-5I3e86AKXlxUWDrtAHDToEvL1er1XcJNZTqtsB2gQSUensUjdYHxEgDBb7rK9lofZ7ysm1MwntKFFkTCbe6pvci57XHHiu1OxIRWK-PDtC6ZbQGo-7uXE9edDyoJuwwkjyWGk9qfafGS4EZPL7J-gK0UkOklmAcOoIpbfYNEUp1q3QLvkUBXFAQg6q3WmxNeKqkqth2XLgzN4I3w0THWvrMp04zLfIAt-bLT0SvV75F9ABCVpz1ShuQUg_DXhXZ7wV_ILXW_7cFafqfHOLJGH3EmD6_YeALw7C_x2SaPhd9Dr5EJ_joRv2-L5ZOQOOixhXST1Z4MdN0Dns5znKcOHsAJXBsnDzO85iYOmNMfAPnKXEhx5A4nxmORuKIjtBW-SI6zMGTofWvfMzH8PgvwyhyNzabxsMGn4NjFkYf311fL_Sl5hNw2KBx_nn4qfQdGda212HXjgprTTFx9GTeQSKaYKLXfZ4IG3DMg_XY0Y94iKLwy38u3m4hrsELuQDVCiY1Hf0KcVYfUE2Uztn1IUFpny_Tpas2HQkUVQoaVEnEuEK7ilJwWq08HUEYRXsQTSVNJ1JfmCp3Gjsc4K2oKM6VaCHAjQ4hxsTPJkGB1Q4MarleUtiQttYdFuxVH9sT9ofzxp0UvN3ucL4htdRWu9ea4aYiW0F8CGkV_3VgpbPNDXDx0_63d3_xXVacP-MnnCdZdHUdp8ssuV4u08V8Ng_wAedxnEVJOp8t4uVilhn3a4D_dUKuomyWLtPkOsnibDlP5wstC5iG6gdvmcJ59vofuTDZZw)
 
 Screen document
 
@@ -642,13 +632,13 @@ To transition a general record into a case documentation or incident, it is advi
 
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen%20en-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     identifiersheet(("create
     identifier
     sheet"));
-    identifiersheet-->input[input data];
-    input-->|generate|print("print sheet,
+    identifiersheet-- >input[input data];
+    input-- >|generate|print("print sheet,
     handout to workmates");
 
     filldocument((fill out document))=========>selectdocument[select document];
@@ -670,37 +660,39 @@ graph TD;
     print o-.-o idimport;
 
     summaries(("record
-    summary"))----->record_db;
-    record_db-->displayids["display identifiers
+    summary"))----- >record_db;
+    record_db-- >displayids["display identifiers
     not fully closed
     or matching filter"];
-    displayids-->|select|summary["display summary
+    displayids-- >|select|summary["display summary
     if permissions match"];
-    summary-->close[close];
-    close-->complaint{complaint};
-    complaint-->|yes|complaintclose[prrc, supervisor AND qmo];
-    complaintclose-->record_db;
-    complaint-->|no|nocomplaintclose[supervisor or ceo];
-    nocomplaintclose-->record_db;
-    summary-->export[export];
-    export-->pdf("summary as pdf,
+    summary-- >close[close];
+    close-- >complaint{complaint};
+    complaint-- >|yes|complaintclose[prrc, supervisor AND qmo];
+    complaintclose-- >record_db;
+    complaint-- >|no|nocomplaintclose[supervisor or ceo];
+    nocomplaintclose-- >record_db;
+    summary-- >export[export];
+    export- >pdf("summary as pdf,
     attached files");
-    summary-->matchbundles[match with document bundles];
-    matchbundles-->missing{missing document};
+    summary-- >matchbundles[match with document bundles];
+    matchbundles-- >missing{missing document};
     missing==>|yes|appenddata[append document];
     appenddata==>displaydocument;
-    missing-->|no|nonemissing(status message);
-    summary-->retype[reassign record type];
-    retype-->record_db;
-    summary-->record_state[record state, retention period];
-    record_state-->record_db;
+    missing-- >|no|nonemissing(status message);
+    summary-- >retype[reassign record type];
+    retype-- >record_db;
+    summary-- >record_state[record state, retention period];
+    record_state-- >record_db;
 
     record_db===>|closed, retention period expired|delete;
 
     notification((notification))-....->record_db;
     record_db-..->|"unclosed,
     last record x days ago"|message(message to units users);
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNp9Vltv4jgU_iuWn0ACNC20BUY70mr7Ovuy-7SARiY-BGsTO2M702ZJ__seX4HQNkIkx-c790tyooXiQNf0UKmX4si0JX8_f91KgpfgIK04CNDmCGBHoy0tNDALQ3agPWhLx-P3xafTb0I2rd34f8KZZbuEdCfI70uQoNFA32ghLdrz96B5ErBHJrlCeavIi9L_1og2aBQ1Bf5BVBVXRVuj8dHIUcTB09F4_Fu6vhmooLCJswlkRibnrlEolh5_8P0GXUxkQLuw9swAupQUXOBRut_SEizRUOAR2XdEsjol9EAa0LUwRihpCIZWHLe058I0Feuyn5G-cXSAQ1s-r86jDeP8NuPuIHgUSiLhxYMMxGBehD1mM8FR2qPnSvMYfCDeDf1Dp7ioG6WxD_zNpeDcKdm_CEJ8thdZmc4V3HeCbzRYLeAXEIYV947faj3DXdgaJAdNKmYsYU3jqJCkPmfno8yi9LlSrhXh1Xnbh1uuVCB9S7J9BaThh11KTOhsNZ1NVY42Z820dc0wHDMa5DgwOjdlU3d9nB3kRbcFNxts09g1F1MZJKRCD9uq6khRKQPRkNKh_4Qsnf8Wh5wOGg31upkNSe2jZxeWkq-f9HYuTICiOu_Dxv8npiccS9WoF7N2yk9vCZIOnEMdmD4fBH2N1sUEraALv4TB2H7_85n8rNVuKJ9sDdN6ZUAq_A0sXOjGXwFZ9RD5jvJz9KFhYt8kDYFCLrYPtkNEE2ZcP8WtyKxlxRH7F2uV9uG1ap_xfSs58jeeGIx35CWrl3gn7iony1O8Z7FUgXjuJsPlP8xTWD3-8WZbnRFupV4P2LXOnHIJ8WRkLLMtdhEYw0q4DRaXQdcA7gSG-FLGqSDucJcHxVGfViNynDGny6vwxMRJuzHC4ceyC8V31-PnUQPdN9sLUxUm7ladq7nQwHuOw2UhS-Os4ugWzEFHo0sK98EMr88WguPirm9ltBr4fv3F4F5x_XWGsFLhno_JHcW723KtFNaQ1uDuGH-lE1pqwena6hYmtMbpZo6kJ6d4S-0R3PtijY8cDqyt8NtgK99QrGHyH6XqJKlVWx7p-sAqg1TbYE_As2ClZhnCWqv-6mSRaODCKv09fLn4Dxivla5P9JWu56vZl7v7xXI1v1suF0-PD48T2tH1_f1qNl88PjzdL58eVu74bUL_8458ma0eFsvF_G6-eJovVo_zBbrlXw9_qFZaul69_Q-2uzcr?type=png)](https://mermaid.live/edit#pako:eNp9Vltv4jgU_iuWn0ACNC20BUY70mr7Ovuy-7SARiY-BGsTO2M702ZJ__seX4HQNkIkx-c790tyooXiQNf0UKmX4si0JX8_f91KgpfgIK04CNDmCGBHoy0tNDALQ3agPWhLx-P3xafTb0I2rd34f8KZZbuEdCfI70uQoNFA32ghLdrz96B5ErBHJrlCeavIi9L_1og2aBQ1Bf5BVBVXRVuj8dHIUcTB09F4_Fu6vhmooLCJswlkRibnrlEolh5_8P0GXUxkQLuw9swAupQUXOBRut_SEizRUOAR2XdEsjol9EAa0LUwRihpCIZWHLe058I0Feuyn5G-cXSAQ1s-r86jDeP8NuPuIHgUSiLhxYMMxGBehD1mM8FR2qPnSvMYfCDeDf1Dp7ioG6WxD_zNpeDcKdm_CEJ8thdZmc4V3HeCbzRYLeAXEIYV947faj3DXdgaJAdNKmYsYU3jqJCkPmfno8yi9LlSrhXh1Xnbh1uuVCB9S7J9BaThh11KTOhsNZ1NVY42Z820dc0wHDMa5DgwOjdlU3d9nB3kRbcFNxts09g1F1MZJKRCD9uq6khRKQPRkNKh_4Qsnf8Wh5wOGg31upkNSe2jZxeWkq-f9HYuTICiOu_Dxv8npiccS9WoF7N2yk9vCZIOnEMdmD4fBH2N1sUEraALv4TB2H7_85n8rNVuKJ9sDdN6ZUAq_A0sXOjGXwFZ9RD5jvJz9KFhYt8kDYFCLrYPtkNEE2ZcP8WtyKxlxRH7F2uV9uG1ap_xfSs58jeeGIx35CWrl3gn7iony1O8Z7FUgXjuJsPlP8xTWD3-8WZbnRFupV4P2LXOnHIJ8WRkLLMtdhEYw0q4DRaXQdcA7gSG-FLGqSDucJcHxVGfViNynDGny6vwxMRJuzHC4ceyC8V31-PnUQPdN9sLUxUm7ladq7nQwHuOw2UhS-Os4ugWzEFHo0sK98EMr88WguPirm9ltBr4fv3F4F5x_XWGsFLhno_JHcW723KtFNaQ1uDuGH-lE1pqwena6hYmtMbpZo6kJ6d4S-0R3PtijY8cDqyt8NtgK99QrGHyH6XqJKlVWx7p-sAqg1TbYE_As2ClZhnCWqv-6mSRaODCKv09fLn4Dxivla5P9JWu56vZl7v7xXI1v1suF0-PD48T2tH1_f1qNl88PjzdL58eVu74bUL_8458ma0eFsvF_G6-eJovVo_zBbrlXw9_qFZaul69_Q-2uzcr)
 
 Exported full record summary
 
@@ -715,30 +707,32 @@ Records are stored in a blockchain. This means every entry is hashed and does co
 
 Simplified diagram of a blockchain using short CRC hashes. The CARO App actually uses SHA256.
 
-```mermaid
-graph LR;
+<!--```mermaid
+flowchart LR;
     A["date: 2025-10-29
     author: error on line 1
     content:hello
-    "]-->B(contained content hash: dcce6e55)
+    "]-- >B(contained content hash: dcce6e55)
     B-.->C["date: 2025-10-29
     author: error on line 1
     content:world
     attachments:signature:a5fb0d49
     "]
-    C-->D("contained content hash: 4cff5f20
+    C-- >D("contained content hash: 4cff5f20
     + previous hash dcce6e55
     = 6897f6dc")
     D-.->E["date: 2025-10-29
     author: error on line 1
     content: bye
     "]
-    E-->F("contained content hash: 028fd280
+    E-- >F("contained content hash: 028fd280
     + previous hash: 6897f6dc
     = 4287cac3")
-    B-->D
-    D-->F
-```
+    B-- >D
+    D-- >F
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqlkkGP0zAQhf-KNadFNJXjxGlixEq0XU5wgRuYg9eeNJESu3IcllL1v-M0bZFWLJfNyTPvTfy9kY-gnUEQUHfuSTfKB_LpyztpSfw-fJdgVEBBGGU8SWnCqllRY2icFwS9d544S7rWIklnUTsb0AbRYNe5uSXhR5Lcr-8mSUWruZpIo4ZGEKM1Fsj5m9m-TpbJ_eZ1tz8535mLPwSlmz52BzG0O6vC6FEoXj9Sk1c3wvmwiaDbOwkvoea6rnnN6Ox-S_Yef7ZuHM7yLcisvidFWa3qwmgJl2jbKdrD66KRxwM-o36I1B__Q01ZWRtW_pta_MW8YOesXGmlsxv2etrKNUG8Chaw860BEfyIC-jR92oq4TiZJIQGe5Qg4tFgrcYuSJD2FMf2yn5zrr9OejfuGhC16oZYjftpLdtW7by6WeJO3NeD1dcaTRuc_zw_2_PrPf8VxBF-gciqJU1ZXlZZWpb5quDFAg4gGKuWWV7wVUzGq6l9WsDvMwhdVjwv84xRWlCechonPFqDfuNGG0BUpz8Z5fFa?type=png)](https://mermaid.live/edit#pako:eNqlkkGP0zAQhf-KNadFNJXjxGlixEq0XU5wgRuYg9eeNJESu3IcllL1v-M0bZFWLJfNyTPvTfy9kY-gnUEQUHfuSTfKB_LpyztpSfw-fJdgVEBBGGU8SWnCqllRY2icFwS9d544S7rWIklnUTsb0AbRYNe5uSXhR5Lcr-8mSUWruZpIo4ZGEKM1Fsj5m9m-TpbJ_eZ1tz8535mLPwSlmz52BzG0O6vC6FEoXj9Sk1c3wvmwiaDbOwkvoea6rnnN6Ox-S_Yef7ZuHM7yLcisvidFWa3qwmgJl2jbKdrD66KRxwM-o36I1B__Q01ZWRtW_pta_MW8YOesXGmlsxv2etrKNUG8Chaw860BEfyIC-jR92oq4TiZJIQGe5Qg4tFgrcYuSJD2FMf2yn5zrr9OejfuGhC16oZYjftpLdtW7by6WeJO3NeD1dcaTRuc_zw_2_PrPf8VxBF-gciqJU1ZXlZZWpb5quDFAg4gGKuWWV7wVUzGq6l9WsDvMwhdVjwv84xRWlCechonPFqDfuNGG0BUpz8Z5fFa)
 
 The integrity of a record can be checked from within. Each case has its own chain to enable [deletion](#record-deletion) without affecting others. Details on the record verification can also be viewed within the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries).  
 The blockchain is not a distributed ledger but a private one, but PDF-exports of records do contain the most recent available hash. On handing out any piece of information to third parties, like patients, cost bearers, etc., a piece of information on the chain will be spread and can be found within the detailed verification output of valid untampered records.  
@@ -747,7 +741,7 @@ Merged records do contain the previous verified blockchain information, that cur
 [Content](#content)
 
 ### Risk management
-The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals. Identified risks, that may have to be taken into account for any process are defined within the [language file](#customisation) (also see [here](#runtime-variables)).
+The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals. Identified risks, that may have to be taken into account for any process are defined within the [language file](#customisation) (also see [here](#runtime-variables)\).
 
 As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.  
 Furthermore you are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels. To proof your regulatory compliance you can link any of your documents containing measures as defined.
@@ -802,8 +796,8 @@ Scheduling tasks and its events are not part of the records per se as any treatm
 
 ![tasks screenshot](http://toh.erroronline.one/caro/tasks%20en-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     scheduling((scheduling))===>select_day[select day];
     scheduling==>search[search];
     select_day==>database[("calendar db
@@ -821,39 +815,39 @@ graph TD;
     edit==>complete;
     database==>alert["alert selected unit members once"]
 
-    timesheet((timesheet))-->select_day2[select day];
-    select_day2-->add2[add];
-    add2-->usertype{usertype};
-    usertype-->any["any:
+    timesheet((timesheet))-- >select_day2[select day];
+    select_day2-- >add2[add];
+    add2-- >usertype{usertype};
+    usertype-- >any["any:
     own entries"];
-    usertype-->foreign["human ressources, supervisor:
+    usertype-- >foreign["human ressources, supervisor:
     own and third party"];
-    any-->database2;
-    foreign-->database2;
-    select_day2-->database2[("calendar db
+    any-- >database2;
+    foreign-- >database2;
+    select_day2-- >database2[("calendar db
     timesheet type")];
-    database2-->alert;
-    database2-->entrytype{entry type};
-    entrytype-->|regular working day|usertype2{usertype};
-    usertype2-->|affected user|display_edit("display
+    database2-- >alert;
+    database2-- >entrytype{entry type};
+    entrytype-- >|regular working day|usertype2{usertype};
+    usertype2-- >|affected user|display_edit("display
     edit, delete
     if not closed");
-    usertype2-->|supervisor, ceo, admin|display_close("display
+    usertype2-- >|supervisor, ceo, admin|display_close("display
     close, open");
-    entrytype-->|unavailable|usertype3{usertype};
-    usertype3-->usertype2;
-    usertype3-->|human ressources|display_only(display)
+    entrytype-- >|unavailable|usertype3{usertype};
+    usertype3-- >usertype2;
+    usertype3-- >|human ressources|display_only(display)
     
-    database2-->export[export of selected month];
-    export-->permission2{permission};
-    permission2-->fullexport["admin, ceo, human ressources:
+    database2-- >export[export of selected month];
+    export-- >permission2{permission};
+    permission2-- >fullexport["admin, ceo, human ressources:
     full export of all
     user timesheets"];
-    permission2-->partexport["supervisor:
+    permission2-- >partexport["supervisor:
     export of all
     user timesheets
     of assigned units"];
-    permission2-->ownexport["user:
+    permission2-- >ownexport["user:
     export of own
     timesheet display only"]
 
@@ -864,7 +858,9 @@ graph TD;
     uncompleted past scheduled events, staff off duty entries");
     database2-.->summary;
     summary-......->select_day
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqNVslu2zAQ_RWCJxtQgkR2EltFemmvPbWnWkHAiCNbiESqXJKqdv69Qy2kbKlADdgacvbljXykmeRAE5qX8j07MGXIj6-fUkHwo7MDcFsWYr9YBHq5fHx8_KyhhMw8c9bsOpIg-TRRbCWZyg677uElvDpKcGbYC9OwW6Q0YyUIzhThL2e2gJimhpQuZy0wznf4HXhIjsx6BRfA9H44IqdiBr1pDIMXui5ZQ_qbTjKXijCti70ATqwojMZ4eiu9IBqpQVUFSklxTCnjVSEikoGMOrlf1UBpi5JvhZYqpR-9laCLhk4N6BPwwuzcD0HnHHM28DQrLOQpk1XtBHYVU68YKRkufGGcIRQe7qcVwOors8O43bOvcZ8sqaB6AaWJFBk24ikVnbYpKtAHALNYeHK5vLoajUg8NyOBi7LYsfiig-7aagwD-34ciKFQw9mpisYFLJqkY8l3QUAYVWDb6NNUHrsI2ELUOdiKCaJAa2lVBjoa9WRkjAlOzKFQnNQIjyYYRZ9ob6he_MlPibM_wzlP2XNnx96X8nLuvZpL3XVp5t6l37R1aykyrpznodxJwd6W6PVdqldEq-vPaShV_M-iOxcnluf9bODtqcfLsxuwAJ8wdFE_u91NkRMhDclKqYEHDJ3ZD63o4ENaKHlHre6lp_YyIrIGEayeJWwFe2NFyV5K8Imu_pnoajSC8QzvdDlBPjwpymbRH5ad4kybftcS0dY9iMwD3iopjN-VHR_lA-DjY6Cnu8PZzm1Z9vbPthC5DLkfdCdPQiSsLEO6YRhHiDp355Dh3U1Q9B92O7Tlk_067w5h6b05SxM_KHCJo2Glu9aM1leJ8MbRf67ZHhaL_kTcCZfYNX6uLl8YY41WYiwTX8DxCnnaVriRmzHM3wFe-_dAZpXCGfUvOk7gDc-6Z1vhtzhGpWfkiDYIRsw6J9yaJiy_5WQ1hGCGldSdfBphRdGI7lXBaWKUhYhWWH_mjvToNFNqDlDhXkqQ5JAzW5qUpuID1WomfkpZDZpK2v2BJjkrEZvU1hgNfC3YXjEvwqyR3xuRDWe3MaT61v0xaf-ftFZpcqS_abLaXt_cxuvNdnW72awf7u_uI9rQJI6316v1_d1DvHm427rrj4j-aQO5ud7erTfrVbyOb-9X29ubFYaFjQD1RVphaLL9-As9TBdC?type=png)](https://mermaid.live/edit#pako:eNqNVslu2zAQ_RWCJxtQgkR2EltFemmvPbWnWkHAiCNbiESqXJKqdv69Qy2kbKlADdgacvbljXykmeRAE5qX8j07MGXIj6-fUkHwo7MDcFsWYr9YBHq5fHx8_KyhhMw8c9bsOpIg-TRRbCWZyg677uElvDpKcGbYC9OwW6Q0YyUIzhThL2e2gJimhpQuZy0wznf4HXhIjsx6BRfA9H44IqdiBr1pDIMXui5ZQ_qbTjKXijCti70ATqwojMZ4eiu9IBqpQVUFSklxTCnjVSEikoGMOrlf1UBpi5JvhZYqpR-9laCLhk4N6BPwwuzcD0HnHHM28DQrLOQpk1XtBHYVU68YKRkufGGcIRQe7qcVwOors8O43bOvcZ8sqaB6AaWJFBk24ikVnbYpKtAHALNYeHK5vLoajUg8NyOBi7LYsfiig-7aagwD-34ciKFQw9mpisYFLJqkY8l3QUAYVWDb6NNUHrsI2ELUOdiKCaJAa2lVBjoa9WRkjAlOzKFQnNQIjyYYRZ9ob6he_MlPibM_wzlP2XNnx96X8nLuvZpL3XVp5t6l37R1aykyrpznodxJwd6W6PVdqldEq-vPaShV_M-iOxcnluf9bODtqcfLsxuwAJ8wdFE_u91NkRMhDclKqYEHDJ3ZD63o4ENaKHlHre6lp_YyIrIGEayeJWwFe2NFyV5K8Imu_pnoajSC8QzvdDlBPjwpymbRH5ad4kybftcS0dY9iMwD3iopjN-VHR_lA-DjY6Cnu8PZzm1Z9vbPthC5DLkfdCdPQiSsLEO6YRhHiDp355Dh3U1Q9B92O7Tlk_067w5h6b05SxM_KHCJo2Glu9aM1leJ8MbRf67ZHhaL_kTcCZfYNX6uLl8YY41WYiwTX8DxCnnaVriRmzHM3wFe-_dAZpXCGfUvOk7gDc-6Z1vhtzhGpWfkiDYIRsw6J9yaJiy_5WQ1hGCGldSdfBphRdGI7lXBaWKUhYhWWH_mjvToNFNqDlDhXkqQ5JAzW5qUpuID1WomfkpZDZpK2v2BJjkrEZvU1hgNfC3YXjEvwqyR3xuRDWe3MaT61v0xaf-ftFZpcqS_abLaXt_cxuvNdnW72awf7u_uI9rQJI6316v1_d1DvHm427rrj4j-aQO5ud7erTfrVbyOb-9X29ubFYaFjQD1RVphaLL9-As9TBdC)
 
 [Content](#content)
 
@@ -960,7 +956,7 @@ While editing products, one can edit the
 * revoke a possible *incorporated*-state and
 * set the product *active and available* or *inactive*.
 
-On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
+On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)\).
 
 Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a [renewal](#filename-conventions) be reminded of. Files matching the filename convention for this type will be rejected.
 
@@ -968,21 +964,21 @@ Disabled products are not accessible through the order module. Products can be d
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20en-fullpage.png)
 
-```mermaid
-graph TD;
-    manage_vendors((manage vendors))--->edit_vendor[edit existing vendor];
-    edit_vendor-->vendor_db[(vendor database)];
-    manage_vendors-->new_vendor[new vendor];
-    vendor_db-->add_vinfo["add documents,
+<!--```mermaid
+flowchart TD;
+    manage_vendors((manage vendors))--- >edit_vendor[edit existing vendor];
+    edit_vendor-- >vendor_db[(vendor database)];
+    manage_vendors-- >new_vendor[new vendor];
+    vendor_db-- >add_vinfo["add documents,
     update info,
     set pricelist filter"];
-    new_vendor-->add_vinfo;
-    add_vinfo-->vendor_db;
-    add_vinfo-->inactivate_vendor[inactivate vendor];
+    new_vendor-- >add_vinfo;
+    add_vinfo-- >vendor_db;
+    add_vinfo-- >inactivate_vendor[inactivate vendor];
     inactivate_vendor-.->delete_all_products[delete all products];
-    add_vinfo-->import_pricelist[import pricelist];
-    import_pricelist-->delete_all_products;
-    delete_all_products-->has_docs2{"product
+    add_vinfo-- >import_pricelist[import pricelist];
+    import_pricelist-- >delete_all_products;
+    delete_all_products-- >has_docs2{"product
     has documents,
     been incorporated,
     had samplecheck
@@ -992,11 +988,11 @@ graph TD;
     been incorporated,
     had samplecheck
     (protected)"};
-    has_docs2-->|yes|update["update based on ordernumber
+    has_docs2-- >|yes|update["update based on ordernumber
     if pricelist import"];
-    update-->product_db[(product database)];
-    has_docs2-->|no|delete[delete];
-    delete-->|reinserted from pricelist|product_db;
+    update-- >product_db[(product database)];
+    has_docs2-- >|no|delete[delete];
+    delete-- >|reinserted from pricelist|product_db;
     
     manage_products((manage products))==>edit_product[edit existing product];
     edit_product==>product_db;
@@ -1031,7 +1027,9 @@ graph TD;
     state-.->|active|orderable[orderable];
     state-.->|inactive|inorderable[inorderable];
     state-.->|deleted|inorderable;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNq9Vk1v4jAQ_SuWTyABagO0QNVKq-11T7unJQiZ2EDUxI4cB5YF_vuO43ESQtrjckCe8Xvz5ZmBM40UF3RBt4k6RnumDfn1_hJKAp-USbYT64OQXOm813MyQbnfHw6Hb4LHBhFLeybiT5ybWO4QtkJbDRyw3GHNN8ueOxLODNuwXPRXnc6BI8XRO4Jjy3xlEICM8_Uhllu1DCmcCVdRkQpp8oHDFhk4E8QiUJMLQzIdRyKB2Mk2TozQIfW2a8dN43hZyc2sOu5iySITH8CxT6LWtHK5gw5HwzcuEgEKliTrTCteRCZfOh0BHfG6VZfrNFParKsEl05RZ1w5bgGHnW4R3HED-D3L11DvPDiHFNUODhd3D7ERQkK2kdLgF9LlA4_lJGdplohoL6IPp-yBOSMiQPVDev0iiNFoVMfxf8KosoYKXE4iv7gWg_7DXrOdzYmSRGkutCzSDTSYq_m20XnuAerOc2wwijmUA4Pn-4m5iUKqiysOdsnqpmIWoUUsc6EhE7LVKq3DuNTekHQzkb7Q1T7win7_9dXtA9S0FgJqbzYC6oB457RWwK3t5wxn-tvXM12XrxWwN4PB2dVgF0krrAYECDmUK6oWnJNa43oDAUp7C1Qy3H1IdZQIPePmi2X1lL6fmjBglS1VVeATDDx4vahC2UjGktoF7nyCPE7jhOkzpoli9b4-OtQDwVU9qPvcMaGjPMcxjrHZN9LEN2NZlpxIueuAaYCPF0Yzbhtmp5SfRS0O6kM0pjRWsj0nQVcXtVLEhYGKHm5QFPu3W6Vm-clqDRqWvfJZ0jhUw51u2rgOtsm2D-vpuPZFyfe_AJ_YaLn8any82e4OqFVEweYcKvcQ5_K7enAr2B-hizN1KbcY2yRiWZ1Wd1jvGA41vnG-Z2A2TcILHdCdjjldGF2IAU2FTpkV6dmyQ2r2IhUhXRBbtS0rEqhSKK9Ay5j8rVTqmVoVuz1dbFkCDYj9-h6znWYVhBVG_TzJyMu2d5T-4f4flX-TSqt0caZ_6GI8Hz08BpPZfPw4m02en6ZPA3qiiyCYj8aTp-lzMHuezq36OqB_y0AeRvPpZDYZBw-z8Xg-g28IC-ZV6O-qkIYu5td_hZxcQQ?type=png)](https://mermaid.live/edit#pako:eNq9Vk1v4jAQ_SuWTyABagO0QNVKq-11T7unJQiZ2EDUxI4cB5YF_vuO43ESQtrjckCe8Xvz5ZmBM40UF3RBt4k6RnumDfn1_hJKAp-USbYT64OQXOm813MyQbnfHw6Hb4LHBhFLeybiT5ybWO4QtkJbDRyw3GHNN8ueOxLODNuwXPRXnc6BI8XRO4Jjy3xlEICM8_Uhllu1DCmcCVdRkQpp8oHDFhk4E8QiUJMLQzIdRyKB2Mk2TozQIfW2a8dN43hZyc2sOu5iySITH8CxT6LWtHK5gw5HwzcuEgEKliTrTCteRCZfOh0BHfG6VZfrNFParKsEl05RZ1w5bgGHnW4R3HED-D3L11DvPDiHFNUODhd3D7ERQkK2kdLgF9LlA4_lJGdplohoL6IPp-yBOSMiQPVDev0iiNFoVMfxf8KosoYKXE4iv7gWg_7DXrOdzYmSRGkutCzSDTSYq_m20XnuAerOc2wwijmUA4Pn-4m5iUKqiysOdsnqpmIWoUUsc6EhE7LVKq3DuNTekHQzkb7Q1T7win7_9dXtA9S0FgJqbzYC6oB457RWwK3t5wxn-tvXM12XrxWwN4PB2dVgF0krrAYECDmUK6oWnJNa43oDAUp7C1Qy3H1IdZQIPePmi2X1lL6fmjBglS1VVeATDDx4vahC2UjGktoF7nyCPE7jhOkzpoli9b4-OtQDwVU9qPvcMaGjPMcxjrHZN9LEN2NZlpxIueuAaYCPF0Yzbhtmp5SfRS0O6kM0pjRWsj0nQVcXtVLEhYGKHm5QFPu3W6Vm-clqDRqWvfJZ0jhUw51u2rgOtsm2D-vpuPZFyfe_AJ_YaLn8any82e4OqFVEweYcKvcQ5_K7enAr2B-hizN1KbcY2yRiWZ1Wd1jvGA41vnG-Z2A2TcILHdCdjjldGF2IAU2FTpkV6dmyQ2r2IhUhXRBbtS0rEqhSKK9Ay5j8rVTqmVoVuz1dbFkCDYj9-h6znWYVhBVG_TzJyMu2d5T-4f4flX-TSqt0caZ_6GI8Hz08BpPZfPw4m02en6ZPA3qiiyCYj8aTp-lzMHuezq36OqB_y0AeRvPpZDYZBw-z8Xg-g28IC-ZV6O-qkIYu5td_hZxcQQ)
 
 [Content](#content)
 
@@ -1062,25 +1060,25 @@ Processed orders are also added to a second database with slightly reduced data.
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders%20en-fullpage.png)
 
-```mermaid
-graph TD;
-    new_order((new order))-->search_products[search products];
-    search_products-->product_db[(product database)];
-    product_db-->product_found{product found};
-    product_found-->|yes|add_product[add product to order];
-    new_order-->add_manually[add manually];
-    product_found-->|no|add_manually;
-    product_found---->|no|manage_products((manage products));
-    add_manually-->add_product;
-    add_product-->search_products;
-    add_product-->add_info["set unit,
+<!--```mermaid
+flowchart TD;
+    new_order((new order))-- >search_products[search products];
+    search_products-- >product_db[(product database)];
+    product_db-- >product_found{product found};
+    product_found-- >|yes|add_product[add product to order];
+    new_order-- >add_manually[add manually];
+    product_found-- >|no|add_manually;
+    product_found---- >|no|manage_products((manage products));
+    add_manually-- >add_product;
+    add_product-- >search_products;
+    add_product-- >add_info["set unit,
     justification,
     add files"];
-    add_info-->approve_order{approve order};
-    approve_order-->|by signature|approved_orders(("approved orders
+    add_info-- >approve_order{approve order};
+    approve_order-- >|by signature|approved_orders(("approved orders
     (from own unit unless admin or purchase)"));
-    approve_order-->|by pin|approved_orders;
-    approve_order-->|no|prepared_orders(("prepared orders
+    approve_order-- >|by pin|approved_orders;
+    approve_order-- >|no|prepared_orders(("prepared orders
     (from own unit unless admin or
     order authorized and selected)"));
 
@@ -1143,40 +1141,45 @@ graph TD;
     mark_bulk-.->|yes|approve_order;
     mark_bulk-.->|no|prepared_orders;
     prepared_orders-.->add_product;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqlV0uT4jYQ_isunaCKmdoBZnhMwSV7zSk5pGJTLmELUMaWHEneCYvnv6f1smUwk2wtB-iWv6_V3Wq1mwvKeE7QGh0K_p6dsFDR719fExbBh5H3lIuciNEIxMiI4_HDw1YSLLJTWgme15mSsdUjr-8c_woGRCem-T4eOTnKscJ7LMnY0zpQwDjwmuUXzzHaxxXeLAKlORPZ4Dz3G8cge1CkuI1jdx0jEDWnxKzGRXE2JK_s7u3EeBOShmEOCCB8JG02RiO70GZtPHb00KLzymECgFu5PYxBjNYoO_A4QZKoqGZUTSzur1oqeqAZVpSzScuNDrQgMkG7wJw2oG1VYPcbsVm7OM0m1Z9ID6LD358jSY8Mq1qQxj3N7WNIRIL8kjUjrZXRQfAy4u_M-Atf4JEET0rKABdVNYSt6yZBXeoGNq4ou97yHhpOqRKkwqLnnF_6AecsxuAjXKsTF_Q7GMAsh0tRkEyR3Lvdc8Vvu9nows_ApEuz07o0t5XWgTb6sxXkWBdYcXG-JKhTIkH-rqkgJWHKculB71rA0e8LkiB_dh0FjFGWcVFxgRWJA9lXRbDUB6eSlrTAAlxwUu9myG67ARKYMlfYZsqvmtLVC5FbmLSZI5BW3UW6cu1TbTb1xsN951NPoCYok0RAPwJCbGVD7rLQPg53GsqnxGVVkDQ7kewttkpklNbxAHBlbPjEtxlmGSmsHlul3-FCgKmPd0EhRLscO9XXqnTwwvSDXRtDyAEjt_fpjneCwJVnzjur9L0LATqagjPig9GyRU8i3bYcX52rtgID_K1bQzuYO9JkEA4UfgEPseSsCc7eGR6MZ5tT6faIO9H70q3oLVxd8konEnYqwQ60-8b9prptxE6JoNXbPlKScg-ee5Mh2JRDrzl90gY22xKLt4v-8jdNy9oxByZ5Y-CpTufFHr8WPbx7qElGa6CV8TSHuwXtQMuRlSN8UMD-A27FuXW9z7eHEBoYhMFF-kYz8p-4sEhdGBadj2wkThv3Q6dS1hD3rXUP0G9SCgXUuCBdfNdzQGAAWL39Py-fcM-Wb4W0IqIEByEi6JqdYsFtrrvOeUOzEYZ11Ay5NsjzL1NHnICVtk5s7n_C1rWl_9s9Ntu6yk07VvoFZJXIKP4kQoBtAHDpzKQiytjMFfoSan3Su1E3Ny4YdUIb1y_iT053Y6Yso5hRS09RWghHqPbptd3XOyaduzAsOr9rqWfwLmO9hvDw-GDufbqvizeoIi33phYIyY0auOgqqaVovp2ew8loEHU7Kr3edSmcYNEEHQXN0VqJmkxQCZWDtYoump4gdYIRJUFrEHNywHWhEpSwD6BVmP3JeemZgtfHE1ofcCFBs3XwleKjwC1EX9PfzizzOskpvId_tf93zN8eYxWtL-gftJ6tHr88TefL1expuZwvXp5fJuiM1tPp6nE2f3leTJeL55Ve_pig78aRL4-r5_lyPpvOZ4vF8mmmGQJqh4hfYPJXaL36-Bclh85d?type=png)](https://mermaid.live/edit#pako:eNqlV0uT4jYQ_isunaCKmdoBZnhMwSV7zSk5pGJTLmELUMaWHEneCYvnv6f1smUwk2wtB-iWv6_V3Wq1mwvKeE7QGh0K_p6dsFDR719fExbBh5H3lIuciNEIxMiI4_HDw1YSLLJTWgme15mSsdUjr-8c_woGRCem-T4eOTnKscJ7LMnY0zpQwDjwmuUXzzHaxxXeLAKlORPZ4Dz3G8cge1CkuI1jdx0jEDWnxKzGRXE2JK_s7u3EeBOShmEOCCB8JG02RiO70GZtPHb00KLzymECgFu5PYxBjNYoO_A4QZKoqGZUTSzur1oqeqAZVpSzScuNDrQgMkG7wJw2oG1VYPcbsVm7OM0m1Z9ID6LD358jSY8Mq1qQxj3N7WNIRIL8kjUjrZXRQfAy4u_M-Atf4JEET0rKABdVNYSt6yZBXeoGNq4ou97yHhpOqRKkwqLnnF_6AecsxuAjXKsTF_Q7GMAsh0tRkEyR3Lvdc8Vvu9nows_ApEuz07o0t5XWgTb6sxXkWBdYcXG-JKhTIkH-rqkgJWHKculB71rA0e8LkiB_dh0FjFGWcVFxgRWJA9lXRbDUB6eSlrTAAlxwUu9myG67ARKYMlfYZsqvmtLVC5FbmLSZI5BW3UW6cu1TbTb1xsN951NPoCYok0RAPwJCbGVD7rLQPg53GsqnxGVVkDQ7kewttkpklNbxAHBlbPjEtxlmGSmsHlul3-FCgKmPd0EhRLscO9XXqnTwwvSDXRtDyAEjt_fpjneCwJVnzjur9L0LATqagjPig9GyRU8i3bYcX52rtgID_K1bQzuYO9JkEA4UfgEPseSsCc7eGR6MZ5tT6faIO9H70q3oLVxd8konEnYqwQ60-8b9prptxE6JoNXbPlKScg-ee5Mh2JRDrzl90gY22xKLt4v-8jdNy9oxByZ5Y-CpTufFHr8WPbx7qElGa6CV8TSHuwXtQMuRlSN8UMD-A27FuXW9z7eHEBoYhMFF-kYz8p-4sEhdGBadj2wkThv3Q6dS1hD3rXUP0G9SCgXUuCBdfNdzQGAAWL39Py-fcM-Wb4W0IqIEByEi6JqdYsFtrrvOeUOzEYZ11Ay5NsjzL1NHnICVtk5s7n_C1rWl_9s9Ntu6yk07VvoFZJXIKP4kQoBtAHDpzKQiytjMFfoSan3Su1E3Ny4YdUIb1y_iT053Y6Yso5hRS09RWghHqPbptd3XOyaduzAsOr9rqWfwLmO9hvDw-GDufbqvizeoIi33phYIyY0auOgqqaVovp2ew8loEHU7Kr3edSmcYNEEHQXN0VqJmkxQCZWDtYoump4gdYIRJUFrEHNywHWhEpSwD6BVmP3JeemZgtfHE1ofcCFBs3XwleKjwC1EX9PfzizzOskpvId_tf93zN8eYxWtL-gftJ6tHr88TefL1expuZwvXp5fJuiM1tPp6nE2f3leTJeL55Ve_pig78aRL4-r5_lyPpvOZ4vF8mmmGQJqh4hfYPJXaL36-Bclh85d)
+
 Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.  
 Sample checks are added to product. New checks trigger a system message to these users. Defined authorized users can revoke the sample check from within the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and the [product editor](#vendor-and-product-management).
 
 ### Simplified order process for purchase
 
-```mermaid
-graph TD;
-    order((Order))-->unprocessed[Unprocessed];
-    unprocessed-->copy_order_no(Copy order number);
-    copy_order_no-->paste_order_no("Paste into ERP-software,
+<!--```mermaid
+flowchart TD;
+    order((Order))-- >unprocessed[Unprocessed];
+    unprocessed-- >copy_order_no(Copy order number);
+    copy_order_no-- >paste_order_no("Paste into ERP-software,
     select product");
-    paste_order_no-->copy_identifier(Copy order identifier);
-    copy_identifier-->paste_order_identifier("Paste into ERP-software,
+    paste_order_no-- >copy_identifier(Copy order identifier);
+    copy_identifier-- >paste_order_identifier("Paste into ERP-software,
     any field that is part
     of the order export,
     eg appending to
     product name");
-    paste_order_identifier-->add_commission(Add commission);
-    add_commission-->order_erp(Submit order in erp software);
-    order_erp-->confirm_caro(Confirm order in CARO)
+    paste_order_identifier-- >add_commission(Add commission);
+    add_commission-- >order_erp(Submit order in erp software);
+    order_erp-- >confirm_caro(Confirm order in CARO)
 
-    retrieval((Retrieval))-->processed[processed];
-    processed-->filter("Filter by order identifier
+    retrieval((Retrieval))-- >processed[processed];
+    processed-- >filter("Filter by order identifier
     or ERP order reference,
     according to delivery note");
-    filter-->commission("Print QR code
+    filter-- >commission("Print QR code
     for commission labels");
-    commission-->retrieval_confirmed("Confirm partial
+    commission-- >retrieval_confirmed("Confirm partial
     or full delivery")
-    retrieval_confirmed-->issue("Hand out products with
+    retrieval_confirmed-- >issue("Hand out products with
     commission label
     to workshop")
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqFVE2P2jAQ_SuWT0ECBCGwJJUqrdhWvVS7ZdtLS4VMPAGrjh059rIU8d938h3YSuWCZzzz5s2bcc401hxoRBOpj_GBGUu-P3zYKII_bTgYz3ss_gaD0eijU5nRMeQ58F8_uvPvOr53jcGxzk7bEmKrtLdCqwIkyqU7BKyTrsIwLWO5hS5vQ58KBxHKavJp_TTKdWKPzMCwSs9BQmwJFuYuthvawF7DNHQEB2VFIrCtHqHOe0Wqc9_Q6qH8jx5TJ4KBkhN7YJaIHIkZW8uboBNqDvCaaWPrLNgTlmWguFB7YnXdUdUiUSyFf_d5RZhxvo11moo8F1p595yTzmyyr4MwqwICk3nPbpcK2yikCPpI09ygvyBFdKmvSoRJtzEzxbRLo8te3a8fBxtVpRmwRsALk563bo7lfnXb9W63-puVCGlL7T-XB7J7P8iGXzGT-tJAAgZU3I4mjvGiUphwkOIFzIkobXvqVpXK7lolceQGx02-rUnxdOpALNXFEMl2IPMO50rjtv1trRlwBG0kK_ZDMNk2kDgpW3qIeCNhh4HIWMIBYn1hihPt2meRk6Owh1sqFcvKixIctfmTH3SGNeiQ7o3gNLLGwZCmYFJWmPRcRG8orm2xgxEeOSTMSXx4G3XBtIypn1qnTabRbn-gUcJkjpbLOLPwINjesDaEOaufTypubODCavO1-iiV36YSlUZn-kqjWTieTP1gGc6my2Vwt5gvhvREI98Px7NgMb_zl3fzsHBfhvRvSWQyDufBMpj588kimPiTcIq08GmBWWmnLI3Cyxv-kbY5?type=png)](https://mermaid.live/edit#pako:eNqFVE2P2jAQ_SuWT0ECBCGwJJUqrdhWvVS7ZdtLS4VMPAGrjh059rIU8d938h3YSuWCZzzz5s2bcc401hxoRBOpj_GBGUu-P3zYKII_bTgYz3ss_gaD0eijU5nRMeQ58F8_uvPvOr53jcGxzk7bEmKrtLdCqwIkyqU7BKyTrsIwLWO5hS5vQ58KBxHKavJp_TTKdWKPzMCwSs9BQmwJFuYuthvawF7DNHQEB2VFIrCtHqHOe0Wqc9_Q6qH8jx5TJ4KBkhN7YJaIHIkZW8uboBNqDvCaaWPrLNgTlmWguFB7YnXdUdUiUSyFf_d5RZhxvo11moo8F1p595yTzmyyr4MwqwICk3nPbpcK2yikCPpI09ygvyBFdKmvSoRJtzEzxbRLo8te3a8fBxtVpRmwRsALk563bo7lfnXb9W63-puVCGlL7T-XB7J7P8iGXzGT-tJAAgZU3I4mjvGiUphwkOIFzIkobXvqVpXK7lolceQGx02-rUnxdOpALNXFEMl2IPMO50rjtv1trRlwBG0kK_ZDMNk2kDgpW3qIeCNhh4HIWMIBYn1hihPt2meRk6Owh1sqFcvKixIctfmTH3SGNeiQ7o3gNLLGwZCmYFJWmPRcRG8orm2xgxEeOSTMSXx4G3XBtIypn1qnTabRbn-gUcJkjpbLOLPwINjesDaEOaufTypubODCavO1-iiV36YSlUZn-kqjWTieTP1gGc6my2Vwt5gvhvREI98Px7NgMb_zl3fzsHBfhvRvSWQyDufBMpj588kimPiTcIq08GmBWWmnLI3Cyxv-kbY5)
 
 Possible additional steps in your ERP-software can not be depicted for the amount of software solutions and individual processes.
 
@@ -2073,7 +2076,7 @@ Application support legend:
     * preferably Firefox, Edge or some other Chromium-Browser, [Safari is not fully compatible](#safaris-special-needs)
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
-* Vendor product lists (e.g. pricelists) as CSV-files ([see details](#importing-vendor-product-lists)), ERP stock list exports or a customized [ERP interface](#erp-interface)
+* Vendor product lists (e.g. pricelists) as CSV-files ([see details](#importing-vendor-product-lists)\), ERP stock list exports or a customized [ERP interface](#erp-interface)
 * Occasionally FTP-access to the server for updates of [runtime variables](#runtime-variables) and [language files](#customisation)
 
 Latest tested server environments:
@@ -2120,7 +2123,7 @@ It is strongly recommended to create an additional development environment to te
     * exif
     * pdo_odbc
     * zip
-    * pdo_sqlsrv (sqlsrv if applicable, [source](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows))
+    * pdo_sqlsrv (sqlsrv if applicable, [source](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows)\)
 * php.ini extension_dir = "ext" for IIS
 * apt install php8.5-mysql for Apache if not already satisfied
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
@@ -2141,7 +2144,7 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
 	* users
     * vendors
 * the default language of the application as specified within the [runtime variables](#runtime-variables)
-* the extension being `.json` by default with the option to extended by `.env` files (also see [customisation](#customisation))
+* the extension being `.json` by default with the option to extended by `.env` files (also see [customisation](#customisation)\)
 
 > the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
 
@@ -2176,7 +2179,7 @@ Some variables can be edited during runtime. This applies for all *values* of la
 ### Environment settings
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
 
-Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually (also see [Customization](#customisation)).
+Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually (also see [Customization](#customisation)\).
 
 By default following permissions/roles are defined within the language.XX.json-file:
 ```
@@ -2275,7 +2278,8 @@ session[request_log] = 548 ; DAYS, after these request-log-entries will be delet
 
 training[evaluation] = 62 ; DAYS until supervisors are reminded to evaluate
 training[renewal] = 365 ; DAYS until a training expires, warning per header colour in overviews
-
+```
+```
 ; probability factor for similarity of texts in percent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
@@ -2350,7 +2354,8 @@ texttemplates = "ceo, qmo" ; add and edit text templates
 trainingevaluation = "ceo, supervisor" ; evaluate trainings
 users = "ceo, qmo" ; add and edit application users
 vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
-
+```
+```
 ; settings for sticky labels of different formats
 ; extend or change at your convenience
 [label]
@@ -2533,7 +2538,7 @@ with just the entry
 ```
 within the ENV-file and leave the remaining language chunks untouched to adapt to your actual environment.
 
-The same applies to the config.ini-file and to all template files. As the latter are primarily for installation even an template ENV-File without a JSON-File will be processed, given the structure is suitable. However ENV-Files **do not delete** default JSON-settings. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the files manually (also see [Environment settings](#environment-settings)).
+The same applies to the config.ini-file and to all template files. As the latter are primarily for installation even an template ENV-File without a JSON-File will be processed, given the structure is suitable. However ENV-Files **do not delete** default JSON-settings. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the files manually (also see [Environment settings](#environment-settings)\).
 
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the templates/manual.XX.env/.json for the selected default language prior to the installation process (see _language.md within api-directory).
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
@@ -2972,7 +2977,7 @@ This has been interpreted merely as a recommendation than a requirement to avoid
 | Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation<br/>&bull; Message to purchase regarding orders<br/>&bull; Reload empty order form after submission<br/>&bull; Vendor filter as text with dataset on product searches<br/>&bull; Record state filter: no display of further proceedings |
 | Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 | Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
-| Data safety officer demonstration | Data safety officer | 2026-03-02 | &bull; two factor login, add an additional password/pin to token login<br/>&bull; no onscreen display/download of signatures, add watermark to pdf output<br/>&bull; consider storing login tokens as hash (requires a new generation on every export)<br/>&bull; consider a mechanism to automate invalidating user access (e.g. on expected discharge)<br/>&bull; consider statement on user verification before handing out login tokens
+| Data safety officer demonstration | Data safety officer | 2026-03-02 | &bull; two factor login, add an additional password/pin to token login<br/>&bull; no onscreen display/download of signatures, add watermark to pdf output<br/>&bull; consider storing login tokens as hash (requires a new generation on every export)<br/>&bull; consider a mechanism to automate invalidating user access (e.g. on expected discharge)<br/>&bull; consider statement on user verification before handing out login tokens |
 
 [Content](#content)
 
@@ -3204,39 +3209,41 @@ Response properties are
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS Composer-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
 ## Request flow
-```mermaid
-graph TD;
-    request((request))-->api_js(api.js);
-    api_js-->api_php(api.php);
-    api_php-->language_php(_language.php);
-    api_php-->setup(config.ini);
-    api_php-->sql(_sqlinterface.php);
-    api_php-->utility_php(_utility.php);
+<!-->```mermaid
+flowchart TD;
+    request((request))-- >api_js(api.js);
+    api_js-- >api_php(api.php);
+    api_php-- >language_php(_language.php);
+    api_php-- >setup(config.ini);
+    api_php-- >sql(_sqlinterface.php);
+    api_php-- >utility_php(_utility.php);
 
     api_php<==>module(*.php);
-    language_php<-->module;
-    setup<-->module;
-    sql<-->module;
-    utility_php<-->module;
+    language_php<-- >module;
+    setup<-- >module;
+    sql<-- >module;
+    utility_php<-- >module;
 
-    module<---->calendar(_calendarutility.php)
-    module<----->csv(_csvprocessor.php);
-    module<----->pdf(_tcpdfinterface.php);
-    module<----->table(_table.php);
-    module<--->file(_filehandler.php);
+    module<---- >calendar(_calendarutility.php)
+    module<----- >csv(_csvprocessor.php);
+    module<----- >pdf(_tcpdfinterface.php);
+    module<----- >table(_table.php);
+    module<--- >file(_filehandler.php);
     module<-.->erp(_erpinterface.php);
-    module<-->libraries([vendor libraries]);
+    module<-- >libraries([vendor libraries]);
     module==>api_php2(api.php);
 
-    api_php2-->response((response));
-    response-->api_js2(api.js);
-    api_js2<-->language_js(language.js);
-    api_js2<-->utility_js(utility.js);
-    api_js2<-->libraries;
+    api_php2-- >response((response));
+    response-- >api_js2(api.js);
+    api_js2<-- >language_js(language.js);
+    api_js2<-- >utility_js(utility.js);
+    api_js2<-- >libraries;
     api_js2==>compose(compose.js);
     api_js2==>assemble(assemble.js);
     compose==>assemble;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNp9lEuPmzAQgP9K5BNUCUoIecBmc-lee2pPbSrkhYF4ZWziR9o0yn_v8BQotBzseXwzHntG3EkiUyARybj8lZypMrNvby8nMcNPwcWCNo7TCq67WBxpyeIP7eDmfWi3JRtj6y3PZe3GfehHFQFORW5pDjUVd9o0q8HY0kmkyFjuMcEmiAt3YlyYMKAymvwjkTWMM3NrzmyVjhyxh9fXYyFTy8H5NEw1rPqACRumddZlPlsv_Mk2qGPka7yNig50JZSDSKly4k4alv3EY4C-IquvpZIJaC3VsPwRWaaZE5sEt8lXG7GGvuNTxPU2DR0zVhHVeqYi5TB5sLc4gsK3x-X_hx45e1dUMdDOjyveW6pZb_k5prFVbdf84biN-uljRgW6lEJDNcaN5Lr9gDeGfqz9ybn2D8PBxeHvx3aS7LqMYNe06YzdxcYuvFcii1Jixe3-HF7dXWsoqu50woBq4wbUC5mTXLGUREZZmJMCVEErldyrkBMxZyjgRCIUU8io5eZETuKBYSUV36UsukglbX4mUUa5Rs2WKTXwxmiuaI9Qa-TXm0g6HVJmpPrS_Gfq302dlUR38ptE69BbrvxgH65X-32w2262c3Ijke-H3jrYbnb-frcJK_NjTv7UhSy9cBPsg7W_2i43yyDYYoTCYQH1WVphSBQ-_gKhKJh2?type=png)](https://mermaid.live/edit#pako:eNp9lEuPmzAQgP9K5BNUCUoIecBmc-lee2pPbSrkhYF4ZWziR9o0yn_v8BQotBzseXwzHntG3EkiUyARybj8lZypMrNvby8nMcNPwcWCNo7TCq67WBxpyeIP7eDmfWi3JRtj6y3PZe3GfehHFQFORW5pDjUVd9o0q8HY0kmkyFjuMcEmiAt3YlyYMKAymvwjkTWMM3NrzmyVjhyxh9fXYyFTy8H5NEw1rPqACRumddZlPlsv_Mk2qGPka7yNig50JZSDSKly4k4alv3EY4C-IquvpZIJaC3VsPwRWaaZE5sEt8lXG7GGvuNTxPU2DR0zVhHVeqYi5TB5sLc4gsK3x-X_hx45e1dUMdDOjyveW6pZb_k5prFVbdf84biN-uljRgW6lEJDNcaN5Lr9gDeGfqz9ybn2D8PBxeHvx3aS7LqMYNe06YzdxcYuvFcii1Jixe3-HF7dXWsoqu50woBq4wbUC5mTXLGUREZZmJMCVEErldyrkBMxZyjgRCIUU8io5eZETuKBYSUV36UsukglbX4mUUa5Rs2WKTXwxmiuaI9Qa-TXm0g6HVJmpPrS_Gfq302dlUR38ptE69BbrvxgH65X-32w2262c3Ijke-H3jrYbnb-frcJK_NjTv7UhSy9cBPsg7W_2i43yyDYYoTCYQH1WVphSBQ-_gKhKJh2)
 
 All endpoints may return
 ```
@@ -3249,29 +3256,31 @@ with a HTTP status code 511 in case of a reauthetification prompt due to timeout
 ## Authentification flow
 User authentification is handled by the backend. Usage time of the application can be [restricted](#runtime-variables) within the boundaries of the [server setting](#installation) for session duration. Whichever comes first enforces a new authentification of the last user or logout to proceed. While interacting with the application there will be a tiny request shortly before timeout to avoid friction. The defined timeout will happen after the last request without intermittent interaction.
 
-```mermaid
-graph TD;
-    ui((interface use))-->count("frontend timeout tracking,
+<!--```mermaid
+flowchart TD;
+    ui((interface use))-- >count("frontend timeout tracking,
     illustration,
     count interactions");
-    count-->ui_timeout(timeout approaching);
-    ui_timeout-->autoprolong{interactions counted?};
-    autoprolong-->|yes|prolong["background request
+    count-- >ui_timeout(timeout approaching);
+    ui_timeout-- >autoprolong{interactions counted?};
+    autoprolong-- >|yes|prolong["background request
     to frictionless
     prolong session"];
-    autoprolong-->|no|terminate["runout to terminate
+    autoprolong-- >|no|terminate["runout to terminate
     authorization"]
 
-    request((api request))-->auth("backend user
+    request((api request))-- >auth("backend user
     authentification");
-    auth-->active_session{active session?};
-    active_session--->|no|loginauth["serve token submit form
+    auth-- >active_session{active session?};
+    active_session--- >|no|loginauth["serve token submit form
     http status 511"];
-    active_session-->|yes|timeout{timeout?};
-    timeout-->|yes|reauth["serve token resubmit form
+    active_session-- >|yes|timeout{timeout?};
+    timeout-- >|yes|reauth["serve token resubmit form
     http status 511"];
-    timeout-->|no|serve_content[serve content];
-```
+    timeout-- >|no|serve_content[serve content];
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqNU02PmzAQ_SvWnIiURAkhCRCpPXSvPbWnLqvICwasgk390TZL8t87GEPSag_Nhcx43ps38-weclkwSKFs5K-8psqQr0-nTBD8WR4EXBimSpozYjVbLFarD7m0wgQZlErimSiI4S2T1hCjaP6di2o5onnTWI05w6XwKQcljpLmQ15nsDg9nCG95WdPGEzEtOuUpHmN3ItZ2lSFEGqNxIpGiqp_JB85WfHx5lEPhQi7Xpi--vA5g1dUXylEFESxH5ZpM4KMJKXijrFhWo9JDyMaM3iQwcv7LYS8op6WC2oY9lBWuE1JMmdnWC0Vf3PbQrZMjHmvJAhox6fAuTAAglH04AGao-5MTBhe8tyTLe7S6gGJo_xkZ6-8H8NpkPuq_qpa-VkaWaFo5MFZsCPijMT-RNvXlhtSStWO8NqYjmhDjdVkv90-7Ocf3tEF72Xvv7OKu8euTLF3eiv2_90f-HAax3LO3TU2zyOnj15OsIRK8QJSoyxbQot-0SGEfqDKALfcsgxS_FuwktrGZJCJG8I6Kr5J2U5IvFJVDWlJG42R7Qo0_YnTStG5ZLg0Xy4in2JWcCPV5_FhuvfpWCHt4Teku2S92YZRnOy2cRwdD_vDEi6QhmGy3kWH_TGMj_tkSN-W8OaEbNbJPoqjXYioeBMdwhBl4bVh6tPwQiBNbn8A5G5lBQ?type=png)](https://mermaid.live/edit#pako:eNqNU02PmzAQ_SvWnIiURAkhCRCpPXSvPbWnLqvICwasgk390TZL8t87GEPSag_Nhcx43ps38-weclkwSKFs5K-8psqQr0-nTBD8WR4EXBimSpozYjVbLFarD7m0wgQZlErimSiI4S2T1hCjaP6di2o5onnTWI05w6XwKQcljpLmQ15nsDg9nCG95WdPGEzEtOuUpHmN3ItZ2lSFEGqNxIpGiqp_JB85WfHx5lEPhQi7Xpi--vA5g1dUXylEFESxH5ZpM4KMJKXijrFhWo9JDyMaM3iQwcv7LYS8op6WC2oY9lBWuE1JMmdnWC0Vf3PbQrZMjHmvJAhox6fAuTAAglH04AGao-5MTBhe8tyTLe7S6gGJo_xkZ6-8H8NpkPuq_qpa-VkaWaFo5MFZsCPijMT-RNvXlhtSStWO8NqYjmhDjdVkv90-7Ocf3tEF72Xvv7OKu8euTLF3eiv2_90f-HAax3LO3TU2zyOnj15OsIRK8QJSoyxbQot-0SGEfqDKALfcsgxS_FuwktrGZJCJG8I6Kr5J2U5IvFJVDWlJG42R7Qo0_YnTStG5ZLg0Xy4in2JWcCPV5_FhuvfpWCHt4Teku2S92YZRnOy2cRwdD_vDEi6QhmGy3kWH_TGMj_tkSN-W8OaEbNbJPoqjXYioeBMdwhBl4bVh6tPwQiBNbn8A5G5lBQ)
 
 [Content](#content)
 
@@ -4402,7 +4411,7 @@ Parameters
 
 Sample response
 ```
-{"toasst":{"msg":"Upload has been completed","type":"success"}}
+{"toast":{"msg":"Upload has been completed","type":"success"},"redirect":["externalfilemanager"]}
 ```
 
 > PUT ./api/api.php/file/externalfilemanager/{id}/{value}
@@ -5784,28 +5793,30 @@ If you experience any issues with data security or application usage contact :is
 ### Encryption statement
 > **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a network environment not accessible from the web (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
 
-```mermaid
-graph TD;
-    database[(encrypted data)]-->onekey(system key);
-    onekey-->handling{key handling};
-    handling-->|"server decryption
+<!--```mermaid
+flowchart TD;
+    database[(encrypted data)]-- >onekey(system key);
+    onekey-- >handling{key handling};
+    handling-- >|"server decryption
     for all users"|storedkey{{"key has to be stored
     on the server"}};
-    handling-->|"pass decryption token
+    handling-- >|"pass decryption token
     by user for each request"|sharedkey{{"unusable application,
     possible spread of key"}}
 
-    database-->userkey(user key);
-    userkey-->access{access};
-    access-->|contributing user|granted{{"granted for lifecycle
+    database-- >userkey(user key);
+    userkey-- >access{access};
+    access-- >|contributing user|granted{{"granted for lifecycle
     of token only"}};
-    access-->|other users|denied{{data not
+    access-- >|other users|denied{{data not
     decryptable/accessable}}
 
-    database-->processing(data processing);
-    processing-->drag{{"performance loss
+    database-- >processing(data processing);
+    processing-- >drag{{"performance loss
     for sql queries"}}
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNptU8tu2zAQ_BWCJwdwXD9kW1KAXJprT-2pVQ80ubKJ0KTCR1tV9r93SUqxC0QXcV-zM0NpoNwIoDVtlfnNT8x68u3lqdEEH8E8OzAHP2ague07DyLlHn4-Pj4bDa_Qz1zvPJwJHh_GqVzAjhPTQkl9HDAkU3Adu6YY-y4NdWB_gSUC0hppdG5qjSVMKRKw7hp6cd5YEAg3DA3NqI54Qw5AcmliQPwJUwm0odePd3bMubuNiPMK495Dn1am_cD4iVh4C-B8pIAWvVMIOjh2UEBY1ynJWcSZZ4jOOCdjyXUWmCCmjR5FMo3-311kE5dFM9PSOyvHPHYwzsG5Ib8mPTmKarjR3spD8KguTV2Olmm8r8hyPCY1SrbAe65gdKrNstEy1d85dUM26KTNF3ARoGWEjMyJNn7UkS2MPnzKc_H4oc7OmlhHkrOEcYsnxbcMtgvLjlFABxa5n5nmQBT6evs43JsieDNWgovs6RzFSkFrbwPM6RlwKIZ0iCMNRS1naGiNRwEtCwpvtNFxrGP6uzHnadKacDzRumXKYRQ6ZAsvkqGT7y0sePO113yKQUj8BL_knyn9UwmV1gP9Q-tNtViu1kVZbVZlWex3292c9rRer6vFptht9-tyv61i-jqnfxOR5aLaFmWxWVXFsiqL5QZZgRZgP5ugPa2r6z8smUe_?type=png)](https://mermaid.live/edit#pako:eNptU8tu2zAQ_BWCJwdwXD9kW1KAXJprT-2pVQ80ubKJ0KTCR1tV9r93SUqxC0QXcV-zM0NpoNwIoDVtlfnNT8x68u3lqdEEH8E8OzAHP2ague07DyLlHn4-Pj4bDa_Qz1zvPJwJHh_GqVzAjhPTQkl9HDAkU3Adu6YY-y4NdWB_gSUC0hppdG5qjSVMKRKw7hp6cd5YEAg3DA3NqI54Qw5AcmliQPwJUwm0odePd3bMubuNiPMK495Dn1am_cD4iVh4C-B8pIAWvVMIOjh2UEBY1ynJWcSZZ4jOOCdjyXUWmCCmjR5FMo3-311kE5dFM9PSOyvHPHYwzsG5Ib8mPTmKarjR3spD8KguTV2Olmm8r8hyPCY1SrbAe65gdKrNstEy1d85dUM26KTNF3ARoGWEjMyJNn7UkS2MPnzKc_H4oc7OmlhHkrOEcYsnxbcMtgvLjlFABxa5n5nmQBT6evs43JsieDNWgovs6RzFSkFrbwPM6RlwKIZ0iCMNRS1naGiNRwEtCwpvtNFxrGP6uzHnadKacDzRumXKYRQ6ZAsvkqGT7y0sePO113yKQUj8BL_knyn9UwmV1gP9Q-tNtViu1kVZbVZlWex3292c9rRer6vFptht9-tyv61i-jqnfxOR5aLaFmWxWVXFsiqL5QZZgRZgP5ugPa2r6z8smUe_)
 
 I welcome any constructive input on this topic.
 
@@ -6600,7 +6611,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf)
     * creates PDF-files on the server side, successor of [TCPDF](https://github.com/tecnickcom/tcpdf)
     * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v8.12.2
+    * v8.27.0
     * \> 1.8k stars
     * \> 200 forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
@@ -6654,7 +6665,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v3.0.2
+    * v3.0.10
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)
@@ -6688,7 +6699,7 @@ Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
 You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
-Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
+Third party libraries are distributed under their own terms (see [readme.md](#external-libraries)\)
 
 # The team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |

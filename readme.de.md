@@ -71,7 +71,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
 * [Bibliotheken](#bibliotheken)
 * [Lizenz](#lizenz)
 
-Die aktuellste Dokumentation ist verfügbar auf [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
+Die aktuellste Dokumentation ist verfügbar auf [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro). Bei der Anzeige dieses Dokuments innerhalb der Anwendung werden Bilder nur mit einem uneingeschränkten Internetzugang angeziegt.
 
 # Einleitung
 
@@ -126,48 +126,34 @@ Die Informationsfülle wird von zugewiesenen Rollen und Fachbereichen beeinfluss
 ![sample application menu](http://toh.erroronline.one/caro/anwendung%20menu%20de.png)
 
 ### Nutzer
-Für sie wurde die Anwendung kreiert.  
-Das Verfahren der Personenvalidierung vor der Nutzernanlage sollte aus Datenschutzgründen beschrieben werden.
 
-#### Bei der Anlage eines Nutzers wird ein eindeutiger Nutzername vergeben, verfügbare Berechtigungen, Bereiche und die Zeitüberschreitung für die Anwendung unter Berücksichtigung von Barrierefreiheit oder typischer Arbeitsumgebung festgelegt.
+Das Verfahren der Personenvalidierung vor der Nutzeranlage sollte aus Datenschutzgründen beschrieben werden.
 
-Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht verknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird.
-
-Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Nutzer können unterschiedliche Berechtigungen erhalten. So wie der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich ist, steuern Berechtigungen welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
-
+Bei der Anlage eines Nutzers wird ein eindeutiger Nutzername vergeben, verfügbare Berechtigungen, Bereiche und die Zeitüberschreitung für die Anwendung unter Berücksichtigung von Barrierefreiheit oder typischer Arbeitsumgebung festgelegt. Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht verknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird.  
+Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Nutzer können unterschiedliche Berechtigungen erhalten. So wie der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich ist, steuern Berechtigungen welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.  
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden. Nur die Inhalte, deren zugeordnete Berechtigungen oder Bereiche die selbe Schnittmenge haben werden angezeigt oder in Benachrichtigungen eingeschlossen.
 
-#### Es kann ein Profilbild gewählt werden, andernfalls wird ein Standardbild aus den Initialien erzeugt.
-
+Es kann ein Profilbild gewählt werden, andernfalls wird ein Standardbild aus den Initialien erzeugt.  
 Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben (da die Anwendung nicht zwischen individuellen oder Standardbildern unterscheiden kann).
 
-#### Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden.
+Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden.
 
-#### Arbeitszeiten und Einstellungen zum Urlaubsanspruch erlauben den Nutzern die Zeiterfassung.
+Arbeitszeiten und Einstellungen zum Urlaubsanspruch erlauben den Nutzern die Zeiterfassung. Das Format ist YYYY-MM-DD XX, siehe [Zeiterfassung](#zeiterfassung) für weitere Informationen.
 
-Das Format ist YYYY-MM-DD XX  
-Siehe [Zeiterfassung](#zeiterfassung) für weitere Informationen.
-
-#### Bekannte Schulungen und Fähigkeiten können erfasst werden.
-
+Bekannte Schulungen und Fähigkeiten können erfasst werden.  
 Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden.
 
-#### Neuausstellung eines Anmelde-Tokens sofern zutreffend.
-
-Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Die Zwei-Faktor-PIN ist Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden. 
-
-![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
-
+Neuausstellung eines Anmelde-Tokens sofern zutreffend.  
+Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden. Die Zwei-Faktor-PIN ist Teil des Exports und muss vor dem Laminieren entfernt und entsorgt werden.  
+![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)  
 Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern. *In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.*
 
-#### Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden.
-
+Nutzern kann aus Datenschutzgründen ein Datum zur automatischen Zugangssperre zugeordnet werden.  
 Ist das Datum erreicht wird ein neuer Token generiert und macht alle laufenden Anmeldungen ungültig. Nutzer sind dann noch nicht gelöscht, können aber die Anwendung nicht ohne Weiteres nutzen.
 
 ![user screenshot](http://toh.erroronline.one/caro/user%20de-fullpage.png)
 
-Manche Berechtigungen/Einschränkungen sind unabhängig von der Anwendungskonfoguration systemisch festgelegt:
-
+Manche Berechtigungen/Einschränkungen sind unabhängig von der Anwendungskonfoguration systemisch festgelegt:  
 Einträge zur Zeiterfassung sind nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das gilt auch für den Anwendungsadministrator. Dienstfrei-Einträge sind jedoch für jeden personifizierten Nutzer möglich.
 
 * Patienten
@@ -193,13 +179,13 @@ Einträge zur Zeiterfassung sind nur erreichbar, wenn eine Wochenarbeitszeit fü
     * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen.
     * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitenden der Leitungsebene erteilt werden
 
-```mermaid
-graph TD;
-    application((Anwendung))-->login[Anmeldung];
-    login-->scan_code;
-    scan_code{Code scannen}-->user_db[(Nutzerdatenbank)];
-    user_db-->|gefunden|permission{Berechtigung};
-    user_db-->|nicht gefunden|login;
+<!--```mermaid
+flowchart TD;
+    application((Anwendung))-- >login[Anmeldung];
+    login-- >scan_code;
+    scan_code{Code scannen}-- >user_db[(Nutzerdatenbank)];
+    user_db-- >|gefunden|permission{Berechtigung};
+    user_db-- >|nicht gefunden|login;
 
     permission-..->manage_users((Nutzerverwaltung));
     manage_users-..->new_user[neuer Nutzer];
@@ -219,13 +205,15 @@ graph TD;
     Anmelde-Token erneuern"];
     profile==>user_db;
 
-    permission-->|PIN vorhanden|orders(("Bestellungen
+    permission-- >|PIN vorhanden|orders(("Bestellungen
     freigeben"));
-    permission-->|Berechtigungen|authorized(("Inhalte gemäß
+    permission-- >|Berechtigungen|authorized(("Inhalte gemäß
     Berechtigung einsehen"))
-    permission-->|Bereiche|units(("Inhalte gemäß
+    permission-- >|Bereiche|units(("Inhalte gemäß
     Bereichen einsehen"))
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNp9VNtu4jAQ_ZXIT1QCVAIUyKpI3VYr9WGrSu2-LKmQQ4bEwhkj2ynbAt-yL_2G_QF-bG3nQti2ywPKTM45mTMz9pYsRAwkIEsuNouUSu093nwJ0TM_ul5ztqCaCWy1rnADGOeYnJ11OlMuEoazK8yA29xTyXBp81otKM6tcJmv4-21-XMhAu4NMlcg53E0a93l-hVkTDVgRHF1VkmWAAPdJbDMMQbcrUFmTClT1_YrSFikmiWmiv17CjLz0quJrj6DKnBHmU6325lmFGkCc8tWrbKeZ5AbyrWzXao3YY6HsHHRDCEH6RXEpw_RnSnETBfoAudFQGUEzNiuKJWehTsrCrRmmKhZSO5oBtj2mq5NXPBs0tiFtncvxZLxiPHYQpUGzqMGQ3Xub-9K0rfDW8qSlSug7T0s0pwXml4xXOg8ipUNb8QqN9_WUBKvXNXqtWT-kJzmkdLGbMNSSCpTte93rppDq3I1KI4-4sfAQcNJG_nhjzLe6yY2IKdi_47-8nIqNjhfu5ZBqwXMuAdV9rCeegNjGOWTGcgtLoXM3BkB9IChgrSeyHEOntk_rz5CFmaH4jrtUVxTpWrSSd89kG6rGp08VvG5Kbv6Zsbes5ApdZsvZOzWOiTlQrhvF7yltKYjO67a76nW6b7taK5TIdkrxFbwFlNzRMCcsuzwdvh9XMaKUbfF6n8mbzd3l6NZqf9qWhieCJI2SSSLSaBlDm2SGWVqQ7K1rJDoFDIISWAeY1jSnOuQhLg3tDXFn0JkFVOKPElJsKRcmShf27vohtFE0hpijIuHF1xUsd1KIb8XN6i7SJ0qCbbkFwn6k-55zx-MJ_3eeDwYXQwv2uSFBL4_6fYHF8ORPx4NJza9b5NXV8h5dzIcjAd9v-ePBv7Y701MWWZnQF6LHDUJJvu_JsX7MA?type=png)](https://mermaid.live/edit#pako:eNp9VNtu4jAQ_ZXIT1QCVAIUyKpI3VYr9WGrSu2-LKmQQ4bEwhkj2ynbAt-yL_2G_QF-bG3nQti2ywPKTM45mTMz9pYsRAwkIEsuNouUSu093nwJ0TM_ul5ztqCaCWy1rnADGOeYnJ11OlMuEoazK8yA29xTyXBp81otKM6tcJmv4-21-XMhAu4NMlcg53E0a93l-hVkTDVgRHF1VkmWAAPdJbDMMQbcrUFmTClT1_YrSFikmiWmiv17CjLz0quJrj6DKnBHmU6325lmFGkCc8tWrbKeZ5AbyrWzXao3YY6HsHHRDCEH6RXEpw_RnSnETBfoAudFQGUEzNiuKJWehTsrCrRmmKhZSO5oBtj2mq5NXPBs0tiFtncvxZLxiPHYQpUGzqMGQ3Xub-9K0rfDW8qSlSug7T0s0pwXml4xXOg8ipUNb8QqN9_WUBKvXNXqtWT-kJzmkdLGbMNSSCpTte93rppDq3I1KI4-4sfAQcNJG_nhjzLe6yY2IKdi_47-8nIqNjhfu5ZBqwXMuAdV9rCeegNjGOWTGcgtLoXM3BkB9IChgrSeyHEOntk_rz5CFmaH4jrtUVxTpWrSSd89kG6rGp08VvG5Kbv6Zsbes5ApdZsvZOzWOiTlQrhvF7yltKYjO67a76nW6b7taK5TIdkrxFbwFlNzRMCcsuzwdvh9XMaKUbfF6n8mbzd3l6NZqf9qWhieCJI2SSSLSaBlDm2SGWVqQ7K1rJDoFDIISWAeY1jSnOuQhLg3tDXFn0JkFVOKPElJsKRcmShf27vohtFE0hpijIuHF1xUsd1KIb8XN6i7SJ0qCbbkFwn6k-55zx-MJ_3eeDwYXQwv2uSFBL4_6fYHF8ORPx4NJza9b5NXV8h5dzIcjAd9v-ePBv7Y701MWWZnQF6LHDUJJvu_JsX7MA)
 
 Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds, individuelle Anwendungeinstellungen sowie eine Zugangstoken-Erneuerung durch den Nutzer selbst können an dieser Stelle ebenfalls vorgenommen werden.
 
@@ -234,9 +222,11 @@ Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihre
 [Übersicht](#übersicht)
 
 ### Anleitung
-Die Anwendung stellt im Bereich *Über CARO App* eine Schnellübersicht der Funktionen dar. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt.
+Die Anwendung stellt im Bereich *Über CARO App* eine individualisierbare Schnellübersicht der Funktionen dar. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt.
 
 Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
+
+Die volle Dokumentation kann an dieser Stellen ebenfalls eingesehen werden.
 
 ## Kommunikation
 ![sample communication menu](http://toh.erroronline.one/caro/kommunikation%20menu%20de.png)
@@ -297,8 +287,8 @@ Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwische
 
 ![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20de-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     textrecommendation(("Textvorschlag"))==>select[Vorlage auswählen];
     select===>chunks[("Datenbank mit
     Bausteinen und Vorlagen")];
@@ -309,16 +299,16 @@ graph TD;
     display==>|Eingabe und Aktualisierung|render(vorbereiteter Text);
 
     managechunks(("Textabschnitte
-    verwalten"))--->select2["Wahl des neuesten
+    verwalten"))--- >select2["Wahl des neuesten
     nach Name oder Neuanlage"];
-    managechunks-->select3["Beliebige Auswahl
+    managechunks-- >select3["Beliebige Auswahl
     oder Neuanlage"];
-    select2-->chunks;
-    select3--->chunks;
-    chunks--->editchunk[Abschnitt bearbeiten];
-    editchunk-->type{Typ};
-    type--->|"Ersatz hinzufügen"|chunks;
-    type-->|"Text hinzufügen"|chunks;
+    select2-- >chunks;
+    select3--- >chunks;
+    chunks--- >editchunk[Abschnitt bearbeiten];
+    editchunk-- >type{Typ};
+    type--- >|"Ersatz hinzufügen"|chunks;
+    type-- >|"Text hinzufügen"|chunks;
     
     managetemplate(("Textvorlagen
     bearbeiten"))-..->select4["Wahl des neuesten
@@ -329,7 +319,9 @@ graph TD;
     select5-..->chunks;
     chunks-...->edittemplate[Vorlage bearbeiten];
     edittemplate-.->|Vorlage hinzufügen|chunks;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqlVE1vGjEQ_Ssrn4IEiOxHsmyVSEnJsbk0aqSyPZjdgbXitZHXDiHAv-nP6C1_rOM13kBEe2i5wAxv3rx5Y3tDClkCycicy1VRUaWDh8mnXAT40fCiFRSyrkGUVDMpzs5y8oDZZ6maouJ0kZNe7-rqugEOhZ5-kwpzEFDTrN5-VhzEjz2VA1whtKiMeGqmSDShGsSMiqegZtrBbrFSAxMgAiPKYM8nsIsncuXIs83JI4MS1ILOIMDvQIABrBYO6LUIWlTBPa0hJ9uSNUtO11PbWyGUcyMWWNu4kqPJGqvA5S35HRO20Rw4RjnxcvaMVs8e0Qq_edKGctYwUNhhq9A_UGfIPQMFTINGRtuthzSOqKYC1brpvMt0hlIE0xoc5hnUinLd-tEbDAZ720Oc55FW3A7ywYRu-EDaIe7BUGFdeR_gsG_HGCHjLXAGM4YO3uA2kd7h_8Szl4IUjusoHQ0-5n3DwTWUTLfR9MaPG8yAolPoU3d-OhRW6PUSNg_r5c4fU4wtE56IO9VQ_RpUTLya-duv9uhsjxo7sMVah_-GPPRHQ41r1nBw_t3BbDHvctvFDIfex_j_N-M7DzrS5F-XE1uOE9tJWsWn1jO0f1jrvYruhp_e0KHYrYceWOwNJn2yUKwkmVYG-qQGVVMbko3lyomuwN7XDH-WMKeG65zkYodlSyq-S1n7SiXNoiLZnPIGI7PEVwomjC4U7SDUaPl1LQofW51SfXGPXvv2tawk25AXkkXj4eg8jNNxdJ6m8eVFctEna5KF4XgYxRfJZZheJmOb3vXJaytkNBwncRpH4fkoTtIkDSOU1d73z9IITbLx7jdBF9R7?type=png)](https://mermaid.live/edit#pako:eNqlVE1vGjEQ_Ssrn4IEiOxHsmyVSEnJsbk0aqSyPZjdgbXitZHXDiHAv-nP6C1_rOM13kBEe2i5wAxv3rx5Y3tDClkCycicy1VRUaWDh8mnXAT40fCiFRSyrkGUVDMpzs5y8oDZZ6maouJ0kZNe7-rqugEOhZ5-kwpzEFDTrN5-VhzEjz2VA1whtKiMeGqmSDShGsSMiqegZtrBbrFSAxMgAiPKYM8nsIsncuXIs83JI4MS1ILOIMDvQIABrBYO6LUIWlTBPa0hJ9uSNUtO11PbWyGUcyMWWNu4kqPJGqvA5S35HRO20Rw4RjnxcvaMVs8e0Qq_edKGctYwUNhhq9A_UGfIPQMFTINGRtuthzSOqKYC1brpvMt0hlIE0xoc5hnUinLd-tEbDAZ720Oc55FW3A7ywYRu-EDaIe7BUGFdeR_gsG_HGCHjLXAGM4YO3uA2kd7h_8Szl4IUjusoHQ0-5n3DwTWUTLfR9MaPG8yAolPoU3d-OhRW6PUSNg_r5c4fU4wtE56IO9VQ_RpUTLya-duv9uhsjxo7sMVah_-GPPRHQ41r1nBw_t3BbDHvctvFDIfex_j_N-M7DzrS5F-XE1uOE9tJWsWn1jO0f1jrvYruhp_e0KHYrYceWOwNJn2yUKwkmVYG-qQGVVMbko3lyomuwN7XDH-WMKeG65zkYodlSyq-S1n7SiXNoiLZnPIGI7PEVwomjC4U7SDUaPl1LQofW51SfXGPXvv2tawk25AXkkXj4eg8jNNxdJ6m8eVFctEna5KF4XgYxRfJZZheJmOb3vXJaytkNBwncRpH4fkoTtIkDSOU1d73z9IITbLx7jdBF9R7)
 
 Obgleich Textvorschläge dazu vorgesehen sind die professionelle Korrespondenz zu optimieren, werden sie nicht als kritisch betrachtet und können von berechtigten Nutzern gelöscht werden. Sie können im Zweifelsfall oder zur späteren Wiederverwendung auch verborgen werden.
 
@@ -435,8 +427,8 @@ Die Versionierung findet über einen Zeitstempel statt.
 
 Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden. Dokumentenpakete unterliegen keiner Freigabe oder Versionierung, können aber auch nicht gelöscht sondern nur verborgen werden. Auch externe Dokumente können Teil der Pakete sein. Eine Überwachung der Nutzung kann jedoch nicht erfolgen.
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     manage_components(("Komponenten
     verwalten"))===>select["Wahl der neuesten Komponente
     nach Name"];
@@ -453,16 +445,16 @@ graph TD;
     Nachricht mit Freigabeaufforderung"|documents_database;
 
     manage_documents(("Dokumente
-    verwalten"))--->select3["Wahl des neuesten Dokuments
+    verwalten"))--- >select3["Wahl des neuesten Dokuments
     nach Name"];
-    select3-->documents_database;
-    manage_documents-->select4["beliebiges Dokument"];
-    select4-->documents_database;
-    manage_documents-->|neues Dokument|edit_document["Dokument bearbeiten,
+    select3-- >documents_database;
+    manage_documents-- >select4["beliebiges Dokument"];
+    select4-- >documents_database;
+    manage_documents-- >|neues Dokument|edit_document["Dokument bearbeiten,
     Komponenten hinzufügen oder sortieren"];
-    documents_database-->|"bestehendes Dokument"|edit_document;
-    edit_document-->save;
-    save--->|"neue Version,
+    documents_database-- >|"bestehendes Dokument"|edit_document;
+    edit_document-- >save;
+    save--- >|"neue Version,
     Nachricht mit Freigabeaufforderung"|documents_database;
     
     manage_bundles(("Dokumentenpakete
@@ -470,7 +462,7 @@ graph TD;
     nach Name"];
     select5-.->documents_database;
     manage_bundles-.->select6["beliebiges Paket"];
-    select6-->documents_database;
+    select6-- >documents_database;
     manage_bundles-.->|neues Paket|edit_bundle["Paket bearbeiten,
     Dokumente hinzufügen oder sortieren"];
     documents_database-.->|"bestehendes Paket"|edit_bundle;
@@ -481,7 +473,9 @@ graph TD;
     documents_database o----o returns("gibt auf Anfrage nur den neuesten Datensatz heraus,
     sofern dieser nicht verborgen,
     vollständig freigegeben ist und die Berechtigungen übereinstimmen")
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNq1lttq3DAQhl9F6CqBtUm8Z5cttA2FUhoKLS10HYJsj20RW1okOWlOb9PHyF1erCOf1ntoQ0K7V6uxZubXP9_Ke0sjGQP1aZLLqyhjypCvJ68CQfBTMMFSOI9ksZIChNEHBwH92K5A1LsuQV2x3C7p4eFisXitIYfILAP6nWU5iUERASVo3EHWyXWuYFFGTlkBAT1rmtbZWCaWUVnYrucxMyxkGpbY_kReVFEQGAURMnHRiOWmV14M6uh6-4B8ZhdQyzz70wE79R7KDyHnEPIU-rK3dHp7hf6l_F1ArRt9qQG9g5ib9T7s_UFk1lMSAlMh8PWBMi5uyuTxIUU3pfVWS2U4KFumlbYrqG4c2iFk6Nzmiba6N0U2g9YYdglLvQIeZaBEZwNGF71zfQOluWzVnuJ8FSaYajzvFfCU4ZHKJJEKxZcixfZ7_dtwsNtx0CdgD36O4zQDHK7502v-2lz9BH5DrPPUWLvnXc9RHxrdNdsuPnpm8btKfleuHle7Ybk2ZBeWHmQvBMe274PTP9WmkD42bcw6g3z0UHHqgv8UFZu9YV5YijiHTVjEqvr172PGddsBjvdCU90bTxEzdtynp9oIc7qGk01iqk7blSfOswo3tFSl6gnVD7FTFdulpPPopYy4O5A0B-n37_NRR2rjt_hwXec_3SW7j4hEHB1JFJhSCY24pDw0BEuSNyJRaCwRpUIYRO8GsW8dzcwNwVuQlboRp2WClyKJOWj7vqtkImWhVGnn86XMc20ef4mYpySx-iGFEGtybQg6YrPJW3Qbk3mK58FHjw8hBrjQhhdFxSsd0FTxmPpGlTCgBaiC2SW9tV0CajKwdPr4NYaElTnOIRD3mLZi4oeURZupZJlm1E9YrnFVruz79ISzVLFuCyuN_HItonZthyfVp_oPQ_W_oapK_Vv6k_rDuXt07I1m8-HxbDaaTsaTAb2mvufN3eFoMp56s-l4bsP3A3pTCTly5-PRbDT0vOGx5x3NplOUZQlS72QpDPXn978B1LEFcg?type=png)](https://mermaid.live/edit#pako:eNq1lttq3DAQhl9F6CqBtUm8Z5cttA2FUhoKLS10HYJsj20RW1okOWlOb9PHyF1erCOf1ntoQ0K7V6uxZubXP9_Ke0sjGQP1aZLLqyhjypCvJ68CQfBTMMFSOI9ksZIChNEHBwH92K5A1LsuQV2x3C7p4eFisXitIYfILAP6nWU5iUERASVo3EHWyXWuYFFGTlkBAT1rmtbZWCaWUVnYrucxMyxkGpbY_kReVFEQGAURMnHRiOWmV14M6uh6-4B8ZhdQyzz70wE79R7KDyHnEPIU-rK3dHp7hf6l_F1ArRt9qQG9g5ib9T7s_UFk1lMSAlMh8PWBMi5uyuTxIUU3pfVWS2U4KFumlbYrqG4c2iFk6Nzmiba6N0U2g9YYdglLvQIeZaBEZwNGF71zfQOluWzVnuJ8FSaYajzvFfCU4ZHKJJEKxZcixfZ7_dtwsNtx0CdgD36O4zQDHK7502v-2lz9BH5DrPPUWLvnXc9RHxrdNdsuPnpm8btKfleuHle7Ybk2ZBeWHmQvBMe274PTP9WmkD42bcw6g3z0UHHqgv8UFZu9YV5YijiHTVjEqvr172PGddsBjvdCU90bTxEzdtynp9oIc7qGk01iqk7blSfOswo3tFSl6gnVD7FTFdulpPPopYy4O5A0B-n37_NRR2rjt_hwXec_3SW7j4hEHB1JFJhSCY24pDw0BEuSNyJRaCwRpUIYRO8GsW8dzcwNwVuQlboRp2WClyKJOWj7vqtkImWhVGnn86XMc20ef4mYpySx-iGFEGtybQg6YrPJW3Qbk3mK58FHjw8hBrjQhhdFxSsd0FTxmPpGlTCgBaiC2SW9tV0CajKwdPr4NYaElTnOIRD3mLZi4oeURZupZJlm1E9YrnFVruz79ISzVLFuCyuN_HItonZthyfVp_oPQ_W_oapK_Vv6k_rDuXt07I1m8-HxbDaaTsaTAb2mvufN3eFoMp56s-l4bsP3A3pTCTly5-PRbDT0vOGx5x3NplOUZQlS72QpDPXn978B1LEFcg)
 
 Bildschirmformular
 
@@ -537,12 +531,12 @@ Um eine allgemeine Aufzeichnung in eine Versorgungsdokumentation oder Vorkommnis
 
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen%20de-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     identifiersheet(("Erstelle einen Aufkleberbogen
     mit Kennzeichen"));
-    identifiersheet-->input[Eingabedaten];
-    input-->|Absenden|print("Bogen ausdrucken und
+    identifiersheet-- >input[Eingabedaten];
+    input-- >|Absenden|print("Bogen ausdrucken und
     an Mitarbeitende aushändigen");
 
     filldocument((Dokument ausfüllen))=========>selectdocument[Dokument wählen];
@@ -562,37 +556,39 @@ graph TD;
 
     print o-.-o idimport;
 
-    summaries(("Dokumentationen"))----->record_db;
-    record_db-->displayids["Zeige Kennzeichen,
+    summaries(("Dokumentationen"))----- >record_db;
+    record_db-- >displayids["Zeige Kennzeichen,
     nicht abgeschlossen oder
     Filter zutreffend"];
-    displayids-->|Auswahl|summary["zeige Zusammenfassung an
+    displayids-- >|Auswahl|summary["zeige Zusammenfassung an
     sofern Berechtigungen übereinstimmen"];
-    summary-->close[abschließen];
-    close-->complaint{Reklamation};
-    complaint-->|ja|complaintclose[Verantwortliche Person, Bereichsleiter UND QMB];
-    complaintclose-->record_db;
-    complaint-->|nein|nocomplaintclose[Bereichsleiter oder Leitung];
-    nocomplaintclose-->record_db;
-    summary-->export[exportieren];
-    export-->pdf("Zusammenfassung als PDF,
+    summary-- >close[abschließen];
+    close-- >complaint{Reklamation};
+    complaint-- >|ja|complaintclose[Verantwortliche Person, Bereichsleiter UND QMB];
+    complaintclose-- >record_db;
+    complaint-- >|nein|nocomplaintclose[Bereichsleiter oder Leitung];
+    nocomplaintclose-- >record_db;
+    summary-- >export[exportieren];
+    export-- >pdf("Zusammenfassung als PDF,
     angehängte Dateie");
-    summary-->matchbundles[Abgleich mit Dokumenen-Paketen];
-    matchbundles-->missing{fehlendes Dokument};
+    summary-- >matchbundles[Abgleich mit Dokumenen-Paketen];
+    matchbundles-- >missing{fehlendes Dokument};
     missing==>|ja|appenddata[Dokument hinzufügen];
     appenddata==>displaydocument;
-    missing-->|nein|nonemissing(Statusbenachrichtigung);
-    summary-->retype[Aufzeichnungstyp ändern];
-    retype-->record_db;
-    summary-->record_state[Vorgangsstatus, Aufbewahrungsfrist];
-    record_state-->record_db;
+    missing-- >|nein|nonemissing(Statusbenachrichtigung);
+    summary-- >retype[Aufzeichnungstyp ändern];
+    retype-- >record_db;
+    summary-- >record_state[Vorgangsstatus, Aufbewahrungsfrist];
+    record_state-- >record_db;
 
     record_db===>|abgeschlossen, Aufbewahrungsfrist abgelaufen|delete;
 
     notification((Benachrichtigungen))-....->record_db;
     record_db-..->|"nicht abgeschlossen,
     letzter Eintrag vor X Tagen"|message(Nachricht an Benutzer der Bereiche);
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqVVttu4zYQ_RWCTw5gB7t2bvaiCyR1AhRtgrS7WxSxg4KSRhJriTR4adaO8y19yWfsm39sZ6iLL0kWqF9MkXM5PHNmpEce6wT4iKeFfohzYRz7PP4wVQx_MgHlZCrB2BzAdTpTfmmsg6IABlKBYuc-nRUQgYl0BqryKqVjv4JSS5Bxjpv84OD1eL3eR6nm3k0upcpEBIlwoO4bWzpBi9V5ZEGh42pupHII4YJSMeFtYnw8w6VXSeUjFLuWTpgIpCMfMsrXzyqRWcCBoSvDVBZFomNfIp5OZ6xnYUXm6fob3k4dHPzU_D5aKCB2jfmktX5YP-fFBvCuGfo1y7-TaIKwG79eZR4uGwk1Q1xNiC0P9F9NuQIPyLdlV7r0hTBMiThnN6IMV8uQ-PpCVqdgFLsAA3HuZOYVcbT-hpXBQlkny5IYWCXSzguxeHkZQeXKNrfZM0Q4oSCIWkzGBB2qmu2Ui043wBULhla4ZdBEkwulQRew86APQ7AQtTZJTRRqKkhH4SXsG2y9CTKR5VwbN_kl_O1rsUVbm6FHm7o-ap_bykcLmUzA5KJwSDtpv7rX-tkt4a0MG1ciBFWVAaurueOONK5a7t7iHiNcfiW80VZ9VxC22lJWj9hbGDSRtIiEQencjq_uG8JCCzHdO-zploOWTevLUhgJtrOlVuGkVlUT9-j3Nl94VgOXiZ1M-R3paZuabuWg8AH1FmVg47zQFrub4QQy1emVRJYNW3pnIE2xiad8T5IYPYwFbx9EXqwq1AtMGATM7rwVJPZUWIssobD_V4e09avCYqYYMcJERIRWwvq_TY3DCVnoEoEhs49_wKwQZeDsqTFqDgn0P2LVPldx_wQjlHvAOhREErvF2ahVN-DEDVvQKDPsy82Y_X59cb8ftIGwX5WdrNSrK6X3Mu9loBKw33CNxDRp9n1eSbThqdLflgxbnqotNJknKUrrRYWKINJuM8MzoJmd1Y0ioRrcu8mQ4ziPcPAXYCfnUVbQVbanDKjerZjB1gtl24UiSGtxhD2mQEM8wUZpJN9Urrag7sO6ifkczar51wzNXKqlD73dZtmY0Rtgt5F3425VRkG91_mEDectjnWc80Y2Qn15fwNuMYfJzqjEHUYvO5T5fducZPbDstUnFhOjGrXJsADWBhhder1HgG1mKH5qpHX3u20f3Pbiv5ijSOBOu78WNwyEQnhs-VWCs9NBG0lp-maIQ1d1Ohd73NC7uneIvx-NJjqlt9LL0VOrDhMuqQvwS8QZkbF_tWF_sc8ifDesSrAWl52bJjN9aSAQjxPcMGqcupng4APv8szIhI-c8dDlJZhS0CN_pExT7nIoUdIjXCaQCl-4KZ-qJ3SbC3Wnddl4Gu2znI9SbA988nN6BY6lyIxoTYR3-tNCxc0zzX1trqvvufBZF6Ly0SP_ykeD4eG79_2js-Hg_dnZ0enJ8UmXL_io3x8eDo5Ojk_7Z6fHQ9p-6vJlAPLucHh8dHY06A8G_f7JSfAw1CzmZ-2V46Ph03eqFat3?type=png)](https://mermaid.live/edit#pako:eNqVVttu4zYQ_RWCTw5gB7t2bvaiCyR1AhRtgrS7WxSxg4KSRhJriTR4adaO8y19yWfsm39sZ6iLL0kWqF9MkXM5PHNmpEce6wT4iKeFfohzYRz7PP4wVQx_MgHlZCrB2BzAdTpTfmmsg6IABlKBYuc-nRUQgYl0BqryKqVjv4JSS5Bxjpv84OD1eL3eR6nm3k0upcpEBIlwoO4bWzpBi9V5ZEGh42pupHII4YJSMeFtYnw8w6VXSeUjFLuWTpgIpCMfMsrXzyqRWcCBoSvDVBZFomNfIp5OZ6xnYUXm6fob3k4dHPzU_D5aKCB2jfmktX5YP-fFBvCuGfo1y7-TaIKwG79eZR4uGwk1Q1xNiC0P9F9NuQIPyLdlV7r0hTBMiThnN6IMV8uQ-PpCVqdgFLsAA3HuZOYVcbT-hpXBQlkny5IYWCXSzguxeHkZQeXKNrfZM0Q4oSCIWkzGBB2qmu2Ui043wBULhla4ZdBEkwulQRew86APQ7AQtTZJTRRqKkhH4SXsG2y9CTKR5VwbN_kl_O1rsUVbm6FHm7o-ap_bykcLmUzA5KJwSDtpv7rX-tkt4a0MG1ciBFWVAaurueOONK5a7t7iHiNcfiW80VZ9VxC22lJWj9hbGDSRtIiEQencjq_uG8JCCzHdO-zploOWTevLUhgJtrOlVuGkVlUT9-j3Nl94VgOXiZ1M-R3paZuabuWg8AH1FmVg47zQFrub4QQy1emVRJYNW3pnIE2xiad8T5IYPYwFbx9EXqwq1AtMGATM7rwVJPZUWIssobD_V4e09avCYqYYMcJERIRWwvq_TY3DCVnoEoEhs49_wKwQZeDsqTFqDgn0P2LVPldx_wQjlHvAOhREErvF2ahVN-DEDVvQKDPsy82Y_X59cb8ftIGwX5WdrNSrK6X3Mu9loBKw33CNxDRp9n1eSbThqdLflgxbnqotNJknKUrrRYWKINJuM8MzoJmd1Y0ioRrcu8mQ4ziPcPAXYCfnUVbQVbanDKjerZjB1gtl24UiSGtxhD2mQEM8wUZpJN9Urrag7sO6ifkczar51wzNXKqlD73dZtmY0Rtgt5F3425VRkG91_mEDectjnWc80Y2Qn15fwNuMYfJzqjEHUYvO5T5fducZPbDstUnFhOjGrXJsADWBhhder1HgG1mKH5qpHX3u20f3Pbiv5ijSOBOu78WNwyEQnhs-VWCs9NBG0lp-maIQ1d1Ohd73NC7uneIvx-NJjqlt9LL0VOrDhMuqQvwS8QZkbF_tWF_sc8ifDesSrAWl52bJjN9aSAQjxPcMGqcupng4APv8szIhI-c8dDlJZhS0CN_pExT7nIoUdIjXCaQCl-4KZ-qJ3SbC3Wnddl4Gu2znI9SbA988nN6BY6lyIxoTYR3-tNCxc0zzX1trqvvufBZF6Ly0SP_ykeD4eG79_2js-Hg_dnZ0enJ8UmXL_io3x8eDo5Ojk_7Z6fHQ9p-6vJlAPLucHh8dHY06A8G_f7JSfAw1CzmZ-2V46Ph03eqFat3)
 
 Exportierte vollständige Aufzeichnung
 
@@ -606,31 +602,32 @@ Exportierte reduzierte Aufzeichnung
 Aufzeichnungen werden in einer Blockchain gespeichert. Das bedeutet, dass jeder Eintrag gehashed wird und auch den vorherigen Hash beinhaltet. Dies schließt Prüfsummen von Anhängen mit ein. Auf diesem Weg kann ein hohes Maß an Vertrauen in die Integrität der Daten erreicht werden. Jeder Versuch die Daten zu manipulieren invalidiert die gesamte Aufzeichnung aufgrund widersprüchlicher Hashes und Prüfsummen.
 
 Ein vereinfachtes Diagramm einer Blockchain mit kurzen CRC Hashes. Die CARO App nutzt jedoch SHA256.
-
-```mermaid
-graph LR;
+<!--```mermaid
+flowchart LR;
     A["date: 2025-10-29
     author: error on line 1
     content:hello
-    "]-->B(contained content hash: dcce6e55)
+    "]-- >B(contained content hash: dcce6e55)
     B-.->C["date: 2025-10-29
     author: error on line 1
     content:world
     attachments:signature:a5fb0d49
     "]
-    C-->D("contained content hash: 4cff5f20
+    C-- >D("contained content hash: 4cff5f20
     + previous hash dcce6e55
     = 6897f6dc")
     D-.->E["date: 2025-10-29
     author: error on line 1
     content: bye
     "]
-    E-->F("contained content hash: 028fd280
+    E-- >F("contained content hash: 028fd280
     + previous hash: 6897f6dc
     = 4287cac3")
-    B-->D
-    D-->F
-```
+    B-- >D
+    D-- >F
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqlkkGP0zAQhf-KNadFNJXjxGlixEq0XU5wgRuYg9eeNJESu3IcllL1v-M0bZFWLJfNyTPvTfy9kY-gnUEQUHfuSTfKB_LpyztpSfw-fJdgVEBBGGU8SWnCqllRY2icFwS9d544S7rWIklnUTsb0AbRYNe5uSXhR5Lcr-8mSUWruZpIo4ZGEKM1Fsj5m9m-TpbJ_eZ1tz8535mLPwSlmz52BzG0O6vC6FEoXj9Sk1c3wvmwiaDbOwkvoea6rnnN6Ox-S_Yef7ZuHM7yLcisvidFWa3qwmgJl2jbKdrD66KRxwM-o36I1B__Q01ZWRtW_pta_MW8YOesXGmlsxv2etrKNUG8Chaw860BEfyIC-jR92oq4TiZJIQGe5Qg4tFgrcYuSJD2FMf2yn5zrr9OejfuGhC16oZYjftpLdtW7by6WeJO3NeD1dcaTRuc_zw_2_PrPf8VxBF-gciqJU1ZXlZZWpb5quDFAg4gGKuWWV7wVUzGq6l9WsDvMwhdVjwv84xRWlCechonPFqDfuNGG0BUpz8Z5fFa?type=png)](https://mermaid.live/edit#pako:eNqlkkGP0zAQhf-KNadFNJXjxGlixEq0XU5wgRuYg9eeNJESu3IcllL1v-M0bZFWLJfNyTPvTfy9kY-gnUEQUHfuSTfKB_LpyztpSfw-fJdgVEBBGGU8SWnCqllRY2icFwS9d544S7rWIklnUTsb0AbRYNe5uSXhR5Lcr-8mSUWruZpIo4ZGEKM1Fsj5m9m-TpbJ_eZ1tz8535mLPwSlmz52BzG0O6vC6FEoXj9Sk1c3wvmwiaDbOwkvoea6rnnN6Ox-S_Yef7ZuHM7yLcisvidFWa3qwmgJl2jbKdrD66KRxwM-o36I1B__Q01ZWRtW_pta_MW8YOesXGmlsxv2etrKNUG8Chaw860BEfyIC-jR92oq4TiZJIQGe5Qg4tFgrcYuSJD2FMf2yn5zrr9OejfuGhC16oZYjftpLdtW7by6WeJO3NeD1dcaTRuc_zw_2_PrPf8VxBF-gciqJU1ZXlZZWpb5quDFAg4gGKuWWV7wVUzGq6l9WsDvMwhdVjwv84xRWlCechonPFqDfuNGG0BUpz8Z5fFa)
 
 Die Integrität einer Aufzeichnung kann direkt aus der Ansicht heraus überprüft werden. Jeder Vorgang hat seine eigene Kette um eine [Löschung](#löschung-von-aufzeichnungen) zu ermöglichen ohne andere zu beeinträchtigen. Die [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) bieten eine detailliertere Darstellung der Integritätsprüfung.  
 Die Blockchain ist zwar privat und kein verteiltes Hauptbuch, exportierte PDF-Aufzeichnungen enthalten aber den jeweils neuesten verfügbaren Hash. Bei der Ausgabe von Informationen an Dritte, wie beispielsweise Patienten oder Kostenträger, werden auch kleine Teile der Ketteninformation verteilt, die sich dann in der detaillierten Integritätsprüfung unveränderter valider Aufzeichnungen wiederfinden lassen.  
@@ -639,7 +636,7 @@ Zusammengeführte Aufzeichnungen beinhalten die zuvor verifizierten Blockchain-I
 [Übersicht](#übersicht)
 
 ### Risikomanagement
-Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Prozess Beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)).
+Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Prozess Beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)\).
 
 Wie in der ISO 14971 gefordert können Eigenschaften von Medizinprodukten und dahingehend anwendbare Risiken beschrieben werden. Da die DGIHV erfreulicherweise die Definition von Eigenschaften und Risiken für Gruppen von Medizinprodukten (z.B. Prothesen und Orthesen im allgemeinen) als angemessen betrachtet, werden alle Bewertungen prozessweise zugeordnet.  
 Ferner werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt. Die Schwelle ist das Produkt aus Wahrscheinlichkeit x Schaden gemäß der jeweiligen Positionen in den Auflistungen der Sprachdateien für risk.probabilities und risk.damages. Diese Methode ist der praktischste Weg einer algorithmischen Verarbeitung und Hervorhebung des Akzeptanzbereichs.
@@ -694,8 +691,8 @@ Die Planung von Aufgaben ist nicht Bestandteil der Aufzeichnungen, da jede Maßn
 
 ![tasks screenshot](http://toh.erroronline.one/caro/tasks%20de-fullpage.png)
 
-```mermaid
-graph TD;
+<!--```mermaid
+flowchart TD;
     scheduling((Planung))===>select_day[Auswahl Tag];
     scheduling==>search[Suche];
     select_day==>database[("Kalenderdatenbank
@@ -714,40 +711,40 @@ graph TD;
     database==>alert["Mitarbeitende ausgewählter Bereiche
     einmalig benachrichtigen"]
 
-    timesheet((Zeiterfassung))-->select_day2[Auswahl Tag];
-    select_day2-->add2[hinzufügen];
-    add2-->usertype{Nutzertyp};
-    usertype-->any["jeder:
+    timesheet((Zeiterfassung))-- >select_day2[Auswahl Tag];
+    select_day2-- >add2[hinzufügen];
+    add2-- >usertype{Nutzertyp};
+    usertype-- >any["jeder:
     eigene Einträge"];
-    usertype-->foreign["Personalverwaltung, Bereichsleiter:
+    usertype-- >foreign["Personalverwaltung, Bereichsleiter:
     eigene und fremde Einträge"];
-    any-->database2;
-    foreign-->database2;
-    select_day2-->database2[("Kalenderdatenbank
+    any-- >database2;
+    foreign-- >database2;
+    select_day2-- >database2[("Kalenderdatenbank
     Typ Zeiterfassung")];
-    database2-->alert;
-    database2-->entrytype{Eintragstyp};
-    entrytype-->|regulärer Arbeitstag|usertype2{Nutzertyp};
-    usertype2-->|betroffener Nutzer|display_edit("Anzeige,
+    database2-- >alert;
+    database2-- >entrytype{Eintragstyp};
+    entrytype-- >|regulärer Arbeitstag|usertype2{Nutzertyp};
+    usertype2-- >|betroffener Nutzer|display_edit("Anzeige,
     Änderung,
     Löschung,
     falls nicht abgeschlossen");
-    usertype2-->|Bereichsleiter, Leitung, Administrator|display_close("Anzeige,
+    usertype2-- >|Bereichsleiter, Leitung, Administrator|display_close("Anzeige,
     abschließen,
     wiedereröffnen");
-    entrytype-->|Dienstfrei|usertype3{Nutzertyp};
-    usertype3-->usertype2;
-    usertype3-->|Personalverwaltung|display_only(Anzeige)
+    entrytype-- >|Dienstfrei|usertype3{Nutzertyp};
+    usertype3-- >usertype2;
+    usertype3-- >|Personalverwaltung|display_only(Anzeige)
     
-    database2-->export[Export des gewählten Monats];
-    export-->permission2{Berechtigung};
-    permission2-->fullexport["Leitung, Personalverwaltung, Admin:
+    database2-- >export[Export des gewählten Monats];
+    export-- >permission2{Berechtigung};
+    permission2-- >fullexport["Leitung, Personalverwaltung, Admin:
     vollständiger Export
     aller Zeiterfassungen"];
-    permission2-->partexport["Bereichsleiter:
+    permission2-- >partexport["Bereichsleiter:
     Export aller Zeiterfassungen
     zugewiesener Bereiche"];
-    permission2-->ownexport["Mitarbeitende:
+    permission2-- >ownexport["Mitarbeitende:
     Export der eigenen Zeiterfassung"]
 
     landing_page((Startseite))-....->database;
@@ -757,7 +754,9 @@ graph TD;
     nicht abgeschlossene vergangene Ereignisse, Mitarbeitende dienstbefreit");
     database2-.->summary;
     summary-......->select_day
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqFVktuIzcQvQrBlQzIhqcly5ICB_DEXiUOJrBXIw0MSl3dzRk22SDZo9HHu9wjG59hVtnpYimy_1Yb0UYi-erDqnqP2tO1CoHOaSTUZp0wbcnT3S9LSfBj1gmEueAyHgw-CSZzGZ-d3dzc_GpAwNo-h2y7uM3NhiWCPLH4y4mZhzK9ThaPOW7WgNocASGzbMUMLAZL-jsTIEPQuAdyxeS3Av-0zUgZf0nPer2wMFwkXO7y6PhvDLLC4HYrRG3oUjrdr5Z4kjKL-RpM6V7HsJLcGCC7PIYNBwMSdGHxETRwBBImd8AxLqZXOis9oK8MdIr2XMn9kt6GKUdvVjOr9LCA_gHc4tWG5K-Hj8OOYyPwCIPRl9Jr4wsdH76yA4TcLo6vrmiSYCM1EcefrgF1CbomErg8rFWaCbCwYCuECg7Hfxq884jICnNaG-yRtoslfeCW6ZVLEKMTlhuszvE1EZhwXZjSJZcpEzwmK5BsnWg8sUW1vixlAbE8BZMA2MHgs79zxIzx83Z-3hq3oHfemmMEY8uDd0bBHecGs99msP8ztzv_s6ptdeJ8yC1e8CtgPefVFdAVkHsurT6-xoCpn5pFCm8dSzT9BNooycR30Bsmiu52e9r1m8uQRBrSsDcEpoPeqxYE5W4ZreekW5D69H8Y1ql7i2e1vSuM633PPmDOW19Wnz6LTauw9SECDxriXBxfNQ7JrZ8eY1l8qIoYvN8WF-awAqtVFDkGkgJ5CLnJBNs-u7nFC94WTCx5dPzbXdaVv6SaJ0ezjpgQhkg3kIStYnB0UMj1FpE78bs9HDbU7fC6zmmNzuAkqTbryi2UFcwT9PFnFMl29E7t7jhIY3FOeF2w0fsFG7WmPeg5O5wOaZ24kmI7KLM-K0x7mv4jU6gE9_6LhGBIrQCSPKBna2pR8Ri0adQo2LtieiXAyKcC5yJEuRBllCWta91HLl__klPfFTbVOlHE7DUp8itLj_50d9K9DPVGz_AxrKP3sre8er9Xj2i_GY0qvhNQbWQdr6Ou3XBO5QvdkG9JW-spvpYhPsDPGYthMHhEX9Y4KOrpBX7O3759bbxHtDHBG8af45nJ05TpbUtSNgqvVo34N5uDEDgQOE7Soqp5rXLPaIno4RwQ7GjMZKG0jQHpvjShZ8EKHA9sw5RmMpvsKj0sVvW9Gn2kQxprHtK51TkMaYrtYG5J985ySW0CKbZrjj9DiFguMOBSvqBZxuRnpdLKUqs8Tugc9QQTpnnm9PWOs1izGsJyqx63cl2tnWAp_VD8-_J_wrxXOt_TH3Q-ml1cfgjG09now3Q6vp5cTYZ0S-dBMLsYjSdX18H0-mrmtl-GdOcTubyYXY2n41EwupxMJtOrS7TQvjO_qVxaOp-9_Afj4XrO?type=png)](https://mermaid.live/edit#pako:eNqFVktuIzcQvQrBlQzIhqcly5ICB_DEXiUOJrBXIw0MSl3dzRk22SDZo9HHu9wjG59hVtnpYimy_1Yb0UYi-erDqnqP2tO1CoHOaSTUZp0wbcnT3S9LSfBj1gmEueAyHgw-CSZzGZ-d3dzc_GpAwNo-h2y7uM3NhiWCPLH4y4mZhzK9ThaPOW7WgNocASGzbMUMLAZL-jsTIEPQuAdyxeS3Av-0zUgZf0nPer2wMFwkXO7y6PhvDLLC4HYrRG3oUjrdr5Z4kjKL-RpM6V7HsJLcGCC7PIYNBwMSdGHxETRwBBImd8AxLqZXOis9oK8MdIr2XMn9kt6GKUdvVjOr9LCA_gHc4tWG5K-Hj8OOYyPwCIPRl9Jr4wsdH76yA4TcLo6vrmiSYCM1EcefrgF1CbomErg8rFWaCbCwYCuECg7Hfxq884jICnNaG-yRtoslfeCW6ZVLEKMTlhuszvE1EZhwXZjSJZcpEzwmK5BsnWg8sUW1vixlAbE8BZMA2MHgs79zxIzx83Z-3hq3oHfemmMEY8uDd0bBHecGs99msP8ztzv_s6ptdeJ8yC1e8CtgPefVFdAVkHsurT6-xoCpn5pFCm8dSzT9BNooycR30Bsmiu52e9r1m8uQRBrSsDcEpoPeqxYE5W4ZreekW5D69H8Y1ql7i2e1vSuM633PPmDOW19Wnz6LTauw9SECDxriXBxfNQ7JrZ8eY1l8qIoYvN8WF-awAqtVFDkGkgJ5CLnJBNs-u7nFC94WTCx5dPzbXdaVv6SaJ0ezjpgQhkg3kIStYnB0UMj1FpE78bs9HDbU7fC6zmmNzuAkqTbryi2UFcwT9PFnFMl29E7t7jhIY3FOeF2w0fsFG7WmPeg5O5wOaZ24kmI7KLM-K0x7mv4jU6gE9_6LhGBIrQCSPKBna2pR8Ri0adQo2LtieiXAyKcC5yJEuRBllCWta91HLl__klPfFTbVOlHE7DUp8itLj_50d9K9DPVGz_AxrKP3sre8er9Xj2i_GY0qvhNQbWQdr6Ou3XBO5QvdkG9JW-spvpYhPsDPGYthMHhEX9Y4KOrpBX7O3759bbxHtDHBG8af45nJ05TpbUtSNgqvVo34N5uDEDgQOE7Soqp5rXLPaIno4RwQ7GjMZKG0jQHpvjShZ8EKHA9sw5RmMpvsKj0sVvW9Gn2kQxprHtK51TkMaYrtYG5J985ySW0CKbZrjj9DiFguMOBSvqBZxuRnpdLKUqs8Tugc9QQTpnnm9PWOs1izGsJyqx63cl2tnWAp_VD8-_J_wrxXOt_TH3Q-ml1cfgjG09now3Q6vp5cTYZ0S-dBMLsYjSdX18H0-mrmtl-GdOcTubyYXY2n41EwupxMJtOrS7TQvjO_qVxaOp-9_Afj4XrO)
 
 [Übersicht](#übersicht)
 
@@ -862,22 +861,22 @@ Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Art
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de-fullpage.png)
 
-```mermaid
-graph TD;
-    manage_vendors((Lieferanten))--->edit_vendor[bestehenden Lieferanten bearbeiten];
-    edit_vendor-->vendor_db[("Lieferanten-
+<!--```mermaid
+flowchart TD;
+    manage_vendors((Lieferanten))--- >edit_vendor[bestehenden Lieferanten bearbeiten];
+    edit_vendor-- >vendor_db[("Lieferanten-
     datenbank")];
-    manage_vendors-->new_vendor[neuer Lieferant];
-    vendor_db-->add_vinfo["Dokumente hinzufügen
+    manage_vendors-- >new_vendor[neuer Lieferant];
+    vendor_db-- >add_vinfo["Dokumente hinzufügen
     Informationen aktualisieren,
     Artikellistenfilter festlegen"];
-    new_vendor-->add_vinfo;
-    add_vinfo-->vendor_db;
-    add_vinfo-->inactivate_vendor[Lieferant deaktivieren];
+    new_vendor-- >add_vinfo;
+    add_vinfo-- >vendor_db;
+    add_vinfo-- >inactivate_vendor[Lieferant deaktivieren];
     inactivate_vendor-.->delete_all_products[alle Produkte löschen];
-    add_vinfo-->import_pricelist[Preisliste importieren];
-    import_pricelist-->delete_all_products;
-    delete_all_products-->has_docs2{"Dokumente vorhanden,
+    add_vinfo-- >import_pricelist[Preisliste importieren];
+    import_pricelist-- >delete_all_products;
+    delete_all_products-- >has_docs2{"Dokumente vorhanden,
     Einführung erfolgt,
     Stichprobenprüfung erfolgt,
     (geschützt)"};
@@ -885,11 +884,11 @@ graph TD;
     Einführung erfolgt,
     Stichprobenprüfung erfolgt,
     (geschützt)"};
-    has_docs2-->|ja|update["Aktualisierung nach Artikelnummer"];
-    update-->product_db[("Produkt-
+    has_docs2-- >|ja|update["Aktualisierung nach Artikelnummer"];
+    update-- >product_db[("Produkt-
     datenbank")];
-    has_docs2-->|nein|delete[Löschung];
-    delete-->|Wiedereinfügung aus Preisliste|product_db;
+    has_docs2-- >|nein|delete[Löschung];
+    delete-- >|Wiedereinfügung aus Preisliste|product_db;
     
     manage_products((Produkte))==>edit_product[bestehendes Produkt bearbeiten];
     edit_product==>product_db;
@@ -922,7 +921,9 @@ graph TD;
     state-.->|aktiv|orderable[bestellbar];
     state-.->|inaktiv|inorderable[nicht bestellbar];
     state-.->|gelöscht|inorderable;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNq9Vttu4zYQ_RWBTzZgGxtfEtuLXWDRFGiBLbBAihaoFRi0NJJYU6RBUXbXdv6m39CnvPnHOpRIUb4kfWseAomcM3Nm5szIBxLJGMicJFzuoowqHfz6-DEUAf7lVNAUllsQsVRFp_OVQQKKCg2i2-33-58hZtpeL1ZQaMjwGUTQMgxWQNUKGD4-W7ctFPqoH5bxatEJSQvYr41jis8rKtYh6T7f5IU-BOwcDQElKE_AQZooaE3jeLllIpGLkDzKdZkDxgsyJvZlcnpNQdSQn9FC5VQzKTANutYl5axgoED0aosvSrM1cDxFjgnjGiMnWAYOxglxsT27dnB72by3S3HjjgkaabbFarhMmxyDGJAd21bUXNAr-_6g_zkGDnhAOV9ulIzLSBcLfIHgm3lbYxX46Z8iyrybMwr5RiqNSBaByXnxTQErquyD-u6cwYV5_2Z8a3zjBu0zWixjGRXDQ7tTW6kyanRm2_Aj8ju9ZqoUaQAqkTzV9uZJsyhDfysQG3V6Ta4tOilgvqdXvdfdkLy8w2YwGHhC_zOfpg5Yk-Of9FhuzFigfL94VRpf2PPMqVKUeQ7Kq7DGoAObkZ042_l3pu0suAAmjnV5Fl8rrWDc57OyGbPfGcSohaoQqWFGyyLwcjl6DhZ6Ntiu5p2O02W3--lTvW3sXWvdFE69b60aC0EPV2H9Ad4arW_e2wu9_1wMvtwXqTj3lr3ZUp53K0R77jzvAgsb6avBx-i7098Z97AzQwRebpTmHe_WQu6ENT34ZcJE8OhU4PTXNkWkkWBTrDdMKqH4zReKVl4GdtmNm_0qWM44VQdMUnAcndaiQkHZ3B1Ja4ywWupDbGO7OUEKFUJ7L25VCsAJ5isUsPLJ91xJ9R6C33BMsUErqtYoMHv1k5l6vqMK7AEKZs9Qle0VcDmBw1s6vMjb7h974KagWc7d8zXlcW5ULya36UcTtwLGi2b8G9eebRuM_XZQ-12BFrb9-fH4i1jvTZ_zeVsT_iiQuIX7Mig01vHwhP_Loum-OTPfuGNF5igVNpOuONSbgnNs3fOVLUaurJnw9gKFZnbJ26gU6nLpNu4j6ZFUsZjMtSqhR3D55tS8koPBh0RnkENI5vgYQ0JLrkMSiheEbaj4Q8rcIZUs04zME8oLfKtV88hoqmhjQkstn76LyL0b_Uj1S_1LrvpBV3kl8wP5i8xHs8GHu-F4OhvdTafjh_vJfY98J_PhcDYYje8nD8Ppw2Rmjl96ZF8R-TCYTcbT8ehuNn2YPcwmozHSMstW_SBLocl89vIvTMOvXQ?type=png)](https://mermaid.live/edit#pako:eNq9Vttu4zYQ_RWBTzZgGxtfEtuLXWDRFGiBLbBAihaoFRi0NJJYU6RBUXbXdv6m39CnvPnHOpRIUb4kfWseAomcM3Nm5szIBxLJGMicJFzuoowqHfz6-DEUAf7lVNAUllsQsVRFp_OVQQKKCg2i2-33-58hZtpeL1ZQaMjwGUTQMgxWQNUKGD4-W7ctFPqoH5bxatEJSQvYr41jis8rKtYh6T7f5IU-BOwcDQElKE_AQZooaE3jeLllIpGLkDzKdZkDxgsyJvZlcnpNQdSQn9FC5VQzKTANutYl5axgoED0aosvSrM1cDxFjgnjGiMnWAYOxglxsT27dnB72by3S3HjjgkaabbFarhMmxyDGJAd21bUXNAr-_6g_zkGDnhAOV9ulIzLSBcLfIHgm3lbYxX46Z8iyrybMwr5RiqNSBaByXnxTQErquyD-u6cwYV5_2Z8a3zjBu0zWixjGRXDQ7tTW6kyanRm2_Aj8ju9ZqoUaQAqkTzV9uZJsyhDfysQG3V6Ta4tOilgvqdXvdfdkLy8w2YwGHhC_zOfpg5Yk-Of9FhuzFigfL94VRpf2PPMqVKUeQ7Kq7DGoAObkZ042_l3pu0suAAmjnV5Fl8rrWDc57OyGbPfGcSohaoQqWFGyyLwcjl6DhZ6Ntiu5p2O02W3--lTvW3sXWvdFE69b60aC0EPV2H9Ad4arW_e2wu9_1wMvtwXqTj3lr3ZUp53K0R77jzvAgsb6avBx-i7098Z97AzQwRebpTmHe_WQu6ENT34ZcJE8OhU4PTXNkWkkWBTrDdMKqH4zReKVl4GdtmNm_0qWM44VQdMUnAcndaiQkHZ3B1Ja4ywWupDbGO7OUEKFUJ7L25VCsAJ5isUsPLJ91xJ9R6C33BMsUErqtYoMHv1k5l6vqMK7AEKZs9Qle0VcDmBw1s6vMjb7h974KagWc7d8zXlcW5ULya36UcTtwLGi2b8G9eebRuM_XZQ-12BFrb9-fH4i1jvTZ_zeVsT_iiQuIX7Mig01vHwhP_Loum-OTPfuGNF5igVNpOuONSbgnNs3fOVLUaurJnw9gKFZnbJ26gU6nLpNu4j6ZFUsZjMtSqhR3D55tS8koPBh0RnkENI5vgYQ0JLrkMSiheEbaj4Q8rcIZUs04zME8oLfKtV88hoqmhjQkstn76LyL0b_Uj1S_1LrvpBV3kl8wP5i8xHs8GHu-F4OhvdTafjh_vJfY98J_PhcDYYje8nD8Ppw2Rmjl96ZF8R-TCYTcbT8ehuNn2YPcwmozHSMstW_SBLocl89vIvTMOvXQ)
 
 [Übersicht](#übersicht)
 
@@ -934,7 +935,7 @@ Manuelle Bestellungen erlauben einen direkten Import in den Artikelstamm.
 
 Manchmal weiß der Einkauf besser über Lieferkonditionen bescheid. Falls es dem Besteller egal ist von welchem Lieferanten das Produkt kommt, kann dem Einkauf mitgeteilt werden gegebenenfalls auch ein ähnliches Produkt zu bestellen.
 
-Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN, Zugangstoken, Unterschrift, je nach [Konfiguration](#laufzeitvariablen)) gesammelt freigegeben werden.
+Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN, Zugangstoken, Unterschrift, je nach [Konfiguration](#laufzeitvariablen)\) gesammelt freigegeben werden.
 
 Freigegebene Bestellungen können als *bestellt/bearbeitet*, *teilgeliefert*, *vollständig geliefert*, *teilweise an Bereich übergeben*, *vollständig an Bereich übergeben* und *archiviert* markiert werden. Vollständig übergebene Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen.  
 Falls der Einkauf auch ein ähnliches Produkt bestellen kann, wird daran erinnert gegebenenfalls die Bestellung zu korrigieren um das System in Bezug auf Produkteinführungen, Stichprobenprüfungen und Rückverfolgung nicht durcheinanderzubringen.
@@ -953,28 +954,28 @@ Bearbeitete Bestellungen werden zusätzlich in leicht reduzierter Form zu einer 
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders%20de-fullpage.png)
 
-```mermaid
-graph TD;
-    new_order((neue Bestellung))-->search_products[Artikelsuche];
-    search_products-->product_db[("Produkt-
+<!--```mermaid
+flowchart TD;
+    new_order((neue Bestellung))-- >search_products[Artikelsuche];
+    search_products-- >product_db[("Produkt-
     datenbank")];
-    product_db-->product_found{Artikel gefunden};
-    product_found-->|ja|add_product["Artikel zur
+    product_db-- >product_found{Artikel gefunden};
+    product_found-- >|ja|add_product["Artikel zur
     Bestellung hinzufügen"];
-    new_order-->add_manually[manuell hinzufügen];
-    product_found-->|nein|add_manually;
-    product_found---->|nein|manage_products(("Produkte
+    new_order-- >add_manually[manuell hinzufügen];
+    product_found-- >|nein|add_manually;
+    product_found---- >|nein|manage_products(("Produkte
     bearbeiten"));
-    add_manually-->add_product;
-    add_product-->search_products;
-    add_product-->add_info["Bereich wählen,
+    add_manually-- >add_product;
+    add_product-- >search_products;
+    add_product-- >add_info["Bereich wählen,
     Begründung angeben,
     Dateien anhängen"];
-    add_info-->approve_order{Bestellung freigeben};
-    approve_order-->|mit Unterschrift|approved_orders(("freigegebene Bestellungen
+    add_info-- >approve_order{Bestellung freigeben};
+    approve_order-- >|mit Unterschrift|approved_orders(("freigegebene Bestellungen
     (nur von eigenen Bereichen, außer Einkäufer oder Admin)"));
-    approve_order-->|mit PIN|approved_orders;
-    approve_order-->|nein|prepared_orders(("vorbereitete Bestellungen,
+    approve_order-- >|mit PIN|approved_orders;
+    approve_order-- >|nein|prepared_orders(("vorbereitete Bestellungen,
     nur von eigenen Bereichen,
     außer bestellberechtigt
     und Bereich ausgewählt"));
@@ -1042,42 +1043,47 @@ graph TD;
     mark_bulk-.->|ja|approve_order;
     mark_bulk-.->|nein|prepared_orders;
     prepared_orders-.->add_product;
-```
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqdV8Fu4zYQ_RVBJxtwgqxjJ7YDG8g2bbFAu1hstpfagUFLI4m1RAkUFW9i51t6yTf0lJt_rEOKlChbzhbNJaL85nFm-GaG2rpe6oM7cYM43XgR4cL5dnezYA7-MdgsU-4D73QYFOB8hFxAHBcs7HbPzmY5EO5Fy4ynfuGJfH7LBV1DnBdeBA-a4gCDVvpx6a_mnYX7Ra7W4qxE-0QAWxG2Xrhdw1DjLeMgLZi_1Rs6IQS4BPZyYKJQaLX7i-yI7xsv5gvXWD4XvDSpQ3Miyp6LYP8WAlu4D4epQDpJlRBWkDh-mssHNLStHk65wYCynW3dDqygCCMhVMnr1PmC0nCF2V0BFdLTblez2RtobzWDBdBvjk-xFSNXlAUpZu4jcKBe5Gz2r1EMrGfSF_L9G_Nl_ggLYVX9codHSoHh22j_yho5Naxygww3e4QyxVvrMALcTdGZs20gZaYSKpw_mACeexGngdhphF9CVNZKFsVjqxidUZwdVnDnMWWORDF0VgeJQTik2P8N3PmZsvX-tQjwEcuFO7d-QlnXznqbX18-fT505xRcHXjGISO84fpjiifM5RmLpus6v6dd1xuV_q9KS0nlRYKGovwV9WYsEJmHoI5V6LgarhqnplNZhR7k-fFp1Xp8qcwb4Kn8m3EIi5iIlD9tF261oHiA4NyiICTSOp48xbRLBW2A-SvCF64RQ02ErJR5Kc9SjoKbmzJBee3fIklmRGehmjbLnCY0JhxdwhywmKJUdJuoN2zBI4vsLznEgCWsX84NiQypWSqyIGQwhx2mSVBmWZbfD_vku54pWVGWA8cOSgSZN7evs1Ih7J3b0pyTJIthiYF56_m9wAgRjoWVYQMIrETbuAPOdmHMPMI8iMs1MqecpYbM_kkJaMNRZcvy9ZwyR8Gpko1TJBuC4yCuomvC0f64Jk-4xEEUnGmXvu7fvHUOqsvV1DVAhhCnTBe16pVVZazTDL2rqzLOHZvOSQhfK0AtCIur1eXj7VVx7dYYq6ol7vyK-fB3ljRORTrzaa53mONMlJ5tgOa1QOrf5RZpJmjKSOx8JrLpYkepFLVLkFZOrYJROWlxCoFpMTn2RNMgfFPdKB1DQhsFYRMpATV64zv9ZTqT2dxWKTXFK19I73UvFDtlshRPGZgmhs8GXf8obeqj3JFCpEuUFzZkGR-uElIm3Plt_w_-R5DuzRiY8935RhpxNYltFdjUreB74I_Ugx_jVPHo-Eqc37HUGEKsPBXdZmb2bzgg1Jhs2cKA5HWBPmJmxU5nQd-BrPirEV-zoGnDH404IUd748q-fFhmwBOa56jAbXkfUdKpso76tQ6iat1HxuWxtglz1-Zoq728FpAi6OEgrWZfY07_D6oTRP-1Z01nRearKSDkJNQMclHkZC3wWkjzslGaQ7LxZafBLKibGU9Q4Z_UA5EVf3C3a83e6YJuEB9eI95Rw1TdP9VCXUKbDjUHWQN5uMfNCXrdaeR1S6fL-HMUS7db573Rj87Oz1TbWa6KeL21ez-OW_RRE_4ib6JkBXbDt_uTMpdc6pvFviS2gtpujTcn_bM_BdyeG3LquxPBC-i5CWqRyKW7leYLV0SQwMKd4KMPASnkpXDBXtAsI-zPNE2MJU-LMHInAY40XJVauqMk5KSCyC5w_8Q8swafYoP6vfzuVJ-fitWdbN3v7uRyfH7xoT8YjS8_jEaD66vhVc99cif9_vj8cnA1vO6Prodj-fql5z4rRy7Ox8PBaHDZHwwG_dHwYjhEt6QW-U_4RSXcyfjlXyuwcDs?type=png)](https://mermaid.live/edit#pako:eNqdV8Fu4zYQ_RVBJxtwgqxjJ7YDG8g2bbFAu1hstpfagUFLI4m1RAkUFW9i51t6yTf0lJt_rEOKlChbzhbNJaL85nFm-GaG2rpe6oM7cYM43XgR4cL5dnezYA7-MdgsU-4D73QYFOB8hFxAHBcs7HbPzmY5EO5Fy4ynfuGJfH7LBV1DnBdeBA-a4gCDVvpx6a_mnYX7Ra7W4qxE-0QAWxG2Xrhdw1DjLeMgLZi_1Rs6IQS4BPZyYKJQaLX7i-yI7xsv5gvXWD4XvDSpQ3Miyp6LYP8WAlu4D4epQDpJlRBWkDh-mssHNLStHk65wYCynW3dDqygCCMhVMnr1PmC0nCF2V0BFdLTblez2RtobzWDBdBvjk-xFSNXlAUpZu4jcKBe5Gz2r1EMrGfSF_L9G_Nl_ggLYVX9codHSoHh22j_yho5Naxygww3e4QyxVvrMALcTdGZs20gZaYSKpw_mACeexGngdhphF9CVNZKFsVjqxidUZwdVnDnMWWORDF0VgeJQTik2P8N3PmZsvX-tQjwEcuFO7d-QlnXznqbX18-fT505xRcHXjGISO84fpjiifM5RmLpus6v6dd1xuV_q9KS0nlRYKGovwV9WYsEJmHoI5V6LgarhqnplNZhR7k-fFp1Xp8qcwb4Kn8m3EIi5iIlD9tF261oHiA4NyiICTSOp48xbRLBW2A-SvCF64RQ02ErJR5Kc9SjoKbmzJBee3fIklmRGehmjbLnCY0JhxdwhywmKJUdJuoN2zBI4vsLznEgCWsX84NiQypWSqyIGQwhx2mSVBmWZbfD_vku54pWVGWA8cOSgSZN7evs1Ih7J3b0pyTJIthiYF56_m9wAgRjoWVYQMIrETbuAPOdmHMPMI8iMs1MqecpYbM_kkJaMNRZcvy9ZwyR8Gpko1TJBuC4yCuomvC0f64Jk-4xEEUnGmXvu7fvHUOqsvV1DVAhhCnTBe16pVVZazTDL2rqzLOHZvOSQhfK0AtCIur1eXj7VVx7dYYq6ol7vyK-fB3ljRORTrzaa53mONMlJ5tgOa1QOrf5RZpJmjKSOx8JrLpYkepFLVLkFZOrYJROWlxCoFpMTn2RNMgfFPdKB1DQhsFYRMpATV64zv9ZTqT2dxWKTXFK19I73UvFDtlshRPGZgmhs8GXf8obeqj3JFCpEuUFzZkGR-uElIm3Plt_w_-R5DuzRiY8935RhpxNYltFdjUreB74I_Ugx_jVPHo-Eqc37HUGEKsPBXdZmb2bzgg1Jhs2cKA5HWBPmJmxU5nQd-BrPirEV-zoGnDH404IUd748q-fFhmwBOa56jAbXkfUdKpso76tQ6iat1HxuWxtglz1-Zoq728FpAi6OEgrWZfY07_D6oTRP-1Z01nRearKSDkJNQMclHkZC3wWkjzslGaQ7LxZafBLKibGU9Q4Z_UA5EVf3C3a83e6YJuEB9eI95Rw1TdP9VCXUKbDjUHWQN5uMfNCXrdaeR1S6fL-HMUS7db573Rj87Oz1TbWa6KeL21ez-OW_RRE_4ib6JkBXbDt_uTMpdc6pvFviS2gtpujTcn_bM_BdyeG3LquxPBC-i5CWqRyKW7leYLV0SQwMKd4KMPASnkpXDBXtAsI-zPNE2MJU-LMHInAY40XJVauqMk5KSCyC5w_8Q8swafYoP6vfzuVJ-fitWdbN3v7uRyfH7xoT8YjS8_jEaD66vhVc99cif9_vj8cnA1vO6Prodj-fql5z4rRy7Ox8PBaHDZHwwG_dHwYjhEt6QW-U_4RSXcyfjlXyuwcDs)
+
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.  
 Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus. Berechtigte Nutzer können die Prüfung innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) und der [Artikelverwaltung](#lieferanten--und-artikelverwaltung) widerrufen.
 
 
 ### Vereinfachter Bestellprozess auf Einkaufsseite
 
-```mermaid
-graph TD;
-    order((Bestellung))-->unprocessed[unbearbeitet];
-    unprocessed-->copy_order_no(Bestellnummer kopieren);
-    copy_order_no-->paste_order_no("in ERP-Software einfügen,
+<!--```mermaid
+flowchart TD;
+    order((Bestellung))-- >unprocessed[unbearbeitet];
+    unprocessed-- >copy_order_no(Bestellnummer kopieren);
+    copy_order_no-- >paste_order_no("in ERP-Software einfügen,
     Produkt wählen");
-    paste_order_no-->copy_identifier(Bestellzuordnung kopieren);
-    copy_identifier-->paste_order_identifier("in ERP-Software einfügen,
+    paste_order_no-- >copy_identifier(Bestellzuordnung kopieren);
+    copy_identifier-- >paste_order_identifier("in ERP-Software einfügen,
     in beliebiges Feld das Teil
     des Bestellbelegs wird,
     z.B. an Artikelbezeichnung
     anhängen");
-    paste_order_identifier-->add_commission(Kommission wählen);
-    add_commission-->order_erp("Bestellung in
+    paste_order_identifier-- >add_commission(Kommission wählen);
+    add_commission-- >order_erp("Bestellung in
     ERP-Software abschließen");
-    order_erp-->confirm_caro("Bestellung in
+    order_erp-- >confirm_caro("Bestellung in
     CARO bestätigen")
 
-    retrieval((Wareneingang))-->processed[bearbeitet];
-    processed-->filter("nach Bestellzuordnung oder
+    retrieval((Wareneingang))-- >processed[bearbeitet];
+    processed-- >filter("nach Bestellzuordnung oder
     Bestellbelegnummer filtern,
     gemäß Lieferschein");
-    filter-->commission("QR-Code für Kommission
+    filter-- >commission("QR-Code für Kommission
     ausdrucken");
-    commission-->retrieval_confirmed("Teillieferung oder
+    commission-- >retrieval_confirmed("Teillieferung oder
     vollständige Lieferung
     bestätigen")
-    retrieval_confirmed-->issue("Artikel an Werkstatt liefern")
-```
+    retrieval_confirmed-- >issue("Artikel an Werkstatt liefern")
+```-->
+
+[![Mermaid graph](https://mermaid.ink/img/pako:eNqFVMtu2zAQ_BWCJwewjcSPxFaBAnm0l7ZoXkCAVoVBiyuJMEUKFBnXDvItufgzetOPdfWyrCRFfRLF3dmZ2bGeaKA5UI-GUq-DmBlL7q8--IrgTxsOpte7gMyClE5FR0eDwUenUqMDyDLgP51aAjNLEBbsr7rr4B6rA51uFiXQQukGSrkkAUNWOhVgQB3VnZ1a7E0ZVrfNPhWKfLq9Htzp0K6ZAQJChfmfCFS_Arg2mruVJet8F0tQPm2Qu0gNLcFBWREih4bY1mGNQqXvc2sbXrE7QPo_S7xfghSwFBFk5DNITjjLyD0IWRVwfF0TwkKIMrIWhtfd2-HFkDBFzo0VK8CCLYggLjhX90zF-U5F_1LfkcA4XwQ6SUSWCa16X_aPjYMNQrcQOyswMCnqbfOB0qr6jn62zIIY9eYvh6T2COU2VChMsgiY0e8DXp7ffkfXMpvvrKjE-fWVAWsEPDLZ6z3gOIV2R6zOapvUtzk9TGkopC13p1gQkzdhwH-IqZoO11KnuOptlhtBku_yF_JVQAgGhSOdVnRVWyreu-7Tm9vBJY4gmBJD2iXU1ruMGxesDr3rrGKvf1HbCBwxizTJkkNXwKOWsnBRcbSxZrnPzmuDO_a28DgUpzvAMXUKi0A-gFlllllLqrkFBO3TyAhOPWsc9CnalbDiSJ8KcJ_aGBLwqYePHELmpPWpr56xLWXqh9ZJ02m0i2LqhUxmeHIpZxauBIsM25cwZ_XdRgXNGbiw2nyrvm7lR65Epd4T_U298Xx4fDKazObjk9lscnY6Pe3TDfVGo_lwPDmdno1mZ9N58fq5T7clkePhfDqZTcaj6fFkjHfjKdIChc5eaqcs9ebPfwFsbtp6?type=png)](https://mermaid.live/edit#pako:eNqFVMtu2zAQ_BWCJwewjcSPxFaBAnm0l7ZoXkCAVoVBiyuJMEUKFBnXDvItufgzetOPdfWyrCRFfRLF3dmZ2bGeaKA5UI-GUq-DmBlL7q8--IrgTxsOpte7gMyClE5FR0eDwUenUqMDyDLgP51aAjNLEBbsr7rr4B6rA51uFiXQQukGSrkkAUNWOhVgQB3VnZ1a7E0ZVrfNPhWKfLq9Htzp0K6ZAQJChfmfCFS_Arg2mruVJet8F0tQPm2Qu0gNLcFBWREih4bY1mGNQqXvc2sbXrE7QPo_S7xfghSwFBFk5DNITjjLyD0IWRVwfF0TwkKIMrIWhtfd2-HFkDBFzo0VK8CCLYggLjhX90zF-U5F_1LfkcA4XwQ6SUSWCa16X_aPjYMNQrcQOyswMCnqbfOB0qr6jn62zIIY9eYvh6T2COU2VChMsgiY0e8DXp7ffkfXMpvvrKjE-fWVAWsEPDLZ6z3gOIV2R6zOapvUtzk9TGkopC13p1gQkzdhwH-IqZoO11KnuOptlhtBku_yF_JVQAgGhSOdVnRVWyreu-7Tm9vBJY4gmBJD2iXU1ruMGxesDr3rrGKvf1HbCBwxizTJkkNXwKOWsnBRcbSxZrnPzmuDO_a28DgUpzvAMXUKi0A-gFlllllLqrkFBO3TyAhOPWsc9CnalbDiSJ8KcJ_aGBLwqYePHELmpPWpr56xLWXqh9ZJ02m0i2LqhUxmeHIpZxauBIsM25cwZ_XdRgXNGbiw2nyrvm7lR65Epd4T_U298Xx4fDKazObjk9lscnY6Pe3TDfVGo_lwPDmdno1mZ9N58fq5T7clkePhfDqZTcaj6fFkjHfjKdIChc5eaqcs9ebPfwFsbtp6)
 
 Etwaige zusätzliche Schritte im ERP-System können hier aufgrund der Vielzahl an Softwarelösungen und individuellen Prozessen nicht abgebildet werden.
 
@@ -1103,7 +1109,7 @@ etc.
 ## Regulatorische Auswertungen und Zusammenfassungen
 Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
-* Erfahrungspunkte basierend auf Schulungen, sofern für Schulungen Punkte vergeben werden (intern oder extern, z.b. [IQZ](https://ot-iqz.de/))
+* Erfahrungspunkte basierend auf Schulungen, sofern für Schulungen Punkte vergeben werden (intern oder extern, z.b. [IQZ](https://ot-iqz.de/)\)
 * Erfüllung regulatorischer Anforderungen durch Dokumente
 * aktuell gültige, incl. externe Dokumente
 * Lieferantenverzeichnis
@@ -1308,6 +1314,7 @@ Dies ist eine einfache Fußnote[^1] und hier eine längere[^fussnote]. Fußnoten
 --------
 
 Listen (SETX h2 Überschrift)
+-----------
 
 1. Geordnete Listeneinträge beginnen mit einer Zahl und einem Punkt
     * Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
@@ -1418,95 +1425,95 @@ Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änder
 
 Beschreibung der Optionen:
 
-	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
-	"filesetting":
-		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
-		"headerrow": Offset für die Titelzeile
-		"dialect": Einstellungen gemäß php fgetcsv
-		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
-		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
-		"replacementOverflow": Ganzzahl um eine Fehlermeldung zu erzeugen, im Falle verdächtig vieler Ersetzungen (1000 ohne Angabe)
+    "postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
+    "filesetting":
+        "source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
+        "headerrow": Offset für die Titelzeile
+        "dialect": Einstellungen gemäß php fgetcsv
+        "columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
+        "encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
+        "replacementOverflow": Ganzzahl um eine Fehlermeldung zu erzeugen, im Falle verdächtig vieler Ersetzungen (1000 ohne Angabe)
 
-	"filter": Liste von Objekten
-		"apply": "filter_by_expression"
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"match":
-			"all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
-			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
+    "filter": Liste von Objekten
+        "apply": "filter_by_expression"
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+        "match":
+            "all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
+            "any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
 
-		"apply": "filter_by_monthdiff"
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
-			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
-			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": gemäß https://www.php.net/manual/en/datetime.format.php,
-			"threshold": Ganzzahl für Monate,
-			"bias": < kleiner als, > größer als threshold
+        "apply": "filter_by_monthdiff"
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+        "date": Filtert nach identifier und Unterschied zweier Daten in Monaten
+            "identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
+            "column": Spaltenname mit einem zu vergleichenden Datum,
+            "format": gemäß https://www.php.net/manual/en/datetime.format.php,
+            "threshold": Ganzzahl für Monate,
+            "bias": < kleiner als, > größer als threshold
 
-		"apply": "filter_by_duplicates",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"duplicates": Behalte Anzahl an Duplikaten eines Spaltenwerts, sortiert nach den Werten anderer verketteter Spalten (auf- oder absteigend)
-			"orderby": Liste von Spaltennamen deren Werte als Vergleich verkettet werden sollen
-			"descending": Boolescher Wert,
-			"column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
-			"amount": Ganzzahl > 0
+        "apply": "filter_by_duplicates",
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+        "duplicates": Behalte Anzahl an Duplikaten eines Spaltenwerts, sortiert nach den Werten anderer verketteter Spalten (auf- oder absteigend)
+            "orderby": Liste von Spaltennamen deren Werte als Vergleich verkettet werden sollen
+            "descending": Boolescher Wert,
+            "column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
+            "amount": Ganzzahl > 0
 
-		"apply": "filter_by_comparison_file",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
-		"compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
-			"filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
-			"filter": die gleiche Struktur wie allgemein
-			"modify": die gleiche Struktur wie allgemein
-			"match":
-				"all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
-				"any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
-		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
+        "apply": "filter_by_comparison_file",
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
+        "compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
+            "filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
+            "filter": die gleiche Struktur wie allgemein
+            "modify": die gleiche Struktur wie allgemein
+            "match":
+                "all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
+                "any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
+        "transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
 
-		"apply": "filter_by_monthinterval",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
-			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": gemäß https://www.php.net/manual/en/datetime.format.php,
-			"interval": Ganzzahl für Monate,
-			"offset": optionale Verschiebung in Monaten (Ganzzahl)
+        "apply": "filter_by_monthinterval",
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+        "interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
+            "column": Spaltenname mit einem zu vergleichenden Datum,
+            "format": gemäß https://www.php.net/manual/en/datetime.format.php,
+            "interval": Ganzzahl für Monate,
+            "offset": optionale Verschiebung in Monaten (Ganzzahl)
 
-		"apply": "filter_by_rand",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
-			"columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
-			"amount": Ganzzahl > 0
+        "apply": "filter_by_rand",
+        "comment": Beschreibung, wird angezeigt
+        "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+        "data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
+            "columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
+            "amount": Ganzzahl > 0
 
-	"modify": Ändert das Ergebnis
-		"add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
-			   Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
-			   Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
-		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen Spalte oder an allen
-				   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
-				   Falls mehr als eine Ersetzung angegeben wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
-				   Ersetzungen an einer bestimmten Position müssen die zweite Treffergruppe sein (full match, group 1 (^ if necessary), group 2, ...rest)
-		"remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
-		"rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
-				   Die Originalspalten werden entfernt.
-		"translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
-		"conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
-		"conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
+    "modify": Ändert das Ergebnis
+        "add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
+               Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
+               Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
+        "replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen Spalte oder an allen
+                   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
+                   Falls mehr als eine Ersetzung angegeben wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
+                   Ersetzungen an einer bestimmten Position müssen die zweite Treffergruppe sein (full match, group 1 (^ if necessary), group 2, ...rest)
+        "remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
+        "rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
+                   Die Originalspalten werden entfernt.
+        "translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
+        "conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
+        "conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
 
-	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
+    "split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
 
-	"modify2": Ändert das Ergebnis nach der Aufteilung, falls diese auf Spaltenwerten beruhte
-		"remove":Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung/Aufteilung erforderlich waren
+    "modify2": Ändert das Ergebnis nach der Aufteilung, falls diese auf Spaltenwerten beruhte
+        "remove":Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung/Aufteilung erforderlich waren
 
-	"evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
+    "evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
 
-	"translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
-					 Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
-					 Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.
+    "translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
+                     Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
+                     Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.
 
 Ein beliebiges Beispiel:
 
@@ -1516,7 +1523,7 @@ Ein beliebiges Beispiel:
     "filesetting": {
         "source": "Export.+?\\.csv",
         "headerrow": 0,
-		"destination": "FilteredList.csv",
+        "destination": "FilteredList.csv",
         "columns": [
             "ORIGININDEX",
             "SOMEDATE",
@@ -1665,14 +1672,14 @@ Ein beliebiges Beispiel:
     "evaluate": {
         "EMAIL": "^((?!@).)*$"
     }
-	"translations":{
-		"departments":{
-			"1": "Central",
-			"2": "Department 1",
-			"3": "Department 2",
-			"4": "Office"
-		}
-	}
+    "translations":{
+        "departments":{
+            "1": "Central",
+            "2": "Department 1",
+            "3": "Department 2",
+            "4": "Office"
+        }
+    }
 }
 ```
 
@@ -1973,7 +1980,7 @@ Anwendungsunterstützung Legende:
     * bevorzugt Firefox, Edge oder einen anderen Chromium-Browser, [Safari ist nicht vollständig kompatibel](#safaris-besondere-bedürfnisse)
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
     * Druckerzugang für alle Endgeräte
-* Lieferantenartikellisten (z.B. Preislisten) als CSV-Dateien ([siehe Details](#importierung-von-lieferantenartikellisten)), ERP Datenexporte oder eine angepasste [ERP Anbindung](#erp-anbindung)
+* Lieferantenartikellisten (z.B. Preislisten) als CSV-Dateien ([siehe Details](#importierung-von-lieferantenartikellisten)\), ERP Datenexporte oder eine angepasste [ERP Anbindung](#erp-anbindung)
 * Gelegentlich FTP-Zugang zum Server für Anpassungen der [Laufzeitvariablen](#laufzeitvariablen) und [Sprachdateien](#anpassung)
 
 Zuletzt getestete Serverumgebungen:
@@ -2020,7 +2027,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * exif
     * pdo_odbc
     * zip
-    * pdo_sqlsrv (sqlsrv sofern zutreffend, [Quelle](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows))
+    * pdo_sqlsrv (sqlsrv sofern zutreffend, [Quelle](https://pecl.php.net/package/pdo_sqlsrv/5.12.0/windows)\)
 * php.ini extension_dir = "ext" für IIS Server
 * apt install php8.5-mysql unter Apache sofern noch nicht geschehen
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
@@ -2033,15 +2040,15 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
 Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronline1/caro/tree/master/templates) im entsprechenden *template*-Ordner bereit um eine schnelle Verfügbarkeit von Inhalten bei der Inbetriebnahme der Anwendung zu unterstützen. Dateinamen folgen dem Muster `{frei wählbar}.{Typ}.{Standardsprache}.{Dateinamenerweiterung} wobei
 * der frei wählbare Teil alles sein kann, was die Struktur bei der Vorbereitung vereinfacht
 * der Typ einer der folgenden ist
-	* audits
-	* csvfilter
-	* documents
-	* manuals
-	* texts
-	* users
+    * audits
+    * csvfilter
+    * documents
+    * manuals
+    * texts
+    * users
     * vendors
 * die Standardsprache der Anwendung, wie sie in den [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
-* die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung))
+* die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung)\)
 
 > die Standardautorin von Inhalten ist *CARO App* und sollte in einen berechtigten Nutzer geändert werden um Verwirrungen bei Auditoren zu vermeiden
 
@@ -2076,7 +2083,7 @@ Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft a
 ### Umgebungseinstellungen
 Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklärend diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnung der config.ini-Datei betrifft immer auch die config.env-Datei.
 
-In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen umgebungsbezogen ergänzt werden. Nicht alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Anpassung](#anpassung)).
+In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen umgebungsbezogen ergänzt werden. Nicht alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Anpassung](#anpassung)\).
 
 Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Datei definiert:
 ```
@@ -2175,7 +2182,8 @@ session[request_log] = 548 ; Tage, nach denen Request-Log-Einträge gelöscht we
 
 training[evaluation] = 62 ; Tage bis an eine Evaluierung erinnert wird
 training[renewal] = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
-
+```
+```
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; Prozent
@@ -2250,7 +2258,8 @@ texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
 trainingevaluation = "ceo, supervisor" ; Schulungsbewertungen
 users = "ceo, qmo" ; Nutzer anlegen, bearbeiten und löschen
 vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
-
+```
+```
 ; Seiteneinstellungen für Klebeetiketten in unterschiedlichen Formaten
 ; Nach Belieben zu erweitern
 [label]
@@ -2399,7 +2408,7 @@ Tests:
 Anmerkungen:
 * iOS PWAs scheinen Frontend-Code nicht zu aktualisieren uns müssen ggf. bei Änderungen neu installiert werden.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
-* Der Download von Dateien ist aufgrund von inkonsequenten Verhalten gegenüber Webstandards in der Browser-Ansicht nicht intitiv. Wenn die Datei nicht ausdrücklich *geladen* wird, startet die Anwendung unter Umständen neu und es besteht das Risiko von Verlusten ungespeicherter Eingaben. Als PWA funktioniert es mit dem implementierten Polyfill wie vorgesehen.
+* Der Download von Dateien ist aufgrund von inkonsequenten Verhalten gegenüber Webstandards in der Browser-Ansicht nicht intuitiv. Wenn die Datei nicht ausdrücklich *geladen* wird, startet die Anwendung unter Umständen neu und es besteht das Risiko von Verlusten ungespeicherter Eingaben. Als PWA funktioniert es mit dem implementierten Polyfill wie vorgesehen.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 
@@ -2410,7 +2419,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es gibt einige Einschränkungen und Unterschiede zu [regulärem](https://www.rfc-editor.org/rfc/rfc7763.html) bzw. [GitHub-flavoured](https://github.github.com/gfm/) Markdown sofern man damit vertraut ist. Siehe [Quelle](https://github.com/erroronline1/markdown) für weitere Details.
-    * Bilder können eingebunden werden, aber aufgrund des Service-Workers im CARO-Zusammenhang nicht abgerufen werden
+    * Bilder können eingebunden werden, aber aufgrund des Service-Workers im CARO-Zusammenhang unter Umständen nicht abgerufen werden
 * Die Zeiterfassung nutzt Eingaben vom Typ `time` für Arbeitszeiten und Pausen, was verwirrend erscheint sofern die Systemeinstellungen im Browser ein 12h-Format erzwingen. Bitte sprechen Sie mit Ihrem Betreiber über vernünftige Systemeinstellungen.
 
 [Übersicht](#übersicht)
@@ -2427,14 +2436,14 @@ Es kann beispielsweise die Sprachen-Standardeinstellung
 nur mit dem Eintrag
 ```json
 {
-	"company": {
-		"address": "Tatsächlicher Firmenname, Tatsächliche Adresse"
-	}
+    "company": {
+        "address": "Tatsächlicher Firmenname, Tatsächliche Adresse"
+    }
 }
 ```
 innerhalb der ENV-Datei überschrieben werden um an die tatsächlichen Umgebungsbedingungen anzupassen, während die übrigen Sprachblöcke beibehalten werden.
 
-Das gleiche betrifft auch die config.ini-Datei sowie alle Vorlagen. Da die letztgenannten primär für die Installation genutzt werden, werden auch nur ENV-Dateien verarbeitet, vorausgesetzt die Struktur ist geeignet. ENV-Dateien **entfernen jedoch keine** Standard JSON-Werte. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Umgebungseinstellungen](#umgebungseinstellungen)).
+Das gleiche betrifft auch die config.ini-Datei sowie alle Vorlagen. Da die letztgenannten primär für die Installation genutzt werden, werden auch nur ENV-Dateien verarbeitet, vorausgesetzt die Struktur ist geeignet. ENV-Dateien **entfernen jedoch keine** Standard JSON-Werte. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Umgebungseinstellungen](#umgebungseinstellungen)\).
 
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei templates/manual.XX.env/.json entsprechend der gewünschten Standardsprache angepasst werden (siehe _language.md im api-Verzeichnis).
 * Manche Teile der config.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
@@ -2454,7 +2463,7 @@ Im Falle einer Anpassung des Quelltexts:
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten. Während der Entwicklung kann die Änderung von Tabellen [aktiviert werden, falls sie standardmäßig deaktiviert ist](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittests.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
-* Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
+* Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benötigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
 * UTILITY::parsePayload:
     * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
     * $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.
@@ -2727,7 +2736,7 @@ Diese Anwendung ist Bestandteil des Qualitätsmanagements. Deine Daten sind für
 Die Anwendung erbittet die Berechtigung für den Kamerazugriff und Benachrichtigungen. Kamerazugriff kann für die Erfassung von Fotos für die Dokumentation und dem Scannen von Strich- und QR-Codes erforderlich sein. Letztere Anwendung kann auch durch zusätzliche Geräte erfolgen. Andernfalls kannst du dich nicht anmelden und die Dokumentation nicht im erforderlichen Maße sicherstellen. Benachrichtigungen informieren über neue Nachrichten innerhalb der Anwendung und verbessern dadurch die Arbeitsbedingungen. Die Berechtigungen können durch die Browsereinstellungen jederzeit entzogen werden.
 
 ### Rückmeldungen
-Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail (*wie in config.ini für application->issue_mail festgelegt*), erläutere die Details und ergänze eine Kontaktmöglichkeit.
+Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wende dich umgehend an :issue_mail (*wie in config.ini für application->issue_mail festgelegt*), erläutere die Details und ergänze eine Kontaktmöglichkeit.
 
 [Übersicht](#übersicht)
 
@@ -2743,7 +2752,7 @@ Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.  
 Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License.  
 Sie sollten ein Exemplar der GNU Affero General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>.  
-Verwendete Bibliotheken von Drittanbietern werden zu deren gesonderten Bedingungen veröffentlicht (siehe [readme.md](readme.md#external-libraries))
+Verwendete Bibliotheken von Drittanbietern werden zu deren gesonderten Bedingungen veröffentlicht (siehe [readme.md](readme.md#external-libraries)\)
 
 # Das Team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
