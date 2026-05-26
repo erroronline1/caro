@@ -26,12 +26,12 @@ class _ERPINTERFACE {
 	/**
 	 * set to true if class has been successfully constructed
 	 */
-	public $_instatiated = null;
+	public ?bool $_instatiated = null;
 
 	/**
 	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
 	 */
-	public $_productsimport = null;
+	public ?bool $_productsimport = null;
 
 	/**
 	 * path to markdown file explaining the interface
@@ -512,12 +512,12 @@ class TEST extends _ERPINTERFACE {
 	/**
 	 * set to true if class has been successfully constructed
 	 */
-	public $_instatiated = null; 
+	public ?bool $_instatiated = null; 
 
 	/**
 	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
 	 */
-	public $_productsimport = null;
+	public ?bool $_productsimport = null;
 
 	public function __construct(){
 		try {
@@ -730,14 +730,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * requires an sql connection to the optadata eva viva database
 	 * readonly is fine, you'll may have to add the port to the host xyz.host.url, 1234
 	 */
-	private $_pdo = null;
-	public $_instatiated = null;
+	private mixed $_pdo = null;
+	public ?bool $_instatiated = null;
 	public $_readme = './CARO App ERP Interface ODEVAVIVA.md';
 
 	/**
 	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
 	 */
-	public $_productsimport = true;
+	public ?bool $_productsimport = true;
 
 	public function __construct(){
 		try {
