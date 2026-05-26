@@ -17,7 +17,7 @@ namespace CARO\API;
 class ERPQUERY extends API {
 	// processed parameters for readability
 	public ?string $_requestedMethod = REQUEST[1];
-	private $_requestedType = null;
+	private mixed $_requestedType = null;
 
 	public function __construct($_class_vars  = []){
 		parent::__construct($_class_vars);
@@ -73,7 +73,7 @@ class ERPQUERY extends API {
 				array_push($response['render']['content'] , ...$append);
 				$response['render']['form'] = [
 					'data-usecase' => 'erpquery',
-					'action' => "javascript:api.erpquery('post', null, 'erpquery', '" . $this->_requestedType . "')"
+					'action' => "javascript:api.erpquery('post', '[data-usecase=erpquery]', 'erpquery', '" . $this->_requestedType . "')"
 				];
 			}
 		}
