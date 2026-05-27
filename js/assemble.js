@@ -3395,7 +3395,7 @@ export class Assemble {
 					"FormData"
 				).then((response) => {
 					if (response) {
-						api.record("post", response, "import", null);
+						api.record("post", response, "import");
 					}
 				});
 			};
