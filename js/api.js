@@ -569,6 +569,7 @@ export const api = {
 										const call = api._unauthorizedRequest.request.shift();
 										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, api._unauthorizedRequest.payload, ...api._unauthorizedRequest.request);
 									}
+									api.session_timeout.init();
 								}
 							} catch (error) {
 								_client.application.debug(error, api._unauthorizedRequest);
@@ -737,7 +738,7 @@ export const api = {
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
 
-						if (request[1] === 'start' && request[2])
+						if (request[1] === "start" && request[2])
 							//search
 							document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
 				}
@@ -1244,7 +1245,10 @@ export const api = {
 				document.getElementById("main").replaceChildren(render.initializeSection());
 				render.processAfterInsertion();
 
-				if (request[1] === "conversation" && request[2]) window.scrollTo(0, document.body.scrollHeight);
+				if (request[1] === "conversation" && request[2])
+					setTimeout(function () {
+						window.scrollTo(0, document.body.scrollHeight);
+					}, 0);
 			}
 			if (data.notif) _serviceWorker.notif.communication(data.notif);
 			if (data.redirect) api.message("get", null, ...data.redirect);
@@ -1319,7 +1323,7 @@ export const api = {
 			if (data.title) api.update_header(data.title);
 		};
 		if (typeof payload === "string") payload = _.getInputs(payload, true);
-		if (!payload || !Object.keys(payload).length) payload = _client.order.approvedFilter();
+		if (!payload || !(payload instanceof FormData)) payload = _client.order.approvedFilter();
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1345,11 +1349,18 @@ export const api = {
 			if (data.dialog) {
 				switch (request[1]) {
 					case "import":
+						const options = {};
+						options[api._lang.GET("general.cancel_button")] = false;
+						if (!data.toast)
+							options[api._lang.GET("record.import.ok")] = {
+								value: true,
+								class: "reducedCTA",
+							};
 						new Dialog({
 							type: "input",
 							header: api._lang.GET("assemble.render.merge"),
 							options: options,
-							render: data.response.msg,
+							render: data.dialog.render,
 						}).then((response) => {
 							if (response && api._lang.GET("erpquery.integrations.data_import") in response) {
 								let result = {};
@@ -1363,17 +1374,21 @@ export const api = {
 										msg: api._lang.GET("record.import.success"),
 									},
 								};
+								// close all modals to avoid duplication
+								for (const opendialog of Object.values(document.querySelectorAll("dialog[open]"))) {
+									opendialog.remove();
+								}
 								successFn(data);
 							}
 						});
 						break;
 					default:
+						new Dialog({
+							type: "input",
+							render: data.dialog.render,
+							options: data.dialog.options,
+						});
 				}
-				new Dialog({
-					type: "input",
-					render: data.dialog.render,
-					options: data.dialog.options,
-				});
 			}
 			if (data.render) {
 				const render = new Assemble(data.render);
@@ -1487,210 +1502,6 @@ export const api = {
 			}
 		}
 		api.send(method, request, successFn, null, payload);
-		/*				let payload,
-			successFn = function (data) {
-				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.render !== undefined) {
-					const options = {};
-					options[api._lang.GET("general.ok_button")] = false;
-					new Dialog({
-						type: "input",
-						render: data.render,
-						options: options,
-					});
-				}
-			},
-			title = {
-				identifier: api._lang.GET("record.navigation.create_identifier"),
-				record: api._lang.GET("record.navigation.summaries"),
-				records: api._lang.GET("record.navigation.summaries"),
-			};
-		switch (method) {
-			case "get":
-				switch (request[1]) {
-					case "displayonly":
-						// for linked documents within documents
-						successFn = function (data) {
-							if (data.render) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({ type: "input", header: data.header, render: data.render, options: options });
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						request[1] = "document";
-						break;
-					case "fullexport":
-					case "simplifiedexport":
-					case "documentexport": // sorry. exports a document with records, not so paperless after all
-					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
-					case "matchbundles":
-						// fall back to default successFn
-						break;
-					case "records":
-						payload = {
-							_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
-							_unit: document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("order.organizational_unit")}"]:checked`).value : null,
-							_state: document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`) ? document.querySelector(`input[name="${api._lang.GET("record.pseudodocument_casedocumentation")}"]:checked`).value : null,
-						};
-						for (const [key, value] of Object.entries(payload)) {
-							if (!value) delete payload[key];
-						}
-					// no break by intent
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] || data.header);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (request[1] === "records" && data.data) {
-								if (api._settings.user.app_settings.recordsLayout) {
-									switch (api._settings.user.app_settings.recordsLayout) {
-										// in case other options may become implemented also see user.php profile
-										case "table":
-											_client.record.table(data.data);
-											break;
-										default:
-											_client.record.tile(data.data);
-									}
-								} else _client.record.tile(data.data);
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.preventDataloss.start();
-						};
-				}
-				break;
-			case "post":
-				switch (request[1]) {
-					case "import":
-						successFn = function (data) {
-							if (data.data !== undefined) {
-								let inputs = document.querySelectorAll("input, textarea, select");
-								let groupname, files, a;
-								for (const input of inputs) {
-									if (input.type === "file") {
-										if (Object.keys(data.data).includes(input.name.replace("[]", ""))) {
-											files = data.data[input.name.replace("[]", "")].split(", ");
-											for (const file of files) {
-												a = document.createElement("a");
-												a.href = file;
-												a.target = "_blank";
-												a.append(document.createTextNode(file));
-												input.parentNode.insertBefore(a, input);
-											}
-											if (files) input.parentNode.insertBefore(document.createElement("br"), input);
-										}
-									} else if (input.type === "radio") {
-										// nest to avoid overriding values of other radio elements
-										input.checked = Object.keys(data.data).includes(input.name) && data.data[input.name] === input.value;
-									} else if (input.type === "checkbox") {
-										groupname = input.dataset.grouped;
-										input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(" | ").includes(input.name);
-									} else {
-										if (Object.keys(data.data).includes(input.name)) input.value = data.data[input.name];
-										// append multiple text-/number inputs / selects / productselections that have been added dynamically
-										let dynamicMultiples = Object.keys(data.data)
-											.filter((name) => {
-												return name.match(new RegExp(String.raw`${input.name}\(\d+\)$`, "g"));
-											})
-											.sort();
-										if (dynamicMultiples.length) {
-											let type = input.previousSibling.dataset.type,
-												element = input.nextSibling, // label
-												clone = { type: type, attributes: { name: null } },
-												content = {};
-											if (input.attributes.multiple) clone.attributes.multiple = true;
-											if (input.attributes.required) clone.attributes.required = true;
-											if (input.attributes["data-loss"]) clone.attributes["data-loss"] = input.attributes["data-loss"].value;
-											if (input.attributes.title) clone.attributes.title = input.attributes.title.value;
-											switch (type) {
-												case "select":
-													for (const opt of input.children) {
-														if (opt.localName === "optgroup") {
-															for (const option of opt.children) {
-																content[option.innerHTML] = [];
-															}
-														} else content[opt.innerHTML] = [];
-													}
-													break;
-												default:
-													clone.attributes.value = null;
-											}
-											dynamicMultiples.forEach((name) => {
-												if (element.nextSibling && element.nextSibling.classList.contains("hint")) element = element.nextSibling;
-												clone.attributes.name = name;
-												clone.attributes.value = data.data[name];
-												switch (type) {
-													case "select":
-														Object.keys(content).forEach((key) => {
-															if (key === data.data[name]) content[key].selected = true;
-															else delete content[key].selected;
-														});
-														clone.content = content;
-														break;
-													case "productselection":
-													case "scanner":
-														element = element.nextSibling; // button
-														break;
-												}
-												if (!document.getElementsByName(name)[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
-												element = document.getElementsByName(name)[0].nextSibling; // label
-											});
-										}
-									}
-								}
-							}
-							if (data.response.msg !== undefined) {
-								const options = {};
-								options[api._lang.GET("general.cancel_button")] = false;
-								if (typeof data.response.msg === "object")
-									options[api._lang.GET("record.import.ok")] = {
-										value: true,
-										class: "reducedCTA",
-									};
-
-								new Dialog({
-									type: typeof data.response.msg === "object" ? "input" : "confirm",
-									header: api._lang.GET("assemble.render.merge"),
-									options: options,
-									render: data.response.msg,
-								}).then((response) => {
-									if (response && typeof data.response.msg === "object" && api._lang.GET("erpquery.integrations.data_import") in response) {
-										let result = {};
-										// deconstruct key:value<br>...
-										for (const match of response[api._lang.GET("erpquery.integrations.data_import")].matchAll(/(.+?): (.*?)(?:<br>|$)/gm)) {
-											result[match[1]] = match[2];
-										}
-										data = {
-											data: result,
-											response: {
-												msg: api._lang.GET("record.import.success"),
-											},
-										};
-										successFn(data);
-									}
-								});
-							}
-						};
-						break;
-				}
-				if (request[3]) {
-					payload = request[3]; // form data object passed by utility.js
-					delete request[3];
-				} else payload = _.getInputs("[data-usecase=record]", true);
-				break;
-			case "patch":
-				if (request[4] instanceof FormData) {
-					payload = request[4]; // casestate
-					delete request[4];
-				}
-				break;
-			default:
-				return;
-		}
-		api.send(method, request, successFn, null, payload);*/
 	},
 
 	/**
