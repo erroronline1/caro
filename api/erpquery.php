@@ -341,8 +341,8 @@ class ERPQUERY extends API {
 		$content[] = $fields;
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+			$result = [];
 			if ($result = ERPINTERFACE->customerdata((array)$this->_payload)) {
-
 				switch ($rendertype){
 					case 'textsection':
 						foreach($result as $option){
@@ -371,7 +371,7 @@ class ERPQUERY extends API {
 						];
 				}
 			}
-			if (count($content) < 2){
+			if (!$result){
 				$content[] = [
 					'type' => 'textsection',
 					'attributes' => [
@@ -379,7 +379,7 @@ class ERPQUERY extends API {
 					]
 				];
 			}
-			else
+			else if ($rendertype ==="textsection")
 				array_splice($content, 1, 0, [
 					[
 						'type' => 'submitbutton',

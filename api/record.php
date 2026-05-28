@@ -785,12 +785,18 @@ class RECORD extends API {
 			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata')){
 				require_once('./erpquery.php');
 				$ERPQUERY = new ERPQUERY(get_class_vars(get_class($this)));
-				if ($options = $ERPQUERY->patientlookup('radio'))
-				$this->response([
-					'dialog' => [
-						'render' => $options
-					]
-				]);
+				if ($result = $ERPQUERY->patientlookup('radio'))
+					$options = [$this->_lang->GET("general.cancel_button") => false];
+					if (!array_is_list($result[0])) $options[$this->_lang->GET("record.import.ok")] = [
+						'value' => true,
+						'class' => "reducedCTA"
+					];
+					$this->response([
+						'dialog' => [
+							'options' => $options,
+							'render' => array_is_list($result[0]) ? [$result[1]] : $result
+						]
+					]);
 			}
 		}
 		$this->response([
