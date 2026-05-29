@@ -262,7 +262,7 @@ class PDF{
 	public function auditPDF($fileContent){
 		$this->init($fileContent);
 		// prepare content as html
-		foreach ($fileContent['content'] as $key => &$value){
+		foreach ($fileContent['content'] as &$value){
 			// values column
 			if (gettype($value) === 'array') {
 				$value = implode("  \n", array_keys($value));
@@ -480,6 +480,8 @@ class PDF{
 
 						$possibleFiles = explode(', ', $link[1]);
 						foreach($possibleFiles as $filename){
+							// remove possible entry information on full exports
+							$filename = preg_replace('/ --\*.+?\*--$/m', '', $filename);
 							$filename = $this->_filehandler->translate_path(str_replace('\_', '_', $filename));
 							if (!isset($fileContent['attachments'][$document]) || !in_array($filename, $fileContent['attachments'][$document])) {
 								$value = $this->_markdown->md2html($value);
