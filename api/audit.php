@@ -216,7 +216,7 @@ class AUDIT extends API {
 				// audit selections
 				foreach ($audits as $row){
 					if (!$row['closed']){
-						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $this->convertFromServerTime($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $this->convertFromServerTime($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					elseif (!$recent && !$audit && $template && $row['unit'] === $template['unit']){
 						$recent = $row;

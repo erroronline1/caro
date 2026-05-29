@@ -384,8 +384,8 @@ class SQLINTERFACE {
 			'sqlsrv' => "UPDATE caro_audit_and_management SET notified = :notified WHERE id = :id"
 		],
 		'audit_get' => [
-			'mysql' => "SELECT * FROM caro_audit_and_management WHERE template IS NOT NULL ORDER BY last_touch DESC",
-			'sqlsrv' => "SELECT * FROM caro_audit_and_management WHERE template IS NOT NULL ORDER BY last_touch DESC"
+			'mysql' => "SELECT caro_audit_and_management.*, caam.hint as hint FROM caro_audit_and_management INNER JOIN caro_audit_templates AS caam ON caro_audit_and_management.template = caam.id ORDER BY caro_audit_and_management.last_touch DESC",
+			'sqlsrv' => "SELECT caro_audit_and_management.*, caam.hint as hint FROM caro_audit_and_management INNER JOIN caro_audit_templates AS caam ON caro_audit_and_management.template = caam.id ORDER BY caro_audit_and_management.last_touch DESC"
 		],
 		'management_get' => [
 			'mysql' => "SELECT * FROM caro_audit_and_management WHERE template IS NULL ORDER BY last_touch DESC",
