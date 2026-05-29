@@ -74,7 +74,7 @@ class PDF{
 			}
 			blockquote {
 				border-left: 3px solid #ddd;
-				margin-left: -5px;
+				padding-left: 5px;
 			}
 			.input {
 				font-size:17px;
@@ -216,6 +216,7 @@ class PDF{
 		
 		foreach($files as $file){
 			$this->_filehandler->serve($file, false);
+			$file = $this->_filehandler->translate_path($file);
 			if (!is_file($file)) continue;
 
 			$page = $this->_pdf->page->getPage();
@@ -429,7 +430,7 @@ class PDF{
 						'fillColor' => 'black',
 					]
 				));
-				$font = $this->_pdf->font->insert($this->_pdf->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // font size
+				$font = $this->_pdf->font->insert($this->_pdf->pon, 'freesans', '', $this->_pageSetup['fontsize']); // font size
 				$this->_pdf->page->addContent($font['out']);
 				$text = $this->_pdf->getTextCell(
 					txt: $fileContent['content'][1],
@@ -663,8 +664,10 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			'ef'        => '/Import',
 		]);
 		$this->setDefaultCellMargin(0, 0, 0, 0);
+		$this->font->insert($this->pon, 'helvetica', '', 10); // add helvetica, without there's an error message even if not actively used
+
 		if ($this->_defaultfont === null) {
-			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // add default font
+			$this->_defaultfont = $this->font->insert($this->pon, 'freesans', '', $this->_pageSetup['fontsize']); // add default font
 		}
 		
 		// create a page with defaultPageContent to determine the top and bottom content boundaries after applying defaultPageContent()
@@ -745,7 +748,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			);
 			$heights['header'][] = $this->qrcodesize + 6;
 
-			$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
+			$footerfont = $this->font->insert($this->pon, 'freesans', '', 8); // font size
 			$out .= $footerfont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->qrcodecontent,
@@ -781,7 +784,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		// insert title into remaining space between
 		$titleBox = null;
 		if ($this->_pageSetup['header'] && $this->header['title']) {
-			$titlefont = $this->font->insert($this->pon, 'helvetica', 'B', 20); // font size
+			$titlefont = $this->font->insert($this->pon, 'freesans', 'B', 20); // font size
 			$out .= $titlefont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->header['title'],
@@ -807,7 +810,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 		}
 		// subtitle, typically a date goes right below the title 
 		if ($this->header['date']){
-			$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', 10); // add default font
+			$this->_defaultfont = $this->font->insert($this->pon, 'freesans', '', 10); // add default font
 			$out .= $this->_defaultfont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->header['date'],
@@ -842,7 +845,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 
 		// insert footer text into the remaining space
 		if ($this->_pageSetup['footer'] ?? false) {
-			$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
+			$footerfont = $this->font->insert($this->pon, 'freesans', '', 8); // font size
 			$out .= $footerfont['out'];
 			$out .= $this->getTextCell(
 				txt: $this->_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'],
@@ -856,7 +859,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 			$heights['footer'][] = $bbox['h'] * 2;
 		}
 
-		$this->_defaultfont = $this->font->insert($this->pon, 'helvetica', '', $this->_pageSetup['fontsize']); // add default font
+		$this->_defaultfont = $this->font->insert($this->pon, 'freesans', '', $this->_pageSetup['fontsize']); // add default font
 		$out .= $this->_defaultfont['out'];
 		$out .= $this->graph->getStopTransform();
 		$this->setDefaultCellPadding(5, 3, 3, 3);
@@ -873,7 +876,7 @@ class RECORDTCPDF extends \Com\Tecnick\Pdf\Tcpdf {
 	// write page numbers, call after all pages have been created
 	// writes to bottom left
 	public function pageNumeration(){
-		$footerfont = $this->font->insert($this->pon, 'helvetica', '', 8); // font size
+		$footerfont = $this->font->insert($this->pon, 'freesans', '', 8); // font size
 		$pages = $this->page->getPages();
 		foreach($pages as $pid => $page){
             $out = $this->color->getPdfColor('black');
