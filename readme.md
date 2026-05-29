@@ -36,8 +36,9 @@ Things are still in motion. Images may be outdated.
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
-* tidy, rephrase readme?
-* check if erpinterface import still works with api.js
+* record / audits
+    * full export images
+    * where file attachments?
 
 ## Content
 * [Introducion](#introducion)
