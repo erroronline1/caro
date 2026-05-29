@@ -243,8 +243,8 @@ CLASS TABLE{
 					tempFolder: $this->_filehandler->directory('tmp')
 					// no page options available yet
 				);
-				$writer = new \OpenSpout\Writer\ODS\Writer($celloptions);
-				if (!empty($options['creator'])) $writer->setCreator($options['creator']);
+				$writer = new \OpenSpout\Writer\ODS\Writer();//$celloptions);
+				$writer->setCreator($options['creator'] ?? 'CARO App');
 				break;
 			case 'xlsx':
 				$celloptions = new \OpenSpout\Writer\XLSX\Options(
@@ -339,7 +339,7 @@ CLASS TABLE{
 					$value = $value ?: '';
 
 					$options['columns'][$column]['type'] = $options['columns'][$column]['type'] ?? 'string';
-					$format = new \OpenSpout\Common\Entity\Style\Style(
+					$format = strtolower($type ?: $file['extension']) === 'ods' ? null : new \OpenSpout\Common\Entity\Style\Style(
 						false, // public bool $fontBold = false,
 						false, // public bool $fontItalic = false,
 						false, // public bool $fontUnderline = false,
