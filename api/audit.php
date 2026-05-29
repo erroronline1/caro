@@ -2357,7 +2357,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.records.export_button'),
-						'onclick' => "api.audit('get', null, 'export', '" . $this->_requestedType . "')",
+						'onclick' => "api.audit('get', '[data-usecase=audit]', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
 				]
@@ -2523,7 +2523,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.records.export_button'),
-						'onclick' => "api.audit('get', null, 'export', '" . $this->_requestedType . "')",
+						'onclick' => "api.audit('get', '[data-usecase=audit]', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
 				]
@@ -3592,7 +3592,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "api.audit('get', null, 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', '[data-usecase=audit]', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
