@@ -756,7 +756,7 @@ export const api = {
 			if (data.redirect) api.application("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -814,7 +814,7 @@ export const api = {
 			if (data.redirect) api.audit("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -858,7 +858,7 @@ export const api = {
 			if (data.redirect) api.calendar("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -929,7 +929,7 @@ export const api = {
 			if (data.data) _client.order.approved(data.data);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -969,7 +969,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1040,7 +1040,7 @@ export const api = {
 			if (data.redirect) api.document("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1080,7 +1080,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1138,7 +1138,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1177,7 +1177,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1206,7 +1206,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1254,7 +1254,7 @@ export const api = {
 			if (data.redirect) api.message("get", null, ...data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1322,7 +1322,7 @@ export const api = {
 			if (data.data) _client.order.approved(data.data);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		if (!payload || !(payload instanceof FormData)) payload = _client.order.approvedFilter();
 		api.send(method, request, successFn, null, payload);
 	},
@@ -1490,7 +1490,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		if (method === "get" && (!payload || !Object.keys(payload).length)) {
 			payload = {
 				_filter: document.getElementById("_recordfilter") ? encodeURIComponent(document.getElementById("_recordfilter").value) : null,
@@ -1542,7 +1542,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1592,7 +1592,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1636,7 +1636,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1681,7 +1681,7 @@ export const api = {
 			}
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 
@@ -1729,7 +1729,7 @@ export const api = {
 			if (data.redirect) api.user("get", null, request[1], data.redirect);
 			if (data.title) api.update_header(data.title);
 		};
-		if (typeof payload === "string") payload = _.getInputs(payload, true);
+		if (typeof payload === "string") payload = _.getInputs(payload, ['post', 'put', 'patch'].includes(method));
 		api.send(method, request, successFn, null, payload);
 	},
 };
