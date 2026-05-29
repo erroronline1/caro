@@ -239,14 +239,15 @@ abstract class RawObject
             // get array content
             $objval = [];
             do {
+                $oldoffset = $offset;
                 $element = $this->getRawObject($offset);
                 $offset = $element[2];
-                $objval[] = $element; // @phpstan-ignore parameterByRef.type
-            } while ($element[0] !== ']');
+                $objval[] = $element;
+            } while ($element[0] !== ']' && (int) $offset !== (int) $oldoffset);
 
             if (\count($objval) > 0) {
                 // remove closing delimiter
-                \array_pop($objval); // @phpstan-ignore parameterByRef.type
+                \array_pop($objval);
             }
         }
     }
@@ -269,14 +270,15 @@ abstract class RawObject
                 // get array content
                 $objval = [];
                 do {
+                    $oldoffset = $offset;
                     $element = $this->getRawObject($offset);
                     $offset = $element[2];
-                    $objval[] = $element; // @phpstan-ignore parameterByRef.type
-                } while ($element[0] !== '>>');
+                    $objval[] = $element;
+                } while ($element[0] !== '>>' && (int) $offset !== (int) $oldoffset);
 
                 if (\count($objval) > 0) {
                     // remove closing delimiter
-                    \array_pop($objval); // @phpstan-ignore parameterByRef.type
+                    \array_pop($objval);
                 }
             }
         } else {

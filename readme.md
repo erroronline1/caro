@@ -31,14 +31,13 @@ Things are still in motion. Images may be outdated.
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## to do
-* review openspout ods cell formatting
+* review openspout ods, implementation broken after update
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
 * record / audits
     * full export images
-    * where file attachments?
 
 ## Content
 * [Introducion](#introducion)
@@ -6612,14 +6611,14 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf)
     * creates PDF-files on the server side, successor of [TCPDF](https://github.com/tecnickcom/tcpdf)
     * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
-    * v8.27.0
+    * v8.29.0
     * \> 1.8k stars
     * \> 200 forks
     * [LGPL license](https://github.com/tecnickcom/tc-lib-pdf?tab=License-1-ov-file#readme)
 * [https://github.com/openspout/openspout](https://github.com/openspout/openspout)
     * creates CSV-, ODS- and XLSX-files on the server side
     * Justification: this library enables consistent and correct creation of widely used table formats for data transfers from the application.
-    * v5.3.0
+    * v5.7.2
     * [MIT license](https://github.com/openspout/openspout/blob/4.x/LICENSE)
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
@@ -6666,7 +6665,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/erroronline1/markdown](https://github.com/erroronline1/markdown)
     * Markdown utilities
     * Justification: formatting text without the need for a rich text editor.
-    * v3.0.10
+    * v3.0.11
     * [AGPL license](https://github.com/erroronline1/markdown?tab=AGPL-3.0-1-ov-file)
     * spinoff library originally created for this application by the same author
 * [Font Awesome 5](https://fontawesome.com/)

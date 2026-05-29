@@ -98,7 +98,7 @@ export class Markdown {
 		"linebreak",
 	];
 
-	_nested_blocks = ["code", "blockquote", "definition", "table"];
+	_nested_blocks = ["code", "blockquote", "definition", "list", "table"];
 
 	/**
 	 * entry method to convert a text to markdown

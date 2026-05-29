@@ -32,7 +32,7 @@ class ParserHarness extends Parser
      *            'root': string,
      *            'size': int,
      *        },
-     *        'xref': array<string, int>,
+     *        'xref': array<string, int|string>,
      *    }
      */
     private array $stubXrefData = [
@@ -56,6 +56,8 @@ class ParserHarness extends Parser
 
     private bool $useParentIndirect = false;
 
+    private bool $useParentRawObject = false;
+
     /**
      * @param array{
      *        'trailer': array{
@@ -65,7 +67,7 @@ class ParserHarness extends Parser
      *            'root': string,
      *            'size': int,
      *        },
-     *        'xref': array<string, int>,
+     *        'xref': array<string, int|string>,
      *    } $xref
      */
     public function setStubXrefData(array $xref): void
@@ -114,7 +116,7 @@ class ParserHarness extends Parser
     }
 
     /**
-     * @param array<string, int> $xref
+     * @param array<string, int|string> $xref
      */
     public function setXrefMapPublic(array $xref): void
     {
@@ -217,6 +219,25 @@ class ParserHarness extends Parser
     }
 
     /**
+     * Test-only: bypass the queue override below and run the real inherited
+     * getRawObject against `$this->pdfdata`. Lets tests exercise the real
+     * processAngular / processBracket loops with arbitrary byte input.
+     *
+     * @return RawObjectArray
+     *
+     * @throws \Com\Tecnick\Pdf\Parser\Exception
+     */
+    public function callParentGetRawObject(int $offset = 0): array
+    {
+        $this->useParentRawObject = true;
+        try {
+            return $this->getRawObject($offset);
+        } finally {
+            $this->useParentRawObject = false;
+        }
+    }
+
+    /**
      * @param array{
      *        'trailer'?: array{
      *            'encrypt'?: string,
@@ -225,7 +246,7 @@ class ParserHarness extends Parser
      *            'root': string,
      *            'size': int,
      *        },
-     *        'xref'?: array<string, int>,
+     *        'xref'?: array<string, int|string>,
      *    } $xref
      *
      * @return array{
@@ -236,7 +257,7 @@ class ParserHarness extends Parser
      *            'root': string,
      *            'size': int,
      *        },
-     *        'xref': array<string, int>,
+     *        'xref': array<string, int|string>,
      *    }
      */
     protected function getXrefData(int $offset = 0, array $xref = []): array
@@ -266,6 +287,10 @@ class ParserHarness extends Parser
      */
     protected function getRawObject(int $offset = 0): array
     {
+        if ($this->useParentRawObject) {
+            return parent::getRawObject($offset);
+        }
+
         if (empty($this->rawObjectQueue)) {
             return ['endobj', 'endobj', $offset];
         }

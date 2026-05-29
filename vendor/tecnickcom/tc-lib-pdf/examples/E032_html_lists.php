@@ -17,10 +17,10 @@
 // NOTE: run make deps fonts in the project root to generate the dependencies and example fonts.
 
 // autoloader when using Composer
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../../vendor/autoload.php';
 
 // define fonts directory
-\define('K_PATH_FONTS', \realpath(__DIR__ . '/../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
+\define('K_PATH_FONTS', \realpath(__DIR__ . '/../../../../vendor/tecnickcom/tc-lib-pdf-font/target/fonts'));
 
 // autoloader when using RPM or DEB package installation
 //require ('/usr/share/php/Com/Tecnick/Pdf/autoload.php');
@@ -45,8 +45,8 @@ $pdf->setPDFFilename('032_html_lists.pdf');
 $pdf->setViewerPreferences(['DisplayDocTitle' => true]);
 $pdf->enableDefaultPageContent();
 
-$bfont = $pdf->font->insert($pdf->pon, 'dejavusans', '', 10);
-// $bfont = $pdf->font->insert($pdf->pon, 'helvetica', '', 10);
+//$bfont = $pdf->font->insert($pdf->pon, 'dejavusans', '', 10);
+ $bfont = $pdf->font->insert($pdf->pon, 'helvetica', '', 10);
 
 $pdf->addPage();
 $pdf->setBookmark(
@@ -148,6 +148,8 @@ $html = <<<HTML
 
     <div class="panel">
       <h2>1) Unordered list styles (`list-style-type`)</h2>
+      <ol type="1" class="eol1_md"><li>Ordered list items start with a number and a period <ul class="eol1_md"><li>Unordered list items start with asterisk or dash</li><li>Sublist nesting</li><li>is possible</li><li>by indentating with four spaces <ol type="1" class="eol1_md"><li>and list types</li><li>are interchangeable</li></ol></li></ul></li><li>Ordered list item with
+      multiple lines <ol type="I" start="2" class="eol1_md"><li>the number</li><li>of ordered lists</li><li>actually doesn't</li><li>matter at all</li></ol></li></ol>	
       <ul class="ul-disc marker-guide">
         <li>Disc marker</li>
         <li>Nested sample
@@ -163,8 +165,12 @@ $html = <<<HTML
       </ul>
     </div>
 
+    <ol type="1" class="eol1_md"><li>Ordered list items start with a number and a period <ul class="eol1_md"><li>Unordered list items start with asterisk or dash</li><li>Sublist nesting</li><li>is possible</li><li>by indentating with four spaces <ol type="1" class="eol1_md"><li>and list types</li><li>are interchangeable</li></ol></li></ul></li><li>Ordered list item with
+    multiple lines <ol type="I" start="2" class="eol1_md"><li>the number</li><li>of ordered lists</li><li>actually doesn't</li><li>matter at all</li></ol></li></ol>	
     <div class="panel">
       <h2>2) Ordered list styles (`list-style-type`)</h2>
+      <ol type="1" class="eol1_md"><li>Ordered list items start with a number and a period <ul class="eol1_md"><li>Unordered list items start with asterisk or dash</li><li>Sublist nesting</li><li>is possible</li><li>by indentating with four spaces <ol type="1" class="eol1_md"><li>and list types</li><li>are interchangeable</li></ol></li></ul></li><li>Ordered list item with
+      multiple lines <ol type="I" start="2" class="eol1_md"><li>the number</li><li>of ordered lists</li><li>actually doesn't</li><li>matter at all</li></ol></li></ol>	
       <ol class="ol-decimal marker-guide">
         <li>Decimal marker</li>
         <li>Second item</li>

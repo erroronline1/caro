@@ -102,6 +102,7 @@ class Markdown {
 		'code',
 		'blockquote',
 		'definition',
+		'list',
 		'table',
 	];
 

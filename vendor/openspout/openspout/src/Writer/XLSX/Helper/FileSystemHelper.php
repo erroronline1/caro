@@ -13,10 +13,12 @@ use OpenSpout\Writer\Common\Entity\Worksheet;
 use OpenSpout\Writer\Common\Helper\CellHelper;
 use OpenSpout\Writer\Common\Helper\FileSystemWithRootFolderHelperInterface;
 use OpenSpout\Writer\Common\Helper\ZipHelper;
+use OpenSpout\Writer\XLSX\Manager\HyperlinkManager;
 use OpenSpout\Writer\XLSX\Manager\Style\StyleManager;
 use OpenSpout\Writer\XLSX\MergeCell;
 use OpenSpout\Writer\XLSX\Options;
 use OpenSpout\Writer\XLSX\Properties;
+use OpenSpout\Writer\XLSX\Validation\ValidationRule;
 
 /**
  * @internal
@@ -289,17 +291,25 @@ final class FileSystemHelper implements FileSystemWithRootFolderHelperInterface
      *
      * @param Worksheet[] $worksheets
      */
-    public function createWorksheetRelsFiles(array $worksheets): self
+    public function createWorksheetRelsFiles(array $worksheets, HyperlinkManager $hyperlinkManager): self
     {
         $this->createFolder($this->getXlWorksheetsFolder(), self::RELS_FOLDER_NAME);
 
         foreach ($worksheets as $worksheet) {
             $worksheetId = $worksheet->getId();
-            $worksheetRelsContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-              <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-                <Relationship Id="rId_comments_vml1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing" Target="../drawings/vmlDrawing'.$worksheetId.'.vml"/>
-                <Relationship Id="rId_comments1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="../comments'.$worksheetId.'.xml"/>
-              </Relationships>';
+            $worksheetRelsContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'.PHP_EOL;
+            $worksheetRelsContent .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'.PHP_EOL;
+            $worksheetRelsContent .= '  <Relationship Id="rId_comments_vml1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing" Target="../drawings/vmlDrawing'.$worksheetId.'.vml"/>'.PHP_EOL;
+            $worksheetRelsContent .= '  <Relationship Id="rId_comments1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="../comments'.$worksheetId.'.xml"/>'.PHP_EOL;
+
+            $hyperlinks = $hyperlinkManager->getHyperlinks($worksheet);
+            $hyperlinkId = 1;
+            foreach ($hyperlinks as $url) {
+                $worksheetRelsContent .= '  <Relationship Id="rId_hyperlink'.$hyperlinkId.'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="'.$this->escaper->escape($url).'" TargetMode="External"/>'.PHP_EOL;
+                ++$hyperlinkId;
+            }
+
+            $worksheetRelsContent .= '</Relationships>';
 
             $folder = $this->getXlWorksheetsFolder().\DIRECTORY_SEPARATOR.'_rels';
             $filename = 'sheet'.$worksheetId.'.xml.rels';
@@ -326,9 +336,11 @@ final class FileSystemHelper implements FileSystemWithRootFolderHelperInterface
      *
      * @param Worksheet[] $worksheets
      */
-    public function createContentFiles(Options $options, array $worksheets): self
+    public function createContentFiles(Options $options, array $worksheets, HyperlinkManager $hyperlinkManager): self
     {
         $allMergeCells = $options->getMergeCells();
+        $allValidationRules = $options->getValidationRules();
+
         foreach ($worksheets as $worksheet) {
             $contentXmlFilePath = $this->getXlWorksheetsFolder().\DIRECTORY_SEPARATOR.basename($worksheet->getFilePath());
             $worksheetFilePointer = fopen($contentXmlFilePath, 'w');
@@ -402,11 +414,63 @@ final class FileSystemHelper implements FileSystemWithRootFolderHelperInterface
                 fwrite($worksheetFilePointer, $mergeCellString);
             }
 
+            // create nodes for data validations
+            $validationRules = array_filter(
+                $allValidationRules,
+                static fn (ValidationRule $v) => $v->sheetIndex === $worksheet->getExternalSheet()->getIndex(),
+            );
+            if ([] !== $validationRules) {
+                $validationString = '<dataValidations count="'.\count($validationRules).'">';
+                foreach ($validationRules as $validationRule) {
+                    $sqref = \sprintf(
+                        '%s%s:%s%s',
+                        CellHelper::getColumnLettersFromColumnIndex($validationRule->topLeftColumn),
+                        $validationRule->topLeftRow,
+                        CellHelper::getColumnLettersFromColumnIndex($validationRule->bottomRightColumn),
+                        $validationRule->bottomRightRow,
+                    );
+                    $validation_display = $validationRule->validation_display;
+                    $rule = $validationRule->rule;
+
+                    $serialized = $rule->serialize();
+
+                    $validationString .= \sprintf(
+                        '<dataValidation type="%s"%s allowBlank="%d" showInputMessage="%d" showErrorMessage="%d" errorStyle="%s"%s%s%s%s sqref="%s"><formula1>%s</formula1>%s</dataValidation>',
+                        $serialized->type,
+                        null !== $serialized->operator ? ' operator="'.$serialized->operator.'"' : '',
+                        (int) $validation_display->allowBlank,
+                        (int) $validation_display->showInputMessage,
+                        (int) $validation_display->showErrorMessage,
+                        $validation_display->errorStyle->value,
+                        null !== $validation_display->promptTitle ? ' promptTitle="'.htmlspecialchars($validation_display->promptTitle, ENT_XML1).'"' : '',
+                        null !== $validation_display->prompt ? ' prompt="'.htmlspecialchars($validation_display->prompt, ENT_XML1).'"' : '',
+                        null !== $validation_display->errorTitle ? ' errorTitle="'.htmlspecialchars($validation_display->errorTitle, ENT_XML1).'"' : '',
+                        null !== $validation_display->error ? ' error="'.htmlspecialchars($validation_display->error, ENT_XML1).'"' : '',
+                        htmlspecialchars($sqref, ENT_XML1),
+                        $serialized->formula1,
+                        null !== $serialized->formula2 ? '<formula2>'.$serialized->formula2.'</formula2>' : '',
+                    );
+                }
+                $validationString .= '</dataValidations>';
+                fwrite($worksheetFilePointer, $validationString);
+            }
+
             $this->getXMLFragmentForPageMargin($worksheetFilePointer, $options);
 
             $this->getXMLFragmentForPageSetup($worksheetFilePointer, $options);
 
             $this->getXMLFragmentForHeaderFooter($worksheetFilePointer, $options);
+
+            $hyperlinks = $hyperlinkManager->getHyperlinks($worksheet);
+            if ([] !== $hyperlinks) {
+                fwrite($worksheetFilePointer, '<hyperlinks>');
+                $hyperlinkId = 1;
+                foreach ($hyperlinks as $cellRef => $url) {
+                    fwrite($worksheetFilePointer, '<hyperlink ref="'.$cellRef.'" r:id="rId_hyperlink'.$hyperlinkId.'"/>');
+                    ++$hyperlinkId;
+                }
+                fwrite($worksheetFilePointer, '</hyperlinks>');
+            }
 
             // Add the legacy drawing for comments
             fwrite($worksheetFilePointer, '<legacyDrawing r:id="rId_comments_vml1"/>');

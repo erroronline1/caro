@@ -13,5 +13,6 @@ final readonly class Options
         public string $FIELD_DELIMITER = ',',
         public string $FIELD_ENCLOSURE = '"',
         public string $ENCODING = EncodingHelper::ENCODING_UTF8,
+        public string $FIELD_ESCAPE = '',
     ) {}
 }
