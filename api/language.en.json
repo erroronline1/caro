@@ -869,7 +869,7 @@
 			"end": "End",
 			"end_date": "End date",
 			"end_time": "End time",
-			"error":"Error saving entry! Please try again.",
+			"error": "Error saving entry! Please try again.",
 			"error_missing": "Entries can only be created with a start- and end-date and -time as well as breaks! Please try again.",
 			"export": {
 				"proceed": "Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.",
@@ -1398,8 +1398,8 @@
 		"add_manually_warning": "Manually added products may not be considered regarding incorporation and sample check:erp_interface. Please add information if the product has skin contact, an expiry date or if it is a trading good.",
 		"add_manually_warning_erpinterface": ", as well as automated matching with order state",
 		"add_manually_warning_header": "Please consider",
-		"add_product_search":{
-			"current_orders":":your for :commissions (your units and common), :other from other units, are being processed",
+		"add_product_search": {
+			"current_orders": ":your for :commissions (your units and common), :other from other units, are being processed",
 			"matches": "Add article from :number matches",
 			"oversized": "too many results for current order matching"
 		},
@@ -1595,6 +1595,7 @@
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
+		"export_attachments": "Attachments are embedded in the PDF-file. Since this unfortunately is not supported by all operating systems, these can be downloaded separately here:",
 		"export_author": ":author on :date",
 		"export_pdf_attachment": "Click or double click on the icon to export attached file:",
 		"export_proceed": "Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.",
@@ -2022,7 +2023,7 @@
 		"user_not_saved": "User could not be saved",
 		"user_saved": "User :name has been saved",
 		"welcome_message": "Hello :name,  \nwelcome to the :appname.:welcome_name_cousin A brief summary:  \nYour contact persons for your units are :supervisor, regarding QM :qmo, in questions of product safety you'll get support by :prrc and regarding hazardous materials :hazardous_materials. A detailed list is available at :register\n\nOn :landingpage you will find a compact manual for your available functions.  \nIn case you want to know which settings apply to you, check out :profile. You can set some own options too.\n\nIf you have questions regarding the app, please contact :admin.  \nI hope the app does make things easier at work, good luck!",
-		"welcome_name_cousin":" Hey, I actually like your name :)"
+		"welcome_name_cousin": " Hey, I actually like your name :)"
 	},
 	"regulatory": {
 		"iso13485_4_1_1": "13485 4.1.1 General quality management requirements",

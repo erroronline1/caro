@@ -585,16 +585,32 @@ class AUDIT extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
+		$response = [
+			[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]
+		];
+		$downloadfiles = [];
+		// windows is a bitch. attaching files to the document raises no issues on a proper os
+		foreach($summary['files'] as $file){
+			$downloadfiles[$file] = [
+				'href' => $this->_filehandler->getFileLink($file),
+				'download' => pathinfo($file)['basename']
+			];
+		}
+		if ($downloadfiles) array_push($response,
+			[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_attachments'),
+				'content' => $downloadfiles
+			]
+		);
 		$this->response([
 			'dialog' => [
-				'render' => [
-					[
-						'type' => 'links',
-						'description' =>  $this->_lang->GET('record.export_proceed'),
-						'content' => $downloadfiles
-					]
-				]
-			]
+				'render' => $response
+			],
 		]);
 	}
 
@@ -2857,16 +2873,32 @@ class AUDIT extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
+		$response = [
+			[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]
+		];
+		$downloadfiles = [];
+		// windows is a bitch. attaching files to the document raises no issues on a proper os
+		foreach($summary['files'] as $file){
+			$downloadfiles[$file] = [
+				'href' => $this->_filehandler->getFileLink($file),
+				'download' => pathinfo($file)['basename']
+			];
+		}
+		if ($downloadfiles) array_push($response,
+			[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_attachments'),
+				'content' => $downloadfiles
+			]
+		);
 		$this->response([
 			'dialog' => [
-				'render' => [
-					[
-						'type' => 'links',
-						'description' =>  $this->_lang->GET('record.export_proceed'),
-						'content' => $downloadfiles
-					]					
-				]
-			]
+				'render' => $response
+			],
 		]);
 	}
 

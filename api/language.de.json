@@ -913,7 +913,7 @@
 			"start": "Start",
 			"start_date": "Startdatum",
 			"start_time": "Startzeit",
-			"success":"Der Eintrag wurde gespeichert",
+			"success": "Der Eintrag wurde gespeichert",
 			"vacation_warning": "Du hast noch :number Tage Urlaub übrig. Bitte plane die Tage ein!",
 			"workinghourscorrection": "Arbeitszeitkorrektur",
 			"yearly_summary": "Zusammenfassung für dieses Jahr"
@@ -1398,8 +1398,8 @@
 		"add_manually_warning": "Manuell hinzugefügte Artikel können unter Umständen nicht systematisch im Sinne des Einführungsstatus und der Stichprobenprüfung:erp_interface überwacht werden. Bitte gib bei den Anmerkungen an, ob der Artikel Hautkontakt oder ein Verfallsdatum hat und ob es sich um eine Handelware handelt.",
 		"add_manually_warning_erpinterface": ", sowie dem automatische Abgleich der Bestelldaten",
 		"add_manually_warning_header": "Bitte beachten",
-		"add_product_search":{
-			"current_orders":":your für :commissions (deine Bereiche und Allgemein), :other für andere Bereiche, sind in Bearbeitung",
+		"add_product_search": {
+			"current_orders": ":your für :commissions (deine Bereiche und Allgemein), :other für andere Bereiche, sind in Bearbeitung",
 			"matches": "Füge einen Artikel aus :number Treffern hinzu",
 			"oversized": "zu viele Ergebnisse für Abgleich mit laufenden Bestellungen"
 		},
@@ -1595,6 +1595,7 @@
 		"erp_case_number_hint": "mehrere Vorgangsnummern können getrennt eingetragen werden, z.B. 12345; 12346",
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"export": "Exportiere die Daten als PDF",
+		"export_attachments": "Anhänge sind in der PDF-Datei eingebettet. Da das leider nicht von allen Betriebssystemen unterstützt wird, können diese hier separat heruntergeladen werden:",
 		"export_author": ":author am :date",
 		"export_pdf_attachment": "Klick oder Doppelklick auf das Symbolbild um die angehängte Datei zu exportieren:",
 		"export_proceed": "Öffne den Link, speichere oder drucke die Zusammenfassung. Du bist für die Sicherheit exportierter Daten selbst verantwortlich.",
