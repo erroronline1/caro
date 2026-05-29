@@ -715,7 +715,7 @@ export class Composer {
 			return;
 		}
 
-		targetform.scrollIntoView();
+		targetform.scrollIntoView({ block: "center" });
 
 		// import attributes/values
 		if (["image"].includes(element.type)) return;
@@ -831,7 +831,6 @@ export class Composer {
 		// style context menu and position relative to pointer
 		div.classList.add("contextmenu");
 		div.style.left = evnt.clientX + "px";
-		div.style.top = window.scrollY + evnt.clientY - 10 + "px";
 
 		// add close "button"
 		const img = document.createElement("img");
@@ -940,6 +939,8 @@ export class Composer {
 
 		// append context menu
 		document.querySelector("body").append(div);
+		const offsetY = (div.offsetHeight * evnt.clientY) / window.innerHeight;
+		div.style.top = window.scrollY + evnt.clientY - offsetY + "px";
 		return false;
 	}
 
