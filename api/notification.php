@@ -599,14 +599,11 @@ class NOTIFICATION extends API {
 									// construct vendor request messages grouped by vendor
 									if (!isset($undelivered_notif[$decoded_order_data['vendor_label'] ?? ''])) $undelivered_notif[$decoded_order_data['vendor_label'] ?? ''] = [];
 									$undelivered_notif[$decoded_order_data['vendor_label'] ?? ''][] = $this->_lang->GET('order.alert_undelivered_order', [
-											':days' => $ordered->diff($this->_date['servertime'])->days,
 											':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
-											':quantity' => $decoded_order_data['quantity_label'],
-											':unit' => $decoded_order_data['unit_label'] ?? '',
-											':number' => $decoded_order_data['ordernumber_label'] ?? '',
-											':name' => $decoded_order_data['productname_label'] ?? '',
+											':ordertext' => '<a href="javascript:void(0);" onclick="api.order(\'get\', null, \'approved\', \'' . rawurlencode($decoded_order_data['commission']) . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
 											':vendor' => $decoded_order_data['vendor_label'] ?? '',
 											':commission' => preg_replace('/\*/', '\\*', addslashes(strip_tags($decoded_order_data['commission']))), // add asterisk masking to avoid dob resulting in wrong formatting
+											':days' => $ordered->diff($this->_date['servertime'])->days,
 											':orderer' => $this->_users[array_search(UTILITY::propertySet($decoded_order_data, 'orderer'), array_column($this->_users, 'id'))]['name']
 										], true);
 									$update = true;
@@ -632,12 +629,12 @@ class NOTIFICATION extends API {
 										foreach($this->_unit_members[$unit] as $unit_member){
 											if (!isset($unissued_notif[$unit_member])) $unissued_notif[$unit_member] = [];
 											$unissued_notif[$unit_member][] = $this->_lang->GET('order.alert_unissued_order', [
-												':days' => $delivered_full->diff($this->_date['servertime'])->days,
 												':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 												':ordertext' => '<a href="javascript:void(0);" onclick="api.order(\'get\', null, \'approved\', \'' . rawurlencode($decoded_order_data['commission']) . '\', \'delivered_full\')"> ' . strip_tags(implode(' ', [$decoded_order_data['quantity_label'], $decoded_order_data['unit_label'] ?? '', $decoded_order_data['ordernumber_label'] ?? '', $decoded_order_data['productname_label'] ?? ''])) . '</a>',
 												':vendor' => strip_tags($decoded_order_data['vendor_label'] ?? ''),
 												':commission' => preg_replace('/\*/', '\\*', addslashes(strip_tags($decoded_order_data['commission']))), // add asterisk masking to avoid dob resulting in wrong formatting
-												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true)
+												':deliverydate' => $this->convertFromServerTime($order['delivered_full'], true),
+												':days' => $delivered_full->diff($this->_date['servertime'])->days
 											], true);
 										}
 									}
