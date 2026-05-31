@@ -1,5 +1,5 @@
 {
-	"_LICENSE": "CARO - Cloud Assisted Records and Operations\nCopyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\nYou should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.\nThird party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))",
+	"_LICENSE": "CARO - Cloud Assisted Records and Operations\nCopyright (C) 2023 by error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\nYou should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.\nThird party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))",
 	"_IMPORTANT": "see _language.md",
 	"company": {
 		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland",
@@ -1595,7 +1595,7 @@
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
-		"export_attachments": "Attachments are embedded in the PDF-file. Since this unfortunately is not supported by all operating systems, these can be downloaded separately here:",
+		"export_attachments": "Embedded attachments in PDF-file",
 		"export_author": ":author on :date",
 		"export_pdf_attachment": "Click or double click on the icon to export attached file:",
 		"export_proceed": "Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.",
