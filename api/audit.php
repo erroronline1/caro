@@ -530,6 +530,7 @@ class AUDIT extends API {
 		]);
 		$audit = $audit ? $audit[0] : null;
 		if (!$audit) $this->response($return['toast'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
+		$embedfiles = UTILITY::propertySet($this->_payload, '_embedfiles') === 'true' ?: false;
 
 		$audit['content'] = json_decode($audit['content'], true);
 
@@ -540,7 +541,8 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit['unit']],
-			'date' => $this->convertFromServerTime($audit['last_touch'], true)
+			'date' => $this->convertFromServerTime($audit['last_touch'], true),
+			'embedfiles' => $embedfiles
 		];
 		
 		$summary['content'][$audit['last_user']] = '';
@@ -585,31 +587,23 @@ class AUDIT extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$response = [
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_proceed'),
-				'content' => $downloadfiles
-			]
-		];
-		$downloadfiles = [];
-		// windows is a bitch. attaching files to the document raises no issues on a proper os
-		foreach($summary['files'] as $file){
-			$downloadfiles[$file] = [
-				'href' => $this->_filehandler->getFileLink($file),
-				'download' => pathinfo($file)['basename']
-			];
+		if (!$embedfiles) {
+			foreach($summary['files'] as $file){
+				$downloadfiles[$file] = [
+					'href' => $this->_filehandler->getFileLink($file),
+					'download' => pathinfo($file)['basename']
+				];
+			}
 		}
-		if ($downloadfiles) array_push($response,
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_attachments'),
-				'content' => $downloadfiles
-			]
-		);
 		$this->response([
 			'dialog' => [
-				'render' => $response
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('record.export_proceed'),
+						'content' => $downloadfiles
+					]
+				]
 			],
 		]);
 	}
@@ -735,10 +729,22 @@ class AUDIT extends API {
 				'mdcontent' => $audit['content']['summary']
 			];
 			$current[] = [
+				'type' => 'hr'
+			];
+			$current[] = [
+				'type' => 'checkbox',
+				'content' => [
+					$this->_lang->GET('record.export_attachments') => [
+						'checked' => true,
+						'id' => '_embedfiles_' . $audit['id']
+					]
+				]
+			];
+			$current[] = [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.records.export'),
-					'onclick' => "const fd = new FormData(); fd.append('_auditid', " . $audit['id'] . "); api.audit('get', fd, 'export', 'audit')",
+					'onclick' => "api.audit('get', {_auditid: " . $audit['id'] . ", _embedfiles: document.getElementById('_embedfiles_" . $audit['id'] . "').checked}, 'export', 'audit')",
 					'data-type' => 'download'
 				]
 			];
@@ -1481,7 +1487,6 @@ class AUDIT extends API {
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
-
 		];
 
 		$this->response([
@@ -2826,11 +2831,21 @@ class AUDIT extends API {
 				$content[] = $summary;
 
 				$content[] = [
+					'type' => 'checkbox',
+					'content' => [
+						$this->_lang->GET('record.export_attachments') => [
+							'checked' => true,
+							'id' => '_embedfiles'
+						]
+					]
+				];
+
+				$content[] = [
 					[
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.records.export'),
-							'onclick' => "const identifier = document.getElementById('_identifier').value; if (identifier) {const fd = new FormData(); fd.append('" . $this->_lang->GET('audit.records.identifier') ."', identifier); api.audit('post', fd, 'export', 'recordverification')}",
+							'onclick' => "const identifier = document.getElementById('_identifier').value; if (identifier) {const fd = new FormData(); fd.append('" . $this->_lang->GET('audit.records.identifier') ."', identifier); fd.append('_embedfiles', document.getElementById('_embedfiles').checked); api.audit('post', fd, 'export', 'recordverification')}",
 						]
 					]
 				];
@@ -2839,6 +2854,8 @@ class AUDIT extends API {
 		return $content;
 	}
 	private function exportrecordverification(){
+		$embedfiles = UTILITY::propertySet($this->_payload, '_embedfiles') === 'true' ?: false;
+
 		$summary = [
 			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.recordverification', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
@@ -2846,7 +2863,8 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.recordverification', [], true),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true),
+			'embedfiles' => $embedfiles
 		];
 
 		$issues = $this->recordverification();
@@ -2873,31 +2891,23 @@ class AUDIT extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$response = [
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_proceed'),
-				'content' => $downloadfiles
-			]
-		];
-		$downloadfiles = [];
-		// windows is a bitch. attaching files to the document raises no issues on a proper os
-		foreach($summary['files'] as $file){
-			$downloadfiles[$file] = [
-				'href' => $this->_filehandler->getFileLink($file),
-				'download' => pathinfo($file)['basename']
-			];
+		if (!$embedfiles){
+			foreach($summary['files'] as $file){
+				$downloadfiles[$file] = [
+					'href' => $this->_filehandler->getFileLink($file),
+					'download' => pathinfo($file)['basename']
+				];
+			}
 		}
-		if ($downloadfiles) array_push($response,
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_attachments'),
-				'content' => $downloadfiles
-			]
-		);
 		$this->response([
 			'dialog' => [
-				'render' => $response
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('record.export_proceed'),
+						'content' => $downloadfiles
+					]
+				]
 			],
 		]);
 	}
