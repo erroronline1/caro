@@ -100,12 +100,14 @@ class PDF{
 	 *     'files' => [], array of files to be embedded  
 	 *     'images' => [], array of images to be embedded, also ensures availability via filehandler  
 	 *     'title' => 'title of the document',  
-	 *     'date' => 'generally used as such but can be any string to show up under the title'  
+	 *     'date' => 'generally used as such but can be any string to show up under the title',  
+	 *     'embedfiles' => bool
 	 * ]
 	 */
 	private function init($fileContent){
 		$this->_fileContent = $fileContent;
-
+		$this->_fileContent['embedfiles'] = $this->_fileContent['embedfiles'] ?? true;
+		
 		// create new PDF document and set initial properties
 		$this->_pdf = new RECORDTCPDF($this->_pageSetup, true, 
 		20, $fileContent['identifier'] ?? null, ['title' => $fileContent['title'] ?? '', 'date' => $fileContent['date'] ?? '']);
@@ -198,7 +200,7 @@ class PDF{
 	 * @param array $files
 	 */
 	private function attachments($files){
-		if (empty($files)) return;
+		if (empty($files) || !$this->_fileContent['embedfiles']) return;
 
 		$page = $this->_pdf->page->getPage();
 		$bbox = $this->_pdf->getLastBBox();
