@@ -510,7 +510,7 @@ class RECORD extends API {
 			$response['render']['content'][] = $defaults;
 		}
 
-		// add export options or notifictaion
+		// add export options or notification
 		if (PERMISSION::permissionFor('documentexport') || ($document['permitted_export'] && !array_intersect(['patient'], $_SESSION['user']['permissions']))){
 			if (isset($response['render']['form'])) {
 				$export = [
@@ -572,17 +572,6 @@ class RECORD extends API {
 		$this->response($response);
 	}
 	
-	/**
-	 *     _                           _                       _   
-	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ _ _ ___ ___ ___| |_ 
-	 *  | . | . |  _| | |     | -_|   |  _| -_|_'_| . | . |  _|  _|
-	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|_,_|  _|___|_| |_|  
-	 *                                            |_| 
-	 */
-	public function documentexport(){
-		$this->export('document');
-	}
-	
 
 	/**
 	 *                                           _ _   _
@@ -620,9 +609,14 @@ class RECORD extends API {
 	 * export records as pdf
 	 * @param string $summarize full|document|simplified|simplifieddocument
 	 */
-	private function export($summarize = "full"){
+	public function export($summarize = "full"){
 		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
-		$content = $this->summarizeRecord($summarize, true);
+		$embedfiles = UTILITY::propertySet($this->_payload, '_embedfiles') === 'true' ?: false;
+		$content = $this->summarizeRecord(
+			UTILITY::propertySet($this->_payload, '_summarize') ?: 'full',
+			true,
+			$embedfiles
+		);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record'], $this->_sqlinterface);
@@ -631,47 +625,29 @@ class RECORD extends API {
 			'href' => $this->_filehandler->getFileLink($file),
 			'download' => pathinfo($file)['basename']
 		];
-		$response = [
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_proceed'),
-				'content' => $downloadfiles
-			]
-		];
-		$downloadfiles = [];
-		// windows is a bitch. attaching files to the document raises no issues on a proper os
-		foreach($content['attachments'] as $document => $files){
-			foreach($files as $file){
-				$downloadfiles[$file] = [
-					'href' => $this->_filehandler->getFileLink($file),
-					'download' => pathinfo($file)['basename']
-				];
+		if (!$embedfiles) {
+			foreach($content['attachments'] as $document => $files){
+				foreach($files as $file){
+					$downloadfiles[$file] = [
+						'href' => $this->_filehandler->getFileLink($file),
+						'download' => pathinfo($file)['basename']
+					];
+				}
 			}
 		}
-		if ($downloadfiles) array_push($response,
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_attachments'),
-				'content' => $downloadfiles
-			]
-		);
 		$this->response([
 			'dialog' => [
-				'render' => $response
+				'render' => [
+					[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('record.export_proceed'),
+						'content' => $downloadfiles
+					]
+				]
 			],
 		]);
 	}
 
-	/**
-	 *   ___     _ _                     _
-	 *  |  _|_ _| | |___ _ _ ___ ___ ___| |_
-	 *  |  _| | | | | -_|_'_| . | . |  _|  _|
-	 *  |_| |___|_|_|___|_,_|  _|___|_| |_|
-	 *                      |_|
-	 */
-	public function fullexport(){
-		$this->export('full');
-	}
 
 	/**
 	 *   _   _         _   _ ___ _
@@ -1529,9 +1505,10 @@ class RECORD extends API {
 								'title' => $this->_lang->GET('record.export'),
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
-								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
-								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
+								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" .
+								"{type:'checkbox', content:{'" . $this->_lang->GET('record.export_attachments'). "': {checked: true, id: '_embedfiles'}}}," . 
+								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', {_embedfiles: document.getElementById(\'_embedfiles\').checked, _summarize: \'document\'}, \'export\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
+								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', {_embedfiles: document.getElementById(\'_embedfiles\').checked, _summarize: \'simplifieddocument\'}, \'export\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 							]
 						]);
@@ -1743,9 +1720,10 @@ class RECORD extends API {
 									'title' => $this->_lang->GET('record.export'),
 									'value' => $this->_lang->GET('record.export'),
 									'data-type' => 'download',
-									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'fullexport\', \'" . $this->_requestedID . "\')'}},".
-									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', null, \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
+									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" .
+									"{type:'checkbox', content:{'" . $this->_lang->GET('record.export_attachments'). "': {checked: true, id: '_embedfiles'}}}," . 
+									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', {_embedfiles: document.getElementById(\'_embedfiles\').checked, _summarize: \'full\'}, \'export\', \'" . $this->_requestedID . "\')'}},".
+									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', {_embedfiles: document.getElementById(\'_embedfiles\').checked, _summarize: \'simplified\'}, \'export\', \'" . $this->_requestedID . "\')'}}".
 									"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 								]
 							]
@@ -2287,27 +2265,6 @@ class RECORD extends API {
 			]]);
 	}
 
-	/**
-	 *       _           _ _ ___ _       _                     _
-	 *   ___|_|_____ ___| |_|  _|_|___ _| |___ _ _ ___ ___ ___| |_
-	 *  |_ -| |     | . | | |  _| | -_| . | -_|_'_| . | . |  _|  _|
-	 *  |___|_|_|_|_|  _|_|_|_| |_|___|___|___|_,_|  _|___|_| |_|
-	 *              |_|                           |_|
-	 */
-	public function simplifiedexport(){
-		$this->export('simplified');
-	}
-
-	/**
-	 *       _           _     ___ _       _ ___                                   _   
-	 *   ___|_|_____ ___| |_ _|  _|_|___ _| |  _|___ ___ _____ ___ _ _ ___ ___ ___| |_ 
-	 *  |_ -| |     | . | | | |  _| | -_| . |  _| . |  _|     | -_|_'_| . | . |  _|  _|
-	 *  |___|_|_|_|_|  _|_|_  |_| |_|___|___|_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|  
-	 *              |_|   |___|                                       |_|              
-	 */
-	public function simplifieddocumentexport(){
-		$this->export('simplifieddocument');
-	}
 
 	/**
 	 *                               _                               _
@@ -2317,11 +2274,12 @@ class RECORD extends API {
 	 *
 	 * @param string $type full, simplified, document
 	 * @param bool $export if summary is about to be exported to a pdf
+	 * @param bool $embedfiles if summary pdf should embed attachments, which is only supported on proper operating systems that do not patronise their users
 	 * 
 	 * @return array $summary
 	 */
 
-	private function summarizeRecord($type = 'full', $export = false){
+	private function summarizeRecord($type = 'full', $export = false, $embedfiles = true){
 		$data = $this->_sqlinterface->EXECUTE('records_get_identifier', [
 			':identifier' => $this->_requestedID
 		]);
@@ -2358,7 +2316,8 @@ class RECORD extends API {
 			'erp_case_number' => $data['erp_case_number'],
 			'note' => $data['note'],
 			'recenthash' => '',
-			'unit' => $data['unit']
+			'unit' => $data['unit'],
+			'embedfiles' => $embedfiles
 		];
 		$accumulatedcontent = [];
 
