@@ -31,13 +31,11 @@ Things are still in motion. Images may be outdated.
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## to do
-* review openspout ods, implementation broken after update
+* review openspout ods styles, implementation broken after update
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
-* record / audits
-    * full export images
 
 ## Content
 * [Introducion](#introducion)
@@ -58,9 +56,9 @@ Things are still in motion. Images may be outdated.
         * [Responsibilities](#responsibilities)
         * [Improvement suggestions](#improvement-suggestions)
         * [Whiteboard](#whiteboard)
-    * [Records](#records-1)
+    * [Records](#records)
         * [Documents](#documents)
-        * [Records](#records-2)
+        * [Records](#records-1)
         * [Risk management](#risk-management)
         * [Audit](#audit)
         * [Management review](#management-review)
@@ -592,7 +590,7 @@ This scenario justifies documents to bypass unavailable application functions, e
 [Content](#content)
 
 ### Records
-Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime. PDF-exports include embedded images and file attachments if provided.
+Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime. PDF-exports include embedded images and [file attachments](#miscellaneous-1) if provided and selected.
 
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
@@ -2473,6 +2471,7 @@ Please consult your operator of infrasturcture which strategy suits you best.
 * Notifications on new messages are as reliable as the timespan of a Service-Worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes and [Safari](#safaris-special-needs).
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads.
+* Embedded attachments in record exports may not be supported on operating systems and applications that patronise their users. 
 
 ### Filename conventions
 Filenames will be modified on upload depending on their use case.
@@ -3161,7 +3160,7 @@ Other libraries rely on dynamic data and have to be tested in development runtim
 * viewstl: upload an stl/obj-file and view it within the file selection
 * tc-lib-pdf: generate a record and export it as pdf
 * openspout: generate orders and export the order statistic from the audit-module
-* markdown: preview markdown with the markdown playground from eny eligible input (e.g. Messages, Managementreview)
+* markdown: preview markdown with the markdown playground from any eligible input (e.g. Messages, Managementreview)
 
 ## Stress test and performance
 Some stress tests can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
@@ -3558,7 +3557,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
-| {param} | query parameter/form data | optional | additional filters if applicable |
+| {param} | query parameter/form data | optional | additional filters if applicable, _embedfiles in pdf |
 
 Sample response
 ```
@@ -5046,33 +5045,20 @@ Sample response
 {"title":"Basic data","render":{"content":[[{"type":"identify","attributes":{"name":"Case","value":"Jane Doe *01.02.2003 DAFO #tebvz0"}},{"type":"hidden","attributes":{"name":"_context","value":"casedocumentation"}},{"type":"hidden","attributes":{"name":"_document_name","value":"Basic data"}},{"type":"hidden","attributes":{"name":"_document_id","value":186}}],[{"type":"text","attributes":{"name":"Name","required":true,"data-loss":"prevent"}},{"type":"date","attributes":{"name":"Date of birth","data-loss":"prevent"}},....
 ```
 
-> GET ./api/api.php/record/documentexport/{identifier}/{name}
+> GET ./api/api.php/record/export/{identifier}/{name}?{params}
 
-Returns a download link to a temporary file with all records for a given document as a pdf.
+Returns a download link to a temporary file with records for a given document as a pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {identifier} | path parameter | optional | identifier for records |
-| {name} | path parameter | required | document name |
+| {name} | path parameter | mandatory for documentwise record exports | document name |
+| {params} | query parameters | optional | _summary type, _embedfiles in pdf |
 
 Sample response
 ```
 {"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2311.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2311.pdf"}}}]}}
-```
-
-> GET ./api/api.php/record/fullexport/{identifier}
-
-Returns a download link to a temporary file with all records as a pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
-
-Sample response
-```
-{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/identifier
@@ -5201,35 +5187,6 @@ Parameters
 Sample response
 ```
 {"toast":{"msg":"The record has been saved.","type":"success"}}
-```
-
-> GET ./api/api.php/record/simplifiedexport/{identifier}
-
-Returns a download link to a temporary file with most recent records as a pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
-
-Sample response
-```
-{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2309.pdf"}}}]}}
-```
-
-> GET ./api/api.php/record/simplifieddocumentexport/{identifier}/{name}
-
-Returns a download link to a temporary file with all records for a given document as a pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | optional | identifier for records |
-| {name} | path parameter | required | document name |
-
-Sample response
-```
-{"dialog":{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summaries":{"href":"./api/api.php/file/stream/./fileserver/tmp/Jane Doe 01022003 DAFO tebvz0_2026-05-16 2312.pdf","download":"Jane Doe 01022003 DAFO tebvz0_2026-05-16 2312.pdf"}}}]}}
 ```
 
 > GET ./api/api.php/record/verify/{identifier}
@@ -6619,12 +6576,14 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * creates CSV-, ODS- and XLSX-files on the server side
     * Justification: this library enables consistent and correct creation of widely used table formats for data transfers from the application.
     * v5.7.2
+    * \> 1.8k stars
+    * \> 100 forks
     * [MIT license](https://github.com/openspout/openspout/blob/4.x/LICENSE)
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
     * Justification: this library enables the application to handle 2D-codes for transfer of physical to digital data. This is used for the login process and a safe way of consistent tracing of records and products.
     * v2.3.8
-    * \> 5k stars
+    * \> 6k stars
     * \> 1k forks
     * [ASL 2.0 license](https://github.com/mebjas/html5-qrcode?tab=Apache-2.0-1-ov-file)
     * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
@@ -6641,7 +6600,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 200 stars
     * \> 20 forks
     * [MIT license](https://github.com/nimiq/qr-creator?tab=MIT-1-ov-file)
-* [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
+* [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode)
     * creates barcodes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
     * v3.12.3
@@ -6694,7 +6653,7 @@ There are **no** dependency install routines for [composer](https://getcomposer.
 
 # License
 [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
-Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
+Copyright (C) 2023 by error on line 1 (dev@erroronline.one)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  

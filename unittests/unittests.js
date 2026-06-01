@@ -2331,41 +2331,41 @@ export async function screenshot(lang = null, distinct = null) {
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Remember bringing shoes";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
 					await _.sleep(500);
-					api.calendar("post", "[data-usecase=appointment]","appointment");
+					api.calendar("post", "[data-usecase=appointment]", "appointment");
 					console.log(`appointment ${lang}.png`);
 				},
 				de: async function () {
-					api.calendar("get", null,"appointment");
+					api.calendar("get", null, "appointment");
 					await _.sleep(2000);
 					document.getElementsByName(api._lang.GET("calendar.appointment.datetime"))[0].value = "2025-07-27T10:00";
 					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Gipsabdruck für Orthese";
 					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Bringen Sie Schuhe mit";
 					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
 					await _.sleep(500);
-					api.calendar("post", "[data-usecase=appointment]","appointment");
+					api.calendar("post", "[data-usecase=appointment]", "appointment");
 					console.log(`appointment ${lang}.png`);
 				},
 			},
 			/* 32 */ {
 				en: async function () {
-					api.record("get", null, "fullexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
+					api.record("get", { _summarize: "full" }, "export", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", null, "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
+					api.record("get", { _summarize: "full" }, "export", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record full summary ${lang}.png`);
 				},
 			},
 			/* 33 */ {
 				en: async function () {
-					api.record("get", null, "simplifiedexport", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
+					api.record("get", { _summarize: "simplified" }, "export", "Jane Doe *01.02.2003 DAFO #tebvz0"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
 				de: async function () {
-					api.record("get", null, "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
+					api.record("get", { _summarize: "simplified" }, "export", "Erika Musterfrau *01.02.2003 UA-Prothese #tebwhc"); // customize identifier
 					await _.sleep(2000);
 					console.log(`record reduced summary ${lang}.png`);
 				},
@@ -2514,6 +2514,6 @@ export function jsMarkdown(lang = "en") {
 	const MARKDOWN = new Markdown();
 	console.time("markdown");
 	document.body.innerHTML = MARKDOWN.md2html(markdown[lang]);
-//	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis', 'bigger']);
+	//	document.body.innerHTML = MARKDOWN.md2html(markdown[lang], true, ['emphasis', 'bigger']);
 	console.timeEnd("markdown");
 }
