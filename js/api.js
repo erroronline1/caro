@@ -774,7 +774,7 @@ export const api = {
 	 */
 	audit: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get" && !request[0].startsWith("export")) api.history.write(["audit", payload, ...request]);
+		if (method === "get" && !['export'].includes(request[0])) api.history.write(["audit", payload, ...request]);
 		request.splice(0, 0, "audit");
 		if (["import"].contains(request[1])) api.preventDataloss.stop();
 		let successFn = async function (data) {
@@ -1291,7 +1291,7 @@ export const api = {
 	 */
 	order: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["order", payload, ...request]);
+		if (method === "get" && !['export'].includes(request[0])) api.history.write(["order", payload, ...request]);
 		request.splice(0, 0, "order");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
@@ -1342,7 +1342,7 @@ export const api = {
 	 */
 	record: (method, payload = {}, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["record", payload, ...request]);
+		if (method === "get" && !['export'].includes(request[0])) api.history.write(["record", payload, ...request]);
 		request.splice(0, 0, "record");
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
