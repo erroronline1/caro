@@ -21,9 +21,9 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
         * [Verantwortlichkeiten](#verantwortlichkeiten)
         * [Verbesserungsvorschläge](#verbesserungsvorschläge)
         * [Whiteboard](#whiteboard)
-    * [Aufzeichnungen](#aufzeichnungen-1)
+    * [Aufzeichnungen](#aufzeichnungen)
         * [Dokumente](#dokumente)
-        * [Aufzeichnungen](#aufzeichnungen-2)
+        * [Aufzeichnungen](#aufzeichnungen-1)
         * [Risikomanagement](#risikomanagement)
         * [Audit](#audit)
         * [Managementbericht](#managementbericht)
@@ -491,7 +491,7 @@ Dieses Szenario rechtfertigt Dokumente um nicht erreichbare Funktionen der Anwen
 [Übersicht](#übersicht)
 
 ### Aufzeichnungen
-Aufzeichnungen speichern alle Eingaben für jedes gewählte Dokument. Manche Dokumenten-Kontexte erfordern ein Kennzeichen, das alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Zusammenfassungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter. Ein weiterer Anwendungsfall sind Gebrauchsanleitungen, deren Inhalt für die Dokumentation gespeichert, aber auch jederzeit für die Anwender inclusive Erläuterungen exportiert werden kann. PDF-Exporte beinhalten auch eingebettete Bilder und Dateianhänge sofern bereitgestellt.
+Aufzeichnungen speichern alle Eingaben für jedes gewählte Dokument. Manche Dokumenten-Kontexte erfordern ein Kennzeichen, das alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Zusammenfassungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter. Ein weiterer Anwendungsfall sind Gebrauchsanleitungen, deren Inhalt für die Dokumentation gespeichert, aber auch jederzeit für die Anwender inclusive Erläuterungen exportiert werden kann. PDF-Exporte beinhalten auch eingebettete Bilder und [Dateianhänge](#verschiedenes-1) sofern bereitgestellt und ausgewählt.
 
 Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet sein. Daher können einzelne Dokumente ebenfalls exportiert werden um die Daten in Situationen bereithalten zu können, in denen elektronische Geräte Schaden nehmen könnten.
 
@@ -2377,6 +2377,7 @@ Der Betreiber der Infrastruktur sollte zu Rate gezogen werden, welche Speicherst
 * Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des Service-Workers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den Service-Worker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus und [Safari](#safaris-besondere-bedürfnisse).
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
+* Eingebettete Anhänge in Aufzeichnungsexporten werden möglicherweise von Betriebssystemen und Anwendungen die ihre Nutzer bevormunden nicht unterstützt.
 
 ### Dateinamenkonventionen
 Dateinamen werden bei der Bereitstellung je nach Anwendungsfall modifiziert.
@@ -2747,7 +2748,7 @@ Eine Auflistung der verwendeten Bibliotheken liegt in der englischsprachigen Bes
 
 # Lizenz
 [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
-Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
+Copyright (C) 2023 by error on line 1 (dev@erroronline.one)
 
 Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.  
 Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License.  
