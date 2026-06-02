@@ -1,4 +1,5 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: © 2026 error on line 1 <dev@erroronline.one> -->
 <!-- SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script. -->
 
 # Markdown

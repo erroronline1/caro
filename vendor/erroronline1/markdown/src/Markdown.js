@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-FileCopyrightText: © 2026 error on line 1 <dev@erroronline.one>
 // SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script.
 
 class ListTypeGenerator {
@@ -118,7 +119,7 @@ export class Markdown {
 			comments = [...text.matchAll(this._comment)];
 		if (comments.length) {
 			for (let i = 0; i < comments.length; i++) {
-				text = text.replace(comments[i], comment_placeholder + i);
+				text = text.replace(comments[i], `{${comment_placeholder + i}}`);
 			}
 		}
 		// apply methods
@@ -133,7 +134,7 @@ export class Markdown {
 
 		// revert comments
 		if (comments.length) {
-			text = text.replaceAll(new RegExp(comment_placeholder + "(\\d+)", "g"), (...match) => {
+			text = text.replaceAll(new RegExp(`{${comment_placeholder}(\\d+)}`, "g"), (...match) => {
 				return comments[match[1]] || match[0];
 			});
 			// escape remaining characters within code if applicable

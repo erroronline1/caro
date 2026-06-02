@@ -1,5 +1,6 @@
 <?php
 // SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-FileCopyrightText: © 2026 error on line 1 <dev@erroronline.one>
 // SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script.
 
 namespace erroronline1\Markdown;
@@ -247,7 +248,7 @@ class Markdown {
 		if ($comments){
 			$comments = $comments[0];
 			foreach($comments as $i => $comment){
-				$text = str_replace($comment, $comment_placeholder . $i, $text);
+				$text = str_replace($comment, '{' . $comment_placeholder . $i . '}', $text);
 			}
 		}
 		// apply methods
@@ -262,7 +263,7 @@ class Markdown {
 
 		// revert comments
 		if ($comments){
-			$text = preg_replace_callback('/' . $comment_placeholder . '(\\d+)/',
+			$text = preg_replace_callback('/{' . $comment_placeholder . '(\\d+)}/',
 				function ($match) use ($comments) {
 					return $comments[$match[1]] ?? $match[0];
 				},

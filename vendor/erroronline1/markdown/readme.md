@@ -1,4 +1,5 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: © 2026 error on line 1 <dev@erroronline.one> -->
 <!-- SPDX-FileNotice: Part of erroronline1/markdown parser for PHP & ECMA-Script. -->
 
 # Markdown
@@ -138,6 +139,4 @@ class md extends \erroronline1\Markdown\Markdown{
     * Forgiving indentation handling within lists, here you should be accurate; also lists don't accept blank lines without indentation regarding paragraphs
     * Block sizes (lists, code, blockquote, etc.) longer than 8k characters may fail and impact further processing on php. You can split them though if applicable. This may be considered visually uncritical.
 
-Due to the **intended** capability of turning scripts into links like `[test](javascript:fn())` there may be the need to escape a bit more as in `(this is an example: [test](javascript:fn())\)`
-
-You should avoid a number right beside a HTML-comment. Something like `<!--comment-->2` will likely fail. Whatever symbol i'd choose, chances are never zero. I can as well stick with numbers. 
+Due to the **intended** capability of turning scripts into links like `[test](javascript:fn())` there may be the need to escape a bit more as in `(this is an example: [test](javascript:fn())\)` for the pattern of parentheses is hard to determine.
