@@ -1,10 +1,7 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
- * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileNotice: Part of erroronline1/caro a quality management software.
+ * SPDX-FileCopyrightText: © 2023 error on line 1 <dev@erroronline.one>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -569,7 +566,7 @@ export const api = {
 										const call = api._unauthorizedRequest.request.shift();
 										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, api._unauthorizedRequest.payload, ...api._unauthorizedRequest.request);
 									}
-									api.session_timeout.init();
+									api.session_timeout.reset();
 								}
 							} catch (error) {
 								_client.application.debug(error, api._unauthorizedRequest);
