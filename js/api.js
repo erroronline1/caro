@@ -875,6 +875,7 @@ export const api = {
 		request = [...request];
 		if (method === "get") api.history.write(["consumables", payload, ...request]);
 		request.splice(0, 0, "consumables");
+		if (['search'].includes(request[1])) api.preventDataloss.monitor = false;
 		let successFn = function (data) {
 			if (data.toast) new Toast(data.toast.msg, data.toast.type);
 			if (data.dialog) {
@@ -920,6 +921,7 @@ export const api = {
 						search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
 						render.processAfterInsertion();
 				}
+				api.preventDataloss.monitor = true;
 			}
 			if (data.notif) _serviceWorker.notif.consumables(data.notif);
 			if (data.redirect) api.order("get", null, ...data.redirect);
