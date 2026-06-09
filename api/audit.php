@@ -126,6 +126,16 @@ class AUDIT extends API {
 						// manual human template question
 						$audit[':content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
+				
+				// content sanitation
+				// sort by key, as fileinputs may mess up the order
+				ksort($audit[':content']['questions']);
+				// reduce empty answers and utilize values to return a proper list type array
+				foreach($audit[':content']['questions'] as &$question){
+					foreach($question as $topic => $answer_array){
+						$question[$topic] = array_values(array_filter($answer_array, Fn($v) => boolval($v)) ?: ['']);
+					}
+				}
 
 				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
@@ -317,7 +327,8 @@ class AUDIT extends API {
 						if (isset($preset['proof'])){
 							foreach ($preset['proof'] as $value){
 								if ($value) // empty values are stored by default, to have everything an the audits data, clear empty proofs that otherwise would pile up to an array of emptyness
-									$proof[] = ['type' => 'scanner',
+									$proof[] = [
+										'type' => 'scanner',
 										'attributes' => [
 											'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
 											'multiple' => true,
@@ -328,13 +339,13 @@ class AUDIT extends API {
 							}
 						}
 						$proof[] = [
-							'type' => 'scanner',
-								'attributes' => [
-									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
-									'multiple' => true,
-									'data-loss' => 'prevent'
-								]
-							];
+						'type' => 'scanner',
+							'attributes' => [
+								'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
+								'multiple' => true,
+								'data-loss' => 'prevent'
+							]
+						];
 						if (isset($preset['files'])){
 							$link = [];
 							foreach ($preset['files'] as $file){
@@ -551,7 +562,7 @@ class AUDIT extends API {
 			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 				$currentquestion = $key;
-				$summary['content'][$currentquestion] = implode("\n", $values) . "\n";
+				$summary['content'][$currentquestion] = implode("\n", $values) . "\n\n";
 				break;
 			}
 			if (!$currentquestion) continue;
@@ -664,7 +675,7 @@ class AUDIT extends API {
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 					$currentquestion = $key;
-					$currentanswer = implode("\n", $values) . "\n";
+					$currentanswer = implode("\n", $values) . "\n\n";
 					break;
 				}
 				if (!$currentquestion) continue;
