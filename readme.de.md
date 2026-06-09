@@ -659,6 +659,8 @@ Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt wer
 
 Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem letzten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
+Ergänzugen sind nicht vorgesehen. Die Überwachung von Folgemaßnahmen können über ein Folgeaudit mit angepasster Fragestellung dokumentiert werden. 
+
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20de-fullpage.png)
 
 [Übersicht](#übersicht)
@@ -1433,7 +1435,7 @@ Beschreibung der Optionen:
         "columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
         "encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
         "replacementOverflow": Ganzzahl um eine Fehlermeldung zu erzeugen, im Falle verdächtig vieler Ersetzungen (1000 ohne Angabe)
-
+    
     "filter": Liste von Objekten
         "apply": "filter_by_expression"
         "comment": Beschreibung, wird angezeigt
@@ -1441,7 +1443,7 @@ Beschreibung der Optionen:
         "match":
             "all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
             "any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
-
+    
         "apply": "filter_by_monthdiff"
         "comment": Beschreibung, wird angezeigt
         "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
@@ -1451,7 +1453,7 @@ Beschreibung der Optionen:
             "format": gemäß https://www.php.net/manual/en/datetime.format.php,
             "threshold": Ganzzahl für Monate,
             "bias": < kleiner als, > größer als threshold
-
+    
         "apply": "filter_by_duplicates",
         "comment": Beschreibung, wird angezeigt
         "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
@@ -1460,7 +1462,7 @@ Beschreibung der Optionen:
             "descending": Boolescher Wert,
             "column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
             "amount": Ganzzahl > 0
-
+    
         "apply": "filter_by_comparison_file",
         "comment": Beschreibung, wird angezeigt
         "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
@@ -1472,7 +1474,7 @@ Beschreibung der Optionen:
                 "all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
                 "any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
         "transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
-
+    
         "apply": "filter_by_monthinterval",
         "comment": Beschreibung, wird angezeigt
         "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
@@ -1481,14 +1483,14 @@ Beschreibung der Optionen:
             "format": gemäß https://www.php.net/manual/en/datetime.format.php,
             "interval": Ganzzahl für Monate,
             "offset": optionale Verschiebung in Monaten (Ganzzahl)
-
+    
         "apply": "filter_by_rand",
         "comment": Beschreibung, wird angezeigt
         "keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
         "data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
             "columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
             "amount": Ganzzahl > 0
-
+    
     "modify": Ändert das Ergebnis
         "add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
                Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
@@ -1503,14 +1505,14 @@ Beschreibung der Optionen:
         "translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
         "conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
         "conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
-
+    
     "split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
-
+    
     "modify2": Ändert das Ergebnis nach der Aufteilung, falls diese auf Spaltenwerten beruhte
         "remove":Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung/Aufteilung erforderlich waren
-
+    
     "evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
-
+    
     "translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
                      Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
                      Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.

@@ -36,6 +36,7 @@ Things are still in motion. Images may be outdated.
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
     * on repeated failure parent::response(203|207)?
+* audit answer nesting slightly off
 
 ## Content
 * [Introducion](#introducion)
@@ -761,6 +762,8 @@ Audits can be added to the calendar from the form as well, informing selected un
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20en-fullpage.png)
 
 Executing an audit starts by selecting one of the prepared templates. Answers and statements will be initially imported from the last audit for the selected unit. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries). [Markdown](#markdown) is available.
+
+Amendments are not intended. Tracking of follow ups can be documented by another audit with an adjusted question set. 
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20en-fullpage.png)
 
@@ -1528,7 +1531,7 @@ Description of options:
 		"columns": list/array of column names to process and export to destination
 		"encoding": Comma separated string of possible character encoding of sourcefile
 		"replacementOverflow": integer to raise an exception on an suspicious amount of replacements (1000 by default)
-
+    
 	"filter": List/array of objects/dicts
 		"apply": "filter_by_expression"
 		"comment": Description, will be displayed
@@ -1536,7 +1539,7 @@ Description of options:
 		"match":
 			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
 			"any": At least one expression has to be matched, it's either "all" or "any"
-
+    
 		"apply": "filter_by_monthdiff"
 		"comment": Description, will be displayed
 		"keep": Boolean if matches are kept or omitted
@@ -1546,7 +1549,7 @@ Description of options:
 			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"threshold": Integer for months,
 			"bias": < less than, > greater than threshold
-
+    
 		"apply": "filter_by_duplicates",
 		"comment": Description, will be displayed
 		"keep": Boolean if matches are kept or omitted
@@ -1555,7 +1558,7 @@ Description of options:
 			"descending": Boolean,
 			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
 			"amount": Integer > 0
-
+    
 		"apply": "filter_by_comparison_file",
 		"comment": description, will be displayed
 		"keep": boolean if matches are kept or omitted, not set or null to only transfer matching 
@@ -1567,7 +1570,7 @@ Description of options:
 				"all": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if all match
 				"any": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if at least one matches
 		"transfer": add a new column with comparison value of all kept matching rows or first match of any
-
+    
 		"apply": "filter_by_monthinterval",
 		"comment": Description, will be displayed
 		"keep": Boolean if matches are kept or omitted
@@ -1576,14 +1579,14 @@ Description of options:
 			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"interval": Integer for months,
 			"offset": Optional offset in months
-
+    
 		"apply": "filter_by_rand",
 		"comment": Description, will be displayed
 		"keep": boolean if matches are kept or omitted
 		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
 			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
 			"amount": Integer > 0
-
+    
 	"modify": Modifies the result
 		"add": Adds a column with the set value. if the name is already in use this will be replaced!
 			   If property is an array with number values and arithmetic operators it will try to calculate
@@ -1598,14 +1601,14 @@ Description of options:
 		"translate": Column values to be translated according to specified translation object
 		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
 		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
-
+    
 	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
-
+    
 	"modify2": Modifies the result even after splitting in case this has relied on previous column values
 		"remove": remove columns from result, may have been used solely for filtering/splitting
-
+    
 	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
-
+    
 	"translations" : Can replace e.g. numerical values with legible translations.
 					 This is an object/dict whose keys can be refered to from the modifier. 
 					 The dict keys are processed as regex for a possible broader use.
