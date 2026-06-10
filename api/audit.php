@@ -300,7 +300,7 @@ class AUDIT extends API {
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
 							'mdcontent' => $template['objectives'] .
-								(!$template['method'] ? '' : "  \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $template['method'])) .
+								(!$template['method'] ? '' : "\n\n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $template['method'])) .
 								($audit['id'] ? "  \n\n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->convertFromServerTime($audit['last_touch']), ':user' => $audit['last_user']]) : '')
 						], [
 							'type' => 'textsection',
@@ -562,25 +562,28 @@ class AUDIT extends API {
 			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 				$currentquestion = $key;
-				$summary['content'][$currentquestion] = implode("\n", $values) . "\n\n";
+				$summary['content'][$currentquestion] = trim(implode("  \n", $values)) . "\n"; 
 				break;
 			}
 			if (!$currentquestion) continue;
 			// assign question response as value
+			// keys may appear in another order than the actual audit form depending on intermediate saves and their respective processing.
+			// however due to possible future changes limiting keys to a predefined order has been rejected to avoid data not being rendered.
+			$summary['content'][$currentquestion] .= "\n- - -\n";
 			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
-					$summary['content'][$currentquestion] .= "  \n*" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ':* ';
+					$summary['content'][$currentquestion] .= "\n* *" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ':* ';
 					switch ($key){
 						case 'rating':
 							$summary['content'][$currentquestion] .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 							break;
 						case 'regulatory':
-							if ($values[0])	$summary['content'][$currentquestion] .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0]))) . "\n\n";
+							if ($values[0])	$summary['content'][$currentquestion] .= "\n    * " . implode("\n    * " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 							break;
 						case 'files':
 							array_push($summary['files'], ...$values);
 						default:
-							$summary['content'][$currentquestion] .= implode("  \n", $values);
+							$summary['content'][$currentquestion] .= trim(implode("  \n", $values));
 					}
 				}
 			}
@@ -675,24 +678,27 @@ class AUDIT extends API {
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 					$currentquestion = $key;
-					$currentanswer = implode("\n", $values) . "\n\n";
+					$currentanswer = trim(implode("  \n", $values)) . "\n";
 					break;
 				}
 				if (!$currentquestion) continue;
 				// assign question response as value
+				// keys may appear in another order than the actual audit form depending on intermediate saves and their respective processing.
+				// however due to possible future changes limiting keys to a predefined order has been rejected to avoid data not being rendered.
+				$currentanswer .= "\n- - -\n";
 				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 						if ($key === 'files') continue;
-						$currentanswer .= "  \n*" . (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ':* ';
+						$currentanswer .= "\n* *" . (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ':* ';
 						switch ($key){
 							case 'rating':
 								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 								break;
 							case 'regulatory':
-								if ($values[0])	$currentanswer .= "\n* " . implode("\n* " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0]))) . "\n\n";
+								if ($values[0])	$currentanswer .= "\n    * " . implode("\n    * " , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r] ?? $r, explode(',', $values[0])));
 								break;
 							default:
-								$currentanswer .= implode("  \n", $values);
+								$currentanswer .= trim(implode("  \n", $values));
 						}
 					}
 				}
