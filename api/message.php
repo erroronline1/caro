@@ -166,8 +166,8 @@ class MESSAGE extends API {
 							UTILITY::json_encode(
 								[
 									...$this->announcementform([
-										'subject' => $announcement['subject'] ? : '',
-										'text' => $announcement['text'] ? preg_replace(['/\r/', '/\n/', '/\'/'],['', "\\n", "&apos;"], $announcement['text']): '',
+										'subject' => $announcement['subject'] ?: '',
+										'text' => $announcement['text'] ?: '',
 										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
 										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
 										'units' => $announcementunits,
@@ -217,13 +217,13 @@ class MESSAGE extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.subject'),
 						'required' => true,
-						'value' => $preset['subject'] ?? ''
+						'value' => isset($preset['subject']) ? addslashes($preset['subject']) : ''
 					]
 				], [
 					'type' => 'textarea',
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.text'),
-						'value' => isset($preset['text']) ? str_replace('\\\\n', '\n', addslashes($preset['text'])) : '',
+						'value' => isset($preset['text']) ? addslashes(preg_replace(['/\r/', '/\n/', '/\'/'],['', "\\n", "&apos;"], $preset['text'])) : '',
 						'id' => 'announcement'
 					]
 				], [
