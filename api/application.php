@@ -46,7 +46,7 @@ class APPLICATION extends API {
 				]);
 				// no break by intent
 			case 'POST':
-				$this->response($this->_auth);
+				$this->response(['config' => $this->_auth]);
 				break;
 			default:
 				$response = [

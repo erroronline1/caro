@@ -548,7 +548,7 @@ export const api = {
 						case "post":
 							// sometimes an error occures, try to show what's happening
 							try {
-								if (data.user) {
+								if (data.config && data.config.user) {
 									// reset notif interval
 									if (_serviceWorker.worker)
 										// registered
@@ -566,7 +566,7 @@ export const api = {
 										const call = api._unauthorizedRequest.request.shift();
 										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, api._unauthorizedRequest.payload, ...api._unauthorizedRequest.request);
 									}
-									api.session_timeout.reset();
+									api.session_timeout.init();
 								}
 							} catch (error) {
 								_client.application.debug(error, api._unauthorizedRequest);
