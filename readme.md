@@ -2,6 +2,16 @@
 # CARO - Cloud Assisted Records and Operations
 A quality management software as device agnostic web-app for local Apache- or IIS-server environments.
 
+# This project has moved
+
+This repository is now maintained at
+[codeberg.org/erroronline1/caro](https://codeberg.org/erroronline1/caro).
+
+This GitHub mirror may be out of date. Please file issues and
+contributions on Codeberg.
+
+- - -
+
 # ...work in progress
 
 ## CURRENT PRE-RELEASE STATE
