@@ -199,7 +199,7 @@ class APPLICATION extends API {
 						[
 							[
 								'type' => 'textsection',
-								'mdcontent' => addslashes($erpmd)
+								'mdcontent' => addslashes(preg_replace(['/\r/', '/\n/', '/\'/'], ['', "\\n", "&apos;"], $erpmd))
 							]
 						]
 					) . "')})"
