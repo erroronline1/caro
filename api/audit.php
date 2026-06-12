@@ -785,7 +785,7 @@ class AUDIT extends API {
 		function sanitizeQuestionNesting($element, $result = []){
 			foreach ($element as $sub){
 				if (array_is_list($sub)){
-					array_push($result, ...sanitizeQuestionNesting($sub, $result));
+					array_push($result, ...sanitizeQuestionNesting($sub));
 				} else {
 					$result[] = $sub;					
 				}
@@ -826,7 +826,6 @@ class AUDIT extends API {
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
-
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if ($this->_sqlinterface->EXECUTE('audit_post_template', $template)) $this->response([
@@ -881,7 +880,7 @@ class AUDIT extends API {
 				// prepare selection and datalists
 				foreach ($data as $row){
 					// selection
-					$select[$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
+					$select[$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = (intval($this->_requestedID) === intval($row['id'])) ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 					// template hint datalist
 					$templatehints[] = $row['hint'];
 					// objective datalist
@@ -1005,11 +1004,11 @@ class AUDIT extends API {
 							'id' => '_question',
 							'rows' => 4,
 							'data-loss' => 'prevent',
-							'maxlength' => 80,
+							//'maxlength' => 80,
 							'data-type' => 'auditsection' // for composer, not icon
 						],
 						'hint' => $this->_lang->GET('audit.audit.question_hint'),
-						'autocomplete' => array_values($datalist['questions']) ? : null
+						'autocomplete' => array_unique(array_values($datalist['questions'])) ? : null
 					], [
 						'type' => 'checkbox2text',
 						'attributes' => [
@@ -1027,7 +1026,7 @@ class AUDIT extends API {
 							'data-loss' => 'prevent'
 						],
 						'numeration' => 'none',
-						'autocomplete' => array_values($datalist['hints']) ? : null
+						'autocomplete' => array_unique(array_values($datalist['hints'])) ? : null
 					], [
 						'type' => 'button',
 						'attributes' => [
