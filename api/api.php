@@ -306,6 +306,9 @@ class API {
 				]
 			],
 			'config' => [
+				'user' => [
+					'name' => $_SESSION['user']['name'] ?? null
+				],
 				'config' => [
 					'application' => [
 						'language' =>  $_SESSION['user']['app_settings']['language'] ?? CONFIG['application']['defaultlanguage'],
