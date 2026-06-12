@@ -35,8 +35,11 @@ Things are still in motion. Images may be outdated.
 * sqlsqrv 16->19->22 migration compatibility?
 * consider SQLINTERFACE reinstatiate its own pdo on exceptions
     * [sql cluster switch](#rejected-requirements) **does** terminate the session, try/catch with repeated connection attempts
-    * on repeated failure parent::response(203|207)?
-* audit answer nesting slightly off
+    * on repeated failure response 416, internal response, not relying on assumed parent class
+* hazardous materials cadaster interface if available data allows for it
+* external documents folders/categories to improve overview and administration
+* contextual send/save distinction for submit buttons, optional hoverbutton?
+* markdown email pattern messes up [unpgk links](#external-libraries)
 
 ## Content
 * [Introducion](#introducion)
@@ -6589,7 +6592,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * \> 6k stars
     * \> 1k forks
     * [ASL 2.0 license](https://github.com/mebjas/html5-qrcode?tab=Apache-2.0-1-ov-file)
-    * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
+    * [html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of electronic signatures (SES according to eIDAS without further implementations).
@@ -6650,7 +6653,7 @@ There are **no** dependency install routines for [composer](https://getcomposer.
 * [mermaid charts](https://mermaid.js.org/)
 * [recommendations on documenting software](https://github.com/openregulatory)
 * setting up one of the development environments regarding the local server with proper certificates to Joe <3
-* relentlessly reporting bugs and providing relevant feedback to Dennis and Patric
+* relentlessly reporting bugs and providing relevant feedback to Dennis, Patric and Selina
 
 [Content](#content)
 
