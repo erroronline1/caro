@@ -53,7 +53,7 @@ class PDF{
 		];
 		$customsetup = preg_split('/\D{1,}/', $this->_pageSetup['format']);
 		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
-			$this->_pageSetup['format'] = [$customsetup[0], $customsetup[1]];
+			$this->_pageSetup['format'] = [floatval($customsetup[0]), floatval($customsetup[1])];
 		}
 
 		$this->_sqlinterface = $pdo;
