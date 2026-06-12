@@ -3214,7 +3214,7 @@ Response properties are
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS Composer-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
 ## Request flow
-<!-->```mermaid
+<!--```mermaid
 flowchart TD;
     request((request))-- >api_js(api.js);
     api_js-- >api_php(api.php);
